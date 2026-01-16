@@ -3,6 +3,7 @@
 use App\Http\Controllers\SuperAdmin\DashboardController;
 use App\Http\Controllers\SuperAdmin\InventoryController;
 use App\Http\Controllers\SuperAdmin\StockRequestController;
+use App\Http\Controllers\SuperAdmin\BorrowingController;
 use App\Http\Controllers\SuperAdmin\StockApprovalController;
 use App\Http\Controllers\SuperAdmin\ActivityLogController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,10 @@ Route::get('/inventory/{inventory}/qr/print', [InventoryController::class, 'prin
 // Stock Request Routes
 Route::get('/inventory/{inventory}/stock/request', [StockRequestController::class, 'create'])->name('inventory.stock.request.create');
 Route::post('/inventory/{inventory}/stock/request', [StockRequestController::class, 'store'])->name('inventory.stock.request.store');
+
+// Borrowing Routes
+Route::post('/inventory/{sparepart}/borrow', [BorrowingController::class, 'store'])->name('inventory.borrow.store');
+Route::post('/inventory/borrow/{borrowing}/return', [BorrowingController::class, 'returnItem'])->name('inventory.borrow.return');
 
 // Stock Approval Routes
 Route::get('/stock-approvals', [StockApprovalController::class, 'index'])->name('stock-approvals.index');

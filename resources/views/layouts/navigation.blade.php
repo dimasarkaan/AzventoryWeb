@@ -1,180 +1,261 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-secondary-200">
+<nav x-data="{ mobileMenuOpen: false }" class="glass-nav border-b border-secondary-200">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="flex justify-between h-16">
             <div class="flex">
-                <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    @if(Auth::user()->role === 'superadmin')
-                        <a href="{{ route('superadmin.dashboard') }}" class="text-2xl font-extrabold text-primary-600">Azventory</a>
-                    @elseif(Auth::user()->role === 'admin')
-                        <a href="{{ route('admin.dashboard') }}" class="text-2xl font-extrabold text-primary-600">Azventory</a>
-                    @else
-                        <a href="{{ route('operator.dashboard') }}" class="text-2xl font-extrabold text-primary-600">Azventory</a>
-                    @endif
+                    @php
+                        $dashboardRoute = match(Auth::user()->role) {
+                            'superadmin' => route('superadmin.dashboard'),
+                            'admin' => route('admin.dashboard'),
+                            'operator' => route('operator.dashboard'),
+                            default => route('dashboard'),
+                        };
+                    @endphp
+                    <a href="{{ $dashboardRoute }}" class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary-500/30">
+                            A
+                        </div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
+                            Azventory
+                        </span>
+                    </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-1 sm:-my-px sm:ms-10 sm:flex items-center">
+                    @php
+                        $navClass = "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md transition duration-150 ease-in-out gap-2";
+                        $activeClass = "bg-primary-50 text-primary-700";
+                        $inactiveClass = "text-secondary-600 hover:text-secondary-900 hover:bg-secondary-50";
+                    @endphp
+
                     @if (Auth::user()->role === 'superadmin')
-                        <x-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')">
+                        <a href="{{ route('superadmin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.dashboard') ? $activeClass : $inactiveClass }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                             {{ __('Dashboard') }}
-                        </x-nav-link>
-                        <x-nav-link :href="route('superadmin.inventory.index')" :active="request()->routeIs('superadmin.inventory.*')">
+                        </a>
+                        <a href="{{ route('superadmin.inventory.index') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.inventory.*') ? $activeClass : $inactiveClass }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                             {{ __('Inventaris') }}
-                        </x-nav-link>
-                        <x-nav-link href="#" :active="false">
+                        </a>
+                        <a href="{{ route('superadmin.users.index') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.users.*') ? $activeClass : $inactiveClass }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             {{ __('Pengguna') }}
-                        </x-nav-link>
+                        </a>
+                        <a href="{{ route('superadmin.scan-qr') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.scan-qr') ? $activeClass : $inactiveClass }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                            {{ __('Scan QR') }}
+                        </a>
                     @endif
-                    {{-- Add other roles navigation here if needed --}}
+                    
+                     @if (Auth::user()->role === 'admin')
+                        <a href="{{ route('admin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('admin.dashboard') ? $activeClass : $inactiveClass }}">
+                            Dashboard
+                        </a>
+                     @endif
+                     
+                     @if (Auth::user()->role === 'operator')
+                        <a href="{{ route('operator.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('operator.dashboard') ? $activeClass : $inactiveClass }}">
+                            Dashboard
+                        </a>
+                     @endif
                 </div>
             </div>
 
-            <!-- Notifications Dropdown -->
-            <div x-data="{
-                open: false,
-                unreadCount: {{ auth()->user()->unreadNotifications()->count() }},
-                notifications: [],
-                init() {
-                    this.fetchNotifications();
-                    window.Echo.private('App.Models.User.{{ auth()->id() }}')
-                        .notification((notification) => {
-                            this.unreadCount++;
-                            this.notifications.unshift(notification);
-                            console.log(notification);
-                        });
-                },
-                fetchNotifications() {
-                    axios.get('{{ route('notifications.index') }}')
-                        .then(response => {
-                            this.notifications = response.data;
-                        });
-                },
-                markAsRead(notification, event) {
-                    event.preventDefault();
-                    axios.patch(`/notifications/${notification.id}/read`).then(() => {
-                        window.location.href = notification.data.url;
-                    });
-                }
-            }" class="hidden sm:flex sm:items-center sm:ms-6">
-                <div class="relative">
-                    <button @click="open = !open" class="relative p-2 text-secondary-500 hover:text-secondary-700 focus:outline-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-                        <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-1 right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full"></span>
+            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-3">
+                <!-- Notifications Dropdown -->
+                <div x-data="{ 
+                    notificationOpen: false, 
+                    unreadCount: {{ auth()->user()->unreadNotifications()->count() }},
+                    notifications: [],
+                    init() { this.fetchNotifications(); },
+                    fetchNotifications() {
+                        axios.get('/notifications')
+                            .then(response => {
+                                this.notifications = response.data;
+                                this.unreadCount = this.notifications.length;
+                            })
+                            .catch(error => console.error(error));
+                    },
+                    markAsRead(id, url) {
+                         axios.patch('/notifications/' + id + '/read')
+                            .then(response => {
+                                if (response.data.url) window.location.href = response.data.url;
+                                else if (url) window.location.href = url;
+                                else this.fetchNotifications();
+                            })
+                            .catch(error => console.error(error));
+                    }
+                }" class="relative">
+                    <button @click="notificationOpen = !notificationOpen" class="relative p-2 text-secondary-500 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none transition-all duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]"></span>
                     </button>
 
-                    <div x-show="open" @click.away="open = false"
+                    <div x-show="notificationOpen" @click.away="notificationOpen = false"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="transform opacity-0 scale-95"
                          x-transition:enter-end="transform opacity-100 scale-100"
                          x-transition:leave="transition ease-in duration-75"
                          x-transition:leave-start="transform opacity-100 scale-100"
                          x-transition:leave-end="transform opacity-0 scale-95"
-                         class="absolute right-0 z-50 mt-2 w-80 rounded-md shadow-lg origin-top-right" style="display: none;">
-                        <div class="rounded-md ring-1 ring-black ring-opacity-5 bg-white">
-                            <div class="p-4 font-semibold border-b">Notifikasi</div>
-                            <div class="py-1 max-h-96 overflow-y-auto">
+                         class="absolute right-0 z-50 mt-2 w-80 rounded-xl shadow-floating bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden" style="display: none;">
+                        <div class="py-2">
+                            <div class="px-4 py-2 border-b border-secondary-100 font-semibold text-secondary-800 flex justify-between items-center bg-secondary-50/50">
+                                <span>Notifikasi</span>
+                                <a href="{{ route('notifications.index') }}" class="text-xs text-primary-600 hover:text-primary-800 font-medium">Lihat Semua</a>
+                            </div>
+                            <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
                                 <template x-if="notifications.length > 0">
                                     <template x-for="notification in notifications" :key="notification.id">
-                                        <a :href="notification.data.url" @click="markAsRead(notification, $event)" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">
-                                            <p x-text="notification.data.message"></p>
-                                            <p class="text-xs text-gray-500 mt-1" x-text="new Date(notification.created_at).toLocaleString('id-ID')"></p>
-                                        </a>
+                                        <div @click="markAsRead(notification.id, notification.data.url)" class="cursor-pointer block px-4 py-3 hover:bg-secondary-50 border-b border-secondary-50 last:border-0 transition duration-150 group">
+                                            <div class="flex gap-3">
+                                                <div class="flex-shrink-0 mt-1">
+                                                     <div class="w-2 h-2 rounded-full bg-primary-500"></div>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors" x-text="notification.data.title || 'Notifikasi Baru'"></p>
+                                                    <p class="text-xs text-secondary-500 line-clamp-2 mt-0.5" x-text="notification.data.message"></p>
+                                                    <p class="text-[10px] text-secondary-400 mt-1" x-text="new Date(notification.created_at).toLocaleString('id-ID')"></p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </template>
                                 </template>
                                 <template x-if="notifications.length === 0">
-                                    <div class="px-4 py-3 text-sm text-gray-500">Tidak ada notifikasi baru.</div>
+                                    <div class="px-4 py-8 text-center text-sm text-secondary-500 flex flex-col items-center">
+                                        <svg class="w-8 h-8 text-secondary-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                        Tidak ada notifikasi baru.
+                                    </div>
                                 </template>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-secondary-500 bg-white hover:text-secondary-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
-
-                            <div class="ms-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                <!-- Settings Dropdown -->
+            <div x-data="{ profileOpen: false }" class="relative">
+                <button @click="profileOpen = !profileOpen" class="inline-flex items-center gap-3 px-1 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-secondary-500 hover:text-secondary-700 focus:outline-none transition ease-in-out duration-150 group">
+                    <div class="flex flex-col items-end hidden md:flex text-right">
+                        <span class="font-bold text-secondary-800 text-sm group-hover:text-primary-600 transition-colors">{{ Auth::user()->name }}</span>
+                        <span class="text-xs text-secondary-500 font-normal">{{ ucfirst(Auth::user()->role) }}</span>
+                    </div>
+                    <div class="h-9 w-9 rounded-full overflow-hidden border-2 border-secondary-200 group-hover:border-primary-200 transition-colors shadow-sm relative">
+                         @if(Auth::user()->avatar)
+                            <img class="h-full w-full object-cover" src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" />
+                         @else
+                            <div class="h-full w-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
+                                {{ substr(Auth::user()->name, 0, 1) }}
                             </div>
-                        </button>
-                    </x-slot>
-
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profil') }}
-                        </x-dropdown-link>
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Keluar') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-secondary-400 hover:text-secondary-500 hover:bg-secondary-100 focus:outline-none focus:bg-secondary-100 focus:text-secondary-500 transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                         @endif
+                    </div>
                 </button>
+
+                <div x-show="profileOpen" @click.away="profileOpen = false"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl shadow-floating bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden" 
+                     style="display: none;">
+                    
+                    <div class="px-4 py-3 border-b border-secondary-100 bg-secondary-50/50">
+                        <p class="text-sm font-semibold text-secondary-900">Akun Saya</p>
+                        <p class="text-xs text-secondary-500 truncate" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</p>
+                    </div>
+                    
+                    <div class="py-1">
+                        <x-dropdown-link :href="route('profile.edit')" class="flex items-center gap-2 group">
+                             <svg class="w-4 h-4 text-secondary-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            {{ __('Profil Saya') }}
+                        </x-dropdown-link>
+                    </div>
+
+                    <div class="border-t border-secondary-100 my-1"></div>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-dropdown-link :href="route('logout')"
+                                onclick="event.preventDefault(); this.closest('form').submit();" 
+                                class="text-danger-600 hover:bg-danger-50 hover:text-danger-700 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            {{ __('Keluar') }}
+                        </x-dropdown-link>
+                    </form>
+                </div>
             </div>
         </div>
+
+        <!-- Hamburger -->
+        <div class="-me-2 flex items-center sm:hidden absolute right-4 top-4">
+            <button @click="mobileMenuOpen = ! mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-secondary-500 hover:text-secondary-900 hover:bg-secondary-100 focus:outline-none focus:bg-secondary-100 focus:text-secondary-900 transition duration-150 ease-in-out">
+                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                    <path :class="{'hidden': mobileMenuOpen, 'inline-flex': ! mobileMenuOpen }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    <path :class="{'hidden': ! mobileMenuOpen, 'inline-flex': mobileMenuOpen }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+    </div>
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+    <div x-show="mobileMenuOpen" style="display: none;" class="sm:hidden bg-white border-t border-secondary-100">
         <div class="pt-2 pb-3 space-y-1">
+             @php
+                $resNavClass = "block w-full ps-3 pe-4 py-2 border-l-4 text-start text-base font-medium transition duration-150 ease-in-out";
+                $resActiveClass = "border-primary-400 text-primary-700 bg-primary-50 focus:outline-none focus:text-primary-800 focus:bg-primary-100 focus:border-primary-700";
+                $resInactiveClass = "border-transparent text-secondary-600 hover:text-secondary-800 hover:bg-secondary-50 hover:border-secondary-300 focus:outline-none focus:text-secondary-800 focus:bg-secondary-50 focus:border-secondary-300";
+            @endphp
+
             @if (Auth::user()->role === 'superadmin')
-                <x-responsive-nav-link :href="route('superadmin.dashboard')" :active="request()->routeIs('superadmin.dashboard')">
+                <a href="{{ route('superadmin.dashboard') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.dashboard') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('Dashboard') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('superadmin.inventory.index')" :active="request()->routeIs('superadmin.inventory.*')">
+                </a>
+                <a href="{{ route('superadmin.inventory.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.inventory.*') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('Inventaris') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link href="#" :active="false">
+                </a>
+                <a href="{{ route('superadmin.users.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.users.*') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('Pengguna') }}
-                </x-responsive-nav-link>
+                </a>
+                 <a href="{{ route('superadmin.scan-qr') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.scan-qr') ? $resActiveClass : $resInactiveClass }}">
+                    {{ __('Scan QR') }}
+                </a>
             @endif
+
+            <a href="{{ route('notifications.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('notifications.index') ? $resActiveClass : $resInactiveClass }} flex justify-between items-center">
+                {{ __('Notifikasi') }}
+                @if(auth()->user()->unreadNotifications()->count() > 0)
+                    <span class="bg-danger-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        {{ auth()->user()->unreadNotifications()->count() }}
+                    </span>
+                @endif
+            </a>
         </div>
 
         <!-- Responsive Settings Options -->
-        <div class="pt-4 pb-1 border-t border-secondary-200">
-            <div class="px-4">
-                <div class="font-medium text-base text-secondary-800">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-secondary-500">{{ Auth::user()->email }}</div>
+        <div class="pt-4 pb-4 border-t border-secondary-100 bg-secondary-50/50">
+            <div class="px-4 flex items-center gap-3">
+                 <div class="h-10 w-10 rounded-full overflow-hidden border border-secondary-300">
+                    <img class="h-full w-full object-cover" src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" />
+                </div>
+                <div>
+                    <div class="font-medium text-base text-secondary-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-secondary-500">{{ Auth::user()->email }}</div>
+                </div>
             </div>
 
             <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">
+                <a href="{{ route('profile.edit') }}" class="{{ $resNavClass }} {{ $resInactiveClass }}">
                     {{ __('Profil') }}
-                </x-responsive-nav-link>
-
-                <!-- Authentication -->
+                </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="{{ $resNavClass }} {{ $resInactiveClass }} text-danger-600">
                         {{ __('Keluar') }}
-                    </x-responsive-nav-link>
+                    </a>
                 </form>
             </div>
         </div>

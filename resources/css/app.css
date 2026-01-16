@@ -3,7 +3,109 @@
 @tailwind utilities;
 
 @layer components {
+    html {
+        @apply overflow-y-scroll;
+    }
+
     body {
-        @apply font-sans bg-gray-50 text-gray-900 antialiased;
+        @apply font-sans bg-background text-secondary-900 antialiased;
+    }
+
+    /* --- Buttons --- */
+    .btn {
+        @apply inline-flex items-center px-4 py-2 border border-transparent rounded-lg font-medium text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+    }
+
+    .btn-primary {
+        @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm hover:shadow-md active:transform active:scale-95;
+    }
+
+    .btn-secondary {
+        @apply bg-white text-secondary-700 border-secondary-300 hover:bg-secondary-50 focus:ring-primary-500 shadow-sm;
+    }
+
+    .btn-danger {
+        @apply bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500 shadow-sm;
+    }
+
+    .btn-ghost {
+        @apply text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 border-transparent shadow-none;
+    }
+
+    /* --- Cards --- */
+    .card {
+        @apply bg-surface rounded-xl border border-secondary-200 shadow-card overflow-hidden;
+    }
+
+    .card-header {
+        @apply px-6 py-4 border-b border-secondary-100 bg-white flex justify-between items-center;
+    }
+
+    .card-body {
+        @apply p-6;
+    }
+
+    /* --- Inputs --- */
+    .input-field {
+        @apply w-full rounded-lg border-secondary-300 text-secondary-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-colors duration-200;
+    }
+
+    .input-label {
+        @apply block font-medium text-sm text-secondary-700 mb-1;
+    }
+
+    /* --- Tables --- */
+    .table-container {
+        @apply overflow-x-auto rounded-xl border border-secondary-200 shadow-soft bg-white;
+    }
+
+    .table-modern {
+        @apply w-full text-left text-sm text-secondary-600;
+    }
+
+    .table-modern thead {
+        @apply bg-secondary-50 text-xs uppercase text-secondary-500 font-semibold tracking-wider;
+    }
+
+    .table-modern th {
+        @apply px-6 py-3 border-b border-secondary-200;
+    }
+
+    .table-modern td {
+        @apply px-6 py-4 border-b border-secondary-100 whitespace-nowrap transition-colors;
+    }
+
+    .table-modern tr:hover td {
+        @apply bg-secondary-50/50;
+    }
+
+    /* --- Badges --- */
+    .badge {
+        @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border;
+    }
+
+    .badge-primary {
+        @apply bg-primary-50 text-primary-700 border-primary-100;
+    }
+
+    .badge-success {
+        @apply bg-success-50 text-success-700 border-success-100;
+    }
+
+    .badge-warning {
+        @apply bg-warning-50 text-warning-700 border-warning-100;
+    }
+
+    .badge-danger {
+        @apply bg-danger-50 text-danger-700 border-danger-100;
+    }
+
+    .badge-gray {
+        @apply bg-secondary-100 text-secondary-800 border-secondary-200;
+    }
+
+    /* --- Utilities --- */
+    .glass-nav {
+        @apply bg-white/80 backdrop-blur-md border-b border-secondary-200 sticky top-0 z-[100];
     }
 }

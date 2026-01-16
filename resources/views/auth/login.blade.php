@@ -1,76 +1,81 @@
 <x-guest-layout>
-    <div class="w-full sm:max-w-md">
-        <x-card>
-            <x-slot name="header">
-                {{ __('Masuk ke Akun Anda') }}
-            </x-slot>
+    <div class="space-y-6">
+        <div class="text-center lg:text-left">
+            <h3 class="text-2xl font-bold text-secondary-900">Selamat Datang Kembali!</h3>
+            <p class="text-secondary-500 mt-2">Masuk untuk mengelola inventaris Anda.</p>
+        </div>
 
-            <!-- Session Status -->
-            <x-auth-session-status class="mb-4" :status="session('status')" />
+        <form method="POST" action="{{ route('login') }}" class="space-y-5">
+            @csrf
 
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
+            <!-- Login Field -->
+            <div>
+                <label for="login" class="input-label">Username atau Email</label>
+                <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autofocus tabindex="1">
+                <x-input-error :messages="$errors->get('login')" class="mt-2" />
+            </div>
 
-                <!-- Login Field (Username or Email) -->
-                <div>
-                    <x-input-label for="login" :value="__('Username atau Email')" />
-                    <x-text-input id="login" class="block mt-1 w-full" type="text" name="login" :value="old('login')" required autofocus />
-                    <x-input-error :messages="$errors->get('login')" class="mt-2" />
-                </div>
-
-                <!-- Password -->
-                <div class="mt-4">
-                    <x-input-label for="password" :value="__('Kata Sandi')" />
-                    <div class="relative">
-                        <x-text-input id="password" class="block mt-1 w-full pe-10"
-                                        type="password"
-                                        name="password"
-                                        required autocomplete="current-password" />
-                        <button type="button" id="togglePassword" class="absolute inset-y-0 end-0 flex items-center pe-3 text-secondary-500">
-                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                            <svg id="eye-off-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>
-                        </button>
-                    </div>
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                </div>
-
-                <!-- Remember Me -->
-                <div class="block mt-4">
-                    <label for="remember_me" class="inline-flex items-center">
-                        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500" name="remember">
-                        <span class="ms-2 text-sm text-gray-600">{{ __('Ingat saya') }}</span>
-                    </label>
-                </div>
-
-                <div class="flex items-center justify-between mt-4">
+            <!-- Password -->
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label for="password" class="input-label mb-0">Kata Sandi</label>
                     @if (Route::has('password.request'))
-                        <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" href="{{ route('password.request') }}">
-                            {{ __('Lupa kata sandi?') }}
+                        <a href="{{ route('password.request') }}" class="text-xs font-medium text-primary-600 hover:text-primary-500 transition-colors" tabindex="4">
+                            Lupa Kata Sandi?
                         </a>
                     @endif
-
-                    <x-button type="submit" variant="primary" class="ms-3">
-                        {{ __('Masuk') }}
-                    </x-button>
                 </div>
-            </form>
-        </x-card>
+                <div class="relative">
+                    <input id="password" type="password" name="password" class="input-field w-full pr-10" required autocomplete="current-password" tabindex="2">
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-secondary-600 focus:outline-none" tabindex="-1">
+                        <svg id="eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <svg id="eye-off-icon" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                    </button>
+                </div>
+                <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            </div>
+
+            <!-- Remember Me -->
+            <div class="block">
+                <label for="remember_me" class="inline-flex items-center group cursor-pointer">
+                    <input id="remember_me" type="checkbox" name="remember" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition duration-150 ease-in-out cursor-pointer" tabindex="3">
+                    <span class="ml-2 text-sm text-secondary-600 group-hover:text-secondary-800 transition-colors">{{ __('Ingat saya di perangkat ini') }}</span>
+                </label>
+            </div>
+
+            <button type="submit" class="w-full btn btn-primary justify-center py-3 text-base shadow-lg shadow-primary-500/20" tabindex="3">
+                {{ __('Masuk Sekarang') }}
+            </button>
+
+            <div class="text-center mt-6">
+                <a href="/" class="text-sm font-medium text-secondary-500 hover:text-primary-600 transition-colors inline-flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    Kembali ke Beranda
+                </a>
+            </div>
+        </form>
     </div>
 
     <script>
-        const togglePassword = document.getElementById('togglePassword');
-        const password = document.getElementById('password');
-        const eyeIcon = document.getElementById('eye-icon');
-        const eyeOffIcon = document.getElementById('eye-off-icon');
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById('password');
+            var eyeIcon = document.getElementById('eye-icon');
+            var eyeOffIcon = document.getElementById('eye-off-icon');
 
-        togglePassword.addEventListener('click', function (e) {
-            // toggle the type attribute
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            
-            // toggle the eye slash icon
-            eyeIcon.classList.toggle('hidden');
-            eyeOffIcon.classList.toggle('hidden');
-        });
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.add('hidden');
+                eyeOffIcon.classList.remove('hidden');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('hidden');
+                eyeOffIcon.classList.add('hidden');
+            }
+        }
     </script>
 </x-guest-layout>

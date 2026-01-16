@@ -32,8 +32,8 @@ class DashboardController extends Controller
 
         // New Dashboard Data
         $pendingApprovalsCount = StockLog::where('status', 'pending')->count();
-        $lowStockItems = Sparepart::whereColumn('stock', '<=', 'minimum_stock')->where('minimum_stock', '>', 0)->get();
-        $recentActivities = ActivityLog::with('user')->latest()->take(5)->get();
+        $lowStockItems = Sparepart::whereColumn('stock', '<=', 'minimum_stock')->get();
+        $recentActivities = ActivityLog::with('user')->latest()->take(3)->get();
 
         return view('superadmin.dashboard', compact(
             'totalSpareparts',
