@@ -34,11 +34,11 @@ class User extends Authenticatable
     /**
      * Get the user's avatar URL.
      */
-    protected function avatar(): \Illuminate\Database\Eloquent\Casts\Attribute
+    protected function avatarUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(
-            get: fn ($value) => $value 
-                ? asset('storage/' . $value) 
+            get: fn () => $this->avatar 
+                ? asset('storage/' . $this->avatar) 
                 : 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF',
         );
     }

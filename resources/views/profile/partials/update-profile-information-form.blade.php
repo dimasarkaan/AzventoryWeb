@@ -13,7 +13,7 @@
                 <label for="avatar" class="block text-sm font-medium text-secondary-700">Foto Profil</label>
                 <div class="mt-2 flex items-center gap-x-3">
                     @if($user->avatar)
-                        <img class="h-16 w-16 rounded-full object-cover ring-2 ring-secondary-200" src="{{ $user->avatar }}" alt="{{ $user->name }}" />
+                        <img class="h-16 w-16 rounded-full object-cover ring-2 ring-secondary-200" src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" />
                     @else
                         <div class="h-16 w-16 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-2xl ring-2 ring-secondary-200">
                             {{ substr($user->name, 0, 1) }}

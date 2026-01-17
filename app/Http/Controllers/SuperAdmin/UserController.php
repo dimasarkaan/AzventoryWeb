@@ -29,6 +29,9 @@ class UserController extends Controller
             $q->where('role', $request->role);
         });
 
+        // Exclude Current User
+        $query->where('id', '!=', auth()->id());
+
         $users = $query->latest()->paginate(10)->withQueryString();
         
         return view('superadmin.users.index', compact('users'));

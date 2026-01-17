@@ -143,7 +143,7 @@
                     </div>
                     <div class="h-9 w-9 rounded-full overflow-hidden border-2 border-secondary-200 group-hover:border-primary-200 transition-colors shadow-sm relative">
                          @if(Auth::user()->avatar)
-                            <img class="h-full w-full object-cover" src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" />
+                            <img class="h-full w-full object-cover" src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" />
                          @else
                             <div class="h-full w-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
                                 {{ substr(Auth::user()->name, 0, 1) }}
@@ -239,7 +239,7 @@
         <div class="pt-4 pb-4 border-t border-secondary-100 bg-secondary-50/50">
             <div class="px-4 flex items-center gap-3">
                  <div class="h-10 w-10 rounded-full overflow-hidden border border-secondary-300">
-                    <img class="h-full w-full object-cover" src="{{ Auth::user()->avatar }}" alt="{{ Auth::user()->name }}" />
+                    <img class="h-full w-full object-cover" src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" />
                 </div>
                 <div>
                     <div class="font-medium text-base text-secondary-800">{{ Auth::user()->name }}</div>

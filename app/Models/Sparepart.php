@@ -24,6 +24,7 @@ class Sparepart extends Model
         'unit',
         'status',
         'image',
+        'qr_code_path',
     ];
     public function stockLogs()
     {

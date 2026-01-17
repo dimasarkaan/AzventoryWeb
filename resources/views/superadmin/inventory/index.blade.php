@@ -1,6 +1,44 @@
 <x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Flash Messages -->
+            @if(session('success'))
+                <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 bg-success-50 border-l-4 border-success-500 p-4 rounded-md shadow-sm relative">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-success-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-success-800">{{ session('success') }}</p>
+                        </div>
+                        <button @click="show = false" class="text-success-500 hover:text-success-700 focus:outline-none">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 bg-danger-50 border-l-4 border-danger-500 p-4 rounded-md shadow-sm relative">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <svg class="h-6 w-6 text-danger-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <p class="text-sm font-medium text-danger-800">{{ session('error') }}</p>
+                        </div>
+                        <button @click="show = false" class="text-danger-500 hover:text-danger-700 focus:outline-none">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            @endif
             <!-- Header -->
             <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>

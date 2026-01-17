@@ -160,8 +160,23 @@
 
                                     <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                                    <div x-show="stockModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                                        <form action="{{ route('superadmin.inventory.stock.request.store', $sparepart) }}" method="POST">
+                                    <div x-show="stockModalOpen" 
+                                         x-data="{ 
+                                            type: 'masuk', 
+                                            quantity: '', 
+                                            reason: '', 
+                                            currentStock: {{ $sparepart->stock }},
+                                            get isValid() {
+                                                return this.quantity > 0 && 
+                                                       this.reason.trim() !== '' && 
+                                                       (this.type === 'masuk' || (this.type === 'keluar' && this.quantity <= this.currentStock));
+                                            },
+                                            get isStockError() {
+                                                return this.type === 'keluar' && this.quantity > this.currentStock;
+                                            }
+                                         }"
+                                         x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                                        <form action="{{ route('superadmin.inventory.stock.request.store', $sparepart) }}" method="POST" novalidate>
                                             @csrf
                                             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                                 <div class="sm:flex sm:items-start">
@@ -174,36 +189,40 @@
                                                         </h3>
                                                         <div class="mt-4 space-y-4">
                                                             <div>
-                                                                <label class="block text-sm font-medium text-gray-700">Tipe Perubahan</label>
+                                                                <label class="block text-sm font-medium text-gray-700">Tipe Perubahan <span class="text-danger-500">*</span></label>
                                                                 <div class="mt-2 grid grid-cols-2 gap-3">
-                                                                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none">
-                                                                        <input type="radio" name="type" value="masuk" class="peer sr-only" required checked>
-                                                                        <div class="w-full text-center peer-checked:text-primary-600">
-                                                                            <span class="block text-sm font-medium">Stok Masuk (+)</span>
+                                                                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
+                                                                        <input type="radio" name="type" value="masuk" x-model="type" class="peer sr-only">
+                                                                        <div class="w-full text-center peer-checked:text-primary-600 font-medium text-gray-500">
+                                                                            <span class="block text-sm">Stok Masuk (+)</span>
                                                                         </div>
-                                                                        <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-primary-500 pointer-events-none"></div>
+                                                                        <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-primary-500 pointer-events-none transition-all"></div>
                                                                     </label>
-                                                                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none">
-                                                                        <input type="radio" name="type" value="keluar" class="peer sr-only" required>
-                                                                         <div class="w-full text-center peer-checked:text-danger-600">
-                                                                            <span class="block text-sm font-medium">Stok Keluar (-)</span>
+                                                                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
+                                                                        <input type="radio" name="type" value="keluar" x-model="type" class="peer sr-only">
+                                                                         <div class="w-full text-center peer-checked:text-danger-600 font-medium text-gray-500">
+                                                                            <span class="block text-sm">Stok Keluar (-)</span>
                                                                         </div>
-                                                                         <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-danger-500 pointer-events-none"></div>
+                                                                         <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-danger-500 pointer-events-none transition-all"></div>
                                                                     </label>
                                                                 </div>
                                                             </div>
                                                             
                                                             <div>
-                                                                <label for="quantity" class="block text-sm font-medium text-gray-700">Jumlah</label>
+                                                                <label for="quantity" class="block text-sm font-medium text-gray-700">Jumlah <span class="text-danger-500">*</span></label>
                                                                 <div class="relative mt-1 rounded-md shadow-sm">
-                                                                    <input type="number" name="quantity" id="quantity" min="1" class="form-input block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: 10" required>
+                                                                    <input type="number" name="quantity" id="quantity" x-model="quantity" min="1" class="form-input block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: 10">
                                                                 </div>
+                                                                <p x-show="isStockError" x-transition class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                                    Jumlah melebihi stok tersedia ({{ $sparepart->stock }}).
+                                                                </p>
                                                             </div>
 
                                                             <div>
-                                                                <label for="reason" class="block text-sm font-medium text-gray-700">Alasan</label>
+                                                                <label for="reason" class="block text-sm font-medium text-gray-700">Alasan <span class="text-danger-500">*</span></label>
                                                                 <div class="mt-1">
-                                                                    <textarea name="reason" id="reason" rows="3" class="form-textarea block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: Barang rusak, Stok opname, Pembelian baru..." required></textarea>
+                                                                    <textarea name="reason" id="reason" x-model="reason" rows="3" class="form-textarea block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: Barang rusak, Stok opname, Pembelian baru..."></textarea>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -211,7 +230,10 @@
                                                 </div>
                                             </div>
                                             <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                                <button type="submit" 
+                                                        :disabled="!isValid"
+                                                        :class="{ 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400': !isValid, 'bg-primary-600 hover:bg-primary-700': isValid }"
+                                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm transition-all">
                                                     Simpan
                                                 </button>
                                                 <button type="button" @click="stockModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">

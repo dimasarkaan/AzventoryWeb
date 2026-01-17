@@ -110,7 +110,7 @@ class InventoryController extends Controller
         App::setLocale('id');
         $request->validate([
             'name' => 'required|string|max:255',
-            'part_number' => 'required|string|max:255|unique:spareparts',
+            'part_number' => 'required|string|max:255',
             'brand' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'location' => 'required|string|max:255',
@@ -130,6 +130,15 @@ class InventoryController extends Controller
         // Handle Image Upload
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('spareparts', 'public');
+        } elseif ($request->filled('existing_image')) {
+            // Copy existing image to a new file to avoid deletion issues/sharing constraint
+            $existingPath = $request->existing_image;
+            if (Storage::disk('public')->exists($existingPath)) {
+                $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
+                $newPath = 'spareparts/' . \Illuminate\Support\Str::random(40) . '.' . $extension;
+                Storage::disk('public')->copy($existingPath, $newPath);
+                $data['image'] = $newPath;
+            }
         }
 
         $sparepart = Sparepart::create($data);
@@ -144,6 +153,20 @@ class InventoryController extends Controller
         Storage::disk('public')->put($qrCodePath, $qrCodeOutput);
 
         $sparepart->update(['qr_code_path' => $qrCodePath]);
+
+        // Log Initial Stock if > 0
+        if ($sparepart->stock > 0) {
+            \App\Models\StockLog::create([
+                'sparepart_id' => $sparepart->id,
+                'user_id' => auth()->id(),
+                'type' => 'masuk',
+                'quantity' => $sparepart->stock,
+                'reason' => 'Stok awal (Item baru)',
+                'status' => 'approved',
+                'approved_by' => auth()->id(),
+                'approved_at' => now(),
+            ]);
+        }
 
         $this->logActivity('Sparepart Dibuat', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah ditambahkan.");
 
@@ -179,7 +202,7 @@ class InventoryController extends Controller
         App::setLocale('id');
         $request->validate([
             'name' => 'required|string|max:255',
-            'part_number' => 'required|string|max:255|unique:spareparts,part_number,' . $inventory->id,
+            'part_number' => 'required|string|max:255',
             'brand' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'location' => 'required|string|max:255',
@@ -226,6 +249,12 @@ class InventoryController extends Controller
             $inventory->update(['qr_code_path' => $newQrCodePath]);
         }
 
+        // Check for Low Stock Notification
+        if ($inventory->minimum_stock > 0 && $inventory->stock <= $inventory->minimum_stock && $inventory->wasChanged('stock')) {
+            $admins = \App\Models\User::whereIn('role', ['superadmin', 'admin'])->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\LowStockNotification($inventory));
+        }
+
         $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$inventory->name}' (PN: {$inventory->part_number}) telah diperbarui.");
 
         return redirect()->route('superadmin.inventory.index')
@@ -269,5 +298,28 @@ class InventoryController extends Controller
         }
 
         return view('superadmin.inventory.qr_print', ['sparepart' => $inventory]);
+    }
+    public function checkPartNumber(Request $request)
+    {
+        $partNumber = $request->query('part_number');
+        $sparepart = Sparepart::where('part_number', $partNumber)->first();
+
+        if ($sparepart) {
+            return response()->json([
+                'exists' => true,
+                'data' => [
+                    'name' => $sparepart->name,
+                    'brand' => $sparepart->brand,
+                    'category' => $sparepart->category,
+                    'type' => $sparepart->type,
+                    'unit' => $sparepart->unit,
+                    'price' => $sparepart->price,
+                    'image_url' => $sparepart->image ? Storage::url($sparepart->image) : null,
+                    'image_path' => $sparepart->image, // Return raw path for backend copying logic if needed
+                ]
+            ]);
+        }
+
+        return response()->json(['exists' => false]);
     }
 }

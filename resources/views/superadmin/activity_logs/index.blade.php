@@ -1,14 +1,89 @@
 <x-app-layout>
     <div class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Header -->
-            <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ showFilters: false }">
+            <!-- Header & Actions -->
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('Log Aktivitas Sistem') }}
                     </h2>
                     <p class="mt-1 text-sm text-secondary-500">Riwayat aktivitas pengguna dan perubahan data dalam sistem.</p>
                 </div>
+                
+                <button @click="showFilters = !showFilters" 
+                        class="btn btn-secondary flex items-center gap-2"
+                        :class="{ 'bg-secondary-100 ring-2 ring-secondary-200': showFilters }">
+                    <svg class="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                    <span>Filter & Pencarian</span>
+                    <svg class="w-4 h-4 text-secondary-400 transition-transform duration-200" :class="{ 'rotate-180': showFilters }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+            </div>
+
+            <!-- Collabsible Filter Section -->
+            <div x-show="showFilters" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                 class="mb-6"
+                 style="display: none;">
+                 
+                <form action="{{ route('superadmin.activity-logs.index') }}" method="GET" class="card p-6 border border-secondary-200 shadow-lg">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+                        <div class="space-y-1">
+                            <label for="start_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Dari Tanggal</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </span>
+                                <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" 
+                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label for="end_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Sampai Tanggal</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                </span>
+                                <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}" 
+                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label for="user_id" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Pengguna</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                </span>
+                                <select name="user_id" id="user_id" class="form-select pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                    <option value="">Semua User</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
+                                            {{ $user->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-2">
+                             <button type="submit" class="btn btn-primary w-full justify-center flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                Terapkan
+                            </button>
+                            @if(request()->hasAny(['start_date', 'end_date', 'user_id']))
+                                <a href="{{ route('superadmin.activity-logs.index') }}" class="btn btn-secondary w-full justify-center">
+                                    Reset
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </form>
             </div>
 
             <!-- Desktop Table View -->
