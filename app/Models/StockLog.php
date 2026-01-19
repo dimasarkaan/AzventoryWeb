@@ -15,4 +15,9 @@ class StockLog extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function sparepart()
+    {
+        return $this->belongsTo(Sparepart::class);
+    }
 }

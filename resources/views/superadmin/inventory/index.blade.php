@@ -47,13 +47,101 @@
                     </h2>
                     <p class="mt-1 text-sm text-secondary-500">Kelola semua data sparepart, stok, dan lokasi.</p>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-3" x-data="{ reportModalOpen: false }" @keydown.escape.window="reportModalOpen = false">
+                    <!-- Export Button -->
+                    <button @click="reportModalOpen = true" class="btn btn-secondary flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Export Data
+                    </button>
+
                     <a href="{{ route('superadmin.inventory.create') }}" class="btn btn-primary flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         {{ __('Tambah Item') }}
                     </a>
+
+                    <!-- Report Modal -->
+                    <div x-show="reportModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+                        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                            <div x-show="reportModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity" aria-hidden="true">
+                                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                            </div>
+                            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                            <div x-show="reportModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                    <div class="sm:flex sm:items-start">
+                                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 sm:mx-0 sm:h-10 sm:w-10">
+                                            <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        </div>
+                                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                                Download Laporan
+                                            </h3>
+                                            <div class="mt-2 text-sm text-gray-500">
+                                                Pilih jenis laporan dan periode waktu yang diinginkan.
+                                            </div>
+                                            <form id="reportForm" action="{{ route('superadmin.reports.download') }}" method="GET" class="mt-4 space-y-4" x-data="{ type: 'inventory_list', period: 'all' }">
+                                                <!-- Report Type -->
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700">Jenis Laporan</label>
+                                                    <select name="report_type" x-model="type" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
+                                                        <option value="inventory_list">Data Inventaris (Stok Saat Ini)</option>
+                                                        <option value="stock_mutation">Riwayat Stok (Masuk/Keluar)</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Period -->
+                                                <div x-show="type === 'stock_mutation'">
+                                                    <label class="block text-sm font-medium text-gray-700">Periode</label>
+                                                    <select name="period" x-model="period" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
+                                                        <option value="all">Semua Riwayat</option>
+                                                        <option value="this_month">Bulan Ini</option>
+                                                        <option value="last_month">Bulan Lalu</option>
+                                                        <option value="this_year">Tahun Ini</option>
+                                                        <option value="last_year">Tahun Lalu</option>
+                                                        <option value="custom">Kustom (Pilih Tanggal)</option>
+                                                    </select>
+                                                </div>
+
+                                                <!-- Location Filter -->
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-700">Lokasi</label>
+                                                    <select name="location" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
+                                                        <option value="all">Semua Lokasi</option>
+                                                        @foreach($locations as $loc)
+                                                            <option value="{{ $loc }}">{{ $loc }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+
+                                                <!-- Custom Date Range -->
+                                                <div x-show="type === 'stock_mutation' && period === 'custom'" class="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-700">Dari Tanggal</label>
+                                                        <input type="date" name="start_date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-700">Sampai Tanggal</label>
+                                                        <input type="date" name="end_date" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                                    <button type="submit" form="reportForm" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
+                                        Download PDF
+                                    </button>
+                                    <button @click="reportModalOpen = false" type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                                        Batal
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                </div>
 
             <!-- Filters & Search -->
             <div class="mb-4 card p-4">
@@ -114,23 +202,23 @@
                     <table class="table-modern w-full table-fixed">
                         <thead>
                             <tr>
-                                <th class="w-[25%]">Nama Sparepart</th>
-                                <th class="w-[15%]">Merk</th>
-                                <th class="w-[15%]">Kategori</th>
-                                <th class="w-[10%]">Warna</th>
-                                <th class="w-[10%]">Lokasi</th>
-                                <th class="w-[10%]">Stok</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[20%]">Nama Sparepart</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">Merk</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">Kategori</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">Warna</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">Lokasi</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">Stok</th>
                                 <!-- Removed Status Header -->
-                                <th class="text-right w-[15%]">Aksi</th>
+                                <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($spareparts as $sparepart)
                                 <tr class="group hover:bg-secondary-50 transition-colors">
-                                    <td>
+                                    <td class="px-4 py-3">
                                         <div class="flex items-center gap-3">
                                             <!-- Status Indicator -->
-                                            <div class="w-2 h-2 rounded-full flex-shrink-0 {{ $sparepart->status === 'aktif' ? 'bg-success-500' : 'bg-danger-500' }}" title="{{ ucfirst($sparepart->status) }}"></div>
+                                            <div class="w-1.5 h-1.5 rounded-full flex-shrink-0 {{ $sparepart->status === 'aktif' ? 'bg-success-500' : 'bg-danger-500' }}" title="{{ ucfirst($sparepart->status) }}"></div>
                                             
                                             <div class="h-10 w-10 rounded-lg bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0">
                                                 @if($sparepart->image)
@@ -147,42 +235,42 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td class="px-4 py-3 text-center">
                                         <span class="text-sm text-secondary-700 font-medium truncate block">
                                             {{ $sparepart->brand ?? '-' }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td class="px-4 py-3 text-center">
                                         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800 truncate">
                                             {{ $sparepart->category }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td class="px-4 py-3 text-center">
                                         <span class="text-sm text-secondary-700 truncate block">{{ $sparepart->color ?? '-' }}</span>
                                     </td>
-                                    <td>
-                                        <div class="flex items-center gap-1.5 text-secondary-600 text-sm truncate">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center justify-center gap-1.5 text-secondary-600 text-sm truncate">
                                             <svg class="w-4 h-4 text-secondary-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                             <span class="truncate">{{ $sparepart->location }}</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <div class="flex items-center gap-2">
-                                            <span class="font-bold {{ $sparepart->stock <= $sparepart->minimum_stock ? 'text-danger-600' : 'text-secondary-900' }}">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-baseline justify-center gap-1">
+                                            <span class="text-base font-bold {{ $sparepart->stock <= $sparepart->minimum_stock ? 'text-danger-600' : 'text-secondary-900' }}">
                                                 {{ $sparepart->stock }}
                                             </span>
                                             <span class="text-xs text-secondary-500">{{ $sparepart->unit ?? 'Pcs' }}</span>
                                             
                                             @if($sparepart->stock <= $sparepart->minimum_stock)
-                                                <div class="relative group" title="Stok Menipis">
+                                                <div class="relative group self-center" title="Stok Menipis">
                                                     <svg class="w-4 h-4 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                                 </div>
                                             @endif
                                         </div>
                                     </td>
                                     <!-- Removed Status Column Data -->
-                                    <td class="text-right">
-                                        <div class="flex items-center justify-end gap-2">
+                                    <td class="px-4 py-3">
+                                        <div class="flex items-center justify-center gap-2">
                                             <a href="{{ route('superadmin.inventory.show', $sparepart) }}" class="btn btn-ghost p-2 text-secondary-500 hover:text-primary-600" title="Detail">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                             </a>
@@ -216,7 +304,7 @@
                     </table>
                 </div>
                 <!-- Pagination -->
-                <div class="mt-4">
+                <div class="px-4 py-3 border-t border-secondary-100">
                     {{ $spareparts->links() }}
                 </div>
             </div>
@@ -305,14 +393,12 @@
                 @endforelse
 
                 <!-- Pagination -->
-                <div class="mt-4">
+                <div class="mt-4 md:hidden">
                     {{ $spareparts->links() }}
                 </div>
             </div>
 
-            <div class="mt-6">
-                {{ $spareparts->links() }}
-            </div>
+
         </div>
     </div>
 </x-app-layout>

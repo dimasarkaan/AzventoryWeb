@@ -347,7 +347,8 @@
             <!-- New Section: Analytics & Forecasting -->
             <div x-show="showStats" class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4 print-grid-3">
                 <!-- Forecast Widget -->
-                <div x-show="showForecast" x-transition class="card bg-gradient-to-br from-indigo-50 to-white border-l-4 border-indigo-500">
+                <!-- Forecast Widget (Hidden) -->
+                {{-- <div x-show="showForecast" x-transition class="card bg-gradient-to-br from-indigo-50 to-white border-l-4 border-indigo-500">
                     <div class="card-header p-4 border-b border-secondary-100">
                          <h3 class="font-bold text-indigo-900 text-sm uppercase tracking-wide flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
@@ -369,7 +370,7 @@
                             @endforelse
                         </ul>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Dead Stock Widget -->
                 <div x-show="showDeadStock" x-transition class="card border-l-4 border-secondary-400">

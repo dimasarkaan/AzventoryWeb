@@ -18,6 +18,7 @@ Route::middleware(['auth', 'verified'])->prefix('superadmin')->name('superadmin.
     Route::view('/scan-qr', 'superadmin.scan-qr')->name('scan-qr');
     Route::patch('users/{user}/reset-password', [\App\Http\Controllers\SuperAdmin\UserController::class, 'resetPassword'])->name('users.reset-password');
     Route::get('inventory/check-part-number', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'checkPartNumber'])->name('inventory.check-part-number');
+    Route::get('reports/download', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'download'])->name('reports.download');
     Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class);
 });
 
