@@ -85,6 +85,8 @@ class UserController extends Controller
      */
     public function show(\App\Models\User $user)
     {
+        $user->load(['borrowings.sparepart']);
+        
         return view('superadmin.users.show', compact('user'));
     }
 

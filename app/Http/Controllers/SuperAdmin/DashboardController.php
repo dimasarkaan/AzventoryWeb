@@ -165,6 +165,40 @@ class DashboardController extends Controller
             ->groupBy('location')
             ->pluck('total', 'location');
 
+        // 7. Active Borrowings & Overdue Items (Role-Based)
+        $user = auth()->user();
+        $borrowQuery = \App\Models\Borrowing::query();
+
+        if ($user->role === 'admin') {
+            // Admin sees Own + Operators
+            $operatorIds = \App\Models\User::where('role', 'operator')->pluck('id');
+            $allowedUserIds = $operatorIds->push($user->id);
+            $borrowQuery->whereIn('user_id', $allowedUserIds);
+        } elseif ($user->role === 'operator' || $user->role === 'user') {
+            // Operator/User sees Own only
+            $borrowQuery->where('user_id', $user->id);
+        }
+        // SuperAdmin sees ALL (no filter needed)
+
+        // Clone query for efficiency
+        $activeQuery = clone $borrowQuery;
+        $overdueQuery = clone $borrowQuery;
+
+        // Active Borrowings Count
+        $activeBorrowingsCount = $activeQuery->where('status', 'borrowed')->count();
+
+        // Overdue Items (List top 5 + Count)
+        $overdueBaseQuery = $overdueQuery->where('status', 'borrowed')
+            ->where('expected_return_at', '<', now());
+        
+        $totalOverdueCount = $overdueBaseQuery->count();
+        
+        $overdueBorrowings = $overdueBaseQuery->with(['user', 'sparepart'])
+            ->orderBy('expected_return_at', 'asc') // Most overdue first
+            ->take(5)
+            ->get();
+
+
         // New Dashboard Data
         $pendingApprovalsCount = StockLog::where('status', 'pending')->count();
         $lowStockItems = Sparepart::whereColumn('stock', '<=', 'minimum_stock')->take(5)->get();
@@ -172,7 +206,7 @@ class DashboardController extends Controller
         $recentActivities = ActivityLog::with('user')
             ->whereBetween('created_at', [$start, $end])
             ->latest()
-            ->take(3) // Decreased to 3 as requested
+            ->take(3) 
             ->get();
 
         return view('superadmin.dashboard', compact(
@@ -195,7 +229,10 @@ class DashboardController extends Controller
             'activeUsers',
             'forecasts',
             'year',
-            'month'
+            'month',
+            'activeBorrowingsCount',
+            'totalOverdueCount',
+            'overdueBorrowings'
         ));
     }
 }

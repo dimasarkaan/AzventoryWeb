@@ -8,9 +8,9 @@
         .header h1 { margin: 0; font-size: 18pt; color: #1e40af; }
         .header p { margin: 5px 0; color: #666; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { bg-color: #f3f4f6; font-weight: bold; text-transform: uppercase; font-size: 8pt; }
-        tr:nth-child(even) { bg-color: #f9fafb; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; vertical-align: top; }
+        th { background-color: #4b5563; color: #ffffff; font-weight: bold; text-transform: uppercase; font-size: 9pt; text-align: center; }
+        tr:nth-child(even) { background-color: #f3f4f6; }
         .text-success { color: #059669; font-weight: bold; }
         .text-danger { color: #dc2626; font-weight: bold; }
         .footer { text-align: right; margin-top: 30px; font-size: 8pt; color: #999; }
@@ -44,7 +44,7 @@
         <tbody>
             @foreach($data as $log)
             <tr>
-                <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
+                <td>{{ $log->created_at->translatedFormat('d F Y H:i') }}</td>
                 <td>
                     <strong>{{ $log->sparepart->name ?? 'Unknown' }}</strong><br>
                     <small>PN: {{ $log->sparepart->part_number ?? '-' }}</small>
@@ -53,7 +53,7 @@
                     @if($log->type == 'masuk')
                         <span style="color: green;">MASUK</span>
                     @else
-                        <span style="color: red;">KELUAR</span>
+                        <span style="color: #dc2626;">KELUAR</span>
                     @endif
                 </td>
                 <td style="text-align: right;">

@@ -68,4 +68,8 @@ class User extends Authenticatable
             'password_changed_at' => 'datetime',
         ];
     }
+    public function borrowings()
+    {
+        return $this->hasMany(Borrowing::class);
+    }
 }

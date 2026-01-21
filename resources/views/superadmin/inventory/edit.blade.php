@@ -114,33 +114,62 @@
                             <!-- Gambar (Optional) -->
                             <div class="col-span-1 md:col-span-2">
                                 <label for="image" class="input-label">Gambar Barang</label>
-                                <div class="mt-1 flex items-center gap-4">
+                                <div class="mt-1" x-data="{ isDragging: false, fileName: null, imagePreview: null }">
+                                    <!-- Existing Image (Visible only if no new image selected) -->
                                     @if($sparepart->image)
-                                        <div class="flex-shrink-0">
-                                            <img src="{{ asset('storage/' . $sparepart->image) }}" class="h-20 w-20 object-cover rounded-lg border border-secondary-200" alt="Current Image">
+                                        <div class="mb-4 flex items-center gap-4" x-show="!imagePreview">
+                                            <div class="flex-shrink-0">
+                                                <span class="block text-xs text-secondary-500 mb-1">Gambar Saat Ini:</span>
+                                                <img src="{{ asset('storage/' . $sparepart->image) }}" class="h-20 w-20 object-cover rounded-lg border border-secondary-200" alt="Current Image">
+                                            </div>
                                         </div>
                                     @endif
-                                    <div x-data="{ isDragging: false, fileName: null }" 
-                                         class="w-full flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md transition-colors duration-200"
+
+                                    <div class="w-full flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md transition-colors duration-200"
                                          :class="{ 'border-primary-400 bg-primary-50': isDragging, 'border-gray-300 hover:border-primary-400': !isDragging }"
                                          x-on:dragover.prevent="isDragging = true"
                                          x-on:dragleave.prevent="isDragging = false"
-                                         x-on:drop.prevent="isDragging = false; fileName = $event.dataTransfer.files[0].name; $refs.fileInput.files = $event.dataTransfer.files">
-                                        <div class="space-y-1 text-center">
+                                         x-on:drop.prevent="isDragging = false; fileName = $event.dataTransfer.files[0].name; $refs.fileInput.files = $event.dataTransfer.files;
+                                                          const file = $event.dataTransfer.files[0];
+                                                          const reader = new FileReader();
+                                                          reader.onload = (e) => { imagePreview = e.target.result; };
+                                                          reader.readAsDataURL(file);
+                                         ">
+                                        
+                                        <!-- New Image Preview -->
+                                        <template x-if="imagePreview">
+                                            <div class="relative group">
+                                                <img :src="imagePreview" class="h-40 w-auto object-contain rounded-md shadow-sm border border-secondary-200">
+                                                <button type="button" @click="imagePreview = null; fileName = null; $refs.fileInput.value = ''" 
+                                                    class="absolute -top-2 -right-2 bg-danger-500 text-white rounded-full p-1 shadow-md hover:bg-danger-600 focus:outline-none transition-colors"
+                                                    title="Hapus gambar">
+                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                </button>
+                                                <p class="mt-2 text-sm text-primary-600 font-semibold break-all text-center" x-text="fileName"></p>
+                                            </div>
+                                        </template>
+
+                                        <!-- Upload Placeholder -->
+                                        <div x-show="!imagePreview" class="space-y-1 text-center">
                                             <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                                 <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                             </svg>
                                             <div class="flex text-sm text-gray-600 justify-center">
                                                 <label for="image" class="relative cursor-pointer bg-transparent rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
-                                                    <span>Pilih file</span>
-                                                    <input id="image" name="image" type="file" accept="image/*" class="sr-only" x-ref="fileInput" x-on:change="fileName = $event.target.files[0].name">
+                                                    <span>Pilih file baru</span>
+                                                    <input id="image" name="image" type="file" accept="image/*" class="sr-only" x-ref="fileInput" 
+                                                           x-on:change="fileName = $event.target.files[0].name;
+                                                                        const file = $event.target.files[0];
+                                                                        const reader = new FileReader();
+                                                                        reader.onload = (e) => { imagePreview = e.target.result; };
+                                                                        reader.readAsDataURL(file);
+                                                           ">
                                                 </label>
-                                                <p class="pl-1">atau seret dan lepas di sini</p>
+                                                <p class="pl-1">atau seret ke sini</p>
                                             </div>
                                             <p class="text-xs text-secondary-500">
                                                 PNG, JPG, GIF hingga 2MB
                                             </p>
-                                            <p x-show="fileName" x-text="fileName" class="text-sm text-primary-600 font-semibold mt-2 break-all"></p>
                                         </div>
                                     </div>
                                 </div>

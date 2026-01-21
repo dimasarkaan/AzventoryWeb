@@ -49,6 +49,11 @@ class InventoryController extends Controller
             $q->where('color', $request->color);
         });
 
+        // Filter Low Stock
+        if ($request->filter === 'low_stock') {
+            $query->whereColumn('stock', '<=', 'minimum_stock');
+        }
+
         // Sorting
         if ($request->sort) {
             switch ($request->sort) {
@@ -179,7 +184,7 @@ class InventoryController extends Controller
      */
     public function show(Sparepart $inventory)
     {
-        $inventory->load(['borrowings' => function ($query) {
+        $inventory->load(['borrowings.user' => function ($query) {
             $query->where('status', 'borrowed')->latest();
         }]);
         

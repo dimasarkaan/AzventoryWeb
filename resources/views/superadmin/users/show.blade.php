@@ -101,6 +101,67 @@
                             </div>
                         </div>
                     </div>
+                <!-- Borrowing History (Moved inside col-span-2) -->
+                <div class="card p-6 mt-4">
+                    <h3 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">Riwayat Peminjaman</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="table-modern w-full">
+                            <thead>
+                                <tr>
+                                    <th>Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Tgl Pinjam</th>
+                                    <th>Status</th>
+                                    <th>Tgl Kembali</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($user->borrowings->sortByDesc('created_at') as $borrowing)
+                                    <tr class="group hover:bg-secondary-50 transition-colors">
+                                        <td>
+                                            <div class="font-medium text-secondary-900">{{ $borrowing->sparepart->name ?? 'Item Terhapus' }}</div>
+                                            @if($borrowing->notes)
+                                                <div class="text-xs text-secondary-500 italic truncate max-w-xs">{{ $borrowing->notes }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="text-secondary-700">{{ $borrowing->quantity }}</td>
+                                        <td>
+                                            <div class="text-sm text-secondary-900">{{ $borrowing->borrowed_at->translatedFormat('d F Y') }}</div>
+                                            <div class="text-xs text-secondary-500">Tenggat: {{ $borrowing->expected_return_at ? $borrowing->expected_return_at->translatedFormat('d F Y') : '-' }}</div>
+                                        </td>
+                                        <td>
+                                            @if($borrowing->status === 'returned')
+                                                <span class="badge badge-success">Dikembali</span>
+                                            @elseif($borrowing->status === 'borrowed')
+                                                @if($borrowing->expected_return_at < now())
+                                                    <span class="badge badge-danger">Terlambat</span>
+                                                @else
+                                                    <span class="badge badge-warning">Dipinjam</span>
+                                                @endif
+                                            @else
+                                                <span class="badge badge-secondary">{{ ucfirst($borrowing->status) }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($borrowing->returned_at)
+                                                <div class="text-sm text-secondary-900">{{ $borrowing->returned_at->format('d M Y') }}</div>
+                                                <div class="text-xs text-secondary-500">{{ $borrowing->returned_at->format('H:i') }}</div>
+                                            @else
+                                                <span class="text-secondary-400">-</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="p-8 text-center text-secondary-500">
+                                            Belum ada riwayat peminjaman.
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

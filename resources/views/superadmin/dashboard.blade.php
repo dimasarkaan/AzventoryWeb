@@ -11,6 +11,8 @@
                 showForecast: localStorage.getItem('dashboard_showForecast') !== 'false',
                 showDeadStock: localStorage.getItem('dashboard_showDeadStock') !== 'false',
                 showLeaderboard: localStorage.getItem('dashboard_showLeaderboard') !== 'false',
+                showBorrowings: localStorage.getItem('dashboard_showBorrowings') !== 'false',
+                showOverdue: localStorage.getItem('dashboard_showOverdue') !== 'false',
                 
                 toggle(key) {
                     this[key] = !this[key];
@@ -32,7 +34,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                             <span>Atur Tampilan</span>
                         </button>
-                        <div x-show="open" x-transition class="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-secondary-100">
+                        <div x-show="open" x-transition class="absolute left-0 xl:left-auto xl:right-0 mt-2 w-56 bg-white rounded-md shadow-lg py-1 z-50 border border-secondary-100">
                             <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">Widget Aktif</div>
                             <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
                                 <input type="checkbox" :checked="showStats" @change="toggle('showStats')" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
@@ -45,6 +47,14 @@
                             <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
                                 <input type="checkbox" :checked="showLowStock" @change="toggle('showLowStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                                 <span class="ml-2 text-sm text-secondary-700">Peringatan Stok</span>
+                            </label>
+                            <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                <input type="checkbox" :checked="showBorrowings" @change="toggle('showBorrowings')" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-secondary-700">Peminjaman Aktif</span>
+                            </label>
+                            <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                <input type="checkbox" :checked="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                                <span class="ml-2 text-sm text-secondary-700">Terlambat Kembali</span>
                             </label>
                             <div class="border-t border-secondary-100 my-1"></div>
                             <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">Widget Analitik</div>
@@ -89,7 +99,7 @@
             </div>
 
             <!-- Stats Overview Section -->
-            <div x-show="showStats" x-transition class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
+            <div x-show="showStats" x-transition class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6">
                 <!-- Total Spareparts -->
                 <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-primary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary-200"></div>
@@ -135,6 +145,21 @@
                     </div>
                 </div>
 
+                <!-- Active Borrowings Widget -->
+                <div x-show="showBorrowings" class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+                    <div class="absolute right-0 top-0 h-24 w-24 bg-indigo-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-indigo-200"></div>
+                    <div>
+                        <p class="text-sm font-medium text-secondary-500 z-10 relative">Sedang Dipinjam</p>
+                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative">{{ $activeBorrowingsCount }}</h3>
+                    </div>
+                    <div class="mt-4 flex items-center text-indigo-600 z-10 relative">
+                        <div class="p-2 bg-indigo-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <span class="ml-2 text-xs font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">Unit Keluar</span>
+                    </div>
+                </div>
+
                 <!-- Total Locations -->
                 <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-secondary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-secondary-200"></div>
@@ -147,6 +172,46 @@
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         </div>
                         <span class="ml-2 text-xs font-semibold bg-secondary-100 text-secondary-700 px-2 py-0.5 rounded-full">Gudang & Rak</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Overdue Items Widget (New Row) -->
+            <div x-show="showOverdue && {{ $totalOverdueCount }} > 0" x-transition class="mb-6">
+                <div class="card border-l-4 border-danger-500">
+                        <div class="card-header p-4 border-b border-secondary-100 flex justify-between items-center bg-danger-50/50">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-danger-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h3 class="font-bold text-danger-900">Perhatian: Barang Terlambat Kembali ({{ $totalOverdueCount }})</h3>
+                        </div>
+                        <!-- Link to inventory if > 5 -->
+                        @if($totalOverdueCount > 5)
+                            <span class="text-xs text-secondary-500 italic">Menampilkan 5 teratas. Cek detail per item di Inventaris.</span>
+                        @endif
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-secondary-500 uppercase bg-secondary-50 border-b border-secondary-200">
+                                <tr>
+                                    <th class="px-6 py-3">Peminjam</th>
+                                    <th class="px-6 py-3">Barang</th>
+                                    <th class="px-6 py-3 text-center">Jatuh Tempo</th>
+                                    <th class="px-6 py-3 text-center">Telat</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-secondary-100">
+                                @foreach($overdueBorrowings as $borrow)
+                                    <tr class="hover:bg-secondary-50">
+                                        <td class="px-6 py-3 font-medium text-secondary-900">{{ $borrow->user->name ?? $borrow->borrower_name }}</td>
+                                        <!-- sparepart is eager loaded -->
+                                        <td class="px-6 py-3">{{ $borrow->sparepart->name ?? 'Unknown item' }} ({{ $borrow->quantity }})</td>
+                                        <td class="px-6 py-3 text-center font-bold text-danger-600">{{ $borrow->expected_return_at->format('d M Y') }}</td>
+                                        <td class="px-6 py-3 text-center text-danger-500">{{ $borrow->expected_return_at->diffForHumans(['parts' => 1]) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -265,7 +330,7 @@
                              </div>
                             <h3 class="font-bold text-secondary-900">Peringatan: Stok Menipis</h3>
                         </div>
-                        <a href="{{ route('superadmin.inventory.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">Lihat Semua</a>
+                        <a href="{{ route('superadmin.inventory.index', ['filter' => 'low_stock']) }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">Lihat Semua</a>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left text-secondary-500">

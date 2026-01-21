@@ -47,6 +47,10 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                             {{ __('Scan QR') }}
                         </a>
+                        <a href="{{ route('superadmin.reports.index') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.reports.*') ? $activeClass : $inactiveClass }}">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            {{ __('Laporan') }}
+                        </a>
                     @endif
                     
                      @if (Auth::user()->role === 'admin')
@@ -222,6 +226,9 @@
                 </a>
                  <a href="{{ route('superadmin.scan-qr') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.scan-qr') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('Scan QR') }}
+                </a>
+                <a href="{{ route('superadmin.reports.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.reports.*') ? $resActiveClass : $resInactiveClass }}">
+                    {{ __('Laporan') }}
                 </a>
             @endif
 

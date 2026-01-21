@@ -19,12 +19,16 @@ class Borrowing extends Model
         'returned_at',
         'notes',
         'status',
+        'return_condition',
+        'return_notes',
+        'return_photos',
     ];
 
     protected $casts = [
         'borrowed_at' => 'datetime',
         'expected_return_at' => 'datetime',
         'returned_at' => 'datetime',
+        'return_photos' => 'array',
     ];
 
     public function sparepart()

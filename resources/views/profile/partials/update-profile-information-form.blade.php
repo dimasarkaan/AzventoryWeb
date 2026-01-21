@@ -1,4 +1,4 @@
-<section>
+<section x-data="{ isEditing: false }">
     <form id="send-verification" method="post" action="{{ route('verification.send') }}">
         @csrf
     </form>
@@ -7,7 +7,7 @@
         @csrf
         @method('patch')
 
-        <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-6">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-6 user-select-none">
             <!-- Avatar -->
             <div class="sm:col-span-6">
                 <label for="avatar" class="block text-sm font-medium text-secondary-700">Foto Profil</label>
@@ -20,12 +20,36 @@
                         </div>
                     @endif
                     
-                    <div class="relative">
-                        <input type="file" id="avatar" name="avatar" class="hidden" onchange="document.getElementById('file-chosen').textContent = this.files[0].name" accept="image/*">
-                        <label for="avatar" class="btn btn-secondary text-xs cursor-pointer">
-                            Pilih Foto Baru
-                        </label>
-                        <span id="file-chosen" class="ml-2 text-xs text-secondary-500">Tidak ada file dipilih</span>
+                    <div class="relative" x-show="isEditing" x-transition x-data="{ avatarPreview: null, fileName: null }">
+                        <!-- Hidden Input -->
+                        <input type="file" id="avatar" name="avatar" class="hidden" accept="image/*" x-ref="avatarInput"
+                               @change="fileName = $event.target.files[0].name;
+                                        const file = $event.target.files[0];
+                                        const reader = new FileReader();
+                                        reader.onload = (e) => { avatarPreview = e.target.result; };
+                                        reader.readAsDataURL(file);">
+
+                        <!-- Buttons & Preview -->
+                         <div class="flex items-center gap-2">
+                            <label for="avatar" class="btn btn-secondary text-xs cursor-pointer" x-show="!avatarPreview">
+                                Pilih Foto Baru
+                            </label>
+
+                            <template x-if="avatarPreview">
+                                <div class="flex items-center gap-2">
+                                     <div class="relative group">
+                                        <img :src="avatarPreview" class="h-10 w-10 object-cover rounded-full border border-secondary-200">
+                                        <button type="button" @click="avatarPreview = null; fileName = null; $refs.avatarInput.value = ''"
+                                                class="absolute -top-1 -right-1 bg-danger-500 text-white rounded-full p-0.5 shadow-md hover:bg-danger-600 focus:outline-none">
+                                            <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </button>
+                                     </div>
+                                     <span class="text-xs text-secondary-500 truncate max-w-[150px]" x-text="fileName"></span>
+                                </div>
+                            </template>
+                            
+                             <span x-show="!fileName" class="text-xs text-secondary-500">Tidak ada file dipilih</span>
+                         </div>
                     </div>
                 </div>
                  <x-input-error class="mt-2" :messages="$errors->get('avatar')" />
@@ -59,29 +83,41 @@
              <!-- Name -->
              <div class="sm:col-span-3">
                 <label for="name" class="input-label">Nama Lengkap</label>
-                <input type="text" name="name" id="name" class="input-field w-full" value="{{ old('name', $user->name) }}" required autofocus>
+                <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('name', $user->name) }}" :disabled="!isEditing" required>
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
              <!-- Phone -->
              <div class="sm:col-span-3">
                 <label for="phone" class="input-label">No. WhatsApp</label>
-                <input type="text" name="phone" id="phone" class="input-field w-full" value="{{ old('phone', $user->phone) }}" placeholder="Contoh: 08123456789">
+                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('phone', $user->phone) }}" placeholder="Contoh: 08123456789" :disabled="!isEditing">
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
             </div>
 
             <!-- Address -->
             <div class="sm:col-span-6">
                  <label for="address" class="input-label">Alamat</label>
-                 <textarea id="address" name="address" rows="3" class="input-field w-full">{{ old('address', $user->address) }}</textarea>
+                 <textarea id="address" name="address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" :disabled="!isEditing">{{ old('address', $user->address) }}</textarea>
                  <x-input-error class="mt-2" :messages="$errors->get('address')" />
             </div>
         </div>
 
         <div class="flex items-center gap-4 pt-2 border-t border-secondary-100">
-            <button type="submit" class="btn btn-primary">
-                {{ __('Simpan Perubahan') }}
+            <!-- Edit Button -->
+            <button type="button" class="btn btn-secondary flex items-center gap-2" @click="isEditing = true; setTimeout(() => document.getElementById('name').focus(), 100)" x-show="!isEditing">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                {{ __('Edit Profil') }}
             </button>
+
+            <!-- Save & Cancel Buttons -->
+            <div class="flex items-center gap-2" x-show="isEditing" style="display: none;">
+                <button type="submit" class="btn btn-primary">
+                    {{ __('Simpan Perubahan') }}
+                </button>
+                <button type="button" class="btn btn-ghost text-secondary-600" @click="isEditing = false">
+                    {{ __('Batal') }}
+                </button>
+            </div>
 
             @if (session('status') === 'profile-updated')
                 <p

@@ -8,10 +8,10 @@
         .header h1 { margin: 0; font-size: 18pt; color: #1e40af; }
         .header p { margin: 5px 0; color: #666; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { bg-color: #f3f4f6; font-weight: bold; text-transform: uppercase; font-size: 8pt; }
-        tr:nth-child(even) { bg-color: #f9fafb; }
-        .badges { font-size: 8pt; padding: 2px 5px; border-radius: 4px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: left; vertical-align: top; }
+        th { background-color: #4b5563; color: #ffffff; font-weight: bold; text-transform: uppercase; font-size: 9pt; text-align: center; }
+        tr:nth-child(even) { background-color: #f3f4f6; }
+        .badges { font-size: 8pt; padding: 2px 5px; border-radius: 4px; border: 1px solid #ccc; }
         .badge-success { background: #d1fae5; color: #065f46; }
         .badge-warning { background: #fef3c7; color: #92400e; }
         .badge-danger { background: #fee2e2; color: #b91c1c; }
