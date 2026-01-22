@@ -565,6 +565,22 @@
                         <!-- Return Modal -->
                         <div x-show="returnModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                                 <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-4 text-center sm:block sm:p-0">
+                                    <style>
+                                        .custom-scrollbar::-webkit-scrollbar {
+                                            width: 5px;
+                                        }
+                                        .custom-scrollbar::-webkit-scrollbar-track {
+                                            background: #f1f1f1;
+                                            border-radius: 4px;
+                                        }
+                                        .custom-scrollbar::-webkit-scrollbar-thumb {
+                                            background: #d1d5db;
+                                            border-radius: 4px;
+                                        }
+                                        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                                            background: #9ca3af;
+                                        }
+                                    </style>
                                 <div x-show="returnModalOpen" @click="returnModalOpen = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
 
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
@@ -590,8 +606,14 @@
                                             </div>
                                         </div>
                                         
-                                        <div class="bg-white px-4 pb-4 sm:p-6 sm:pb-4 max-h-[60vh] overflow-y-auto">
+                                        <div class="bg-white px-4 pb-4 sm:p-6 sm:pb-4 max-h-[45vh] sm:max-h-[60vh] overflow-y-auto custom-scrollbar border-y border-gray-100">
                                             <div class="space-y-4">
+                                                <!-- Mobile Scroll Hint -->
+                                                <div class="sm:hidden bg-primary-50 border border-primary-100 rounded-md p-2 flex items-center justify-center gap-2 text-primary-700 text-xs mb-2 animate-pulse">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7m14-8l-7 7-7-7"></path></svg>
+                                                    <span>Scroll ke bawah untuk lengkapi data</span>
+                                                </div>
+
                                                 <p class="text-sm text-gray-500">Pastikan barang yang dikembalikan sesuai dengan data peminjaman.</p>
                                                         
                                                         <!-- Quantity Input -->

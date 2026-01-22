@@ -62,7 +62,7 @@ class StockRequestController extends Controller
             if ($isAutoApproved) {
                 // Determine Log Title
                 $actionTitle = $request->type === 'masuk' ? 'Penambahan Stok' : 'Pengurangan Stok';
-                $this->logActivity($actionTitle, "{$actionTitle} manual: {$request->quantity} {$inventory->unit} untuk '{$inventory->name}'. Alasan: {$request->reason}");
+                $this->logActivity($actionTitle, "{$actionTitle}: {$request->quantity} {$inventory->unit} untuk '{$inventory->name}'. Alasan: {$request->reason}");
                 
                 // Low Stock Notification Check (if reduced)
                 if ($request->type === 'keluar' && $inventory->minimum_stock > 0 && $inventory->stock <= $inventory->minimum_stock) {

@@ -7,7 +7,7 @@
                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('Persetujuan Perubahan Stok') }}
                     </h2>
-                    <p class="mt-1 text-sm text-secondary-500">Tinjau dan setujui permintaan perubahan stok manual.</p>
+                    <p class="mt-1 text-sm text-secondary-500">Tinjau dan setujui permintaan perubahan stok.</p>
                 </div>
             </div>
 
