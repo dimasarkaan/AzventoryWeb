@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use chillerlan\QRCode\QRCode;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Traits\ActivityLogger;
 
 class InventoryController extends Controller
@@ -290,19 +291,112 @@ class InventoryController extends Controller
     public function downloadQrCode(Sparepart $inventory)
     {
         if (!$inventory->qr_code_path || !Storage::disk('public')->exists($inventory->qr_code_path)) {
-            abort(404, 'QR Code not found.');
+            abort(404, 'QR Code tidak ditemukan.');
         }
 
-        return Storage::disk('public')->download($inventory->qr_code_path);
+        // 1. Read existing QR Code SVG
+        $qrContent = Storage::disk('public')->get($inventory->qr_code_path);
+        
+        // Extract the <path> or <g> content from the existing SVG
+        // Simple regex to grab everything between <svg ...> and </svg>
+        preg_match('/<svg[^>]*>(.*?)<\/svg>/s', $qrContent, $matches);
+        $qrInnerContent = $matches[1] ?? '';
+
+        // 2. Define Dimensions (33mm x 15mm @ 96DPI)
+        // 1mm = 3.7795 px
+        // Width: 33mm * 3.7795 ≈ 125px
+        // Height: 15mm * 3.7795 ≈ 57px
+        $width = 125;
+        $height = 57;
+        
+        // QR Size: 12mm * 3.7795 ≈ 45px
+        $qrSize = 45;
+        $qrMargin = ($height - $qrSize) / 2; // Center vertically (~6px)
+
+        // 3. Construct New SVG
+        $svg = '<?xml version="1.0" encoding="UTF-8"?>
+<svg width="33mm" height="15mm" viewBox="0 0 ' . $width . ' ' . $height . '" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <rect width="100%" height="100%" fill="white"/>
+    
+    <!-- QR Code Section (Left) -->
+    <g transform="translate(' . $qrMargin . ', ' . $qrMargin . ') scale(' . ($qrSize / 53) . ')">
+        <!-- Scale factor depends on original QR viewBox size. Chillerlan usually defaults to ~53x53 blocks for V5? 
+             Actually, simpler approach: Use an <image> tag with base64 if path extraction is tricky, 
+             OR just put the path in a container with defined width/height. 
+             Let`s try wrapping the inner content in an SVG element to handle scaling automatically. 
+        -->
+        <svg width="53" height="53" viewBox="0 0 53 53">
+            ' . $qrInnerContent . '
+        </svg>
+    </g>
+
+    <!-- Text Section (Right) -->
+    <g font-family="monospace" fill="black">
+        <!-- Part Number Header (Small) -->
+        <text x="55" y="15" font-size="6" font-weight="bold" fill="#444">PART NUMBER</text>
+        
+        <!-- Part Number (Large) -->
+        <text x="55" y="28" font-size="8" font-weight="bold">' . htmlspecialchars($inventory->part_number) . '</text>
+        
+        <!-- Name (Truncated) -->
+        <text x="55" y="42" font-size="6">' . htmlspecialchars(Str::limit($inventory->name, 18)) . '</text>
+    </g>
+</svg>';
+        
+        // Only for specific QR generator versions:
+        // If the original QR SVG relied on a specific viewBox, we might need to adjust the `scale` or nested `svg` viewBox.
+        // Chillerlan V5 standard: check the original file content? 
+        // Safer way: regeneraet QR code object to get the matrix size, OR assume standard.
+        // Let's rely on the nested <svg> trick with viewBox="0 0 X Y".
+        // Use a known Chillerlan option "eccLevel" etc? 
+        // For robustness, Re-generate the QR with known options is safer than regex parsing:
+        
+        $options = new \chillerlan\QRCode\QROptions([
+            'outputBase64' => false,
+            'imageTransparent' => false, // We want white background? No, transparent path on white rect.
+        ]);
+        // Re-render purely to get a clean string we control
+        $freshQr = (new \chillerlan\QRCode\QRCode($options))->render(route('superadmin.inventory.show', $inventory));
+         
+        // Extract viewBox from fresh QR
+        preg_match('/viewBox="([^"]+)"/', $freshQr, $vbMatches);
+        $qrViewBox = $vbMatches[1] ?? '0 0 53 53'; // Fallback
+        
+        preg_match('/<svg[^>]*>(.*?)<\/svg>/s', $freshQr, $contentMatches);
+        $cleanInner = $contentMatches[1] ?? '';
+
+        $finalSvg = '<?xml version="1.0" encoding="UTF-8"?>
+<svg width="33mm" height="15mm" viewBox="0 0 ' . $width . ' ' . $height . '" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background with Border Stroke -->
+    <rect x="0.5" y="0.5" width="' . ($width - 1) . '" height="' . ($height - 1) . '" fill="white" stroke="black" stroke-width="0.5" rx="3" ry="3"/>
+    
+    <!-- QR Code (Left) -->
+    <!-- We constrain it to 45x45 pixels -->
+    <svg x="' . $qrMargin . '" y="' . $qrMargin . '" width="' . $qrSize . '" height="' . $qrSize . '" viewBox="' . $qrViewBox . '">
+        ' . $cleanInner . '
+    </svg>
+
+    <!-- Text (Right) -->
+    <g font-family="sans-serif" fill="black">
+        <text x="55" y="18" font-size="5" font-weight="bold" fill="#555">PART NUMBER</text>
+        <text x="55" y="29" font-size="8" font-family="monospace" font-weight="bold">' . htmlspecialchars($inventory->part_number) . '</text>
+        <text x="55" y="40" font-size="6">' . htmlspecialchars(\Illuminate\Support\Str::limit($inventory->name, 20)) . '</text>
+    </g>
+</svg>';
+
+        return response($finalSvg, 200, [
+            'Content-Type' => 'image/svg+xml',
+            'Content-Disposition' => 'attachment; filename="Label-' . $inventory->part_number . '.svg"',
+        ]);
     }
 
     public function printQrCode(Sparepart $inventory)
     {
         if (!$inventory->qr_code_path) {
-            abort(404, 'QR Code not found.');
+            abort(404, 'QR Code tidak ditemukan.');
         }
 
-        return view('superadmin.inventory.qr_print', ['sparepart' => $inventory]);
+        return view('superadmin.inventory.print_label', ['sparepart' => $inventory]);
     }
     public function checkPartNumber(Request $request)
     {

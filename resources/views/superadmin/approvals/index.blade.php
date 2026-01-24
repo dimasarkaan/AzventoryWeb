@@ -78,7 +78,7 @@
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="status" value="rejected">
-                                                <button type="submit" class="btn btn-danger flex items-center gap-1 text-xs py-1.5 px-3" onclick="return confirm('Tolak pengajuan ini?')">
+                                                <button type="submit" class="btn btn-danger flex items-center gap-1 text-xs py-1.5 px-3" onclick="confirmReject(event)">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                                     Tolak
                                                 </button>
@@ -147,7 +147,7 @@
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="status" value="rejected">
-                                <button type="submit" class="btn btn-outline-danger w-full text-xs justify-center" onclick="return confirm('Tolak pengajuan ini?')">
+                                <button type="submit" class="btn btn-outline-danger w-full text-xs justify-center" onclick="confirmReject(event)">
                                     Tolak
                                 </button>
                             </form>
@@ -173,4 +173,36 @@
             </div>
         </div>
     </div>
+    @push('scripts')
+    <script>
+        function confirmReject(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            Swal.fire({
+                title: 'Tolak Pengajuan?',
+                text: "Stok tidak akan ditambahkan ke inventaris.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Tolak!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    popup: '!rounded-2xl !font-sans',
+                    title: '!text-secondary-900 !text-xl !font-bold',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200',
+                    cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+                },
+                buttonsStyling: false,
+                iconColor: '#ef4444',
+                padding: '2em',
+                backdrop: `rgba(0,0,0,0.4)`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
+        }
+    </script>
+    @endpush
 </x-app-layout>

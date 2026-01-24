@@ -92,10 +92,10 @@
                         <p class="text-sm text-secondary-500 mb-4">
                             Jika pengguna lupa password, Anda dapat meresetnya ke default <code>password123</code>.
                         </p>
-                        <form action="{{ route('superadmin.users.reset-password', $user) }}" method="POST" onsubmit="return confirm('Yakin ingin reset password menjadi default?');">
+                        <form action="{{ route('superadmin.users.reset-password', $user) }}" method="POST">
                             @csrf
                             @method('PATCH')
-                            <button type="submit" class="btn btn-warning w-full justify-center">
+                            <button type="submit" class="btn btn-warning w-full justify-center" onclick="confirmReset(event)">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                 {{ __('Reset Password') }}
                             </button>
@@ -107,10 +107,10 @@
                         <p class="text-sm text-secondary-500 mb-4">
                             Tindakan ini tidak dapat dibatalkan. Pastikan pengguna tidak memiliki data penting yang tertaut.
                         </p>
-                         <form action="{{ route('superadmin.users.destroy', $user) }}" method="POST" onsubmit="return confirm('Apakah Anda YAKIN ingin menghapus akun ini secara permanen?');">
+                         <form action="{{ route('superadmin.users.destroy', $user) }}" method="POST">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-danger w-full justify-center">
+                            <button type="submit" class="btn btn-danger w-full justify-center" onclick="confirmDelete(event)">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 {{ __('Hapus Permanen') }}
                             </button>
@@ -120,4 +120,37 @@
             </div>
         </div>
     </div>
+    </div>
+    @push('scripts')
+    <script>
+        function confirmReset(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            Swal.fire({
+                title: 'Reset Password?',
+                text: "Password akan dikembalikan ke default: password123",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Reset!',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: '!rounded-2xl !font-sans',
+                    title: '!text-secondary-900 !text-xl !font-bold',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    confirmButton: 'btn btn-warning px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200',
+                    cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+                },
+                buttonsStyling: false,
+                reverseButtons: true,
+                iconColor: '#f59e0b',
+                padding: '2em',
+                backdrop: `rgba(0,0,0,0.4)`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            })
+        }
+    </script>
+    @endpush
 </x-app-layout>

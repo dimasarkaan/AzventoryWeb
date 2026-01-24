@@ -8,24 +8,7 @@
                 <p class="mt-1 text-sm text-secondary-500">Isi detail sparepart di bawah ini untuk menambahkan ke inventaris.</p>
             </div>
 
-            @if(session('error'))
-                <div x-data="{ show: true }" x-show="show" x-transition class="mb-4 bg-danger-50 border-l-4 border-danger-500 p-4 rounded-md shadow-sm relative">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <svg class="h-6 w-6 text-danger-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <p class="text-sm font-medium text-danger-800">{{ session('error') }}</p>
-                        </div>
-                        <button @click="show = false" class="text-danger-500 hover:text-danger-700 focus:outline-none">
-                            <span class="sr-only">Close</span>
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            @endif
+
 
             <form action="{{ route('superadmin.inventory.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -69,13 +52,129 @@
                                 <!-- Part Number -->
                                 <div>
                                     <label for="part_number" class="input-label">Part Number (PN) <span class="text-danger-500">*</span></label>
-                                    <div class="relative">
-                                        <input id="part_number" class="input-field" type="text" name="part_number" x-model="partNumber" @change="checkPN" @keydown.enter.prevent="checkPN" placeholder="Contoh: KBD-LOGI-GPRO-X" />
-                                        <div x-show="isLoading" class="absolute right-3 top-3">
-                                            <svg class="animate-spin h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    <div class="relative flex gap-2">
+                                        <div class="relative w-full">
+                                            <input id="part_number" class="input-field pr-10" type="text" name="part_number" x-model="partNumber" @change="checkPN" @keydown.enter.prevent="checkPN" placeholder="Contoh: KBD-LOGI-GPRO-X" />
+                                            <div x-show="isLoading" class="absolute right-3 top-3">
+                                                <svg class="animate-spin h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <button type="button" @click="openScanModal()" class="btn btn-secondary px-3" title="Scan Part Number">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75zM16.5 19.5h.75v.75h-.75v-.75z" />
                                             </svg>
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Scan Modal -->
+                                    <!-- Scan Modal -->
+                                    <div x-show="scanModalOpen" class="fixed inset-0 z-[60] overflow-y-auto" style="display: none;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                                        <!-- Backdrop -->
+                                        <div x-show="scanModalOpen" 
+                                             x-transition:enter="ease-out duration-300"
+                                             x-transition:enter-start="opacity-0"
+                                             x-transition:enter-end="opacity-100"
+                                             x-transition:leave="ease-in duration-200"
+                                             x-transition:leave-start="opacity-100"
+                                             x-transition:leave-end="opacity-0"
+                                             class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
+                                             @click="closeScanModal()"></div>
+
+                                        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                                            <!-- Modal Panel -->
+                                            <div x-show="scanModalOpen" 
+                                                 x-transition:enter="ease-out duration-300"
+                                                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                                                 x-transition:leave="ease-in duration-200"
+                                                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                                                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                                                 class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg w-full max-w-sm mx-auto">
+                                                
+                                                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                                    <div class="sm:flex sm:items-start w-full">
+                                                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                                                            <div class="flex justify-between items-center mb-2">
+                                                                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                                                    Scan Part Number
+                                                                </h3>
+                                                                <div class="flex items-center gap-2">
+                                                                    <label class="inline-flex items-center cursor-pointer">
+                                                                        <input type="checkbox" x-model="debugMode" class="sr-only peer">
+                                                                        <div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
+                                                                        <span class="ms-2 text-xs font-medium text-gray-900">Debug</span>
+                                                                    </label>
+                                                                    <button @click="closeScanModal()" class="text-gray-400 hover:text-gray-500">
+                                                                        <span class="sr-only">Close</span>
+                                                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                                        </svg>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <!-- Camera Container -->
+                                                            <div class="mb-2 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">
+                                                                <span class="font-bold">Tips:</span> Gunakan tulisan cetak (block letters) yang jelas. Pastikan pencahayaan cukup.
+                                                            </div>
+                                                            <div class="grid gap-4" :class="debugMode ? 'grid-cols-2' : 'grid-cols-1'">
+                                                                <!-- Live Camera -->
+                                                                <div class="relative w-full bg-black rounded-lg overflow-hidden aspect-video">
+                                                                    <video x-ref="video" autoplay playsinline class="w-full h-full object-cover"></video>
+                                                                    
+                                                                    <div x-show="ocrLoading" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+                                                                        <div class="text-center">
+                                                                            <svg class="animate-spin h-10 w-10 text-white mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                                            </svg>
+                                                                            <span class="text-white font-semibold text-sm">Memproses...</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <!-- Debug Preview -->
+                                                                <div x-show="debugMode" class="relative w-full bg-gray-100 rounded-lg overflow-hidden aspect-video border border-gray-300">
+                                                                    <div class="absolute top-0 left-0 bg-black/50 text-white text-[10px] px-1">Processed</div>
+                                                                    <img :src="debugImage" class="w-full h-full object-contain" x-show="debugImage">
+                                                                    <div x-show="!debugImage" class="flex items-center justify-center h-full text-xs text-gray-400">Preview Processed</div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="mb-4"></div> <!-- Spacer -->
+
+                                                            <!-- Camera Control Buttons -->
+                                                            <div class="flex justify-between items-center mb-3 px-1" x-show="videoDevices.length > 1">
+                                                                <span class="text-xs text-gray-500" x-text="'Kamera: ' + (currentDeviceLabel || 'Default')"></span>
+                                                                <button type="button" @click="switchCamera()" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs rounded-full transition-colors font-medium border border-gray-300">
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                                                                    </svg>
+                                                                    Putar Kamera
+                                                                </button>
+                                                            </div>
+
+                                                            <div x-show="ocrError" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative text-sm">
+                                                                <span class="block sm:inline" x-text="ocrError"></span>
+                                                            </div>
+
+                                                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                                <button type="button" @click="captureAndScan" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm order-1 sm:order-none">
+                                                                    Ambil Gambar
+                                                                </button>
+                                                                
+                                                                <label class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm cursor-pointer order-2 sm:order-none">
+                                                                    <span>Upload Foto</span>
+                                                                    <input type="file" class="hidden" accept="image/*" @change="handleFileUpload">
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                     <x-input-error :messages="$errors->get('part_number')" class="mt-2" />
@@ -287,6 +386,7 @@
         </div>
     </div>
     @push('scripts')
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('inventoryForm', () => ({
@@ -329,14 +429,251 @@
                             this.isLocked = true;
                             console.log('Produk ditemukan, data diisi otomatis.');
                         } else {
-                            this.isLocked = false;
-                            // Reset optional fields if not found? Maybe better to keep them empty/user input
-                            // keeping them helps if user made a typo in PN and corrects it
+                            // Only reset isLocked status, do not clear form if it was manually filled or if OCR was just used
+                            // But if we want to be strict that "New PN = Fresh Form", we might want to clear.
+                            // For now, let's keep it user-friendly: only unlock fields so they can type.
+                            this.isLocked = false; 
                         }
                     } catch (error) {
                         console.error('Error checking PN:', error);
                     } finally {
                         this.isLoading = false;
+                    }
+                },
+
+                // OCR Functionality
+                scanModalOpen: false,
+                ocrLoading: false,
+                ocrError: null,
+                stream: null,
+                debugMode: false,
+                debugImage: null,
+
+                ocrError: null,
+                stream: null,
+                debugMode: false,
+                debugImage: null,
+                videoDevices: [],
+                currentDeviceIndex: 0,
+                currentDeviceLabel: '',
+
+                openScanModal() {
+                    this.scanModalOpen = true;
+                    this.getVideoDevices().then(() => {
+                        this.startCamera();
+                    });
+                },
+
+                closeScanModal() {
+                    this.stopCamera();
+                    this.scanModalOpen = false;
+                    this.ocrLoading = false;
+                    this.ocrError = null;
+                },
+
+                async getVideoDevices() {
+                    try {
+                        const devices = await navigator.mediaDevices.enumerateDevices();
+                        this.videoDevices = devices.filter(device => device.kind === 'videoinput');
+                    } catch (err) {
+                        console.error("Error enumerating devices:", err);
+                    }
+                },
+
+                async switchCamera() {
+                    if (this.videoDevices.length < 2) return;
+                    
+                    this.currentDeviceIndex = (this.currentDeviceIndex + 1) % this.videoDevices.length;
+                    this.stopCamera();
+                    await this.startCamera();
+                },
+
+                async startCamera() {
+                    try {
+                        const constraints = { 
+                            video: {} 
+                        };
+
+                        // If we have devices listed, pick by ID. Otherwise default to environment.
+                        if (this.videoDevices.length > 0) {
+                            const deviceId = this.videoDevices[this.currentDeviceIndex].deviceId;
+                            constraints.video.deviceId = { exact: deviceId };
+                            this.currentDeviceLabel = this.videoDevices[this.currentDeviceIndex].label;
+                        } else {
+                            constraints.video.facingMode = 'environment';
+                        }
+
+                        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        this.$refs.video.srcObject = this.stream;
+                        
+                        // If we didn't have permission before, labels might be empty. Updating now might get labels.
+                        if (!this.currentDeviceLabel && this.videoDevices.length > 0) {
+                            this.getVideoDevices().then(() => {
+                                if (this.videoDevices[this.currentDeviceIndex]) {
+                                    this.currentDeviceLabel = this.videoDevices[this.currentDeviceIndex].label;
+                                }
+                            });
+                        }
+
+                    } catch (err) {
+                        console.error("Error detecting camera:", err);
+                        this.ocrError = "Tidak dapat mengakses kamera. Pastikan izin diberikan.";
+                    }
+                },
+
+                stopCamera() {
+                    if (this.stream) {
+                        this.stream.getTracks().forEach(track => track.stop());
+                        this.stream = null;
+                    }
+                },
+
+                async captureAndScan() {
+                    if (!this.stream) return;
+
+                    this.ocrLoading = true;
+                    this.ocrError = null;
+
+                    const video = this.$refs.video;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+
+                    const image = canvas.toDataURL('image/png');
+                    
+                    // Preprocess the captured frame
+                    const processedImage = await this.preprocessImage(image);
+                    this.debugImage = processedImage; // Show in debug view
+                    
+                    await this.processOCR(processedImage);
+                },
+
+                // Image Preprocessing (Contrast Stretch + Grayscale + Threshold)
+                async preprocessImage(imageSource) {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            ctx.drawImage(img, 0, 0);
+
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const data = imageData.data;
+
+                            // 1. Grayscale & Find Min/Max (for contrast stretching)
+                            let min = 255;
+                            let max = 0;
+                            
+                            // First pass: convert to gray and find range
+                            for (let i = 0; i < data.length; i += 4) {
+                                const gray = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
+                                data[i] = gray;
+                                data[i+1] = gray;
+                                data[i+2] = gray;
+                                
+                                if (gray < min) min = gray;
+                                if (gray > max) max = gray;
+                            }
+
+                            // Avoid division by zero
+                            if (max === min) max = min + 1;
+
+                            // 2. Contrast Stretching & Thresholding
+                            for (let i = 0; i < data.length; i += 4) {
+                                let gray = data[i];
+                                
+                                // Contrast stretch: Map [min, max] to [0, 255]
+                                gray = ((gray - min) * 255) / (max - min);
+                                
+                                // Thresholding: slightly above middle to clean up background noise
+                                // Since we stretched contrast, 128 is a reliable middle ground now.
+                                // We use 140 to be slightly more aggressive against gray background noise (paper texture).
+                                const value = gray > 150 ? 255 : 0;
+
+                                data[i] = value;
+                                data[i + 1] = value;
+                                data[i + 2] = value;
+                            }
+
+                            ctx.putImageData(imageData, 0, 0);
+                            resolve(canvas.toDataURL('image/png'));
+                        };
+                        img.src = imageSource;
+                    });
+                },
+
+                handleFileUpload(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    this.ocrLoading = true;
+                    this.ocrError = null;
+
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        const processedImage = await this.preprocessImage(event.target.result);
+                        this.debugImage = processedImage; // Show in debug view
+                        await this.processOCR(processedImage);
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                async processOCR(imageSource) {
+                    let worker = null;
+                    try {
+                        this.ocrLoading = true;
+                        
+                        // Create a worker with specific logger
+                        worker = await Tesseract.createWorker('eng', 1, {
+                            logger: m => {
+                                if (m.status === 'recognizing text') {
+                                    console.log(m); 
+                                }
+                            }
+                        });
+
+                        // Set parameters to restrict char set and segmentation mode
+                        await worker.setParameters({
+                            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/', // Only Allow block caps, numbers, dash, slash
+                            tessedit_pageseg_mode: '7', // PSM 7 = Treat the image as a single text line.
+                        });
+
+                        const { data: { text } } = await worker.recognize(imageSource);
+
+                        console.log("Raw OCR:", text);
+                        
+                        // Force uppercase and clean
+                        const cleanedText = text.toUpperCase().replace(/[^A-Z0-9\-\/]/g, '').trim(); 
+                        console.log("Cleaned:", cleanedText);
+
+                        if (cleanedText.length < 3) {
+                            throw new Error("Teks tidak terbaca. Pastikan tulisan jelas, tebal, dan pencahayaan cukup.");
+                        }
+
+                        this.partNumber = cleanedText;
+                        
+                        if (!this.debugMode) {
+                            this.closeScanModal();
+                        } else {
+                            this.ocrLoading = false;
+                        }
+                        
+                        this.checkPN();
+
+                    } catch (err) {
+                        console.error("OCR Error:", err);
+                        this.ocrError = "Gagal: " + (err.message || "Tidak dapat membaca teks.");
+                    } finally {
+                        if (worker) {
+                            await worker.terminate();
+                        }
+                        // Only turn off loading if we didn't success (success handles it in debug/close)
+                        if (this.ocrError) {
+                            this.ocrLoading = false;
+                        }
                     }
                 }
             }))
