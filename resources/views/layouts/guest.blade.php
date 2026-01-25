@@ -32,13 +32,13 @@
                     </div>
                     <h2 class="text-3xl font-bold leading-tight mb-6">Sistem Informasi Inventaris Azzahra Computer.</h2>
                     <p class="text-primary-100 text-lg leading-relaxed">
-                        Kelola penjualan, stok barang, dan perbaikan perangkat komputer dengan lebih efisien, terpusat, dan akurat.
+                        Sistem informasi manajemen inventaris sparepart berbasis web yang terstruktur dan terpusat.
                     </p>
                     
                      <div class="mt-12 flex gap-4 text-sm font-medium text-primary-200">
                         <div class="flex items-center gap-2">
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                             <span>Real-time Tracking</span>
+                             <span>Pemantauan Stok</span>
                         </div>
                         <div class="flex items-center gap-2">
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>

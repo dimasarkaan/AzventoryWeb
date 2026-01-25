@@ -15,7 +15,6 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         // Debug
-        // dd('Hit SuperAdmin Dashboard');
         // Log::info('Dashboard Params:', $request->all());
 
         // 1. Determine Date Range

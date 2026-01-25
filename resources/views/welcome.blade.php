@@ -55,7 +55,7 @@
                             <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">Azzahra Computer</span>
                         </h1>
                         <p class="text-xl text-secondary-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-                            Platform terintegrasi untuk mengelola stok komputer, laptop, sparepart, dan tracking servis di Azzahra Computer Tegal.
+                            Platform terintegrasi untuk mengelola inventaris sparepart di Azzahra Computer Tegal.
                         </p>
                         <div class="flex flex-col sm:flex-row gap-4 justify-center">
                             <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg shadow-xl shadow-primary-500/20 hover:shadow-primary-500/40 transform hover:-translate-y-1 transition-all duration-200">
@@ -79,7 +79,7 @@
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                             </div>
                             <h3 class="text-xl font-bold text-secondary-900 mb-3">Manajemen Stok Terpusat</h3>
-                            <p class="text-secondary-500 leading-relaxed">Pantau ketersediaan barang di berbagai lokasi gudang secara real-time dengan akurasi tinggi.</p>
+                            <p class="text-secondary-500 leading-relaxed">Pantau ketersediaan barang di berbagai lokasi gudang secara terintegrasi dan terpantau.</p>
                         </div>
                         
                         <!-- Card 2 -->
@@ -88,7 +88,7 @@
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                             </div>
                             <h3 class="text-xl font-bold text-secondary-900 mb-3">QR Code Scanner</h3>
-                            <p class="text-secondary-500 leading-relaxed">Identifikasi aset instan dengan teknologi pemindaian QR Code yang terintegrasi langsung.</p>
+                            <p class="text-secondary-500 leading-relaxed">Identifikasi aset dengan teknologi pemindaian QR Code yang telah disesuaikan.</p>
                         </div>
 
                         <!-- Card 3 -->

@@ -114,6 +114,7 @@ class InventoryController extends Controller
     public function store(Request $request)
     {
         App::setLocale('id');
+
         $request->validate([
             'name' => 'required|string|max:255',
             'part_number' => 'required|string|max:255',
@@ -270,8 +271,10 @@ class InventoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Sparepart $inventory)
+    public function destroy($id)
     {
+        $inventory = Sparepart::findOrFail($id);
+
         // Also delete the QR code file from storage
         if ($inventory->qr_code_path && Storage::disk('public')->exists($inventory->qr_code_path)) {
             Storage::disk('public')->delete($inventory->qr_code_path);

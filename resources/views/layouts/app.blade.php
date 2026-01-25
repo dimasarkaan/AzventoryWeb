@@ -36,221 +36,118 @@
         </div>
         @stack('scripts')
         <style>
-            .colored-toast.swal2-icon-success {
-                background-color: #a5dc86 !important;
-            }
-            .colored-toast.swal2-icon-error {
-                background-color: #f27474 !important;
-            }
-            .colored-toast.swal2-icon-warning {
-                background-color: #f8bb86 !important;
-            }
-            .colored-toast.swal2-icon-info {
-                background-color: #3fc3ee !important;
-            }
-            .colored-toast.swal2-icon-question {
-                background-color: #87adbd !important;
-            }
-            .colored-toast .swal2-title {
-                color: white;
-            }
-            .colored-toast .swal2-close {
-                color: white;
-            }
-            .colored-toast .swal2-html-container {
-                color: white;
-            }
+            /* Solid Premium Toast Override */
             
-            /* Modern Clean Toast Override */
-            /* Modern Clean Toast Override */
-            div.swal2-container.swal2-top.swal2-backdrop-show {
-                background: transparent !important;
-                overflow: visible !important;
-                padding: 2rem !important;
-                display: flex !important;
-                justify-content: center !important;
-                z-index: 9999 !important;
-            }
-            div.swal2-popup.swal2-toast.clean-toast-popup {
-                background-color: #ffffff !important;
-                border: 1px solid #e5e7eb !important;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-                border-radius: 1rem !important;
-                padding: 0.75rem 1.25rem !important;
-                display: flex !important;
-                align-items: center !important;
-                justify-content: flex-start !important;
-                gap: 0.8rem !important;
-                
-                /* Sizing & Position */
-                width: auto !important;
-                min-width: 350px !important;
-                max-width: 90vw !important;
-                margin: 0.5rem auto !important;
-                overflow: hidden !important;
-            }
-            
-            /* Clean White Style */
-            div.swal2-popup.swal2-toast.clean-toast-popup.toast-success {
-                border-left: none !important;
-            }
-            div.swal2-popup.swal2-toast.clean-toast-popup.toast-error {
-                border-left: none !important;
+            /* GLOBAL CONTAINER OVERRIDE for Toasts */
+            div.swal2-container.swal2-top-end,
+            div.swal2-container.swal2-top-right {
+                align-items: flex-start !important;
+                justify-content: flex-end !important;
             }
 
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-title {
-                color: #111827 !important;
-                font-family: inherit !important;
-                font-size: 0.95rem !important;
-                font-weight: 600 !important;
-                margin: 0 !important;
-                text-align: left !important;
-                white-space: nowrap !important;
-                letter-spacing: -0.01em !important;
-                padding-right: 0.5rem !important;
+            div.swal2-popup.swal2-toast.solid-toast-popup {
+                /* Visual Style */
+                background: #ffffff !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+                border: 1px solid #f3f4f6 !important;
+                border-left: 4px solid #3b82f6 !important; /* Thinner accent */
+                border-radius: 6px !important; /* Slightly sharper */
+                padding: 0.75rem 1rem !important; /* Compact padding */
                 
-                /* Layout Fixes */
-                flex: 0 0 auto !important;
-                width: auto !important;
-            /* Modern Clean Toast Override */
-            div.swal2-container.swal2-top.swal2-backdrop-show {
-                background: transparent !important;
-                overflow: visible !important;
-                padding: 2rem !important;
-                display: flex !important;
-                justify-content: center !important;
-                z-index: 9999 !important;
-            }
-            div.swal2-popup.swal2-toast.clean-toast-popup {
-                background-color: #ffffff !important;
-                border: 1px solid #e5e7eb !important;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-                border-radius: 1rem !important;
-                padding: 0.75rem 1.25rem !important;
-                
-                /* GRID LAYOUT - The Ultimate Wrapper */
-                display: grid !important;
-                grid-template-columns: min-content 1fr !important;
+                /* Layout */
+                display: flex !important; /* Back to flex for simplicity */
                 align-items: center !important;
                 gap: 0.75rem !important;
                 
-                /* Sizing & Position */
+                /* Sizing */
                 width: auto !important;
-                min-width: 350px !important;
-                max-width: 90vw !important;
-                margin: 0.5rem auto !important;
-                overflow: hidden !important;
-            }
-            
-            /* Clean White Style */
-            div.swal2-popup.swal2-toast.clean-toast-popup.toast-success {
-                border-left: none !important;
-            }
-            div.swal2-popup.swal2-toast.clean-toast-popup.toast-error {
-                border-left: none !important;
+                min-width: 250px !important; /* Smaller min-width */
+                max-width: 350px !important;
+                
+                /* Positioning */
+                margin: 1rem !important;
+                transform: translateY(0) !important;
             }
 
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-title {
-                grid-column: 2 !important; /* Force to second column */
-                color: #111827 !important;
-                font-family: inherit !important;
-                font-size: 0.95rem !important;
-                font-weight: 600 !important;
+            /* Custom Icon Styling */
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon {
+                border: none !important; /* Remove circle border */
                 margin: 0 !important;
-                text-align: left !important;
-                
-                /* Wrapping Fixes */
-                white-space: normal !important;
-                word-wrap: break-word !important;
-                word-break: break-word !important;
-                line-height: 1.5 !important;
-                letter-spacing: -0.01em !important;
-                padding-right: 0 !important;
-                
-                width: 100% !important;
-                min-width: 0 !important;
-                overflow: visible !important;
-            }
-            
-            /* Icon Styling - SINGLE CLEAN CIRCLE */
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-icon {
-                grid-column: 1 !important; /* Force to first column */
-                /* Set base font size for EM calculations */
-                font-size: 12px !important; 
-                margin: 0 !important;
-                width: 3.5em !important; /* ~42px */
-                height: 3.5em !important;
-                min-width: 3.5em !important;
-                border-width: 0.25em !important; /* Proper stroke thickness */
-                border-style: solid !important;
-                border-radius: 50% !important;
+                min-width: 20px !important;
+                width: 20px !important;
+                height: 20px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                flex-shrink: 0 !important;
-                transform: none !important;
                 background: transparent !important;
             }
-
-            /* Fix disconnected lines by forcing geometry */
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-icon .swal2-success-line-tip,
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-icon .swal2-success-line-long {
-                background-color: #10b981 !important; /* Force Green */
-                display: block !important;
-                z-index: 2 !important;
+            
+            /* Remove check for standard classes instead of wildcard to avoid hiding our SVG */
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-ring,
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-line-tip,
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-line-long,
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-circular-line-left,
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-circular-line-right,
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-fix,
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-x-mark {
+                display: none !important;
             }
             
-            /* Hide artifacts */
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-success-ring { display: none !important; }
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-success-fix { display: none !important; }
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-success-circular-line-left { display: none !important; }
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-success-circular-line-right { display: none !important; }
-            
-            /* Color overrides */
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-icon.swal2-success {
-                border-color: #10b981 !important;
+            /* Success Variation */
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-success {
+                border-left-color: #10b981 !important;
+            }
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-success .swal2-icon {
                 color: #10b981 !important;
             }
-             div.swal2-popup.swal2-toast.clean-toast-popup .swal2-icon.swal2-error {
-                border-color: #ef4444 !important;
+
+            /* Error Variation */
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-error {
+                border-left-color: #ef4444 !important;
+            }
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-error .swal2-icon {
                 color: #ef4444 !important;
             }
-            
-            /* Inner Lines Size Adjustment */
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-icon .swal2-success-line-tip,
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-icon .swal2-success-line-long {
-                height: 0.35em !important; /* Scales with font-size */
+
+            /* Typography */
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-title {
+                color: #374151 !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 0.875rem !important;
+                font-weight: 500 !important;
+                margin: 0 !important;
+                text-align: left !important;
+                line-height: 1.25 !important;
             }
-            
-            div.swal2-popup.swal2-toast.clean-toast-popup .swal2-timer-progress-bar {
-                grid-column: 1 / -1 !important;
-                position: absolute !important;
+
+            /* Progress Bar Styling */
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-timer-progress-bar {
+                height: 2px !important;
                 bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                width: 100% !important;
-                height: 4px !important;
-                z-index: 10 !important;
             }
-            div.swal2-popup.swal2-toast.clean-toast-popup.toast-success .swal2-timer-progress-bar {
+
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-success .swal2-timer-progress-bar {
                 background: #10b981 !important;
-                opacity: 0.2 !important;
             }
-            div.swal2-popup.swal2-toast.clean-toast-popup.toast-error .swal2-timer-progress-bar {
-               background: #ef4444 !important;
-               opacity: 0.2 !important;
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-error .swal2-timer-progress-bar {
+                background: #ef4444 !important;
+            }
+
+            /* Hide unnecessary elements */
+            div.swal2-popup.swal2-toast.solid-toast-popup .swal2-close {
+                display: none !important;
             }
         </style>
         <script>
-            // Premium Modern Toast Config
+            // Solid Premium Toast Config
             const Toast = Swal.mixin({
                 toast: true,
-                position: 'top', // Center Top
+                position: 'top-end', // Moved to top-right for standard feel
                 showConfirmButton: false,
-                timer: 4000, // Back to 4s as center is more noticeable
+                timer: 4000,
                 timerProgressBar: true,
                 customClass: {
-                    popup: 'clean-toast-popup', // Use our custom CSS
+                    popup: 'solid-toast-popup',
                 },
                 didOpen: (toast) => {
                     toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -261,10 +158,11 @@
             // Handle Flash Messages
             @if(session('success'))
                 Toast.fire({
-                    icon: 'success',
+                    icon: 'success', // Keep for fallback a11y, though visual is overridden
+                    iconHtml: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>',
                     title: "{{ session('success') }}",
                     customClass: {
-                        popup: 'clean-toast-popup toast-success', // Added variation class
+                        popup: 'solid-toast-popup toast-success',
                     }
                 });
             @endif
@@ -272,9 +170,10 @@
             @if(session('error'))
                 Toast.fire({
                     icon: 'error',
+                    iconHtml: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 15.75h.008v.008H12v-.008z" /></svg>',
                     title: "{{ session('error') }}",
                     customClass: {
-                        popup: 'clean-toast-popup toast-error', // Added variation class
+                        popup: 'solid-toast-popup toast-error',
                     }
                 });
             @endif

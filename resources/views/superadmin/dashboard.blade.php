@@ -24,7 +24,7 @@
             <div class="mb-6 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
                 <div>
                     <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">Dashboard</h1>
-                    <p class="mt-1 text-sm text-secondary-500">Overview Status Inventaris (Real-time)</p>
+                    <p class="mt-1 text-sm text-secondary-500">Overview Status Inventaris (Terkini)</p>
                 </div>
                 
                 <div class="flex items-center gap-3">

@@ -103,7 +103,8 @@
                                                                     Scan Part Number
                                                                 </h3>
                                                                 <div class="flex items-center gap-2">
-                                                                    <label class="inline-flex items-center cursor-pointer">
+                                                                    <!-- Debug hidden -->
+                                                                    <label class="hidden inline-flex items-center cursor-pointer">
                                                                         <input type="checkbox" x-model="debugMode" class="sr-only peer">
                                                                         <div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
                                                                         <span class="ms-2 text-xs font-medium text-gray-900">Debug</span>
@@ -118,15 +119,15 @@
                                                             </div>
                                                             
                                                             <!-- Camera Container -->
-                                                            <div class="mb-2 px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">
-                                                                <span class="font-bold">Tips:</span> Gunakan tulisan cetak (block letters) yang jelas. Pastikan pencahayaan cukup.
+                                                            <div class="mb-2 px-2 py-1 bg-amber-50 text-amber-700 text-xs rounded border border-amber-200">
+                                                                <span class="font-bold">Info:</span> Pastikan foto label terlihat jelas dan terang.
                                                             </div>
                                                             <div class="grid gap-4" :class="debugMode ? 'grid-cols-2' : 'grid-cols-1'">
                                                                 <!-- Live Camera -->
                                                                 <div class="relative w-full bg-black rounded-lg overflow-hidden aspect-video">
                                                                     <video x-ref="video" autoplay playsinline class="w-full h-full object-cover"></video>
                                                                     
-                                                                    <div x-show="ocrLoading" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+                                                                    <div x-show="ocrLoading" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-20">
                                                                         <div class="text-center">
                                                                             <svg class="animate-spin h-10 w-10 text-white mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -174,16 +175,16 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     <x-input-error :messages="$errors->get('part_number')" class="mt-2" />
                                 </div>
 
                                 <!-- Nama Barang -->
                                 <div>
                                     <label for="name" class="input-label">Nama Barang <span class="text-danger-500">*</span></label>
-                                    <input id="name" class="input-field" :class="{'bg-secondary-100 text-secondary-500': isLocked}" type="text" name="name" x-model="itemName" :readonly="isLocked" placeholder="Contoh: Laptop Dell XPS 15 / Keyboard Logitech" />
+                                    <input id="name" class="input-field w-full" :class="{'bg-secondary-100 text-secondary-500': isLocked}" type="text" name="name" x-model="itemName" :readonly="isLocked" placeholder="Contoh: Laptop Dell XPS 15 / Keyboard Logitech" />
                                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                                 </div>
                             </div>
@@ -193,7 +194,7 @@
                                 <!-- Merk -->
                                 <div>
                                     <label for="brand" class="input-label">Merk <span class="text-danger-500">*</span></label>
-                                    <input id="brand" class="input-field" :class="{'bg-secondary-100 text-secondary-500': isLocked}" type="text" name="brand" x-model="itemBrand" :readonly="isLocked" placeholder="Contoh: Dell, Logitech, Toyota" />
+                                    <input id="brand" class="input-field w-full" :class="{'bg-secondary-100 text-secondary-500': isLocked}" type="text" name="brand" x-model="itemBrand" :readonly="isLocked" placeholder="Contoh: Dell, Logitech, Toyota" />
                                     <x-input-error :messages="$errors->get('brand')" class="mt-2" />
                                 </div>
 
@@ -201,7 +202,7 @@
                                 <div>
                                     <label for="category" class="input-label">Kategori <span class="text-danger-500">*</span></label>
                                     <div class="relative">
-                                        <input list="categories" id="category" name="category" class="input-field" :class="{'bg-secondary-100 text-secondary-500': isLocked}" x-model="itemCategory" :readonly="isLocked" placeholder="Pilih atau ketik kategori baru" />
+                                        <input list="categories" id="category" name="category" class="input-field w-full" :class="{'bg-secondary-100 text-secondary-500': isLocked}" x-model="itemCategory" :readonly="isLocked" placeholder="Pilih atau ketik kategori baru" />
                                         <datalist id="categories">
                                             <option value="Elektronik">
                                             <option value="Mesin">
@@ -218,7 +219,7 @@
                                 <!-- Warna -->
                                 <div>
                                     <label for="color" class="input-label">Warna</label>
-                                    <input list="colors" id="color" name="color" class="input-field" value="{{ old('color') }}" placeholder="Contoh: Hitam, Putih, Merah" />
+                                    <input list="colors" id="color" name="color" class="input-field w-full" value="{{ old('color') }}" placeholder="Contoh: Hitam, Putih, Merah" />
                                     <datalist id="colors">
                                         <option value="Hitam">
                                         <option value="Putih">
@@ -232,7 +233,7 @@
                                 <!-- Kondisi -->
                                 <div>
                                     <label for="condition" class="input-label">Kondisi Barang <span class="text-danger-500">*</span></label>
-                                    <select id="condition" name="condition" class="input-field">
+                                    <select id="condition" name="condition" class="input-field w-full">
                                         <option value="" disabled selected>Pilih Kondisi</option>
                                         <option value="Baru" {{ old('condition') == 'Baru' ? 'selected' : '' }}>Baru</option>
                                         <option value="Bekas" {{ old('condition') == 'Bekas' ? 'selected' : '' }}>Bekas</option>
@@ -542,63 +543,68 @@
 
                     const image = canvas.toDataURL('image/png');
                     
-                    // Preprocess the captured frame
+                    // Preprocess full image (for better general reading)
                     const processedImage = await this.preprocessImage(image);
                     this.debugImage = processedImage; // Show in debug view
                     
-                    await this.processOCR(processedImage);
+                    // Process full text
+                    await this.processFullAnalysis(processedImage);
                 },
 
-                // Image Preprocessing (Contrast Stretch + Grayscale + Threshold)
+                // Image Preprocessing (Upscale + Sharpen + Contrast)
                 async preprocessImage(imageSource) {
                     return new Promise((resolve) => {
                         const img = new Image();
                         img.onload = () => {
                             const canvas = document.createElement('canvas');
                             const ctx = canvas.getContext('2d');
-                            canvas.width = img.width;
-                            canvas.height = img.height;
-                            ctx.drawImage(img, 0, 0);
+                            
+                            // 1. Upscale by 2x for better character recognition
+                            const scaleFactor = 2;
+                            canvas.width = img.width * scaleFactor;
+                            canvas.height = img.height * scaleFactor;
+                            
+                            // Smoothing disabled for pixel-perfect scaling (optional, but usually better for text to be crisp)
+                            ctx.imageSmoothingEnabled = false; 
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                             const data = imageData.data;
+                            const width = canvas.width;
+                            const height = canvas.height;
 
-                            // 1. Grayscale & Find Min/Max (for contrast stretching)
+                            // Buffer for sharpening (so we don't read modified pixels)
+                            const outputData = new Uint8ClampedArray(data);
+
+                            // Helper: Get pixel index
+                            const getIdx = (x, y) => (y * width + x) * 4;
+
+                            // 2. Grayscale & Stats (Min/Max)
                             let min = 255;
                             let max = 0;
-                            
-                            // First pass: convert to gray and find range
+
+                            // Calculate min/max and convert to gray
                             for (let i = 0; i < data.length; i += 4) {
                                 const gray = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
                                 data[i] = gray;
-                                data[i+1] = gray;
-                                data[i+2] = gray;
+                                data[i + 1] = gray;
+                                data[i + 2] = gray;
                                 
                                 if (gray < min) min = gray;
                                 if (gray > max) max = gray;
                             }
-
-                            // Avoid division by zero
                             if (max === min) max = min + 1;
 
-                            // 2. Contrast Stretching & Thresholding
+                            // 3. Contrast Stretching Only (No Sharpening)
+                            // Sharpening was causing noise artifacts (reading barcodes as text)
                             for (let i = 0; i < data.length; i += 4) {
                                 let gray = data[i];
-                                
-                                // Contrast stretch: Map [min, max] to [0, 255]
                                 gray = ((gray - min) * 255) / (max - min);
-                                
-                                // Thresholding: slightly above middle to clean up background noise
-                                // Since we stretched contrast, 128 is a reliable middle ground now.
-                                // We use 140 to be slightly more aggressive against gray background noise (paper texture).
-                                const value = gray > 150 ? 255 : 0;
-
-                                data[i] = value;
-                                data[i + 1] = value;
-                                data[i + 2] = value;
+                                data[i] = data[i + 1] = data[i + 2] = gray;
                             }
 
                             ctx.putImageData(imageData, 0, 0);
+
                             resolve(canvas.toDataURL('image/png'));
                         };
                         img.src = imageSource;
@@ -616,64 +622,116 @@
                     reader.onload = async (event) => {
                         const processedImage = await this.preprocessImage(event.target.result);
                         this.debugImage = processedImage; // Show in debug view
-                        await this.processOCR(processedImage);
+                        await this.processFullAnalysis(processedImage);
                     };
                     reader.readAsDataURL(file);
                 },
 
-                async processOCR(imageSource) {
+                async processFullAnalysis(imageSource) {
                     let worker = null;
                     try {
                         this.ocrLoading = true;
                         
-                        // Create a worker with specific logger
                         worker = await Tesseract.createWorker('eng', 1, {
                             logger: m => {
-                                if (m.status === 'recognizing text') {
-                                    console.log(m); 
-                                }
+                                // console.log(m); // Optional logging
                             }
                         });
 
-                        // Set parameters to restrict char set and segmentation mode
+                        // Set parameters for general block text reading
                         await worker.setParameters({
-                            tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/', // Only Allow block caps, numbers, dash, slash
-                            tessedit_pageseg_mode: '7', // PSM 7 = Treat the image as a single text line.
+                            tessedit_pageseg_mode: '11', // PSM 11 = Sparse Text. Finds as much text as possible in no particular order.
                         });
 
                         const { data: { text } } = await worker.recognize(imageSource);
+                        const rawText = text.toUpperCase(); // Normalize to uppercase
+                        console.log("Raw Analysis:", rawText);
 
-                        console.log("Raw OCR:", text);
+                        // --- Extraction Logic ---
                         
-                        // Force uppercase and clean
-                        const cleanedText = text.toUpperCase().replace(/[^A-Z0-9\-\/]/g, '').trim(); 
-                        console.log("Cleaned:", cleanedText);
-
-                        if (cleanedText.length < 3) {
-                            throw new Error("Teks tidak terbaca. Pastikan tulisan jelas, tebal, dan pencahayaan cukup.");
+                        // 1. Brand Detection (List of common IT brands)
+                        const knownBrands = ['LENOVO', 'DELL', 'HP', 'ASUS', 'ACER', 'APPLE', 'SAMSUNG', 'TOSHIBA', 'SONY', 'MSI', 'LOGITECH', 'CANON', 'EPSON'];
+                        let foundBrand = '';
+                        
+                        for (const brand of knownBrands) {
+                            if (rawText.includes(brand)) {
+                                foundBrand = brand;
+                                console.log("Found Brand:", foundBrand);
+                                // Nice-to-have: Title case (Lenovo instead of LENOVO)
+                                foundBrand = brand.charAt(0) + brand.slice(1).toLowerCase(); 
+                                break; // Stop after first match (usually enough)
+                            }
                         }
 
-                        this.partNumber = cleanedText;
+                        // 2. Part Number Detection
+                        let foundPN = '';
                         
+                        // Heuristic A: Explicit Label "PN", "P/N", "Part No", "Orig.PN", etc.
+                        // We allow optional characters like 'Orig' or 'Ship' before 'PN'
+                        const pnRegex = /(?:ORIG\.?|SHIP|MACHINE)?[\s\.]*(?:P\/N|PN|PART NO|PART NUMBER)[\s.:]*([A-Z0-9\-\/]{3,})/i;
+                        const pnMatch = rawText.match(pnRegex);
+
+                        if (pnMatch && pnMatch[1]) {
+                            foundPN = pnMatch[1];
+                            console.log("Found Explicit PN:", foundPN);
+                        } else {
+                            // Heuristic B: Fallback - Look for the longest alphanumeric string that "looks like" a PN
+                            // We prioritize strings that mix letters and numbers, as pure numbers might be dates/quantities.
+                            const tokens = rawText.split(/[\s\n]+/);
+                            const potentialPNs = tokens.filter(t => {
+                                // Filter out common words/noise
+                                if (knownBrands.includes(t)) return false;
+                                if (['MODEL', 'REV', 'DATE', 'QTY', 'MADE', 'CHINA', 'WIN', 'MB', 'ORIG', 'SHIP'].includes(t)) return false;
+                                
+                                // Must be at least 5 chars
+                                if (t.length < 5) return false;
+
+                                // Must contain at least one digit AND (one letter OR one dash/slash)
+                                // This assumes PNs are usually mixed. 
+                                // User said: "kombinasi hurufnya, bukan hanya angka"
+                                const hasDigit = /[0-9]/.test(t);
+                                const hasLetter = /[A-Z]/.test(t);
+                                return hasDigit && hasLetter;
+                            });
+
+                            if (potentialPNs.length > 0) {
+                                // Pick specific ones that match the user's sample format (e.g. 5B21K...)
+                                // For now, taking the longest candidate is often a good heuristic for random labels.
+                                foundPN = potentialPNs.reduce((a, b) => a.length > b.length ? a : b);
+                                console.log("Found Heuristic PN:", foundPN);
+                            }
+                        }
+
+                        // --- Result Handling ---
+
+                        if (!foundPN && !foundBrand) {
+                            throw new Error("Tidak menemukan informasi yang relevan (PN/Merk).");
+                        }
+
+                        // Fill Form
+                        if (foundPN) {
+                            // Clean PN (remove random leading/trailing non-alphanumeric)
+                            this.partNumber = foundPN.replace(/^[^A-Z0-9]+|[^A-Z0-9]+$/g, '');
+                        }
+                        if (foundBrand) this.itemBrand = foundBrand;
+
+                        // Show Success State (Toast or just close)
                         if (!this.debugMode) {
                             this.closeScanModal();
                         } else {
                             this.ocrLoading = false;
+                            // Update Debug info if possible or just log
+                            this.ocrError = `Ditemukan: ${foundBrand || '-'} / ${foundPN || '-'}`;
                         }
                         
-                        this.checkPN();
+                        if (this.partNumber) this.checkPN();
 
                     } catch (err) {
-                        console.error("OCR Error:", err);
-                        this.ocrError = "Gagal: " + (err.message || "Tidak dapat membaca teks.");
+                        console.error("Analysis Error:", err);
+                        this.ocrError = "Gagal menganalisis: " + (err.message || "Kesalahan sistem.");
                     } finally {
-                        if (worker) {
-                            await worker.terminate();
-                        }
-                        // Only turn off loading if we didn't success (success handles it in debug/close)
-                        if (this.ocrError) {
-                            this.ocrLoading = false;
-                        }
+                        if (worker) await worker.terminate();
+                        if (!this.ocrError) this.ocrLoading = false;
                     }
                 }
             }))

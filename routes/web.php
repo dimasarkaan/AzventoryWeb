@@ -28,7 +28,24 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('superadmin')
     Route::get('inventory/check-part-number', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'checkPartNumber'])->name('inventory.check-part-number');
     Route::get('reports/download', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'download'])->name('reports.download');
     Route::get('reports', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'index'])->name('reports.index');
+    
+    // Activity Logs
+    Route::get('activity-logs', [\App\Http\Controllers\SuperAdmin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    
+    // Stock Approvals
+    Route::resource('stock-approvals', \App\Http\Controllers\SuperAdmin\StockApprovalController::class)->only(['index', 'update', 'destroy']);
+    
+    // Inventory Requests & Borrowing (Nested or separate?)
+    // Based on inspection, blade uses: superadmin.inventory.stock.request.store, superadmin.inventory.borrow.store
+    // We likely need nested routes or specific named routes to match the Blade calls
+    Route::post('inventory/{sparepart}/stock-request', [\App\Http\Controllers\SuperAdmin\StockRequestController::class, 'store'])->name('inventory.stock.request.store');
+    Route::post('inventory/{sparepart}/borrow', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'store'])->name('inventory.borrow.store');
+    
+    // Return borrowing (from blade: superadmin/inventory/borrow/{id}/return)
+    Route::post('inventory/borrow/{borrowing}/return', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'returnItem'])->name('inventory.borrow.return');
+    
     Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class);
+    Route::resource('inventory', \App\Http\Controllers\SuperAdmin\InventoryController::class);
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
