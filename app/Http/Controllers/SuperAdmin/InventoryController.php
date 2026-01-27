@@ -21,34 +21,26 @@ class InventoryController extends Controller
     {
         $query = Sparepart::query();
 
-        // Search Scope
-        $query->when($request->search, function ($q) use ($request) {
-            $q->where(function($sub) use ($request) {
+        // Search Scope (Modernized with Arrow Functions)
+        $query->when($request->search, fn($q) => 
+            $q->where(fn($sub) => 
                 $sub->where('name', 'like', '%' . $request->search . '%')
                     ->orWhere('part_number', 'like', '%' . $request->search . '%')
-                    ->orWhere('brand', 'like', '%' . $request->search . '%');
-            });
-        });
+                    ->orWhere('brand', 'like', '%' . $request->search . '%')
+            )
+        );
 
         // Filter Brand
-        $query->when($request->brand && $request->brand !== 'Semua Merk', function ($q) use ($request) {
-            $q->where('brand', $request->brand);
-        });
+        $query->when($request->brand && $request->brand !== 'Semua Merk', fn($q) => $q->where('brand', $request->brand));
 
         // Filter Category
-        $query->when($request->category && $request->category !== 'Semua Kategori', function ($q) use ($request) {
-            $q->where('category', $request->category);
-        });
+        $query->when($request->category && $request->category !== 'Semua Kategori', fn($q) => $q->where('category', $request->category));
 
         // Filter Location
-        $query->when($request->location && $request->location !== 'Semua Lokasi', function ($q) use ($request) {
-            $q->where('location', $request->location);
-        });
+        $query->when($request->location && $request->location !== 'Semua Lokasi', fn($q) => $q->where('location', $request->location));
 
         // Filter Color
-        $query->when($request->color && $request->color !== 'Semua Warna', function ($q) use ($request) {
-            $q->where('color', $request->color);
-        });
+        $query->when($request->color && $request->color !== 'Semua Warna', fn($q) => $q->where('color', $request->color));
 
         // Filter Low Stock
         if ($request->filter === 'low_stock') {
@@ -88,11 +80,24 @@ class InventoryController extends Controller
             $query->latest();
         }
 
-        // Get Data for Dropdowns
-        $categories = Sparepart::select('category')->distinct()->pluck('category');
-        $brands = Sparepart::whereNotNull('brand')->select('brand')->distinct()->pluck('brand');
-        $locations = Sparepart::select('location')->distinct()->pluck('location');
-        $colors = Sparepart::whereNotNull('color')->select('color')->distinct()->pluck('color');
+        // Get Data for Dropdowns (Cached for 60 minutes)
+        // Cache keys are generic as these lists are global. 
+        // We should clear these caches when a Sparepart is created/updated/deleted.
+        $categories = \Illuminate\Support\Facades\Cache::remember('inventory_categories', 3600, function () {
+            return Sparepart::select('category')->distinct()->pluck('category');
+        });
+
+        $brands = \Illuminate\Support\Facades\Cache::remember('inventory_brands', 3600, function () {
+            return Sparepart::whereNotNull('brand')->select('brand')->distinct()->pluck('brand');
+        });
+        
+        $locations = \Illuminate\Support\Facades\Cache::remember('inventory_locations', 3600, function () {
+            return Sparepart::select('location')->distinct()->pluck('location');
+        });
+
+        $colors = \Illuminate\Support\Facades\Cache::remember('inventory_colors', 3600, function () {
+            return Sparepart::whereNotNull('color')->select('color')->distinct()->pluck('color');
+        });
 
         // Pagination with query string to keep filters
         $spareparts = $query->paginate(10);
@@ -105,7 +110,31 @@ class InventoryController extends Controller
      */
     public function create()
     {
-        return view('superadmin.inventory.create');
+        $categories = \Illuminate\Support\Facades\Cache::remember('inventory_categories', 3600, function () {
+            return Sparepart::select('category')->distinct()->pluck('category');
+        });
+
+        $brands = \Illuminate\Support\Facades\Cache::remember('inventory_brands', 3600, function () {
+            return Sparepart::whereNotNull('brand')->select('brand')->distinct()->pluck('brand');
+        });
+
+        $colors = \Illuminate\Support\Facades\Cache::remember('inventory_colors', 3600, function () {
+            return Sparepart::whereNotNull('color')->select('color')->distinct()->pluck('color');
+        });
+
+        $units = \Illuminate\Support\Facades\Cache::remember('inventory_units', 3600, function () {
+            return Sparepart::whereNotNull('unit')->select('unit')->distinct()->pluck('unit');
+        });
+
+        $names = \Illuminate\Support\Facades\Cache::remember('inventory_names', 3600, function () {
+            return Sparepart::select('name')->distinct()->pluck('name');
+        });
+
+        $partNumbers = \Illuminate\Support\Facades\Cache::remember('inventory_part_numbers', 3600, function () {
+            return Sparepart::select('part_number')->distinct()->pluck('part_number');
+        });
+
+        return view('superadmin.inventory.create', compact('categories', 'brands', 'colors', 'units', 'names', 'partNumbers'));
     }
 
     /**
@@ -115,7 +144,7 @@ class InventoryController extends Controller
     {
         App::setLocale('id');
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'part_number' => 'required|string|max:255',
             'brand' => 'required|string|max:255',
@@ -132,53 +161,114 @@ class InventoryController extends Controller
             'image' => 'nullable|image|max:2048', // Max 2MB
         ]);
 
-        $data = $request->all();
+        // Use ONLY validated data
+        $data = $validated;
 
-        // Handle Image Upload
-        if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('spareparts', 'public');
-        } elseif ($request->filled('existing_image')) {
-            // Copy existing image to a new file to avoid deletion issues/sharing constraint
-            $existingPath = $request->existing_image;
-            if (Storage::disk('public')->exists($existingPath)) {
-                $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
-                $newPath = 'spareparts/' . \Illuminate\Support\Str::random(40) . '.' . $extension;
-                Storage::disk('public')->copy($existingPath, $newPath);
-                $data['image'] = $newPath;
+        // Check for exact duplicate (Same PN + all other physical attributes)
+        $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
+            ->where('name', $data['name'])
+            ->where('brand', $data['brand'])
+            ->where('category', $data['category'])
+            ->where('location', $data['location'])
+            ->where('condition', $data['condition'])
+            ->where('type', $data['type']);
+
+        // Handle nullable fields for duplicate check
+        foreach (['color', 'price', 'unit'] as $field) {
+            if (isset($data[$field])) {
+                $existingItemQuery->where($field, $data[$field]);
+            } else {
+                $existingItemQuery->whereNull($field);
             }
         }
 
-        $sparepart = Sparepart::create($data);
+        $existingItem = $existingItemQuery->first();
 
-        // Generate and save QR Code
-        $options = new \chillerlan\QRCode\QROptions([
-            'outputBase64' => false,
-        ]);
-        $qrCodeUrl = route('superadmin.inventory.show', $sparepart);
-        $qrCodeOutput = (new \chillerlan\QRCode\QRCode($options))->render($qrCodeUrl);
-        $qrCodePath = 'qrcodes/' . $sparepart->part_number . '_' . $sparepart->id . '.svg';
-        Storage::disk('public')->put($qrCodePath, $qrCodeOutput);
+        if ($existingItem) {
+            // DUPLICATE FOUND: Merge Stock
+            if ($data['stock'] > 0) {
+                $existingItem->stock += $data['stock'];
+                $existingItem->save();
+                
+                $sparepart = $existingItem;
+                $message = "Stok sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) berhasil ditambahkan ke item yang sudah ada.";
 
-        $sparepart->update(['qr_code_path' => $qrCodePath]);
+                // Log Stock Addition
+                \App\Models\StockLog::create([
+                    'sparepart_id' => $sparepart->id,
+                    'user_id' => auth()->id(),
+                    'type' => 'masuk',
+                    'quantity' => $data['stock'],
+                    'reason' => 'Penambahan stok (Duplicate Entry)',
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                ]);
 
-        // Log Initial Stock if > 0
-        if ($sparepart->stock > 0) {
-            \App\Models\StockLog::create([
-                'sparepart_id' => $sparepart->id,
-                'user_id' => auth()->id(),
-                'type' => 'masuk',
-                'quantity' => $sparepart->stock,
-                'reason' => 'Stok awal (Item baru)',
-                'status' => 'approved',
-                'approved_by' => auth()->id(),
-                'approved_at' => now(),
+                $this->logActivity('Stok Diupdate', $message);
+                
+                return redirect()->route('superadmin.inventory.index')->with('success', $message);
+            } else {
+                // Duplicate input but 0 stock - No Action
+                $message = "Item '{$existingItem->name}' (PN: {$existingItem->part_number}) sudah ada di inventaris dan stok input adalah 0. Silakan periksa kembali jumlah stok.";
+                return redirect()->back()->withInput()->with('warning', $message); // Stay on page, keep input
+            }
+            
+            // Note: We intentionally ignore image upload for duplicates to preserve existing item consistency
+            
+        } else {
+            // NEW ITEM: Handle Image & Create
+
+            // Handle Image Upload
+            if ($request->hasFile('image')) {
+                $data['image'] = $request->file('image')->store('spareparts', 'public');
+            } elseif ($request->filled('existing_image')) {
+                // Copy existing image to a new file to avoid deletion issues/sharing constraint
+                $existingPath = $request->existing_image;
+                if (Storage::disk('public')->exists($existingPath)) {
+                    $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
+                    $newPath = 'spareparts/' . \Illuminate\Support\Str::random(40) . '.' . $extension;
+                    Storage::disk('public')->copy($existingPath, $newPath);
+                    $data['image'] = $newPath;
+                }
+            }
+
+            $sparepart = Sparepart::create($data);
+
+            // Generate and save QR Code
+            $options = new \chillerlan\QRCode\QROptions([
+                'outputBase64' => false,
             ]);
+            $qrCodeUrl = route('superadmin.inventory.show', $sparepart);
+            $qrCodeOutput = (new \chillerlan\QRCode\QRCode($options))->render($qrCodeUrl);
+            $qrCodePath = 'qrcodes/' . $sparepart->part_number . '_' . $sparepart->id . '.svg';
+            Storage::disk('public')->put($qrCodePath, $qrCodeOutput);
+
+            $sparepart->update(['qr_code_path' => $qrCodePath]);
+
+            // Log Initial Stock if > 0
+            if ($sparepart->stock > 0) {
+                \App\Models\StockLog::create([
+                    'sparepart_id' => $sparepart->id,
+                    'user_id' => auth()->id(),
+                    'type' => 'masuk',
+                    'quantity' => $sparepart->stock,
+                    'reason' => 'Stok awal (Item baru)',
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                ]);
+            }
+            
+            $message = "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah ditambahkan.";
+            $this->logActivity('Sparepart Dibuat', $message);
         }
 
-        $this->logActivity('Sparepart Dibuat', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah ditambahkan.");
+        // Clear Cache to update filters
+        $this->clearFilterCache();
 
         return redirect()->route('superadmin.inventory.index')
-            ->with('success', 'Sparepart berhasil ditambahkan.');
+            ->with('success', $message);
     }
 
     /**
@@ -198,7 +288,31 @@ class InventoryController extends Controller
      */
     public function edit(Sparepart $inventory)
     {
-        return view('superadmin.inventory.edit', ['sparepart' => $inventory]);
+        $categories = \Illuminate\Support\Facades\Cache::remember('inventory_categories', 3600, function () {
+            return Sparepart::select('category')->distinct()->pluck('category');
+        });
+
+        $brands = \Illuminate\Support\Facades\Cache::remember('inventory_brands', 3600, function () {
+            return Sparepart::whereNotNull('brand')->select('brand')->distinct()->pluck('brand');
+        });
+
+        $colors = \Illuminate\Support\Facades\Cache::remember('inventory_colors', 3600, function () {
+            return Sparepart::whereNotNull('color')->select('color')->distinct()->pluck('color');
+        });
+
+        $units = \Illuminate\Support\Facades\Cache::remember('inventory_units', 3600, function () {
+            return Sparepart::whereNotNull('unit')->select('unit')->distinct()->pluck('unit');
+        });
+
+        $names = \Illuminate\Support\Facades\Cache::remember('inventory_names', 3600, function () {
+            return Sparepart::select('name')->distinct()->pluck('name');
+        });
+
+        $partNumbers = \Illuminate\Support\Facades\Cache::remember('inventory_part_numbers', 3600, function () {
+            return Sparepart::select('part_number')->distinct()->pluck('part_number');
+        });
+
+        return view('superadmin.inventory.edit', ['sparepart' => $inventory, 'categories' => $categories, 'brands' => $brands, 'colors' => $colors, 'units' => $units, 'names' => $names, 'partNumbers' => $partNumbers]);
     }
 
     /**
@@ -207,7 +321,7 @@ class InventoryController extends Controller
     public function update(Request $request, Sparepart $inventory)
     {
         App::setLocale('id');
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'part_number' => 'required|string|max:255',
             'brand' => 'required|string|max:255',
@@ -224,7 +338,7 @@ class InventoryController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $validated;
 
         // Handle Image Upload
         if ($request->hasFile('image')) {
@@ -261,6 +375,9 @@ class InventoryController extends Controller
             $admins = \App\Models\User::whereIn('role', ['superadmin', 'admin'])->get();
             \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\LowStockNotification($inventory));
         }
+
+        // Clear Cache to update filters
+        $this->clearFilterCache();
 
         $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$inventory->name}' (PN: {$inventory->part_number}) telah diperbarui.");
 
@@ -423,5 +540,18 @@ class InventoryController extends Controller
         }
 
         return response()->json(['exists' => false]);
+    }
+
+    /**
+     * Clear the inventory filter caches.
+     */
+    private function clearFilterCache()
+    {
+        \Illuminate\Support\Facades\Cache::forget('inventory_categories');
+        \Illuminate\Support\Facades\Cache::forget('inventory_brands');
+        \Illuminate\Support\Facades\Cache::forget('inventory_locations');
+        \Illuminate\Support\Facades\Cache::forget('inventory_locations');
+        \Illuminate\Support\Facades\Cache::forget('inventory_colors');
+        \Illuminate\Support\Facades\Cache::forget('inventory_units');
     }
 }

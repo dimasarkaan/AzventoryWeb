@@ -12,16 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('spareparts', function (Blueprint $table) {
-            $table->dropUnique(['part_number']);
-            $table->index('part_number');
+            //
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::table('spareparts', function (Blueprint $table) {
-            $table->dropIndex(['part_number']);
-            $table->unique('part_number');
+            //
         });
     }
 };

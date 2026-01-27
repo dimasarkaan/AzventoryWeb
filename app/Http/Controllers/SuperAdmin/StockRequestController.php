@@ -19,7 +19,7 @@ class StockRequestController extends Controller
         return view('superadmin.inventory.stock_request', ['sparepart' => $inventory]);
     }
 
-    public function store(Request $request, Sparepart $inventory)
+    public function store(Request $request, Sparepart $sparepart)
     {
         $request->validate([
             'type' => 'required|in:masuk,keluar',
@@ -33,23 +33,23 @@ class StockRequestController extends Controller
         $approvedBy = $isAutoApproved ? $user->id : null;
 
         // DB Transaction to ensure data consistency
-        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $inventory, $user, $status, $approvedBy, $isAutoApproved) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $sparepart, $user, $status, $approvedBy, $isAutoApproved) {
             
             // If Auto Approved, update stock immediately
             if ($isAutoApproved) {
                 if ($request->type === 'masuk') {
-                    $inventory->stock += $request->quantity;
+                    $sparepart->stock += $request->quantity;
                 } else { // keluar
-                    if ($inventory->stock < $request->quantity) {
+                    if ($sparepart->stock < $request->quantity) {
                          throw \Illuminate\Validation\ValidationException::withMessages(['quantity' => 'Stok tidak mencukupi untuk pengurangan ini.']);
                     }
-                    $inventory->stock -= $request->quantity;
+                    $sparepart->stock -= $request->quantity;
                 }
-                $inventory->save();
+                $sparepart->save();
             }
 
             // Create Log
-            $stockLog = $inventory->stockLogs()->create([
+            $stockLog = $sparepart->stockLogs()->create([
                 'user_id' => $user->id,
                 'type' => $request->type,
                 'quantity' => $request->quantity,
@@ -62,21 +62,21 @@ class StockRequestController extends Controller
             if ($isAutoApproved) {
                 // Determine Log Title
                 $actionTitle = $request->type === 'masuk' ? 'Penambahan Stok' : 'Pengurangan Stok';
-                $this->logActivity($actionTitle, "{$actionTitle}: {$request->quantity} {$inventory->unit} untuk '{$inventory->name}'. Alasan: {$request->reason}");
+                $this->logActivity($actionTitle, "{$actionTitle}: {$request->quantity} {$sparepart->unit} untuk '{$sparepart->name}'. Alasan: {$request->reason}");
                 
                 // Low Stock Notification Check (if reduced)
-                if ($request->type === 'keluar' && $inventory->minimum_stock > 0 && $inventory->stock <= $inventory->minimum_stock) {
+                if ($request->type === 'keluar' && $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
                     $admins = User::whereIn('role', ['superadmin', 'admin'])->get();
-                     Notification::send($admins, new \App\Notifications\LowStockNotification($inventory));
+                     Notification::send($admins, new \App\Notifications\LowStockNotification($sparepart));
                 }
 
             } else {
                 // Pending Request Logic
-                $this->logActivity('Pengajuan Stok', "Pengajuan stok {$request->type} sebanyak {$request->quantity} untuk '{$inventory->name}' dengan alasan '{$request->reason}'.");
+                $this->logActivity('Pengajuan Stok', "Pengajuan stok {$request->type} sebanyak {$request->quantity} untuk '{$sparepart->name}' dengan alasan '{$request->reason}'.");
                 
                 // Notify admins
                 $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
-                $message = "Pengajuan stok {$stockLog->type} baru untuk {$inventory->name} oleh " . $user->name;
+                $message = "Pengajuan stok {$stockLog->type} baru untuk {$sparepart->name} oleh " . $user->name;
                 Notification::send($admins, new StockRequestNotification($stockLog, $message));
             }
         });
@@ -85,7 +85,7 @@ class StockRequestController extends Controller
             ? 'Stok berhasil diperbarui secara langsung.' 
             : 'Pengajuan perubahan stok berhasil dikirim, menunggu persetujuan Admin/Superadmin.';
 
-        return redirect()->route('superadmin.inventory.show', $inventory)
+        return redirect()->route('superadmin.inventory.show', $sparepart)
             ->with('success', $message);
     }
 }

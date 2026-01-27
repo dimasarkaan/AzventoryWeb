@@ -20,15 +20,14 @@
 </head>
 <body>
     <div class="header">
-        <h1>AZVENTORY</h1>
-        <p>Sistem Manajemen Inventaris & Stok Barang</p>
-        <p><strong>{{ $title }}</strong></p>
-        <div style="font-size: 10pt; margin-top: 10px;">
-            <p>Dicetak pada: {{ now()->translatedFormat('d F Y H:i') }} | User: {{ auth()->user()->name }}</p>
+        <h1 style="text-transform: uppercase;">{{ $title }}</h1>
+        <p style="font-size: 10pt; margin-top: 5px;">
             @if(isset($startDate) && isset($endDate))
-                <p>Periode: {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}</p>
+                Periode: {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
+            @else
+                Periode: Semua Riwayat
             @endif
-        </div>
+        </p>
     </div>
 
     <table>
@@ -89,7 +88,7 @@
     </table>
 
     <div class="footer">
-        Dicetak otomatis oleh Sistem Azventory
+        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
     </div>
 </body>
 </html>

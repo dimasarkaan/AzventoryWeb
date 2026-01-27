@@ -18,16 +18,16 @@
 </head>
 <body>
     <div class="header">
-        <h1>AZVENTORY</h1>
-        <p>Sistem Manajemen Inventaris & Stok Barang</p>
-        <p><strong>{{ $title }}</strong></p>
-        @if($startDate && $endDate)
-            <p style="font-size: 10pt;">Periode: {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}</p>
-        @else
-            <p style="font-size: 10pt;">Periode: Semua Riwayat</p>
-        @endif
-        <p style="font-size: 10pt;">Lokasi: {{ $location == 'all' ? 'Semua Lokasi' : $location }}</p>
-        <p style="font-size: 9pt;">Dicetak pada: {{ now()->translatedFormat('d F Y H:i') }}</p>
+        <h1 style="text-transform: uppercase;">{{ $title }}</h1>
+        <p style="font-size: 10pt; margin-top: 5px;">
+            @if($startDate && $endDate)
+                Periode: {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
+            @else
+                Periode: Semua Riwayat
+            @endif
+            &nbsp; | &nbsp;
+            Lokasi: {{ $location == 'all' ? 'Semua Lokasi' : $location }}
+        </p>
     </div>
 
     <table>
@@ -71,7 +71,7 @@
     </table>
 
     <div class="footer">
-        <p>Dicetak oleh: {{ auth()->user()->name }}</p>
+        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
     </div>
 </body>
 </html>

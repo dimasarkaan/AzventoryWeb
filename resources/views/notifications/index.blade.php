@@ -57,7 +57,7 @@
                             </div>
                             
                             <div class="flex-shrink-0">
-                                <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
+                                <form action="{{ route('notifications.read', $notification->id) }}" method="POST" {{ $notification->type === 'App\Notifications\ReportReadyNotification' ? 'target=_blank' : '' }}>
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-ghost text-xs group" title="Lihat Detail">

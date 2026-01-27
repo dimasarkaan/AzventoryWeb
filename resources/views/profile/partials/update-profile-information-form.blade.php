@@ -67,17 +67,21 @@
                 <p class="mt-1 text-xs text-secondary-400">Username bersifat permanen.</p>
             </div>
 
-            <!-- Email (Read Only) -->
+            <!-- Email -->
             <div class="sm:col-span-3">
                  <label for="email" class="input-label">Email</label>
-                 <div class="relative">
-                    <input type="email" id="email" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->email }}" readonly>
-                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    </div>
-                 </div>
-                 <p class="mt-1 text-xs text-secondary-400">Hubungi admin untuk ganti email.</p>
-                 <x-input-error class="mt-2" :messages="$errors->get('email')" />
+                 @if(auth()->user()->role === 'superadmin')
+                    <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('email', $user->email) }}" :disabled="!isEditing" required>
+                    <x-input-error class="mt-2" :messages="$errors->get('email')" />
+                 @else
+                     <div class="relative">
+                        <input type="email" id="email" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->email }}" readonly>
+                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                     </div>
+                     <p class="mt-1 text-xs text-secondary-400">Hubungi admin untuk ganti email.</p>
+                 @endif
             </div>
 
              <!-- Name -->

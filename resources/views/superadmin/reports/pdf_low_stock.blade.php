@@ -17,12 +17,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>AZVENTORY - WARNING</h1>
-        <p>Laporan Stok Menipis & Kritis</p>
-        <div style="font-size: 10pt; margin-top: 10px;">
-            <p>Dicetak pada: {{ now()->translatedFormat('d F Y H:i') }} | User: {{ auth()->user()->name }}</p>
-            <p>Lokasi: {{ $location == 'all' ? 'Semua Gudang' : $location }}</p>
-        </div>
+        <h1 style="text-transform: uppercase;">{{ $title }}</h1>
+        <p style="font-size: 10pt; margin-top: 5px;">
+            Periode: Saat Ini
+            &nbsp; | &nbsp;
+            Lokasi: {{ $location == 'all' ? 'Semua Gudang' : $location }}
+        </p>
     </div>
 
     <table>
@@ -53,7 +53,7 @@
     </table>
 
     <div class="footer">
-         Laporan ini digenerate otomatis. Mohon segera lakukan restock.
+        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
     </div>
 </body>
 </html>

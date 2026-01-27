@@ -82,19 +82,29 @@
                             })
                             .catch(error => console.error(error));
                     },
-                    markAsRead(id, url) {
+                    markAsRead(id, url, type) {
                          axios.patch('/notifications/' + id + '/read')
                             .then(response => {
-                                if (response.data.url) window.location.href = response.data.url;
-                                else if (url) window.location.href = url;
-                                else this.fetchNotifications();
+                                const targetUrl = response.data.url || url;
+                                if (targetUrl) {
+                                    if (type === 'App\\Notifications\\ReportReadyNotification') {
+                                        window.open(targetUrl, '_blank');
+                                        this.fetchNotifications();
+                                    } else {
+                                        window.location.href = targetUrl;
+                                    }
+                                } else {
+                                    this.fetchNotifications();
+                                }
                             })
                             .catch(error => console.error(error));
                     }
                 }" class="relative">
                     <button @click="notificationOpen = !notificationOpen" class="relative p-2 text-secondary-500 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none transition-all duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span x-show="unreadCount > 0" x-text="unreadCount" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]"></span>
+                        <span x-show="unreadCount > 0" x-text="unreadCount" style="{{ auth()->user()->unreadNotifications()->count() > 0 ? '' : 'display: none;' }}" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]">
+                            {{ auth()->user()->unreadNotifications()->count() > 0 ? auth()->user()->unreadNotifications()->count() : '' }}
+                        </span>
                     </button>
 
                     <div x-show="notificationOpen" @click.away="notificationOpen = false"
@@ -113,7 +123,7 @@
                             <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
                                 <template x-if="notifications.length > 0">
                                     <template x-for="notification in notifications" :key="notification.id">
-                                        <div @click="markAsRead(notification.id, notification.data.url)" class="cursor-pointer block px-4 py-3 hover:bg-secondary-50 border-b border-secondary-50 last:border-0 transition duration-150 group">
+                                        <div @click="markAsRead(notification.id, notification.data.url, notification.type)" class="cursor-pointer block px-4 py-3 hover:bg-secondary-50 border-b border-secondary-50 last:border-0 transition duration-150 group">
                                             <div class="flex gap-3">
                                                 <div class="flex-shrink-0 mt-1">
                                                      <div class="w-2 h-2 rounded-full bg-primary-500"></div>

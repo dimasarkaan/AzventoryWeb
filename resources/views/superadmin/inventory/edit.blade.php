@@ -14,7 +14,7 @@
                 
                 <div class="space-y-4" x-data="{ type: '{{ old('type', $sparepart->type ?? 'sale') }}' }">
                     <!-- Section 1: Informasi Dasar -->
-                    <div class="card p-6">
+                    <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
                             <h3 class="text-lg font-semibold text-secondary-900">Informasi Dasar</h3>
                         </div>
@@ -49,54 +49,378 @@
                                 <!-- Part Number -->
                                 <div>
                                     <label for="part_number" class="input-label">Part Number (PN) <span class="text-danger-500">*</span></label>
-                                    <input id="part_number" class="input-field" type="text" name="part_number" value="{{ old('part_number', $sparepart->part_number) }}" placeholder="Contoh: KBD-LOGI-GPRO-X" />
+                                    <div class="relative" x-data="{
+                                        open: false,
+                                        search: '',
+                                        selected: '{{ old('part_number', $sparepart->part_number) }}',
+                                        options: {{ json_encode($partNumbers) }} || [],
+                                        get filteredOptions() {
+                                            if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                            return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                        },
+                                        select(value) {
+                                            this.selected = value;
+                                            this.search = value;
+                                            this.open = false;
+                                        },
+                                        createNew() {
+                                            let newValue = this.search.toUpperCase();
+                                            this.select(newValue);
+                                        },
+                                        init() {
+                                            if (this.selected && !this.options.includes(this.selected)) {
+                                                this.options.push(this.selected);
+                                            }
+                                            this.search = this.selected || '';
+                                        }
+                                    }" @click.outside="open = false">
+                                        <div class="relative w-full">
+                                            <input type="hidden" name="part_number" x-model="selected">
+                                            <input id="part_number" class="input-field w-full pr-10" type="text" 
+                                                   x-model="search" 
+                                                   @focus="open = true, $el.select()" 
+                                                   @input="open = true, selected = search, search = search.toUpperCase()"
+                                                   @keydown.enter.prevent="createNew()"
+                                                   placeholder="Contoh: KBD-LOGI-GPRO-X" 
+                                                   autocomplete="off">
+                                            
+                                            <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <!-- Dropdown -->
+                                        <div x-show="open" 
+                                             x-transition:leave="transition ease-in duration-100"
+                                             x-transition:leave-start="opacity-100"
+                                             x-transition:leave-end="opacity-0"
+                                             class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                            
+                                            <template x-for="option in filteredOptions" :key="option">
+                                                <div @click="select(option)" 
+                                                     class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                    <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                                    <span x-show="selected === option" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
+                                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            </template>
+
+                                            <!-- Create New Option -->
+                                            <div x-show="search.length > 0 && !options.some(o => o === search)" 
+                                                 @click="createNew()"
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                                <span class="block truncate">
+                                                    Gunakan "<span x-text="search" class="font-bold"></span>"
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <x-input-error :messages="$errors->get('part_number')" class="mt-2" />
                                 </div>
 
-                                <!-- Nama Barang -->
-                                <div>
+                                <!-- Nama Barang (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '{{ old('name', $sparepart->name) }}',
+                                    options: {{ json_encode($names) }} || [],
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        // Ensure existing non-standard value is in options
+                                        if (this.selected && !this.options.includes(this.selected)) {
+                                            this.options.push(this.selected);
+                                        }
+                                        this.search = this.selected || '';
+                                    }
+                                }" @click.outside="open = false">
                                     <label for="name" class="input-label">Nama Barang <span class="text-danger-500">*</span></label>
-                                    <input id="name" class="input-field" type="text" name="name" value="{{ old('name', $sparepart->name) }}" placeholder="Contoh: Laptop Dell XPS 15" />
+                                    <div class="relative">
+                                        <input type="hidden" name="name" x-model="selected">
+                                        <input type="text" 
+                                               id="name"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true, $el.select()" 
+                                               @input="open = true, selected = search"
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="Contoh: Laptop Dell XPS 15" 
+                                               autocomplete="off">
+                                        
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Dropdown -->
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                                <span x-show="selected === option" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
+                                                    <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </span>
+                                            </div>
+                                        </template>
+
+                                        <!-- Create New Option -->
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate">
+                                                Tambah "<span x-text="search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())" class="font-bold"></span>"
+                                            </span>
+                                        </div>
+                                    </div>
                                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                                 </div>
                             </div>
 
                             <!-- Row 2: Merk & Kategori -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- Merk -->
-                                <div>
+                                <!-- Merk (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '{{ old('brand', $sparepart->brand) }}',
+                                    options: {{ json_encode($brands) }},
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        // Ensure existing non-standard value is in options
+                                        if (this.selected && !this.options.includes(this.selected)) {
+                                            this.options.push(this.selected);
+                                        }
+                                        this.search = this.selected || '';
+                                    }
+                                }" @click.outside="open = false">
                                     <label for="brand" class="input-label">Merk <span class="text-danger-500">*</span></label>
-                                    <input id="brand" class="input-field" type="text" name="brand" value="{{ old('brand', $sparepart->brand) }}" placeholder="Contoh: Dell, Logitech" />
+                                    <div class="relative">
+                                        <input type="hidden" name="brand" x-model="selected">
+                                        <input type="text" 
+                                               id="brand"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true, $el.select()" 
+                                               @input="open = true, selected = search"
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="Contoh: Dell, Logitech" 
+                                               autocomplete="off">
+                                        
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Dropdown -->
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            </div>
+                                        </template>
+
+                                        <!-- Create New Option -->
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate">
+                                                Tambah "<span x-text="search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())" class="font-bold"></span>"
+                                            </span>
+                                        </div>
+                                    </div>
                                     <x-input-error :messages="$errors->get('brand')" class="mt-2" />
                                 </div>
 
-                                <!-- Kategori -->
-                                <div>
+                                <!-- Kategori (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '{{ old('category', $sparepart->category) }}',
+                                    options: {{ json_encode($categories) }},
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        if (this.selected && !this.options.includes(this.selected)) {
+                                            this.options.push(this.selected);
+                                        }
+                                        this.search = this.selected || '';
+                                    }
+                                }" @click.outside="open = false">
                                     <label for="category" class="input-label">Kategori <span class="text-danger-500">*</span></label>
-                                    <input list="categories" id="category" name="category" class="input-field" value="{{ old('category', $sparepart->category) }}" placeholder="Contoh: Elektronik" />
-                                    <datalist id="categories">
-                                        <option value="Elektronik">
-                                        <option value="Mesin">
-                                        <option value="Aksesoris">
-                                        <option value="Lainnya">
-                                    </datalist>
+                                    <div class="relative">
+                                        <input type="hidden" name="category" x-model="selected">
+                                        <input type="text" 
+                                               id="category"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true, $el.select()" 
+                                               @input="open = true, selected = search"
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="Pilih atau ketik kategori baru" 
+                                               autocomplete="off">
+                                        
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Dropdown -->
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            </div>
+                                        </template>
+
+                                        <!-- Create New Option -->
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate">
+                                                Tambah "<span x-text="search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())" class="font-bold"></span>"
+                                            </span>
+                                        </div>
+                                    </div>
                                     <x-input-error :messages="$errors->get('category')" class="mt-2" />
                                 </div>
                             </div>
 
                             <!-- Row 3: Warna & Kondisi -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Warna -->
-                                <div>
+                                <!-- Warna (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '{{ old('color', $sparepart->color) }}',
+                                    options: {{ json_encode($colors) }},
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        if (this.selected && !this.options.includes(this.selected)) {
+                                            this.options.push(this.selected);
+                                        }
+                                        this.search = this.selected || '';
+                                    }
+                                }" @click.outside="open = false">
                                     <label for="color" class="input-label">Warna</label>
-                                    <input list="colors" id="color" name="color" class="input-field" value="{{ old('color', $sparepart->color) }}" placeholder="Contoh: Hitam, Putih, Merah" />
-                                    <datalist id="colors">
-                                        <option value="Hitam">
-                                        <option value="Putih">
-                                        <option value="Merah">
-                                        <option value="Biru">
-                                        <option value="Silver">
-                                    </datalist>
+                                    <div class="relative">
+                                        <input type="hidden" name="color" x-model="selected">
+                                        <input type="text" 
+                                               id="color"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true; $el.select()" 
+                                               @input="open = true; selected = search"
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="Contoh: Hitam, Putih, Merah" 
+                                               autocomplete="off">
+                                        
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Dropdown -->
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            </div>
+                                        </template>
+
+                                        <!-- Create New Option -->
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate">
+                                                Tambah "<span x-text="search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())" class="font-bold"></span>"
+                                            </span>
+                                        </div>
+                                    </div>
                                     <x-input-error :messages="$errors->get('color')" class="mt-2" />
                                 </div>
 
@@ -179,15 +503,87 @@
                     </div>
 
                     <!-- Section 2: Detail Lokasi & Stok -->
-                    <div class="card p-6">
+                    <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
                             <h3 class="text-lg font-semibold text-secondary-900">Lokasi & Stok</h3>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Lokasi Gudang -->
-                            <div>
+                            <!-- Lokasi Gudang (Creatable Select) -->
+                            <div class="relative" x-data="{
+                                open: false,
+                                search: '',
+                                selected: '{{ old('location', $sparepart->location) }}',
+                                options: ['Tegal', 'Cibubur'],
+                                init() {
+                                    // Ensure existing non-standard location is in options
+                                    if (this.selected && !this.options.includes(this.selected)) {
+                                        this.options.push(this.selected);
+                                    }
+                                    this.search = this.selected || '';
+                                },
+                                get filteredOptions() {
+                                    if (this.search === '' || this.search === this.selected) return this.options;
+                                    return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                },
+                                select(value) {
+                                    this.selected = value;
+                                    this.search = value;
+                                    this.open = false;
+                                }
+                            }" @click.outside="open = false">
                                 <label for="location" class="input-label">Lokasi Penyimpanan <span class="text-danger-500">*</span></label>
-                                <input id="location" class="input-field" type="text" name="location" value="{{ old('location', $sparepart->location) }}" />
+                                <div class="relative">
+                                    <input type="hidden" name="location" x-model="selected">
+                                    <input type="text" 
+                                           class="input-field w-full pr-10 cursor-text" 
+                                           x-model="search" 
+                                           @focus="open = true; $el.select()" 
+                                           @input="open = true; selected = search"
+                                           placeholder="Pilih Lokasi Penyimpanan" 
+                                           autocomplete="off">
+                                    
+                                    <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Dropdown -->
+                                <div x-show="open" 
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100"
+                                     x-transition:leave-end="opacity-0"
+                                     class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                    
+                                    <template x-for="option in filteredOptions" :key="option">
+                                        <div @click="select(option)" 
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                            <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            
+                                            <span x-show="selected === option" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </template>
+
+                                    <!-- Create New Option (Superadmin Only) -->
+                                    @if(auth()->user()->role === 'superadmin')
+                                        <div x-show="search.length > 0 && !filteredOptions.includes(search)" 
+                                             @click="select(search); open = false"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate">
+                                                Tambah "<span x-text="search" class="font-bold"></span>"
+                                            </span>
+                                        </div>
+                                    @else
+                                        <div x-show="filteredOptions.length === 0" class="cursor-default select-none relative py-2 pl-3 pr-9 text-secondary-500 italic">
+                                            Lokasi tidak ditemukan.
+                                        </div>
+                                    @endif
+                                </div>
                                 <x-input-error :messages="$errors->get('location')" class="mt-2" />
                             </div>
 
@@ -206,17 +602,82 @@
                                 <x-input-error :messages="$errors->get('minimum_stock')" class="mt-2" />
                             </div>
                             
-                             <!-- Satuan -->
-                            <div>
+                             <!-- Satuan (Creatable Select) -->
+                            <div class="relative" x-data="{
+                                open: false,
+                                search: '',
+                                selected: '{{ old('unit', $sparepart->unit ?? 'Pcs') }}',
+                                options: {{ json_encode($units) }},
+                                get filteredOptions() {
+                                    if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                    return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                },
+                                select(value) {
+                                    this.selected = value;
+                                    this.search = value;
+                                    this.open = false;
+                                },
+                                createNew() {
+                                    let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                    this.select(newValue);
+                                },
+                                init() {
+                                    if (this.selected && !this.options.includes(this.selected)) {
+                                        this.options.push(this.selected);
+                                    }
+                                    this.search = this.selected || '';
+                                }
+                            }" @click.outside="open = false">
                                 <label for="unit" class="input-label">Satuan</label>
-                                <input id="unit" class="input-field" type="text" name="unit" value="{{ old('unit', $sparepart->unit ?? 'Pcs') }}" />
+                                <div class="relative">
+                                    <input type="hidden" name="unit" x-model="selected">
+                                    <input type="text" 
+                                           id="unit"
+                                           class="input-field w-full pr-10 cursor-text" 
+                                           x-model="search" 
+                                           @focus="open = true; $el.select()" 
+                                           @input="open = true; selected = search"
+                                           @keydown.enter.prevent="createNew()"
+                                           placeholder="Pcs, Set, Unit" 
+                                           autocomplete="off">
+                                    
+                                    <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Dropdown -->
+                                <div x-show="open" 
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100"
+                                     x-transition:leave-end="opacity-0"
+                                     class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                    
+                                    <template x-for="option in filteredOptions" :key="option">
+                                        <div @click="select(option)" 
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                            <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                        </div>
+                                    </template>
+
+                                    <!-- Create New Option -->
+                                    <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                         @click="createNew()"
+                                         class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                        <span class="block truncate">
+                                            Tambah "<span x-text="search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())" class="font-bold"></span>"
+                                        </span>
+                                    </div>
+                                </div>
                                 <x-input-error :messages="$errors->get('unit')" class="mt-2" />
                             </div>
                         </div>
                     </div>
 
                     <!-- Section 3: Harga & Status -->
-                    <div class="card p-6">
+                    <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
                             <h3 class="text-lg font-semibold text-secondary-900">Harga & Status</h3>
                         </div>

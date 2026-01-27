@@ -109,6 +109,17 @@
                 color: #ef4444 !important;
             }
 
+            /* Warning Variation */
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-warning {
+                border-left-color: #f59e0b !important;
+            }
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-warning .swal2-icon {
+                color: #f59e0b !important;
+            }
+            div.swal2-popup.swal2-toast.solid-toast-popup.toast-warning .swal2-timer-progress-bar {
+                background: #f59e0b !important;
+            }
+
             /* Typography */
             div.swal2-popup.swal2-toast.solid-toast-popup .swal2-title {
                 color: #374151 !important;
@@ -174,6 +185,17 @@
                     title: "{{ session('error') }}",
                     customClass: {
                         popup: 'solid-toast-popup toast-error',
+                    }
+                });
+            @endif
+
+            @if(session('warning'))
+                Toast.fire({
+                    icon: 'warning',
+                    iconHtml: '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>',
+                    title: "{{ session('warning') }}",
+                    customClass: {
+                        popup: 'solid-toast-popup toast-warning',
                     }
                 });
             @endif
