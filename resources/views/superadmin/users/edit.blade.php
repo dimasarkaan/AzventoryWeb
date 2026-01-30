@@ -2,7 +2,7 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
-            <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                      <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('Edit Pengguna') }}
@@ -22,7 +22,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <!-- Main Edit Form -->
                 <div class="lg:col-span-2">
-                    <div class="card p-6">
+                    <div class="bg-white rounded-xl border border-secondary-200 shadow-card p-6 overflow-visible">
                         <form action="{{ route('superadmin.users.update', $user) }}" method="POST">
                             @csrf
                             @method('PUT')
@@ -58,20 +58,27 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label for="role" class="input-label">Role Akses <span class="text-danger-500">*</span></label>
-                                        <select id="role" name="role" class="input-field">
-                                            <option value="operator" {{ $user->role === 'operator' ? 'selected' : '' }}>Operator</option>
-                                            <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Admin</option>
-                                            <option value="superadmin" {{ $user->role === 'superadmin' ? 'selected' : '' }}>Super Admin</option>
-                                        </select>
+                                        @php
+                                            $roleOptions = [
+                                                'operator' => 'Operator',
+                                                'admin' => 'Admin',
+                                                'superadmin' => 'Super Admin',
+                                            ];
+                                        @endphp
+                                        <x-select name="role" :options="$roleOptions" :selected="old('role', $user->role)" placeholder="Pilih Role" width="w-full" />
                                         <x-input-error :messages="$errors->get('role')" class="mt-2" />
                                     </div>
             
                                     <div>
                                         <label for="status" class="input-label">Status Akun</label>
-                                        <select id="status" name="status" class="input-field">
-                                            <option value="active" {{ $user->status === 'active' ? 'selected' : '' }}>Aktif</option>
-                                            <option value="inactive" {{ $user->status === 'inactive' ? 'selected' : '' }}>Nonaktif</option>
-                                        </select>
+                                        @php
+                                            $statusOptions = [
+                                                'active' => 'Aktif',
+                                                'inactive' => 'Nonaktif',
+                                            ];
+                                        @endphp
+                                        <x-select name="status" :options="$statusOptions" :selected="old('status', $user->status)" placeholder="Pilih Status" width="w-full" />
+                                        <x-input-error :messages="$errors->get('status')" class="mt-2" />
                                     </div>
                                 </div>
                             </div>

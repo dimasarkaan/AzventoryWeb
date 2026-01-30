@@ -1,8 +1,8 @@
 <x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-4">
-                <h2 class="text-2xl font-bold text-secondary-900 tracking-tight">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                     {{ __('Edit Sparepart') }}
                 </h2>
                 <p class="mt-1 text-sm text-secondary-500">Perbarui informasi sparepart.</p>
@@ -427,11 +427,14 @@
                                 <!-- Kondisi Barang -->
                                 <div>
                                     <label for="condition" class="input-label">Kondisi Barang <span class="text-danger-500">*</span></label>
-                                    <select id="condition" name="condition" class="input-field">
-                                        <option value="Baru" {{ old('condition', $sparepart->condition) == 'Baru' ? 'selected' : '' }}>Baru</option>
-                                        <option value="Bekas" {{ old('condition', $sparepart->condition) == 'Bekas' ? 'selected' : '' }}>Bekas</option>
-                                        <option value="Rusak" {{ old('condition', $sparepart->condition) == 'Rusak' ? 'selected' : '' }}>Rusak</option>
-                                    </select>
+                                    @php
+                                        $conditionOptions = [
+                                            'Baru' => 'Baru',
+                                            'Bekas' => 'Bekas',
+                                            'Rusak' => 'Rusak',
+                                        ];
+                                    @endphp
+                                    <x-select name="condition" :options="$conditionOptions" :selected="old('condition', $sparepart->condition)" placeholder="Pilih Kondisi" width="w-full" />
                                     <x-input-error :messages="$errors->get('condition')" class="mt-2" />
                                 </div>
                             </div>            
@@ -697,10 +700,13 @@
                             <!-- Status -->
                             <div>
                                 <label for="status" class="input-label">Status <span class="text-danger-500">*</span></label>
-                                <select id="status" name="status" class="input-field">
-                                    <option value="aktif" {{ old('status', $sparepart->status) == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                                    <option value="nonaktif" {{ old('status', $sparepart->status) == 'nonaktif' ? 'selected' : '' }}>Nonaktif</option>
-                                </select>
+                                @php
+                                    $statusOptions = [
+                                        'aktif' => 'Aktif',
+                                        'nonaktif' => 'Nonaktif',
+                                    ];
+                                @endphp
+                                <x-select name="status" :options="$statusOptions" :selected="old('status', $sparepart->status)" placeholder="Pilih Status" width="w-full" />
                                 <x-input-error :messages="$errors->get('status')" class="mt-2" />
                             </div>
                          </div>

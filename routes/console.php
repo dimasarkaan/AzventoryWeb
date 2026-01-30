@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('app:send-overdue-notifications')->dailyAt('08:00');
+Schedule::command('activitylog:clean')->daily();

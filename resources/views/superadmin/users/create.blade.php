@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-6">
                 <div>
                      <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('Tambah Pengguna Baru') }}
@@ -14,7 +14,7 @@
                 </a>
             </div>
 
-            <div class="card p-8">
+            <div class="bg-white rounded-xl border border-secondary-200 shadow-card p-8 overflow-visible">
                 <form action="{{ route('superadmin.users.store') }}" method="POST">
                     @csrf
                     
@@ -33,10 +33,13 @@
                              <!-- Status -->
                              <div>
                                 <label for="status" class="input-label">Status Akun</label>
-                                <select id="status" name="status" class="input-field">
-                                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Aktif</option>
-                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Nonaktif</option>
-                                </select>
+                                @php
+                                    $statusOptions = [
+                                        'active' => 'Aktif',
+                                        'inactive' => 'Nonaktif',
+                                    ];
+                                @endphp
+                                <x-select name="status" :options="$statusOptions" :selected="old('status', 'active')" placeholder="Pilih Status" width="w-full" />
                             </div>
                         </div>
 
@@ -47,11 +50,14 @@
                             <!-- Role -->
                             <div>
                                 <label for="role" class="input-label">Role Akses <span class="text-danger-500">*</span></label>
-                                <select id="role" name="role" class="input-field">
-                                    <option value="operator" {{ old('role') == 'operator' ? 'selected' : '' }}>Operator (Gudang)</option>
-                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin (Manajemen)</option>
-                                    <option value="superadmin" {{ old('role') == 'superadmin' ? 'selected' : '' }}>Super Admin (Full Akses)</option>
-                                </select>
+                                @php
+                                    $roleOptions = [
+                                        'operator' => 'Operator (Gudang)',
+                                        'admin' => 'Admin (Manajemen)',
+                                        'superadmin' => 'Super Admin (Full Akses)',
+                                    ];
+                                @endphp
+                                <x-select name="role" :options="$roleOptions" :selected="old('role')" placeholder="Pilih Role" width="w-full" />
                                 <x-input-error :messages="$errors->get('role')" class="mt-2" />
                             </div>
 

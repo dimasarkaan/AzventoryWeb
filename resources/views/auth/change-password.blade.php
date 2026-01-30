@@ -14,12 +14,26 @@
             <form method="POST" action="{{ route('password.change.store') }}">
                 @csrf
 
+                <!-- Username (Only on First Login / Activation) -->
+                @if(is_null(auth()->user()->password_changed_at))
+                    <div class="mb-4">
+                        <x-input-label for="username" :value="__('Username (Ganti jika diperlukan)')" />
+                        <x-text-input id="username" class="block mt-1 w-full bg-gray-50" type="text" name="username" :value="old('username', auth()->user()->username)" required autofocus />
+                        <x-input-error :messages="$errors->get('username')" class="mt-2" />
+                        <p class="mt-1 text-xs text-gray-500">
+                            {{ __('Username hanya bisa diubah 1 kali saat aktivasi akun.') }}
+                        </p>
+                    </div>
+                @endif
+
                 <!-- Current Password -->
-                <div>
-                    <x-input-label for="current_password" :value="__('Kata Sandi Saat Ini')" />
-                    <x-text-input id="current_password" class="block mt-1 w-full" type="password" name="current_password" required />
-                    <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
-                </div>
+                @if(!is_null(auth()->user()->password_changed_at))
+                    <div>
+                        <x-input-label for="current_password" :value="__('Kata Sandi Saat Ini')" />
+                        <x-text-input id="current_password" class="block mt-1 w-full" type="password" name="current_password" required />
+                        <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
+                    </div>
+                @endif
 
                 <!-- New Password -->
                 <div class="mt-4">

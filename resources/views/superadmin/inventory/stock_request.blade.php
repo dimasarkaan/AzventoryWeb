@@ -7,17 +7,20 @@
 
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <x-card>
+            <div class="bg-white overflow-visible shadow-sm sm:rounded-lg p-6">
                 <form action="{{ route('superadmin.inventory.stock.request.store', $sparepart) }}" method="POST">
                     @csrf
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Tipe Transaksi -->
                         <div>
                             <x-input-label for="type" :value="__('Tipe Transaksi')" :required="true" />
-                            <select id="type" name="type" class="block mt-1 w-full border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-md shadow-sm">
-                                <option value="masuk">Stok Masuk</option>
-                                <option value="keluar">Stok Keluar</option>
-                            </select>
+                            @php
+                                $typeOptions = [
+                                    'masuk' => 'Stok Masuk',
+                                    'keluar' => 'Stok Keluar',
+                                ];
+                            @endphp
+                            <x-select name="type" :options="$typeOptions" :selected="old('type', 'masuk')" placeholder="Pilih Tipe Transaksi" width="w-full" />
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
 
@@ -49,7 +52,7 @@
                         </x-button>
                     </div>
                 </form>
-            </x-card>
+            </div>
         </div>
     </div>
 </x-app-layout>
