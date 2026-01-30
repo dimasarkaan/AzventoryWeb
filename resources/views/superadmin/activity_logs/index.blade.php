@@ -10,13 +10,38 @@
                     <p class="mt-1 text-sm text-secondary-500">Riwayat aktivitas pengguna dan perubahan data dalam sistem.</p>
                 </div>
                 
-                <button @click="showFilters = !showFilters" 
-                        class="btn btn-secondary flex items-center gap-2"
-                        :class="{ 'bg-secondary-100 ring-2 ring-secondary-200': showFilters }">
-                    <svg class="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                    <span>Filter & Pencarian</span>
-                    <svg class="w-4 h-4 text-secondary-400 transition-transform duration-200" :class="{ 'rotate-180': showFilters }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                </button>
+                <div class="flex gap-2">
+                    <!-- Export Dropdown -->
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" @click.away="open = false" class="btn btn-outline-secondary flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            <span>Export Data</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div x-show="open" 
+                             class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-secondary-100"
+                             style="display: none;">
+                            <a href="{{ route('superadmin.activity-logs.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                Export PDF
+                            </a>
+                            <a href="{{ route('superadmin.activity-logs.export', array_merge(request()->query(), ['format' => 'csv'])) }}" class="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 flex items-center gap-2">
+                                <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Export Excel (CSV)
+                            </a>
+                        </div>
+                    </div>
+
+                    <button @click="showFilters = !showFilters" 
+                            class="btn btn-secondary flex items-center gap-2"
+                            :class="{ 'bg-secondary-100 ring-2 ring-secondary-200': showFilters }">
+                        <svg class="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                        <span>Filter & Pencarian</span>
+                        <svg class="w-4 h-4 text-secondary-400 transition-transform duration-200" :class="{ 'rotate-180': showFilters }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                </div>
             </div>
 
             <!-- Collabsible Filter Section -->
@@ -30,8 +55,53 @@
                  class="mb-6"
                  style="display: none;">
                  
-                <form action="{{ route('superadmin.activity-logs.index') }}" method="GET" class="card p-6 border border-secondary-200 shadow-lg">
-                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 items-end">
+                <form action="{{ route('superadmin.activity-logs.index') }}" method="GET" class="card p-6 border border-secondary-200 shadow-lg overflow-visible">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                        
+                        <!-- Search -->
+                        <div class="space-y-1">
+                            <label for="search" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Cari Kata Kunci</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </span>
+                                <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Deskripsi..."
+                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Role Filter -->
+                        <div class="space-y-1">
+                            <label for="role" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Role</label>
+                            @php
+                                $roleOptions = [
+                                    'superadmin' => 'Super Admin',
+                                    'admin' => 'Admin',
+                                    'operator' => 'Operator',
+                                ];
+                            @endphp
+                            <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="Semua Role" width="w-full" />
+                        </div>
+
+                        <!-- Action Filter -->
+                        <div class="space-y-1">
+                            <label for="action" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Jenis Aksi</label>
+                            @php
+                                $actionOptions = $actions->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            @endphp
+                            <x-select name="action" :options="$actionOptions" :selected="request('action')" placeholder="Semua Aksi" width="w-full" />
+                        </div>
+
+                        <!-- User Filter -->
+                        <div class="space-y-1">
+                            <label for="user_id" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Pengguna</label>
+                            @php
+                                $userOptions = $users->pluck('name', 'id')->toArray();
+                            @endphp
+                            <x-select name="user_id" :options="$userOptions" :selected="request('user_id')" placeholder="Semua User" width="w-full" />
+                        </div>
+
+                        <!-- Date Start -->
                         <div class="space-y-1">
                             <label for="start_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Dari Tanggal</label>
                             <div class="relative">
@@ -43,6 +113,7 @@
                             </div>
                         </div>
 
+                        <!-- Date End -->
                         <div class="space-y-1">
                             <label for="end_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Sampai Tanggal</label>
                             <div class="relative">
@@ -54,33 +125,31 @@
                             </div>
                         </div>
 
+                        <!-- NEW: Subject Type Filter -->
                         <div class="space-y-1">
-                            <label for="user_id" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Pengguna</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                                </span>
-                                <select name="user_id" id="user_id" class="form-select pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
-                                    <option value="">Semua User</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user->id }}" {{ request('user_id') == $user->id ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <label for="subject_type" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Tipe Objek</label>
+                            @php
+                                $subjectOptions = [
+                                    'inventory' => 'Inventory / Barang',
+                                    'user' => 'Users / Pengguna',
+                                    'auth' => 'Authentication',
+                                    'report' => 'Reports / Laporan',
+                                ];
+                            @endphp
+                            <x-select name="subject_type" :options="$subjectOptions" :selected="request('subject_type')" placeholder="Semua Tipe" width="w-full" />
                         </div>
 
-                        <div class="flex gap-2">
-                             <button type="submit" class="btn btn-primary w-full justify-center flex items-center gap-2">
+                        <!-- Buttons -->
+                        <div class="flex gap-2 w-full">
+                             <button type="submit" class="btn btn-primary flex-1 justify-center flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                 Terapkan
                             </button>
-                            @if(request()->hasAny(['start_date', 'end_date', 'user_id']))
-                                <a href="{{ route('superadmin.activity-logs.index') }}" class="btn btn-secondary w-full justify-center">
-                                    Reset
-                                </a>
-                            @endif
+                            <a href="{{ route('superadmin.activity-logs.index') }}" class="btn btn-secondary flex items-center justify-center gap-2 px-3" title="Reset Filter">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                            </a>
                         </div>
                     </div>
                 </form>
@@ -121,8 +190,10 @@
                                             {{ $log->action }}
                                         </span>
                                     </td>
-                                    <td class="text-sm text-secondary-600 max-w-md truncate" title="{{ $log->description }}">
-                                        {{ $log->description }}
+                                    <td class="text-sm text-secondary-600">
+                                        <div class="max-w-lg whitespace-normal break-words">
+                                            {{ $log->description }}
+                                        </div>
                                     </td>
                                     <td class="text-sm text-secondary-500 whitespace-nowrap">
                                         {{ $log->created_at->format('d M Y H:i:s') }}

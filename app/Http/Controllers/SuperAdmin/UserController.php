@@ -5,9 +5,11 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Traits\ActivityLogger;
 
 class UserController extends Controller
 {
+    use ActivityLogger;
     /**
      * Display a listing of the resource.
      */
@@ -76,6 +78,8 @@ class UserController extends Controller
             'status' => $request->status,
         ]);
 
+        $this->logActivity('User Dibuat', "Menambahkan user baru: {$user->name} ({$user->role})");
+
         return redirect()->route('superadmin.users.index')
             ->with('success', "User berhasil dibuat. Username Sementara: {$username}, Password Default: {$password}");
     }
@@ -115,6 +119,8 @@ class UserController extends Controller
             'status' => $request->status,
         ]);
 
+        $this->logActivity('User Diupdate', "Mengupdate data user: {$user->name}");
+
         return redirect()->route('superadmin.users.index')
             ->with('success', "Akun pengguna {$user->name} berhasil diperbarui.");
     }
@@ -129,6 +135,8 @@ class UserController extends Controller
             'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
         ]);
 
+        $this->logActivity('Reset Password', "Mereset password user: {$user->name} ke default.");
+
         return back()->with('success', "Password untuk {$user->name} telah direset menjadi: {$defaultPassword}");
     }
 
@@ -141,6 +149,8 @@ class UserController extends Controller
          if (auth()->id() === $user->id) {
             return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
+
+        $this->logActivity('User Dihapus', "Menghapus user: {$user->name}");
 
         $user->delete();
 

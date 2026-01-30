@@ -8,13 +8,29 @@ use App\Models\StockLog;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use App\Traits\ActivityLogger;
+use App\Services\ReportService; // Added this line
 
 class ReportController extends Controller
 {
+    use ActivityLogger;
+    
+    protected $reportService;
+    protected $inventoryService;
+
+    public function __construct(ReportService $reportService, \App\Services\InventoryService $inventoryService)
+    {
+        $this->reportService = $reportService;
+        $this->inventoryService = $inventoryService;
+    }
+
     public function index()
     {
-        // View for report selection if needed, or just specific methods
-        return view('superadmin.reports.index');
+        // Get locations from InventoryService
+        $options = $this->inventoryService->getDropdownOptions();
+        $locations = $options['locations'];
+
+        return view('superadmin.reports.index', compact('locations'));
     }
 
     public function download(Request $request)
@@ -29,88 +45,49 @@ class ReportController extends Controller
         if ($format !== 'excel') {
             \App\Jobs\GenerateReportJob::dispatch($request->user(), $params);
 
+            $this->logActivity('Laporan Diproses', "Meminta laporan PDF tipe: {$type}");
+
             return back()->with('success', 'Laporan sedang memproses. Anda akan menerima notifikasi saat laporan siap diunduh.');
         }
 
-        // If Excel, process synchronously (usually faster/lighter)
-        // Note: For a perfect architecture, we should extract the data fetching logic into a Service 
-        // to avoid duplication between this Controller and GenerateReportJob.
-        // For now, we keep the Excel logic here for immediate download support.
+        // If Excel, use Service to fetch data
         
-        $startDate = null;
-        $endDate = null;
-        $location = $request->input('location');
-        if (empty($location)) {
-            $location = 'all';
-        }
-
-        // Date Logic
-        if ($period == 'custom') {
-            $startDate = Carbon::parse($request->start_date)->startOfDay();
-            $endDate = Carbon::parse($request->end_date)->endOfDay();
-        } elseif ($period == 'this_month') {
-            $startDate = Carbon::now()->startOfMonth();
-            $endDate = Carbon::now()->endOfMonth();
-        } elseif ($period == 'last_month') {
-            $startDate = Carbon::now()->subMonth()->startOfMonth();
-            $endDate = Carbon::now()->subMonth()->endOfMonth();
-        } elseif ($period == 'this_year') {
-            $startDate = Carbon::now()->startOfYear();
-            $endDate = Carbon::now()->endOfYear();
-        } elseif ($period == 'last_year') {
-            $startDate = Carbon::now()->subYear()->startOfYear();
-            $endDate = Carbon::now()->subYear()->endOfYear();
-        }
-
-        $data = collect();
-        $title = 'Laporan';
-        $view = '';
-
-        if ($type == 'inventory_list') {
-            $query = Sparepart::orderBy('name');
-            if ($location !== 'all') {
-                $query->where('location', $location);
-            }
-            $data = $query->get();
-            $title = 'Laporan Data Inventaris Saat Ini';
-            $view = 'superadmin.reports.pdf_inventory_list'; // Reusing view for Excel table structure
-
-        } elseif ($type == 'stock_mutation') {
-            $query = StockLog::with(['sparepart', 'user']);
-            if ($startDate && $endDate) {
-                $query->whereBetween('created_at', [$startDate, $endDate]);
-            }
-            if ($location !== 'all') {
-                $query->whereHas('sparepart', function($q) use ($location) {
-                    $q->where('location', $location);
-                });
-            }
-            $data = $query->latest()->get();
-            $title = 'Laporan Riwayat Stok / Mutasi';
-            $view = 'superadmin.reports.pdf_stock_mutation';
-
-        } elseif ($type == 'borrowing_history') {
-            $query = \App\Models\Borrowing::with(['sparepart', 'user']); 
-            if ($startDate && $endDate) {
-                $query->whereBetween('borrowed_at', [$startDate, $endDate]);
-            }
-            $data = $query->latest()->get();
-            $title = 'Laporan Riwayat Peminjaman';
-            $view = 'superadmin.reports.pdf_borrowing_history';
-
-        } elseif ($type == 'low_stock') {
-            $query = Sparepart::whereColumn('stock', '<=', 'minimum_stock')->orderBy('stock', 'asc');
-             if ($location !== 'all') {
-                $query->where('location', $location);
-            }
-            $data = $query->get();
-            $title = 'Laporan Stok Menipis';
-            $view = 'superadmin.reports.pdf_low_stock';
-        }
-
-        // Return view with Excel headers for "Formatted Excel"
-        $filename = 'laporan_' . $type . '_' . now()->format('YmdHis') . '.xls';
+        $location = $request->input('location', 'all');
         
+        // Resolve Dates
+        [$startDate, $endDate] = $this->reportService->resolveDateRange(
+            $period, 
+            $request->input('start_date'), 
+            $request->input('end_date')
+        );
+
+        // Fetch Data via Service
+        $reportData = $this->reportService->getReportData($type, $location, $startDate, $endDate);
+        
+        $data = $reportData['data'];
+        $title = $reportData['title'];
+        $view = $reportData['view'];
+
+        // Generate Filename (Standardized)
+         $prefix = match($type) {
+            'inventory_list' => 'LaporanInventaris',
+            'stock_mutation' => 'LaporanMutasi',
+            'borrowing_history' => 'LaporanPeminjaman',
+            'low_stock' => 'LaporanStokMenipis',
+            default => 'Laporan'
+        };
+
+        if ($startDate && $endDate) {
+            $start = $startDate->format('d-m-Y');
+            $end = $endDate->format('d-m-Y');
+            $filename = "{$prefix}_{$start}sd{$end}.xls";
+        } else {
+             $filename = "{$prefix}SemuaRiwayat_" . now()->format('d-m-Y') . ".xls";
+        }
+        
+        $this->logActivity('Laporan Diunduh', "Mengunduh laporan Excel tipe: {$type}");
+
+        // Return Excel View
         return response(view($view, compact('data', 'startDate', 'endDate', 'title', 'location', 'type')))
             ->header('Content-Type', 'application/vnd.ms-excel')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');

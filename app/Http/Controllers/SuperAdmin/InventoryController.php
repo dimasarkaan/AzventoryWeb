@@ -10,99 +10,30 @@ use chillerlan\QRCode\QRCode;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Traits\ActivityLogger;
+use App\Services\InventoryService;
 
 class InventoryController extends Controller
 {
     use ActivityLogger;
+
+    protected $inventoryService;
+
+    public function __construct(InventoryService $inventoryService)
+    {
+        $this->inventoryService = $inventoryService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-        $query = Sparepart::query();
+        $spareparts = $this->inventoryService->getFilteredSpareparts($request->all(), 10);
+        $options = $this->inventoryService->getDropdownOptions();
 
-        // Search Scope (Modernized with Arrow Functions)
-        $query->when($request->search, fn($q) => 
-            $q->where(fn($sub) => 
-                $sub->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('part_number', 'like', '%' . $request->search . '%')
-                    ->orWhere('brand', 'like', '%' . $request->search . '%')
-            )
-        );
-
-        // Filter Brand
-        $query->when($request->brand && $request->brand !== 'Semua Merk', fn($q) => $q->where('brand', $request->brand));
-
-        // Filter Category
-        $query->when($request->category && $request->category !== 'Semua Kategori', fn($q) => $q->where('category', $request->category));
-
-        // Filter Location
-        $query->when($request->location && $request->location !== 'Semua Lokasi', fn($q) => $q->where('location', $request->location));
-
-        // Filter Color
-        $query->when($request->color && $request->color !== 'Semua Warna', fn($q) => $q->where('color', $request->color));
-
-        // Filter Low Stock
-        if ($request->filter === 'low_stock') {
-            $query->whereColumn('stock', '<=', 'minimum_stock');
-        }
-
-        // Sorting
-        if ($request->sort) {
-            switch ($request->sort) {
-                case 'name_asc':
-                    $query->orderBy('name', 'asc');
-                    break;
-                case 'name_desc':
-                    $query->orderBy('name', 'desc');
-                    break;
-                case 'stock_asc':
-                    $query->orderBy('stock', 'asc');
-                    break;
-                case 'stock_desc':
-                    $query->orderBy('stock', 'desc');
-                    break;
-                 case 'price_asc':
-                    $query->orderBy('price', 'asc');
-                    break;
-                case 'price_desc':
-                    $query->orderBy('price', 'desc');
-                    break;
-                case 'oldest':
-                    $query->oldest();
-                    break;
-                case 'newest':
-                default:
-                    $query->latest();
-                    break;
-            }
-        } else {
-            $query->latest();
-        }
-
-        // Get Data for Dropdowns (Cached for 60 minutes)
-        // Cache keys are generic as these lists are global. 
-        // We should clear these caches when a Sparepart is created/updated/deleted.
-        $categories = \Illuminate\Support\Facades\Cache::remember('inventory_categories', 3600, function () {
-            return Sparepart::select('category')->distinct()->pluck('category');
-        });
-
-        $brands = \Illuminate\Support\Facades\Cache::remember('inventory_brands', 3600, function () {
-            return Sparepart::whereNotNull('brand')->select('brand')->distinct()->pluck('brand');
-        });
-        
-        $locations = \Illuminate\Support\Facades\Cache::remember('inventory_locations', 3600, function () {
-            return Sparepart::select('location')->distinct()->pluck('location');
-        });
-
-        $colors = \Illuminate\Support\Facades\Cache::remember('inventory_colors', 3600, function () {
-            return Sparepart::whereNotNull('color')->select('color')->distinct()->pluck('color');
-        });
-
-        // Pagination with query string to keep filters
-        $spareparts = $query->paginate(10);
-
-        return view('superadmin.inventory.index', compact('spareparts', 'categories', 'locations', 'colors', 'brands'));
+        return view('superadmin.inventory.index', array_merge([
+            'spareparts' => $spareparts,
+        ], $options));
     }
 
     /**
@@ -349,7 +280,7 @@ class InventoryController extends Controller
             $data['image'] = $request->file('image')->store('spareparts', 'public');
         }
 
-        $inventory->update($data);
+        $inventory->fill($data);
 
         // Check if part_number changed or QR code missing
         if ($inventory->wasChanged('part_number') || !$inventory->qr_code_path) {
@@ -377,9 +308,24 @@ class InventoryController extends Controller
         }
 
         // Clear Cache to update filters
+        // Calculate changes for logging
+        $changes = [];
+        if ($inventory->isDirty()) {
+            foreach ($inventory->getDirty() as $key => $value) {
+                $original = $inventory->getOriginal($key);
+                $changes[$key] = [
+                    'old' => $original,
+                    'new' => $value,
+                ];
+            }
+        }
+
+        $inventory->save();
+
+        // Clear filter cache
         $this->clearFilterCache();
 
-        $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$inventory->name}' (PN: {$inventory->part_number}) telah diperbarui.");
+        $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$inventory->name}' (PN: {$inventory->part_number}) telah diperbarui.", $changes);
 
         return redirect()->route('superadmin.inventory.index')
             ->with('success', 'Data sparepart berhasil diperbarui.');

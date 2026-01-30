@@ -13,6 +13,11 @@ class ActivityLog extends Model
         'user_id',
         'action',
         'description',
+        'properties',
+    ];
+
+    protected $casts = [
+        'properties' => 'array',
     ];
 
     public function user()

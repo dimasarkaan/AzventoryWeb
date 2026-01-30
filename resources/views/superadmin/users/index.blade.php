@@ -2,7 +2,7 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
-            <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('Manajemen Pengguna') }}
@@ -20,7 +20,7 @@
 
 
             <!-- Search & Filters -->
-             <div class="mb-4 card p-4">
+             <div class="mb-4 bg-white rounded-xl border border-secondary-200 shadow-card p-4 overflow-visible">
                 <form method="GET" action="{{ route('superadmin.users.index') }}" class="flex flex-col md:flex-row gap-4 items-center justify-between">
                     <div class="relative w-full md:w-96">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -28,13 +28,15 @@
                         </div>
                         <input type="text" name="search" value="{{ request('search') }}" class="input-field pl-10 w-full" placeholder="Cari nama, email, atau username..." onchange="this.form.submit()">
                     </div>
-                    <div>
-                        <select name="role" class="input-field w-full md:w-auto" onchange="this.form.submit()">
-                            <option value="Semua Role">Semua Role</option>
-                            <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Super Admin</option>
-                            <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                            <option value="operator" {{ request('role') == 'operator' ? 'selected' : '' }}>Operator</option>
-                        </select>
+                    <div class="w-full md:w-auto min-w-[150px]">
+                        @php
+                            $roleOptions = [
+                                'superadmin' => 'Super Admin',
+                                'admin' => 'Admin',
+                                'operator' => 'Operator',
+                            ];
+                        @endphp
+                        <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="Semua Role" :submitOnChange="true" width="w-full md:w-auto" />
                     </div>
                 </form>
             </div>
@@ -122,9 +124,78 @@
                                 </tr>
                             @endforelse
                         </tbody>
+
+                        <!-- Skeleton Body (Hidden by default) -->
+                        <tbody id="skeleton-body" class="hidden divide-y divide-secondary-100">
+                            @for ($i = 0; $i < 5; $i++)
+                                <tr>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-10 w-10 rounded-full bg-secondary-200 animate-pulse"></div>
+                                            <div class="space-y-2">
+                                                <div class="h-4 w-32 bg-secondary-200 rounded animate-pulse"></div>
+                                                <div class="h-3 w-20 bg-secondary-200 rounded animate-pulse"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    @for ($j = 0; $j < 4; $j++)
+                                        <td class="px-6 py-4">
+                                            <div class="h-4 w-24 bg-secondary-200 rounded animate-pulse"></div>
+                                        </td>
+                                    @endfor
+                                    <td class="px-6 py-4 text-right">
+                                         <div class="flex justify-end gap-2">
+                                            <div class="h-8 w-8 bg-secondary-200 rounded animate-pulse"></div>
+                                            <div class="h-8 w-8 bg-secondary-200 rounded animate-pulse"></div>
+                                            <div class="h-8 w-8 bg-secondary-200 rounded animate-pulse"></div>
+                                         </div>
+                                    </td>
+                                </tr>
+                            @endfor
+                        </tbody>
                     </table>
                 </div>
             </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action="{{ route('superadmin.users.index') }}"]');
+            const realBody = document.querySelector('tbody:not(#skeleton-body)');
+            const skeletonBody = document.getElementById('skeleton-body');
+
+            if (form) {
+                // Handle Filter/Search Changes
+                const inputs = form.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.addEventListener('change', function() {
+                        showSkeleton();
+                    });
+                });
+
+                form.addEventListener('submit', function() {
+                    showSkeleton();
+                });
+            }
+
+            // Handle Pagination Clicks
+            // Target all pagination links including Laravel's default nav logic
+            const paginationNavs = document.querySelectorAll('nav[role="navigation"] a, .pagination a'); 
+            paginationNavs.forEach(link => {
+                link.addEventListener('click', function(e) {
+                   showSkeleton();
+                });
+            });
+
+            function showSkeleton() {
+                if (realBody && skeletonBody) {
+                    realBody.classList.add('hidden');
+                    skeletonBody.classList.remove('hidden');
+                }
+            }
+        });
+    </script>
+    @endpush
 
             <!-- Mobile Card View (Visible on Mobile) -->
             <div class="md:hidden space-y-4">

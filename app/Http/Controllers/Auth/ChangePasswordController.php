@@ -7,8 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+use App\Traits\ActivityLogger;
+
 class ChangePasswordController extends Controller
 {
+    use ActivityLogger;
     public function create()
     {
         return view('auth.change-password');
@@ -16,21 +19,41 @@ class ChangePasswordController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
+        $user = $request->user();
+
+        $rules = [
             'password' => [
                 'required',
                 'confirmed',
                 Password::min(8)->max(16)->letters()->numbers(),
             ],
-        ]);
+        ];
 
-        $user = $request->user();
+        // If NOT first login, require current password for security
+        if (!is_null($user->password_changed_at)) {
+            $rules['current_password'] = ['required', 'current_password'];
+        }
 
-        $user->update([
+        // Only validate username if it's the first login (password_changed_at is null)
+        if (is_null($user->password_changed_at)) {
+            $rules['username'] = ['required', 'string', 'max:255', 'unique:users,username,' . $user->id];
+        }
+
+        $request->validate($rules);
+
+        $updateData = [
             'password' => Hash::make($request->password),
             'password_changed_at' => now(),
-        ]);
+        ];
+
+        // Only update username on first login
+        if (is_null($user->password_changed_at)) {
+            $updateData['username'] = $request->username;
+        }
+
+        $user->update($updateData);
+
+        $this->logActivity('Ganti Password', "User mengubah password mereka.");
 
         // Redirect based on role after successful password change
         $redirectPath = match ($user->role) {

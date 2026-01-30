@@ -14,12 +14,13 @@ trait ActivityLogger
      * @param string $description
      * @return void
      */
-    protected function logActivity(string $action, string $description): void
+    protected function logActivity(string $action, string $description, array $properties = null): void
     {
         ActivityLog::create([
             'user_id' => Auth::id(),
             'action' => $action,
             'description' => $description,
+            'properties' => $properties,
         ]);
     }
 }

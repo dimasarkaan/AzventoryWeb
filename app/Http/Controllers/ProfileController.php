@@ -9,8 +9,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+use App\Traits\ActivityLogger;
+
 class ProfileController extends Controller
 {
+    use ActivityLogger;
     /**
      * Display the user's profile form.
      */
@@ -28,6 +31,11 @@ class ProfileController extends Controller
     {
         $request->user()->fill($request->validated());
 
+        // Check if username is being changed (one-time only)
+        if ($request->user()->isDirty('username')) {
+            $request->user()->is_username_changed = true;
+        }
+
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
@@ -44,6 +52,8 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
+        $this->logActivity('Profil Diupdate', "User mengupdate profil mereka.");
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
@@ -57,6 +67,8 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        $this->logActivity('Akun Dihapus', "User menghapus akun mereka sendiri.");
 
         Auth::logout();
 

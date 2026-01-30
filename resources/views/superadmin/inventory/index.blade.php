@@ -4,17 +4,17 @@
             <!-- Flash Messages -->
 
             <!-- Header -->
-            <div class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
-                        {{ __('Master Inventaris') }}
+                        {{ __('Manajemen Inventaris') }}
                     </h2>
                     <p class="mt-1 text-sm text-secondary-500">Kelola semua data sparepart, stok, dan lokasi.</p>
                 </div>
-                <div class="flex gap-3">
+                <div class="flex gap-2">
                     <a href="{{ route('superadmin.inventory.create') }}" class="btn btn-primary flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        {{ __('Tambah Item') }}
+                        {{ __('Tambah Inventaris') }}
                     </a>
                 </div>
 
@@ -35,40 +35,40 @@
 
                     <!-- Bottom: Filters & Sort -->
                     <div class="flex flex-col md:flex-row flex-wrap gap-3">
-                         <select name="category" class="input-field w-full sm:w-auto flex-1" onchange="this.form.submit()">
-                            <option value="Semua Kategori">Semua Kategori</option>
-                            @foreach($categories as $cat)
-                                <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
-                            @endforeach
-                        </select>
-                        <select name="brand" class="input-field w-full sm:w-auto flex-1" onchange="this.form.submit()">
-                            <option value="Semua Merk">Semua Merk</option>
-                            @foreach($brands as $brand)
-                                <option value="{{ $brand }}" {{ request('brand') == $brand ? 'selected' : '' }}>{{ $brand }}</option>
-                            @endforeach
-                        </select>
-                         <select name="location" class="input-field w-full sm:w-auto flex-1" onchange="this.form.submit()">
-                            <option value="Semua Lokasi">Semua Lokasi</option>
-                            @foreach($locations as $loc)
-                                <option value="{{ $loc }}" {{ request('location') == $loc ? 'selected' : '' }}>{{ $loc }}</option>
-                            @endforeach
-                        </select>
-                        <select name="color" class="input-field w-full sm:w-auto flex-1" onchange="this.form.submit()">
-                            <option value="Semua Warna">Semua Warna</option>
-                            @foreach($colors as $col)
-                                <option value="{{ $col }}" {{ request('color') == $col ? 'selected' : '' }}>{{ $col }}</option>
-                            @endforeach
-                        </select>
-                        <select name="sort" class="input-field w-full sm:w-auto flex-1" onchange="this.form.submit()">
-                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Terbaru</option>
-                            <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Terlama</option>
-                            <option value="name_asc" {{ request('sort') == 'name_asc' ? 'selected' : '' }}>Nama (A-Z)</option>
-                            <option value="name_desc" {{ request('sort') == 'name_desc' ? 'selected' : '' }}>Nama (Z-A)</option>
-                            <option value="stock_asc" {{ request('sort') == 'stock_asc' ? 'selected' : '' }}>Stok (Sedikit)</option>
-                            <option value="stock_desc" {{ request('sort') == 'stock_desc' ? 'selected' : '' }}>Stok (Banyak)</option>
-                            <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Harga (Terendah)</option>
-                            <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Harga (Tertinggi)</option>
-                        </select>
+                        @php
+                            $categoryOptions = $categories->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $brandOptions = $brands->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $locationOptions = $locations->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $colorOptions = $colors->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                        @endphp
+
+                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <x-select name="category" :options="$categoryOptions" :selected="request('category')" placeholder="Semua Kategori" :submitOnChange="true" width="w-full" />
+                        </div>
+                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <x-select name="brand" :options="$brandOptions" :selected="request('brand')" placeholder="Semua Merk" :submitOnChange="true" width="w-full" />
+                        </div>
+                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <x-select name="location" :options="$locationOptions" :selected="request('location')" placeholder="Semua Lokasi" :submitOnChange="true" width="w-full" />
+                        </div>
+                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <x-select name="color" :options="$colorOptions" :selected="request('color')" placeholder="Semua Warna" :submitOnChange="true" width="w-full" />
+                        </div>
+                        @php
+                            $sortOptions = [
+                                'newest' => 'Terbaru',
+                                'oldest' => 'Terlama',
+                                'name_asc' => 'Nama (A-Z)',
+                                'name_desc' => 'Nama (Z-A)',
+                                'stock_asc' => 'Stok (Sedikit)',
+                                'stock_desc' => 'Stok (Banyak)',
+                                'price_asc' => 'Harga (Terendah)',
+                                'price_desc' => 'Harga (Tertinggi)',
+                            ];
+                        @endphp
+                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <x-select name="sort" :options="$sortOptions" :selected="request('sort', 'newest')" placeholder="Urutkan" :submitOnChange="true" width="w-full" />
+                        </div>
                         
                         <a href="{{ route('superadmin.inventory.index') }}" class="btn btn-secondary flex items-center justify-center gap-2" title="Reset Filter">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -172,7 +172,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="px-6 py-12 text-center text-secondary-500">
+                                    <td colspan="7" class="px-6 py-12 text-center text-secondary-500">
                                         <div class="flex flex-col items-center justify-center">
                                             <div class="h-16 w-16 bg-secondary-100 text-secondary-400 rounded-full flex items-center justify-center mb-4">
                                                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
@@ -184,14 +184,77 @@
                                 </tr>
                             @endforelse
                         </tbody>
+                        
+                        <!-- Skeleton Body (Hidden by default) -->
+                        <tbody id="skeleton-body" class="hidden divide-y divide-secondary-100">
+                            @for ($i = 0; $i < 5; $i++)
+                                <tr>
+                                    <td class="px-4 py-4">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 bg-secondary-200 rounded-md animate-pulse"></div>
+                                            <div class="ml-4 space-y-1">
+                                                <div class="h-4 w-32 bg-secondary-200 rounded animate-pulse"></div>
+                                                <div class="h-3 w-20 bg-secondary-200 rounded animate-pulse"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    @for ($j = 0; $j < 6; $j++)
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="h-4 w-16 bg-secondary-200 rounded animate-pulse mx-auto"></div>
+                                        </td>
+                                    @endfor
+                                </tr>
+                            @endfor
+                        </tbody>
                     </table>
                 </div>
+
                 <!-- Pagination -->
-                <div class="px-4 py-3 border-t border-secondary-100">
-                    {{ $spareparts->links() }}
-                </div>
+                @if($spareparts->hasPages())
+                    <div class="bg-secondary-50 px-4 py-3 border-t border-secondary-200 sm:px-6">
+                        {{ $spareparts->appends(request()->query())->links() }}
+                    </div>
+                @endif
             </div>
 
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form[action="{{ route('superadmin.inventory.index') }}"]');
+            const realBody = document.querySelector('tbody:not(#skeleton-body)');
+            const skeletonBody = document.getElementById('skeleton-body');
+
+            if (form) {
+                // Handle Filter/Search Changes
+                const inputs = form.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    input.addEventListener('change', function() {
+                        showSkeleton();
+                    });
+                });
+
+                form.addEventListener('submit', function() {
+                    showSkeleton();
+                });
+            }
+
+            // Handle Pagination Clicks
+            const paginationLinks = document.querySelectorAll('.pagination a, .page-link'); // Adjust selector based on Laravel pagination output
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                   showSkeleton();
+                });
+            });
+
+            function showSkeleton() {
+                if (realBody && skeletonBody) {
+                    realBody.classList.add('hidden');
+                    skeletonBody.classList.remove('hidden');
+                }
+            }
+        });
+    </script>
+    @endpush
             <!-- Mobile Card View (Visible on Mobile) -->
             <div class="md:hidden space-y-4">
                 @forelse ($spareparts as $sparepart)

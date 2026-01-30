@@ -8,16 +8,23 @@ use Illuminate\Http\Request;
 
 class InventoryController extends Controller
 {
+    protected $inventoryService;
+
+    public function __construct(\App\Services\InventoryService $inventoryService)
+    {
+        $this->inventoryService = $inventoryService;
+    }
+
     /**
      * Get list of inventory items.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch spareparts with pagination
-        // You can adjust pagination size or add filters here later
-        $spareparts = Sparepart::orderBy('created_at', 'desc')->paginate(20);
+        // Fetch spareparts with pagination using Service (supports logic like web search/filters)
+        $filters = $request->all();
+        $spareparts = $this->inventoryService->getFilteredSpareparts($filters, $request->input('per_page', 20));
 
         return response()->json([
             'status' => 'success',
