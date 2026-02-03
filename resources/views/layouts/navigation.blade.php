@@ -75,9 +75,10 @@
                     notifications: [],
                     init() { this.fetchNotifications(); },
                     fetchNotifications() {
-                        axios.get('/notifications')
+                        axios.get('/notifications?_=' + new Date().getTime())
                             .then(response => {
                                 this.notifications = response.data;
+                                // Since API only returns unread, count is length
                                 this.unreadCount = this.notifications.length;
                             })
                             .catch(error => console.error(error));
@@ -85,25 +86,45 @@
                     markAsRead(id, url, type) {
                          axios.patch('/notifications/' + id + '/read')
                             .then(response => {
+                                // If AJAX success, update local state immediately
+                                this.unreadCount = Math.max(0, this.unreadCount - 1);
+                                this.notifications = this.notifications.map(n => 
+                                    n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+                                );
+                                
                                 const targetUrl = response.data.url || url;
                                 if (targetUrl) {
                                     if (type === 'App\\Notifications\\ReportReadyNotification') {
                                         window.open(targetUrl, '_blank');
-                                        this.fetchNotifications();
                                     } else {
                                         window.location.href = targetUrl;
                                     }
-                                } else {
-                                    this.fetchNotifications();
                                 }
                             })
                             .catch(error => console.error(error));
+                    },
+                    markAllRead() {
+                        // Optimistic UI update
+                        this.unreadCount = 0;
+                        this.notifications = this.notifications.map(n => ({ ...n, read_at: new Date().toISOString() }));
+
+                        axios.patch('/notifications/read-all')
+                            .then(response => {
+                                // Optional: fetch to ensure sync, but UI is already updated
+                                this.fetchNotifications();
+                            })
+                            .catch(error => {
+                                console.error(error);
+                                // Revert on error if needed, or just fetch
+                                this.fetchNotifications(); 
+                            });
                     }
-                }" class="relative">
+                }" 
+                @notification-read.window="unreadCount = Math.max(0, unreadCount - 1)"
+                class="relative">
                     <button @click="notificationOpen = !notificationOpen" class="relative p-2 text-secondary-500 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none transition-all duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                        <span x-show="unreadCount > 0" x-text="unreadCount" style="{{ auth()->user()->unreadNotifications()->count() > 0 ? '' : 'display: none;' }}" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]">
-                            {{ auth()->user()->unreadNotifications()->count() > 0 ? auth()->user()->unreadNotifications()->count() : '' }}
+                        <span x-show="unreadCount > 0" x-text="unreadCount" style="display: none;" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]">
                         </span>
                     </button>
 
@@ -116,24 +137,30 @@
                          x-transition:leave-end="transform opacity-0 scale-95"
                          class="absolute right-0 z-50 mt-2 w-80 rounded-xl shadow-floating bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden" style="display: none;">
                         <div class="py-2">
-                            <div class="px-4 py-2 border-b border-secondary-100 font-semibold text-secondary-800 flex justify-between items-center bg-secondary-50/50">
-                                <span>Notifikasi</span>
-                                <a href="{{ route('notifications.index') }}" class="text-xs text-primary-600 hover:text-primary-800 font-medium">Lihat Semua</a>
+                            <div class="px-4 py-3 border-b border-secondary-100 flex justify-between items-center bg-white">
+                                <span class="font-bold text-secondary-800 text-sm">Notifikasi</span>
+                                <div class="flex items-center gap-3">
+                                    <a href="{{ route('notifications.index') }}" class="text-xs text-secondary-400 hover:text-secondary-600 font-medium transition-colors">Lihat Semua</a>
+                                </div>
                             </div>
                             <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
                                 <template x-if="notifications.length > 0">
                                     <template x-for="notification in notifications" :key="notification.id">
-                                        <div @click="markAsRead(notification.id, notification.data.url, notification.type)" class="cursor-pointer block px-4 py-3 hover:bg-secondary-50 border-b border-secondary-50 last:border-0 transition duration-150 group">
-                                            <div class="flex gap-3">
+                                        <div class="block px-4 py-3 hover:bg-secondary-50 border-b border-secondary-50 last:border-0 transition duration-150 group relative">
+                                            <div @click="markAsRead(notification.id, notification.data.url, notification.type)" class="cursor-pointer flex gap-3">
                                                 <div class="flex-shrink-0 mt-1">
-                                                     <div class="w-2 h-2 rounded-full bg-primary-500"></div>
+                                                     <div class="w-2 h-2 rounded-full" :class="notification.read_at ? 'bg-transparent' : 'bg-primary-500'"></div>
                                                 </div>
-                                                <div>
+                                                <div class="flex-1">
                                                     <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors" x-text="notification.data.title || 'Notifikasi Baru'"></p>
                                                     <p class="text-xs text-secondary-500 line-clamp-2 mt-0.5" x-text="notification.data.message"></p>
                                                     <p class="text-[10px] text-secondary-400 mt-1" x-text="new Date(notification.created_at).toLocaleString('id-ID')"></p>
                                                 </div>
                                             </div>
+                                            <!-- Manual Mark Read Button -->
+                                            <button @click.stop="markAsRead(notification.id, null, null)" x-show="!notification.read_at" class="absolute top-3 right-3 text-secondary-300 hover:text-primary-600 bg-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-secondary-100" title="Tandai Dibaca">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            </button>
                                         </div>
                                     </template>
                                 </template>

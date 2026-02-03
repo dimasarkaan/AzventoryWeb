@@ -9,6 +9,7 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         if ($request->wantsJson()) {
+            // Revert: Only return unread notifications as requested
             return $request->user()->unreadNotifications()->latest()->take(5)->get();
         }
 
@@ -43,7 +44,13 @@ class NotificationController extends Controller
 
     public function markAllAsRead(Request $request)
     {
-        $request->user()->unreadNotifications->markAsRead();
+        // Use query builder for direct update (faster & reliable)
+        $request->user()->unreadNotifications()->update(['read_at' => now()]);
+        
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => 'Semua notifikasi ditandai dibaca.']);
+        }
+
         return back()->with('success', 'Semua notifikasi telah ditandai sebagai dibaca.');
     }
 }

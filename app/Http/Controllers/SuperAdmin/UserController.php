@@ -17,6 +17,11 @@ class UserController extends Controller
     {
         $query = \App\Models\User::query();
 
+        // Handle Trash View
+        if ($request->has('trash') && $request->trash == 'true') {
+            $query->onlyTrashed();
+        }
+
         // Search Scope
         $query->when($request->search, function ($q) use ($request) {
             $q->where(function($sub) use ($request) {
@@ -31,7 +36,12 @@ class UserController extends Controller
             $q->where('role', $request->role);
         });
 
-        // Exclude Current User
+        // Filter Status
+        $query->when($request->status && $request->status !== 'Semua Status', function ($q) use ($request) {
+            $q->where('status', $request->status);
+        });
+
+        // Exclude Current User (even in trash, though unlikely to be there)
         $query->where('id', '!=', auth()->id());
 
         $users = $query->latest()->paginate(10)->withQueryString();
@@ -156,5 +166,96 @@ class UserController extends Controller
 
         return redirect()->route('superadmin.users.index')
             ->with('success', 'User berhasil dihapus.');
+    }
+
+    public function restore($id)
+    {
+        $user = \App\Models\User::withTrashed()->findOrFail($id);
+        $user->restore();
+
+        $this->logActivity('User Dipulihkan', "Memulihkan user: {$user->name}");
+
+        return redirect()->route('superadmin.users.index', ['trash' => 'true'])
+            ->with('success', 'User berhasil dipulihkan.');
+    }
+
+    public function forceDelete($id)
+    {
+        $user = \App\Models\User::withTrashed()->findOrFail($id);
+        
+        // Final check to prevent self-deletion even if force
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+        }
+
+        // Delete avatar if exists
+        if ($user->avatar) {
+             \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+        }
+
+        $this->logActivity('User Dihapus Permanen', "Menghapus permanen user: {$user->name}");
+        
+        $user->forceDelete();
+
+        return redirect()->route('superadmin.users.index', ['trash' => 'true'])
+            ->with('success', 'User berhasil dihapus permanen.');
+    }
+
+    /**
+     * Bulk restore soft-deleted users.
+     */
+    public function bulkRestore(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+        ]);
+
+        $ids = $request->ids;
+        $count = \App\Models\User::onlyTrashed()->whereIn('id', $ids)->count();
+        
+        if ($count === 0) {
+             return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk dipulihkan.');
+        }
+
+        \App\Models\User::onlyTrashed()->whereIn('id', $ids)->restore();
+
+        $this->logActivity('Bulk Restore User', "$count user berhasil dipulihkan.");
+
+        return redirect()->back()->with('success', "$count user berhasil dipulihkan.");
+    }
+
+    /**
+     * Bulk permanently delete users.
+     */
+    public function bulkForceDelete(Request $request)
+    {
+         $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:users,id',
+        ]);
+
+        $ids = $request->ids;
+        $users = \App\Models\User::onlyTrashed()->whereIn('id', $ids)->get();
+
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk dihapus.');
+        }
+
+        $count = 0;
+        foreach ($users as $user) {
+            // Prevent self-deletion just in case
+            if ($user->id === auth()->id()) continue;
+
+             if ($user->avatar) {
+                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            }
+            $user->forceDelete();
+            $count++;
+        }
+
+        $this->logActivity('Bulk Force Delete User', "$count user dihapus permanen.");
+
+        return redirect()->back()->with('success', "$count user berhasil dihapus permanen.");
     }
 }

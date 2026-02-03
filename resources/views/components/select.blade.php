@@ -19,7 +19,13 @@
                  // Use a small timeout to let the input value update before submitting
                  setTimeout(() => {
                     const form = $el.closest('form');
-                    if (form) form.submit();
+                    if (form) {
+                        if (typeof form.requestSubmit === 'function') {
+                            form.requestSubmit();
+                        } else {
+                            form.submit();
+                        }
+                    }
                  }, 50);
              }
         });
@@ -29,7 +35,9 @@
         this.selectedLabel = label;
         this.open = false;
     }
-}" class="relative {{ $width }}">
+}" 
+@reset-filters.window="selected = ''; selectedLabel = placeholder; open = false"
+class="relative {{ $width }}">
     <input type="hidden" name="{{ $name }}" :value="selected">
     
     <button type="button" @click="open = !open" @click.away="open = false"

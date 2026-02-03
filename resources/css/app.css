@@ -34,7 +34,7 @@
 
     /* --- Cards --- */
     .card {
-        @apply bg-surface rounded-xl border border-secondary-200 shadow-card overflow-hidden;
+        @apply bg-surface rounded-xl border border-secondary-300 shadow-card overflow-hidden;
     }
 
     .card-header {
@@ -47,7 +47,7 @@
 
     /* --- Inputs --- */
     .input-field {
-        @apply w-full rounded-lg border-secondary-300 text-secondary-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-colors duration-200;
+        @apply w-full rounded-lg border border-secondary-300 text-secondary-900 shadow-sm focus:border-primary-500 focus:ring-primary-500 transition-colors duration-200;
     }
 
     .input-label {

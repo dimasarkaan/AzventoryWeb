@@ -73,8 +73,6 @@ class InventoryController extends Controller
      */
     public function store(Request $request)
     {
-        App::setLocale('id');
-
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'part_number' => 'required|string|max:255',
@@ -89,117 +87,17 @@ class InventoryController extends Controller
             'minimum_stock' => 'nullable|integer|min:0',
             'unit' => 'nullable|string|max:50',
             'status' => 'required|in:aktif,nonaktif',
-            'image' => 'nullable|image|max:2048', // Max 2MB
+            'image' => 'nullable|image|max:2048',
+            'existing_image' => 'nullable|string',
         ]);
 
-        // Use ONLY validated data
-        $data = $validated;
+        $result = $this->inventoryService->createSparepart($validated);
 
-        // Check for exact duplicate (Same PN + all other physical attributes)
-        $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
-            ->where('name', $data['name'])
-            ->where('brand', $data['brand'])
-            ->where('category', $data['category'])
-            ->where('location', $data['location'])
-            ->where('condition', $data['condition'])
-            ->where('type', $data['type']);
-
-        // Handle nullable fields for duplicate check
-        foreach (['color', 'price', 'unit'] as $field) {
-            if (isset($data[$field])) {
-                $existingItemQuery->where($field, $data[$field]);
-            } else {
-                $existingItemQuery->whereNull($field);
-            }
+        if ($result['status'] === 'error_zero_stock') {
+            return redirect()->back()->withInput()->with('warning', $result['message']);
         }
 
-        $existingItem = $existingItemQuery->first();
-
-        if ($existingItem) {
-            // DUPLICATE FOUND: Merge Stock
-            if ($data['stock'] > 0) {
-                $existingItem->stock += $data['stock'];
-                $existingItem->save();
-                
-                $sparepart = $existingItem;
-                $message = "Stok sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) berhasil ditambahkan ke item yang sudah ada.";
-
-                // Log Stock Addition
-                \App\Models\StockLog::create([
-                    'sparepart_id' => $sparepart->id,
-                    'user_id' => auth()->id(),
-                    'type' => 'masuk',
-                    'quantity' => $data['stock'],
-                    'reason' => 'Penambahan stok (Duplicate Entry)',
-                    'status' => 'approved',
-                    'approved_by' => auth()->id(),
-                    'approved_at' => now(),
-                ]);
-
-                $this->logActivity('Stok Diupdate', $message);
-                
-                return redirect()->route('superadmin.inventory.index')->with('success', $message);
-            } else {
-                // Duplicate input but 0 stock - No Action
-                $message = "Item '{$existingItem->name}' (PN: {$existingItem->part_number}) sudah ada di inventaris dan stok input adalah 0. Silakan periksa kembali jumlah stok.";
-                return redirect()->back()->withInput()->with('warning', $message); // Stay on page, keep input
-            }
-            
-            // Note: We intentionally ignore image upload for duplicates to preserve existing item consistency
-            
-        } else {
-            // NEW ITEM: Handle Image & Create
-
-            // Handle Image Upload
-            if ($request->hasFile('image')) {
-                $data['image'] = $request->file('image')->store('spareparts', 'public');
-            } elseif ($request->filled('existing_image')) {
-                // Copy existing image to a new file to avoid deletion issues/sharing constraint
-                $existingPath = $request->existing_image;
-                if (Storage::disk('public')->exists($existingPath)) {
-                    $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
-                    $newPath = 'spareparts/' . \Illuminate\Support\Str::random(40) . '.' . $extension;
-                    Storage::disk('public')->copy($existingPath, $newPath);
-                    $data['image'] = $newPath;
-                }
-            }
-
-            $sparepart = Sparepart::create($data);
-
-            // Generate and save QR Code
-            $options = new \chillerlan\QRCode\QROptions([
-                'outputBase64' => false,
-            ]);
-            $qrCodeUrl = route('superadmin.inventory.show', $sparepart);
-            $qrCodeOutput = (new \chillerlan\QRCode\QRCode($options))->render($qrCodeUrl);
-            $qrCodePath = 'qrcodes/' . $sparepart->part_number . '_' . $sparepart->id . '.svg';
-            Storage::disk('public')->put($qrCodePath, $qrCodeOutput);
-
-            $sparepart->update(['qr_code_path' => $qrCodePath]);
-
-            // Log Initial Stock if > 0
-            if ($sparepart->stock > 0) {
-                \App\Models\StockLog::create([
-                    'sparepart_id' => $sparepart->id,
-                    'user_id' => auth()->id(),
-                    'type' => 'masuk',
-                    'quantity' => $sparepart->stock,
-                    'reason' => 'Stok awal (Item baru)',
-                    'status' => 'approved',
-                    'approved_by' => auth()->id(),
-                    'approved_at' => now(),
-                ]);
-            }
-            
-            $message = "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah ditambahkan.";
-            $this->logActivity('Sparepart Dibuat', $message);
-        }
-
-        // Clear Cache to update filters
-        $this->clearFilterCache();
-
-        return redirect()->route('superadmin.inventory.index')
-            ->with('success', $message);
+        return redirect()->route('superadmin.inventory.index')->with('success', $result['message']);
     }
 
     /**
@@ -207,11 +105,24 @@ class InventoryController extends Controller
      */
     public function show(Sparepart $inventory)
     {
-        $inventory->load(['borrowings.user' => function ($query) {
-            $query->where('status', 'borrowed')->latest();
-        }]);
-        
-        return view('superadmin.inventory.show', ['sparepart' => $inventory]);
+        // Fetch borrowings with pagination (5 per page)
+        // Using 'history_page' as the query parameter so it doesn't conflict with similar items
+        $borrowings = $inventory->borrowings()
+            ->with('user')
+            ->latest()
+            ->paginate(5, ['*'], 'history_page');
+
+        // Fetch similar items with pagination (3 per page) 
+        // Using 'similar_page' as the query parameter
+        $similarItems = Sparepart::where('part_number', $inventory->part_number)
+            ->where('id', '!=', $inventory->id)
+            ->paginate(3, ['*'], 'similar_page');
+
+        return view('superadmin.inventory.show', [
+            'sparepart' => $inventory,
+            'similarItems' => $similarItems,
+            'borrowings' => $borrowings
+        ]);
     }
 
     /**
@@ -251,7 +162,6 @@ class InventoryController extends Controller
      */
     public function update(Request $request, Sparepart $inventory)
     {
-        App::setLocale('id');
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'part_number' => 'required|string|max:255',
@@ -269,66 +179,10 @@ class InventoryController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        $data = $validated;
-
-        // Handle Image Upload
-        if ($request->hasFile('image')) {
-            // Delete old image
-            if ($inventory->image && Storage::disk('public')->exists($inventory->image)) {
-                Storage::disk('public')->delete($inventory->image);
-            }
-            $data['image'] = $request->file('image')->store('spareparts', 'public');
-        }
-
-        $inventory->fill($data);
-
-        // Check if part_number changed or QR code missing
-        if ($inventory->wasChanged('part_number') || !$inventory->qr_code_path) {
-             // Delete old QR if exists
-            if ($inventory->getOriginal('qr_code_path') && Storage::disk('public')->exists($inventory->getOriginal('qr_code_path'))) {
-                Storage::disk('public')->delete($inventory->getOriginal('qr_code_path'));
-            }
-
-            $options = new \chillerlan\QRCode\QROptions([
-                'outputBase64' => false,
-            ]);
-
-            $qrCodeUrl = route('superadmin.inventory.show', $inventory);
-            $qrCodeOutput = (new \chillerlan\QRCode\QRCode($options))->render($qrCodeUrl);
-            $newQrCodePath = 'qrcodes/' . $inventory->part_number . '_' . $inventory->id . '.svg';
-            Storage::disk('public')->put($newQrCodePath, $qrCodeOutput);
-            
-            $inventory->update(['qr_code_path' => $newQrCodePath]);
-        }
-
-        // Check for Low Stock Notification
-        if ($inventory->minimum_stock > 0 && $inventory->stock <= $inventory->minimum_stock && $inventory->wasChanged('stock')) {
-            $admins = \App\Models\User::whereIn('role', ['superadmin', 'admin'])->get();
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\LowStockNotification($inventory));
-        }
-
-        // Clear Cache to update filters
-        // Calculate changes for logging
-        $changes = [];
-        if ($inventory->isDirty()) {
-            foreach ($inventory->getDirty() as $key => $value) {
-                $original = $inventory->getOriginal($key);
-                $changes[$key] = [
-                    'old' => $original,
-                    'new' => $value,
-                ];
-            }
-        }
-
-        $inventory->save();
-
-        // Clear filter cache
-        $this->clearFilterCache();
-
-        $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$inventory->name}' (PN: {$inventory->part_number}) telah diperbarui.", $changes);
+        $result = $this->inventoryService->updateSparepart($inventory, $validated);
 
         return redirect()->route('superadmin.inventory.index')
-            ->with('success', 'Data sparepart berhasil diperbarui.');
+            ->with('success', $result['message']);
     }
 
     /**
@@ -337,21 +191,10 @@ class InventoryController extends Controller
     public function destroy($id)
     {
         $inventory = Sparepart::findOrFail($id);
-
-        // Also delete the QR code file from storage
-        if ($inventory->qr_code_path && Storage::disk('public')->exists($inventory->qr_code_path)) {
-            Storage::disk('public')->delete($inventory->qr_code_path);
-        }
-        if ($inventory->image && Storage::disk('public')->exists($inventory->image)) {
-            Storage::disk('public')->delete($inventory->image);
-        }
-
-        $this->logActivity('Sparepart Dihapus', "Sparepart '{$inventory->name}' (PN: {$inventory->part_number}) telah dihapus.");
-
-        $inventory->delete();
+        $result = $this->inventoryService->deleteSparepart($inventory);
 
         return redirect()->route('superadmin.inventory.index')
-            ->with('success', 'Data sparepart berhasil dihapus.');
+            ->with('success', $result['message']);
     }
 
     public function downloadQrCode(Sparepart $inventory)
@@ -450,9 +293,22 @@ class InventoryController extends Controller
     </g>
 </svg>';
 
+        // Generate structured filename: Label-[Category]-[Brand]-[PartNumber].svg
+        // Format: Label-Category-Brand-PARTNUMBER (Title Case for text, Upper for PN)
+        $cat = \Illuminate\Support\Str::title($inventory->category);
+        $brand = \Illuminate\Support\Str::title($inventory->brand);
+        $pn = strtoupper($inventory->part_number);
+        
+        // Sanitize: Replace spaces with hyphens, remove special chars
+        $catSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $cat);
+        $brandSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $brand);
+        $pnSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $pn);
+
+        $filename = "Label-{$catSlug}-{$brandSlug}-{$pnSlug}.svg";
+
         return response($finalSvg, 200, [
             'Content-Type' => 'image/svg+xml',
-            'Content-Disposition' => 'attachment; filename="Label-' . $inventory->part_number . '.svg"',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ]);
     }
 
@@ -489,15 +345,142 @@ class InventoryController extends Controller
     }
 
     /**
-     * Clear the inventory filter caches.
+     * Restore a soft-deleted sparepart.
      */
-    private function clearFilterCache()
+    public function restore($id)
     {
-        \Illuminate\Support\Facades\Cache::forget('inventory_categories');
-        \Illuminate\Support\Facades\Cache::forget('inventory_brands');
-        \Illuminate\Support\Facades\Cache::forget('inventory_locations');
-        \Illuminate\Support\Facades\Cache::forget('inventory_locations');
-        \Illuminate\Support\Facades\Cache::forget('inventory_colors');
-        \Illuminate\Support\Facades\Cache::forget('inventory_units');
+        $sparepart = Sparepart::onlyTrashed()->findOrFail($id);
+        $sparepart->restore();
+        
+        // Log activity
+        $this->logActivity('Sparepart Dipulihkan', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dipulihkan dari tong sampah.");
+        // Clear cache
+        $this->inventoryService->clearCache();
+
+        return redirect()->route('superadmin.inventory.index', ['trash' => 'true'])
+            ->with('success', 'Data sparepart berhasil dipulihkan.');
+    }
+
+    /**
+     * Permanently delete a sparepart.
+     */
+    public function forceDelete($id)
+    {
+        $sparepart = Sparepart::onlyTrashed()->findOrFail($id);
+        
+        // Delete associated files
+        if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
+            Storage::disk('public')->delete($sparepart->qr_code_path);
+        }
+        if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+            Storage::disk('public')->delete($sparepart->image);
+        }
+
+        $sparepart->forceDelete();
+        
+        // Log activity
+        $this->logActivity('Sparepart Dihapus Permanen', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dihapus permanen.");
+        // Clear cache
+        $this->inventoryService->clearCache();
+
+        return redirect()->route('superadmin.inventory.index', ['trash' => 'true'])
+            ->with('success', 'Data sparepart berhasil dihapus permanen.');
+    }
+
+    /**
+     * Permanently delete all spareparts in the trash.
+     */
+    public function forceDeleteAll()
+    {
+        $spareparts = Sparepart::onlyTrashed()->get();
+
+        if ($spareparts->isEmpty()) {
+            return redirect()->route('superadmin.inventory.index', ['trash' => 'true'])
+                ->with('warning', 'Tempat sampah sudah kosong.');
+        }
+
+        foreach ($spareparts as $sparepart) {
+            // Delete associated files
+            if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
+                Storage::disk('public')->delete($sparepart->qr_code_path);
+            }
+            if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+                Storage::disk('public')->delete($sparepart->image);
+            }
+            
+            $sparepart->forceDelete();
+        }
+
+        // Log activity
+        $this->logActivity('Tong Sampah Dikosongkan', "Semua item di tong sampah (" . $spareparts->count() . " item) telah dihapus permanen.");
+        // Clear cache
+        $this->inventoryService->clearCache();
+
+        return redirect()->route('superadmin.inventory.index', ['trash' => 'true'])
+            ->with('success', 'Semua data di tong sampah berhasil dihapus permanen.');
+    }
+
+    /**
+     * Bulk restore soft-deleted spareparts.
+     */
+    public function bulkRestore(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:spareparts,id',
+        ]);
+
+        $ids = $request->ids;
+        $count = Sparepart::onlyTrashed()->whereIn('id', $ids)->count();
+        
+        if ($count === 0) {
+             return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk dipulihkan.');
+        }
+
+        Sparepart::onlyTrashed()->whereIn('id', $ids)->restore();
+
+        // Log activity
+        $this->logActivity('Bulk Restore', "$count item berhasil dipulihkan dari tong sampah.");
+        $this->inventoryService->clearCache();
+
+        return redirect()->back()->with('success', "$count item berhasil dipulihkan.");
+    }
+
+    /**
+     * Bulk permanently delete spareparts.
+     */
+    public function bulkForceDelete(Request $request)
+    {
+         $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:spareparts,id',
+        ]);
+
+        $ids = $request->ids;
+        $spareparts = Sparepart::onlyTrashed()->whereIn('id', $ids)->get();
+
+        if ($spareparts->isEmpty()) {
+            return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk dihapus.');
+        }
+
+        $count = $spareparts->count();
+
+        foreach ($spareparts as $sparepart) {
+            // Delete associated files
+            if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
+                Storage::disk('public')->delete($sparepart->qr_code_path);
+            }
+            if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+                Storage::disk('public')->delete($sparepart->image);
+            }
+            
+            $sparepart->forceDelete();
+        }
+
+        // Log activity
+        $this->logActivity('Bulk Force Delete', "$count item telah dihapus permanen dari tong sampah.");
+        $this->inventoryService->clearCache();
+
+        return redirect()->back()->with('success', "$count item berhasil dihapus permanen.");
     }
 }

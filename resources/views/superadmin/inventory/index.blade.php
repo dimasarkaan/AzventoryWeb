@@ -12,17 +12,80 @@
                     <p class="mt-1 text-sm text-secondary-500">Kelola semua data sparepart, stok, dan lokasi.</p>
                 </div>
                 <div class="flex gap-2">
+                     <!-- Trash Toggle Button -->
+                     <a href="{{ request('trash') ? route('superadmin.inventory.index') : route('superadmin.inventory.index', ['trash' => 'true']) }}" 
+                        class="btn flex items-center justify-center p-2.5 {{ request('trash') ? 'btn-danger' : 'btn-secondary' }}" 
+                        title="{{ request('trash') ? 'Keluar dari Tong Sampah' : 'Lihat Tong Sampah' }}">
+                        @if(request('trash'))
+                            <!-- Icon: Arrow Left / Back -->
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        @else
+                            <!-- Icon: Trash -->
+                            <svg class="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        @endif
+                    </a>
+                    
+                    @if(!request('trash'))
                     <a href="{{ route('superadmin.inventory.create') }}" class="btn btn-primary flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                         {{ __('Tambah Inventaris') }}
                     </a>
+                    @endif
                 </div>
+            </div>
 
-                </div>
+            @if(request('trash'))
+                    <!-- Trash Mode Indicator & Bulk Actions -->
+                    <div class="mb-4 relative">
+                        <div class="rounded-lg bg-danger-50 p-4 border border-danger-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                             <div class="flex items-center gap-3">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-5 w-5 text-danger-400" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-medium text-danger-800">Mode Tong Sampah</h3>
+                                    <div class="text-sm text-danger-700 mt-1">
+                                        Pilih item untuk dipulihkan atau dihapus selamanya.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Bulk Action Bar -->
+                        <div id="bulk-action-bar" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-2xl border border-secondary-200 p-3 z-50 flex items-center gap-4 animate-in slide-in-from-bottom-5 fade-in duration-300 ring-1 ring-black/5">
+                            <span class="text-sm font-medium text-secondary-700 whitespace-nowrap pl-2">
+                                <span id="selected-count" class="font-bold text-primary-600">0</span> Dipilih
+                            </span>
+                            <div class="h-6 w-px bg-secondary-200"></div>
+                            <div class="flex gap-2">
+                                <form id="bulk-restore-form" action="{{ route('superadmin.inventory.bulk-restore') }}" method="POST">
+                                    @csrf
+                                    <div id="bulk-restore-inputs"></div>
+                                    <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-sm btn-success flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        Pulihkan
+                                    </button>
+                                </form>
+                                <form id="bulk-delete-form" action="{{ route('superadmin.inventory.bulk-force-delete') }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <div id="bulk-delete-inputs"></div>
+                                    <button type="button" onclick="submitInventoryBulkDelete()" class="btn btn-sm btn-danger flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        Hapus Permanen
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+            @endif
 
             <!-- Filters & Search -->
-            <div class="mb-4 card p-4">
-                <form method="GET" action="{{ route('superadmin.inventory.index') }}">
+            <div class="mb-4 card p-4 overflow-visible">
+                    <form method="GET" action="{{ route('superadmin.inventory.index') }}">
+                    <input type="hidden" name="trash" value="{{ request('trash') }}">
                     <!-- Top: Search Bar -->
                     <div class="mb-4">
                         <div class="relative w-full">
@@ -70,7 +133,7 @@
                             <x-select name="sort" :options="$sortOptions" :selected="request('sort', 'newest')" placeholder="Urutkan" :submitOnChange="true" width="w-full" />
                         </div>
                         
-                        <a href="{{ route('superadmin.inventory.index') }}" class="btn btn-secondary flex items-center justify-center gap-2" title="Reset Filter">
+                        <a href="{{ route('superadmin.inventory.index') }}" id="reset-filters" class="btn btn-secondary flex items-center justify-center gap-2" title="Reset Filter">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
@@ -79,12 +142,17 @@
                 </form>
             </div>
 
-            <!-- Desktop Table View (Hidden on Mobile) -->
+            <!-- Desktop Table View -->
             <div class="hidden md:block card overflow-hidden">
-                <div> <!-- Removed overflow-x-auto -->
+                <div class="overflow-x-auto">
                     <table class="table-modern w-full table-fixed">
                         <thead>
                             <tr>
+                                @if(request('trash'))
+                                    <th class="w-[5%] px-4 py-3 text-center">
+                                        <input type="checkbox" id="select-all" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                                    </th>
+                                @endif
                                 <th class="px-4 py-3 text-left text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[20%]">Nama Sparepart</th>
                                 <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">Merk</th>
                                 <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">Kategori</th>
@@ -98,6 +166,11 @@
                         <tbody>
                             @forelse ($spareparts as $sparepart)
                                 <tr class="group hover:bg-secondary-50 transition-colors">
+                                    @if(request('trash'))
+                                        <td class="px-4 py-3 text-center">
+                                            <input type="checkbox" name="ids[]" value="{{ $sparepart->id }}" class="bulk-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                                        </td>
+                                    @endif
                                     <td class="px-4 py-3">
                                         <div class="flex items-center gap-3">
                                             <!-- Status Indicator -->
@@ -154,31 +227,79 @@
                                     <!-- Removed Status Column Data -->
                                     <td class="px-4 py-3">
                                         <div class="flex items-center justify-center gap-2">
-                                            <a href="{{ route('superadmin.inventory.show', $sparepart) }}" class="btn btn-ghost p-2 text-secondary-500 hover:text-primary-600" title="Detail">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                            </a>
-                                            <a href="{{ route('superadmin.inventory.edit', $sparepart) }}" class="btn btn-ghost p-2 text-secondary-500 hover:text-warning-600" title="Edit">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                            </a>
-                                            <form action="{{ route('superadmin.inventory.destroy', $sparepart) }}" method="POST" class="inline-block">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-ghost p-2 text-secondary-500 hover:text-danger-600" title="Hapus" onclick="confirmDelete(event)">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                </button>
-                                            </form>
+                                            @if(request('trash'))
+                                                <form action="{{ route('superadmin.inventory.restore', $sparepart->id) }}" method="POST" class="inline-block">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="btn btn-ghost p-2 text-success-600 hover:text-success-700 bg-success-50 hover:bg-success-100 rounded-lg" title="Pulihkan" onclick="confirmInventoryRestore(event)">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('superadmin.inventory.force-delete', $sparepart->id) }}" method="POST" class="inline-block">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-ghost p-2 text-danger-600 hover:text-danger-700 bg-danger-50 hover:bg-danger-100 rounded-lg" title="Hapus Permanen" onclick="confirmInventoryForceDelete(event)">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <a href="{{ route('superadmin.inventory.show', $sparepart) }}" class="btn btn-ghost p-2 text-secondary-500 hover:text-primary-600" title="Detail">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                </a>
+                                                <a href="{{ route('superadmin.inventory.edit', $sparepart) }}" class="btn btn-ghost p-2 text-secondary-500 hover:text-warning-600" title="Edit">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                </a>
+                                                <form action="{{ route('superadmin.inventory.destroy', $sparepart) }}" method="POST" class="inline-block">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-ghost p-2 text-secondary-500 hover:text-danger-600" title="Hapus" onclick="confirmDelete(event)">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="px-6 py-12 text-center text-secondary-500">
+                                    <td colspan="{{ request('trash') ? '8' : '7' }}" class="px-6 py-12 text-center text-secondary-500">
                                         <div class="flex flex-col items-center justify-center">
+                                            @php
+                                                $isFiltered = request('search') || request('category') || request('brand') || request('location') || request('color');
+                                            @endphp
+
                                             <div class="h-16 w-16 bg-secondary-100 text-secondary-400 rounded-full flex items-center justify-center mb-4">
-                                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                                @if(request('trash'))
+                                                    {{-- Trash Icon --}}
+                                                    <svg class="w-8 h-8 text-danger-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                @elseif($isFiltered)
+                                                    {{-- Search/Filter Icon --}}
+                                                    <svg class="w-8 h-8 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                                @else
+                                                    {{-- Default Box Icon --}}
+                                                    <svg class="w-8 h-8 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                                @endif
                                             </div>
-                                            <p class="text-lg font-medium text-secondary-900">Belum ada inventaris</p>
-                                            <p class="text-sm mt-1">Mulai dengan menambahkan sparepart baru.</p>
+
+                                            <p class="text-lg font-medium text-secondary-900">
+                                                @if(request('trash'))
+                                                    Tong sampah kosong
+                                                @elseif($isFiltered)
+                                                    Tidak ditemukan hasil
+                                                @else
+                                                    Belum ada inventaris
+                                                @endif
+                                            </p>
+
+                                            <p class="text-sm mt-1 max-w-xs mx-auto leading-relaxed">
+                                                @if(request('trash'))
+                                                    Tidak ada item yang dihapus sementara.
+                                                @elseif($isFiltered)
+                                                    Pencarian Anda tidak cocok dengan data manapun. Coba gunakan kata kunci lain atau reset filter.
+                                                @else
+                                                    Data inventaris masih kosong. Mulai dengan menambahkan sparepart baru.
+                                                @endif
+                                            </p>
                                         </div>
                                     </td>
                                 </tr>
@@ -186,23 +307,60 @@
                         </tbody>
                         
                         <!-- Skeleton Body (Hidden by default) -->
-                        <tbody id="skeleton-body" class="hidden divide-y divide-secondary-100">
+                        <!-- High-Quality Skeleton Body -->
+                        <tbody id="skeleton-body" class="hidden divide-y divide-secondary-100 bg-white">
                             @for ($i = 0; $i < 5; $i++)
                                 <tr>
+                                    @if(request('trash'))
+                                        <td class="px-4 py-4 text-center">
+                                            <div class="h-4 w-4 bg-secondary-100 rounded animate-pulse mx-auto"></div>
+                                        </td>
+                                    @endif
+                                    <!-- Name & Image Column -->
                                     <td class="px-4 py-4">
-                                        <div class="flex items-center">
-                                            <div class="h-10 w-10 bg-secondary-200 rounded-md animate-pulse"></div>
-                                            <div class="ml-4 space-y-1">
-                                                <div class="h-4 w-32 bg-secondary-200 rounded animate-pulse"></div>
-                                                <div class="h-3 w-20 bg-secondary-200 rounded animate-pulse"></div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-secondary-200 animate-pulse flex-shrink-0"></div> <!-- Status Dot -->
+                                            <div class="h-10 w-10 bg-secondary-100 rounded-lg animate-pulse flex-shrink-0"></div> <!-- Image -->
+                                            <div class="space-y-2 flex-1 min-w-0">
+                                                <div class="h-4 w-32 bg-secondary-100 rounded animate-pulse"></div> <!-- Name -->
+                                                <div class="h-3 w-20 bg-secondary-50 rounded animate-pulse"></div>  <!-- Part Number -->
                                             </div>
                                         </div>
                                     </td>
-                                    @for ($j = 0; $j < 6; $j++)
-                                        <td class="px-4 py-4 text-center">
-                                            <div class="h-4 w-16 bg-secondary-200 rounded animate-pulse mx-auto"></div>
-                                        </td>
-                                    @endfor
+                                    <!-- Brand -->
+                                    <td class="px-4 py-4 text-center">
+                                        <div class="h-4 w-20 bg-secondary-50 rounded animate-pulse mx-auto"></div>
+                                    </td>
+                                    <!-- Category -->
+                                    <td class="px-4 py-4 text-center">
+                                        <div class="h-5 w-24 bg-secondary-100 rounded-full animate-pulse mx-auto"></div>
+                                    </td>
+                                    <!-- Color -->
+                                    <td class="px-4 py-4 text-center">
+                                         <div class="h-4 w-16 bg-secondary-50 rounded animate-pulse mx-auto"></div>
+                                    </td>
+                                    <!-- Location -->
+                                    <td class="px-4 py-4 text-center">
+                                        <div class="flex items-center justify-center gap-1.5">
+                                             <div class="h-4 w-4 bg-secondary-100 rounded-full animate-pulse"></div>
+                                             <div class="h-4 w-16 bg-secondary-50 rounded animate-pulse"></div>
+                                        </div>
+                                    </td>
+                                    <!-- Stock -->
+                                    <td class="px-4 py-4 text-center">
+                                        <div class="flex items-baseline justify-center gap-1">
+                                            <div class="h-5 w-8 bg-secondary-100 rounded animate-pulse"></div>
+                                            <div class="h-3 w-6 bg-secondary-50 rounded animate-pulse"></div>
+                                        </div>
+                                    </td>
+                                    <!-- Actions -->
+                                    <td class="px-4 py-4">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <div class="h-8 w-8 bg-secondary-50 rounded-lg animate-pulse"></div>
+                                            <div class="h-8 w-8 bg-secondary-50 rounded-lg animate-pulse"></div>
+                                            <div class="h-8 w-8 bg-secondary-50 rounded-lg animate-pulse"></div>
+                                        </div>
+                                    </td>
                                 </tr>
                             @endfor
                         </tbody>
@@ -221,38 +379,354 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form[action="{{ route('superadmin.inventory.index') }}"]');
+            const tableContainer = document.querySelector('.table-modern').parentNode; // The overflow-x-auto div
+            const paginationContainer = document.querySelector('.bg-secondary-50'); // Container for pagination
             const realBody = document.querySelector('tbody:not(#skeleton-body)');
             const skeletonBody = document.getElementById('skeleton-body');
 
             if (form) {
-                // Handle Filter/Search Changes
+                // Prevent default form submission and use AJAX
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    fetchData(new FormData(form));
+                });
+
+                // Handle Input Changes (Debounced)
                 const inputs = form.querySelectorAll('input, select');
+                let debounceTimer;
                 inputs.forEach(input => {
                     input.addEventListener('change', function() {
-                        showSkeleton();
+                        if(input.name === 'search') return; // Let the form submit or specialized handler for search
+                        fetchData(new FormData(form));
                     });
+                    
+                    // Special handler for search input typing
+                    if(input.name === 'search') {
+                        input.addEventListener('input', function() {
+                            clearTimeout(debounceTimer);
+                            debounceTimer = setTimeout(() => {
+                                fetchData(new FormData(form));
+                            }, 500);
+                        });
+                    }
                 });
 
-                form.addEventListener('submit', function() {
-                    showSkeleton();
-                });
+                // Handle Reset Button
+                const resetButton = document.getElementById('reset-filters');
+                if (resetButton) {
+                    resetButton.addEventListener('click', function(e) {
+                         e.preventDefault();
+                         
+                         // 1. Reset Form Inputs
+                         form.reset();
+                         
+                         // 2. Clear visual state of x-select (via custom event)
+                         window.dispatchEvent(new CustomEvent('reset-filters'));
+                         
+                         // 3. Clear search input explicitly if needed
+                         const searchInput = form.querySelector('input[name="search"]');
+                         if (searchInput) searchInput.value = '';
+
+                         // 4. Reset URL History
+                         // We want the base route, which is in the reset button href
+                         const url = this.href;
+                         window.history.pushState({}, '', url);
+
+                         // 5. Fetch clean data data (empty query)
+                         fetchData(new FormData()); 
+                    });
+                }
             }
 
-            // Handle Pagination Clicks
-            const paginationLinks = document.querySelectorAll('.pagination a, .page-link'); // Adjust selector based on Laravel pagination output
-            paginationLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                   showSkeleton();
-                });
-            });
-
-            function showSkeleton() {
+            // Function to handle fetching data
+            function fetchData(formData) {
+                // 1. Show Skeleton
                 if (realBody && skeletonBody) {
                     realBody.classList.add('hidden');
                     skeletonBody.classList.remove('hidden');
                 }
+
+                // 2. Build Query String
+                const params = new URLSearchParams(formData);
+                const url = `{{ route('superadmin.inventory.index') }}?${params.toString()}`;
+
+                // 3. Update Browser URL (for history)
+                window.history.pushState({}, '', url);
+
+                // 4. Fetch Data
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // 5. Parse Response
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // 6. Replace Table Body
+                    const newBody = doc.querySelector('tbody:not(#skeleton-body)');
+                    if (newBody && realBody) {
+                        realBody.innerHTML = newBody.innerHTML;
+                    }
+                    
+                    // 7. Replace Pagination
+                    const newPagination = doc.querySelector('.bg-secondary-50');
+                    if (newPagination && paginationContainer) {
+                        paginationContainer.innerHTML = newPagination.innerHTML;
+                    } else if (newPagination && !paginationContainer) {
+                        // If pagination didn't exist but now does
+                         tableContainer.parentNode.insertAdjacentHTML('beforeend', newPagination.outerHTML);
+                    } else if (!newPagination && paginationContainer) {
+                        // If pagination existed but now doesn't
+                        paginationContainer.innerHTML = '';
+                    }
+
+                    // 8. Re-attach Pagination Listeners
+                    attachPaginationListeners();
+                    
+                    // 9. Re-initialize Bulk Actions (if needed)
+                    // (Assuming bulk actions state resets on filter change, which is standard behavior)
+                    const newSelectAll = doc.getElementById('select-all');
+                    if (document.getElementById('select-all') && newSelectAll) {
+                         document.getElementById('select-all').checked = false; // Reset select all
+                    }
+                    initBulkActions();
+
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    // Fallback to reload if error
+                     // window.location.reload(); 
+                })
+                .finally(() => {
+                    // 10. Hide Skeleton
+                    setTimeout(() => { // Small delay to ensure smooth transition
+                        if (realBody && skeletonBody) {
+                            skeletonBody.classList.add('hidden');
+                            realBody.classList.remove('hidden');
+                        }
+                    }, 300);
+                });
             }
+
+            // Function to attach listeners to dynamic pagination links
+            function attachPaginationListeners() {
+                const paginationLinks = document.querySelectorAll('.pagination a, .page-link, .bg-secondary-50 a');
+                paginationLinks.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                         e.preventDefault();
+                         const url = new URL(this.href);
+                         // Get current form data to keep filters
+                         const formData = new FormData(form);
+                         // Update page param
+                         formData.set('page', url.searchParams.get('page'));
+                         fetchData(formData);
+                    });
+                });
+            }
+
+            // Initial attachment
+            attachPaginationListeners();
+
+            // --- Bulk Action Logic (Encapsulated) ---
+            function initBulkActions() {
+                const selectAllCheckbox = document.getElementById('select-all');
+                const bulkCheckboxes = document.querySelectorAll('.bulk-checkbox'); // Re-query these
+                const bulkActionBar = document.getElementById('bulk-action-bar');
+                const selectedCountSpan = document.getElementById('selected-count');
+                const bulkRestoreInputs = document.getElementById('bulk-restore-inputs');
+                const bulkDeleteInputs = document.getElementById('bulk-delete-inputs');
+
+                function updateBulkActionBar() {
+                    const selectedCheckboxes = document.querySelectorAll('.bulk-checkbox:checked');
+                    const count = selectedCheckboxes.length;
+                    
+                    if (selectedCountSpan) selectedCountSpan.textContent = count;
+                    
+                    if (bulkRestoreInputs) bulkRestoreInputs.innerHTML = '';
+                    if (bulkDeleteInputs) bulkDeleteInputs.innerHTML = '';
+                    
+                    selectedCheckboxes.forEach(cb => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = cb.value;
+                        if (bulkRestoreInputs) bulkRestoreInputs.appendChild(input.cloneNode());
+                        if (bulkDeleteInputs) bulkDeleteInputs.appendChild(input.cloneNode());
+                    });
+
+                    if (bulkActionBar) {
+                        if (count > 0) {
+                            bulkActionBar.classList.remove('hidden');
+                            bulkActionBar.classList.add('flex');
+                        } else {
+                            bulkActionBar.classList.add('hidden');
+                            bulkActionBar.classList.remove('flex');
+                        }
+                    }
+                }
+
+                if (selectAllCheckbox) {
+                    // Remove old listeners to avoid duplicates (naive approach, better to use named functions or standard clean up, but sufficient here since we replace content)
+                    // Actually since 'realBody' content is replaced, row checkboxes are new elements. 'selectAll' might be static or replaced?
+                    // The table header is static in this implementation, so selectAll persists.
+                    
+                    // Simple cloning to remove listeners
+                    const newSelectAll = selectAllCheckbox.cloneNode(true);
+                    selectAllCheckbox.parentNode.replaceChild(newSelectAll, selectAllCheckbox);
+                    
+                    newSelectAll.addEventListener('change', function() {
+                        const isChecked = this.checked;
+                        const currentBulkCheckboxes = document.querySelectorAll('.bulk-checkbox');
+                        currentBulkCheckboxes.forEach(cb => {
+                            cb.checked = isChecked;
+                        });
+                        updateBulkActionBar();
+                    });
+                }
+
+                const currentBulkCheckboxes = document.querySelectorAll('.bulk-checkbox');
+                if (currentBulkCheckboxes.length > 0) {
+                    currentBulkCheckboxes.forEach(cb => {
+                        cb.addEventListener('change', function() {
+                             const allChecked = Array.from(document.querySelectorAll('.bulk-checkbox')).every(c => c.checked);
+                             const sa = document.getElementById('select-all');
+                             if (sa) sa.checked = allChecked;
+                             updateBulkActionBar();
+                        });
+                    });
+                }
+            }
+
+            // Initial call
+            initBulkActions();
         });
+
+        // Global Bulk Action Handlers (Inventory)
+        window.submitInventoryBulkRestore = function() {
+            const selected = document.querySelectorAll('.bulk-checkbox:checked');
+            if(selected.length === 0) return;
+
+            Swal.fire({
+                title: 'Pulihkan Item?',
+                text: `${selected.length} item akan dipulihkan.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Pulihkan!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                    customClass: {
+                    popup: '!rounded-2xl !font-sans',
+                        title: '!text-secondary-900 !text-xl !font-bold',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    confirmButton: 'btn btn-success px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-success-500',
+                    cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+                },
+                buttonsStyling: false,
+                width: '24em',
+                iconColor: '#10b981', 
+                padding: '2em',
+                backdrop: `rgba(0,0,0,0.4)`
+            }).then((result) => {
+                    if (result.isConfirmed) {
+                    document.getElementById('bulk-restore-form').submit();
+                    }
+            });
+        };
+
+        window.submitInventoryBulkDelete = function() {
+            const selected = document.querySelectorAll('.bulk-checkbox:checked');
+            if(selected.length === 0) return;
+
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak akan bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    popup: '!rounded-2xl !font-sans',
+                    title: '!text-secondary-900 !text-xl !font-bold',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
+                    cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+                },
+                buttonsStyling: false,
+                width: '24em',
+                iconColor: '#ef4444',
+                padding: '2em',
+                backdrop: `rgba(0,0,0,0.4)`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('bulk-delete-form').submit();
+                }
+            });
+        };
+
+        // Single Row Action Handlers
+        window.confirmInventoryRestore = function(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            Swal.fire({
+                title: 'Pulihkan Item Ini?',
+                text: "Item akan dipulihkan ke daftar aktif.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Pulihkan!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    popup: '!rounded-2xl !font-sans',
+                    title: '!text-secondary-900 !text-xl !font-bold',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    confirmButton: 'btn btn-success px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-success-500',
+                    cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+                },
+                buttonsStyling: false,
+                width: '24em',
+                iconColor: '#10b981', 
+                padding: '2em',
+                backdrop: `rgba(0,0,0,0.4)`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        };
+
+        window.confirmInventoryForceDelete = function(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Data yang dihapus tidak akan bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    popup: '!rounded-2xl !font-sans',
+                    title: '!text-secondary-900 !text-xl !font-bold',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
+                    cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+                },
+                buttonsStyling: false,
+                width: '24em',
+                iconColor: '#ef4444',
+                padding: '2em',
+                backdrop: `rgba(0,0,0,0.4)`
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        };
     </script>
     @endpush
             <!-- Mobile Card View (Visible on Mobile) -->
