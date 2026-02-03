@@ -31,9 +31,9 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:auto-rows-fr">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Left Column (Visual & Main Info) -->
-                <div class="lg:col-span-2 flex flex-col gap-4">
+                <div class="lg:col-span-2 flex flex-col gap-6">
                     <!-- Image Card -->
                     <div class="card overflow-hidden">
                         <div class="aspect-video w-full bg-secondary-100 flex items-center justify-center relative">
@@ -361,7 +361,7 @@
                 </div>
 
                 <!-- Active Borrowings Section (Only for Assets) -->
-                @if($sparepart->type === 'asset' && $sparepart->borrowings->count() > 0)
+                @if($sparepart->type === 'asset')
                 <div class="col-span-1 lg:col-span-3">
                     <div x-data="{ 
                         returnModalOpen: false, 
@@ -370,10 +370,7 @@
                         activeEvidence: {},
                         errors: {},
                         successMessage: '',
-                        activeEvidence: {},
                         maxReturnQty: 0,
-                        errors: {},
-                        successMessage: '',
                         isSubmitting: false,
 
                         async submitReturn(e) {
@@ -407,7 +404,6 @@
                                 }
 
                                 this.successMessage = data.message;
-                                // alert(data.message); // Removed as per request
                                 
                                 setTimeout(() => {
                                     window.location.reload();
@@ -422,6 +418,8 @@
                         }
                     }" class="card p-6">
                         <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Riwayat Peminjaman</h3>
+                        
+                        @if($borrowings->count() > 0)
                         <div class="overflow-x-auto">
                             <table class="w-full text-sm text-left">
                                 <thead class="text-xs text-secondary-500 uppercase bg-secondary-50">
@@ -436,7 +434,7 @@
                                 </thead>
                                 <tbody class="divide-y divide-secondary-100">
 
-                                    @foreach($sparepart->borrowings->sortByDesc('created_at') as $borrowing)
+                                    @foreach($borrowings as $borrowing)
                                         @php
                                             $user = auth()->user();
                                             $isSuperAdmin = $user->role === 'superadmin';
@@ -451,194 +449,144 @@
                                         @endphp
                                         
                                         @if($canView)
-                                            <tr>
-                                                <td class="px-4 py-3 whitespace-nowrap font-medium text-secondary-900">{{ $borrowing->borrower_name }}</td>
-                                                <td class="px-4 py-3 whitespace-nowrap">{{ $borrowing->quantity }} {{ $sparepart->unit ?? 'Pcs' }}</td>
-                                                <td class="px-4 py-3 whitespace-nowrap">{{ $borrowing->borrowed_at->translatedFormat('d F Y H:i') }}</td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    @if($borrowing->expected_return_at)
-                                                        <span class="{{ $borrowing->status == 'borrowed' && $borrowing->expected_return_at->isPast() ? 'text-danger-600 font-bold' : '' }}">
-                                                            {{ $borrowing->expected_return_at->translatedFormat('d F Y') }}
-                                                        </span>
+                                        <tr class="hover:bg-secondary-50 transition-colors">
+                                            <td class="px-4 py-3 font-medium text-secondary-900 flex items-center gap-3">
+                                                <div class="w-8 h-8 rounded-full bg-secondary-200 overflow-hidden flex-shrink-0">
+                                                    @if($borrowing->user && $borrowing->user->avatar)
+                                                        <img src="{{ asset('storage/' . $borrowing->user->avatar) }}" class="w-full h-full object-cover">
                                                     @else
-                                                        -
+                                                        <div class="w-full h-full flex items-center justify-center text-secondary-500 text-xs font-bold">
+                                                            {{ substr($borrowing->user->name ?? 'U', 0, 1) }}
+                                                        </div>
                                                     @endif
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap">
-                                                    @if($borrowing->status == 'borrowed')
-                                                        @if($borrowing->expected_return_at && $borrowing->expected_return_at->isPast())
-                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger-100 text-danger-800">
-                                                                Terlambat
-                                                            </span>
-                                                        @else
-                                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-warning-100 text-warning-800">
-                                                                Dipinjam
-                                                            </span>
-                                                        @endif
-                                                    @elseif($borrowing->status == 'returned')
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success-100 text-success-800">
-                                                            Dikembalikan
-                                                        </span>
-                                                    @elseif($borrowing->status == 'lost')
-                                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                                            Hilang
-                                                        </span>
+                                                </div>
+                                                <div class="flex flex-col">
+                                                    <span>{{ $borrowing->user->name ?? 'User Terhapus' }}</span>
+                                                    <span class="text-xs text-secondary-500">{{ $borrowing->user->role ?? '-' }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3 text-secondary-600">
+                                                <span class="font-bold text-secondary-900 bg-secondary-100 px-2 py-1 rounded-lg text-xs">{{ $borrowing->quantity }} {{ $sparepart->unit }}</span>
+                                            </td>
+                                            <td class="px-4 py-3 text-secondary-600">
+                                                {{ \Carbon\Carbon::parse($borrowing->borrow_date)->translatedFormat('d F Y H:i') }}
+                                            </td>
+                                            <td class="px-4 py-3 text-secondary-600">
+                                                {{ $borrowing->expected_return_date ? \Carbon\Carbon::parse($borrowing->expected_return_date)->translatedFormat('d F Y') : '-' }}
+                                            </td>
+                                            <td class="px-4 py-3">
+                                                @if($borrowing->status === 'borrowed')
+                                                    <span class="bg-warning-100 text-warning-800 text-xs font-bold px-2 py-1 rounded-lg inline-flex items-center gap-1">
+                                                        <span class="w-2 h-2 rounded-full bg-warning-500"></span>
+                                                        Dipinjam
+                                                    </span>
+                                                @elseif($borrowing->status === 'returned')
+                                                    <span class="bg-success-100 text-success-800 text-xs font-bold px-2 py-1 rounded-lg inline-flex items-center gap-1">
+                                                        <span class="w-2 h-2 rounded-full bg-success-500"></span>
+                                                        Selesai
+                                                    </span>
+                                                @else
+                                                    <span class="bg-danger-100 text-danger-800 text-xs font-bold px-2 py-1 rounded-lg">
+                                                        {{ ucfirst($borrowing->status) }}
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="px-4 py-3 text-right">
+                                                @if($borrowing->status === 'borrowed')
+                                                    <!-- Return Button -->
+                                                    <button 
+                                                        type="button"
+                                                        @click="
+                                                            selectedBorrowing = {{ $borrowing->id }}; 
+                                                            maxReturnQty = {{ $borrowing->quantity }};
+                                                            returnModalOpen = true;
+                                                        "
+                                                        class="bg-success-50 text-success-600 hover:bg-success-100 hover:text-success-700 font-bold py-1.5 px-3 rounded-lg text-xs transition-colors inline-flex items-center gap-1 group"
+                                                    >
+                                                        <span>Kembalikan</span>
+                                                        <svg class="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                                    </button>
+                                                @else
+                                                    <!-- View Evidence Button -->
+                                                    @if($borrowing->return_evidence)
+                                                    <button 
+                                                        type="button"
+                                                        @click="
+                                                            activeEvidence = {
+                                                                image: '{{ asset('storage/' . $borrowing->return_evidence) }}',
+                                                                notes: '{{ addslashes($borrowing->return_notes ?? '-') }}',
+                                                                date: '{{ $borrowing->actual_return_date ? \Carbon\Carbon::parse($borrowing->actual_return_date)->translatedFormat('d F Y H:i') : '-' }}',
+                                                                condition: '{{ $borrowing->return_condition ?? 'Baik' }}'
+                                                            };
+                                                            evidenceModalOpen = true;
+                                                        "
+                                                        class="text-secondary-400 hover:text-primary-600 transition-colors tooltip-trigger"
+                                                        title="Lihat Bukti Pengembalian"
+                                                    >
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                    </button>
                                                     @endif
-                                                </td>
-                                                <td class="px-4 py-3 whitespace-nowrap text-right">
-                                                    @if($borrowing->status == 'borrowed' && $isOwn)
-                                                        <button @click="returnModalOpen = true; selectedBorrowing = {{ $borrowing->id }}; maxReturnQty = {{ $borrowing->quantity }}" 
-                                                                type="button" 
-                                                                class="text-xs px-3 py-1.5 bg-success-50 text-success-700 rounded-md hover:bg-success-100 font-medium transition-colors">
-                                                            Kembalikan
-                                                        </button>
-                                                    @elseif($borrowing->status == 'returned' || $borrowing->status == 'lost')
-                                                        <button @click="evidenceModalOpen = true; activeEvidence = {
-                                                                    condition: '{{ $borrowing->return_condition }}',
-                                                                    notes: {{ json_encode($borrowing->return_notes ?? '-') }},
-                                                                    returned_at: '{{ $borrowing->returned_at ? $borrowing->returned_at->translatedFormat('d F Y H:i') : '-' }}',
-                                                                    photos: {{ json_encode($borrowing->return_photos ?? []) }}
-                                                                }" 
-                                                                type="button" 
-                                                                class="text-xs px-3 py-1.5 bg-secondary-50 text-secondary-700 rounded-md hover:bg-secondary-100 font-medium transition-colors">
-                                                            Detail
-                                                        </button>
-                                                    @endif
-                                                </td>
-                                            </tr>
+                                                @endif
+                                            </td>
+                                        </tr>
                                         @endif
                                     @endforeach
+
                                 </tbody>
                             </table>
                         </div>
-
-                        <!-- Evidence Modal -->
-                        <div x-show="evidenceModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                <div x-show="evidenceModalOpen" @click="evidenceModalOpen = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                                <div x-show="evidenceModalOpen" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                                    <div class="bg-white px-4 pt-5 pb-2 sm:p-6 sm:pb-2">
-                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Detail Pengembalian</h3>
-                                    </div>
-                                    <div class="bg-white px-4 pb-4 sm:p-6 sm:pb-4 max-h-[60vh] overflow-y-auto">
-                                        
-                                        <div class="space-y-4">
-                                            <div class="grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <label class="block text-xs text-secondary-500 uppercase tracking-wide">Kondisi</label>
-                                                    <span class="font-medium text-secondary-900" x-text="activeEvidence.condition == 'good' ? 'Baik' : (activeEvidence.condition == 'broken' ? 'Rusak' : activeEvidence.condition)"></span>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-xs text-secondary-500 uppercase tracking-wide">Dikembalikan Pada</label>
-                                                    <span class="font-medium text-secondary-900" x-text="activeEvidence.returned_at"></span>
-                                                </div>
-                                            </div>
-
-                                            <div>
-                                                <label class="block text-xs text-secondary-500 uppercase tracking-wide">Catatan</label>
-                                                <p class="text-sm text-secondary-700 bg-gray-50 p-2 rounded mt-1" x-text="activeEvidence.notes"></p>
-                                            </div>
-
-                                            <div>
-                                                <label class="block text-xs text-secondary-500 uppercase tracking-wide mb-2">Bukti Foto</label>
-                                                <div class="grid grid-cols-3 gap-3" x-show="activeEvidence.photos && activeEvidence.photos.length > 0">
-                                                    <template x-for="photo in activeEvidence.photos">
-                                                        <a :href="'/storage/' + photo" target="_blank" class="block aspect-square w-full bg-gray-100 rounded-lg overflow-hidden border border-gray-200 hover:opacity-75 transition group relative">
-                                                            <img :src="'/storage/' + photo" class="w-full h-full object-cover">
-                                                        </a>
-                                                    </template>
-                                                </div>
-                                                <p x-show="!activeEvidence.photos || activeEvidence.photos.length === 0" class="text-sm text-secondary-400 italic">Tidak ada foto dilampirkan.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                        <button type="button" @click="evidenceModalOpen = false" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
-                                            Tutup
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="mt-4 px-4">
+                            {{ $borrowings->links() }}
                         </div>
+                        @else
+                            <div class="text-center py-8 text-secondary-400 bg-secondary-50 rounded-lg border border-dashed border-secondary-200">
+                                <svg class="w-10 h-10 mx-auto mb-2 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-sm">Belum ada riwayat peminjaman untuk item ini.</p>
+                            </div>
+                        @endif
 
                         <!-- Return Modal -->
-                        <div x-show="returnModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                                <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-4 text-center sm:block sm:p-0">
-                                    <style>
-                                        .custom-scrollbar::-webkit-scrollbar {
-                                            width: 5px;
-                                        }
-                                        .custom-scrollbar::-webkit-scrollbar-track {
-                                            background: #f1f1f1;
-                                            border-radius: 4px;
-                                        }
-                                        .custom-scrollbar::-webkit-scrollbar-thumb {
-                                            background: #d1d5db;
-                                            border-radius: 4px;
-                                        }
-                                        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                                            background: #9ca3af;
-                                        }
-                                    </style>
-                                <div x-show="returnModalOpen" @click="returnModalOpen = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                        <div x-show="returnModalOpen" 
+                            style="display: none;"
+                            class="fixed inset-0 z-50 overflow-y-auto" 
+                            aria-labelledby="modal-title" 
+                            role="dialog" 
+                            aria-modal="true"
+                        >
+                            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                                <div x-show="returnModalOpen" 
+                                    x-transition:enter="ease-out duration-300" 
+                                    x-transition:enter-start="opacity-0" 
+                                    x-transition:enter-end="opacity-100" 
+                                    x-transition:leave="ease-in duration-200" 
+                                    x-transition:leave-start="opacity-100" 
+                                    x-transition:leave-end="opacity-0" 
+                                    class="fixed inset-0 bg-secondary-900 bg-opacity-50 transition-opacity" 
+                                    @click="returnModalOpen = false"
+                                    aria-hidden="true">
+                                </div>
 
                                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-                                <div x-show="returnModalOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                                    <form :action="'{{ url('superadmin/inventory/borrow') }}/' + selectedBorrowing + '/return'" method="POST" enctype="multipart/form-data" @submit.prevent="submitReturn">
-                                        @csrf
-                                        <div class="bg-white px-4 pt-5 pb-2 sm:p-6 sm:pb-2">
-                                            <!-- Success Message (Fixed) -->
-                                             <div x-show="successMessage" class="mb-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
-                                                 <span class="block sm:inline" x-text="successMessage"></span>
-                                             </div>
-
+                                <div x-show="returnModalOpen" 
+                                    x-transition:enter="ease-out duration-300" 
+                                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                                    x-transition:leave="ease-in duration-200" 
+                                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
+                                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                                    class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full"
+                                >
+                                    <form :action="`/superadmin/inventory/borrowings/${selectedBorrowing}/return`" @submit.prevent="submitReturn" enctype="multipart/form-data">
+                                        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                             <div class="sm:flex sm:items-start">
-                                                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10 text-green-600">
-                                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-success-100 sm:mx-0 sm:h-10 sm:w-10">
+                                                    <svg class="h-6 w-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                                 </div>
                                                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                                    <h3 class="text-lg leading-6 font-medium text-secondary-900" id="modal-title">
                                                         Pengembalian Barang
                                                     </h3>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="bg-white px-4 pb-4 sm:p-6 sm:pb-4 max-h-[45vh] sm:max-h-[60vh] overflow-y-auto custom-scrollbar border-y border-gray-100">
-                                            <div class="space-y-4">
-                                                <!-- Mobile Scroll Hint -->
-                                                <div class="sm:hidden bg-primary-50 border border-primary-100 rounded-md p-2 flex items-center justify-center gap-2 text-primary-700 text-xs mb-2 animate-pulse">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13l-7 7-7-7m14-8l-7 7-7-7"></path></svg>
-                                                    <span>Scroll ke bawah untuk lengkapi data</span>
-                                                </div>
-
-                                                <p class="text-sm text-gray-500">Pastikan barang yang dikembalikan sesuai dengan data peminjaman.</p>
-                                                        
-                                                        <!-- Quantity Input -->
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Jumlah Dikembalikan <span class="text-danger-500">*</span></label>
-                                                            <input type="number" name="return_quantity" class="form-input mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                                                                   min="1" :max="maxReturnQty" :value="maxReturnQty" required>
-                                                            <p class="text-xs text-gray-500 mt-1">Maksimal: <span x-text="maxReturnQty"></span> Pcs</p>
-                                                        </div>
-
-                                                        <!-- Condition -->
-                                                        <div>
-                                                            <label class="block text-sm font-medium text-gray-700">Kondisi Barang <span class="text-danger-500">*</span></label>
-                                                            <div class="mt-2 space-y-2">
-                                                                <label class="flex items-center">
-                                                                    <input type="radio" name="return_condition" value="good" class="text-primary-600 focus:ring-primary-500" checked>
-                                                                    <span class="ml-2 text-sm text-gray-700">Baik (Kembali ke Stok)</span>
-                                                                </label>
-                                                                <label class="flex items-center">
-                                                                    <input type="radio" name="return_condition" value="bad" class="text-danger-600 focus:ring-danger-500">
-                                                                    <span class="ml-2 text-sm text-gray-700">Rusak (Tidak Masuk Stok)</span>
-                                                                </label>
-                                                                <label class="flex items-center">
-                                                                    <input type="radio" name="return_condition" value="lost" class="text-gray-600 focus:ring-gray-500">
-                                                                    <span class="ml-2 text-sm text-gray-700">Hilang (Tidak Masuk Stok)</span>
                                                                 </label>
                                                             </div>
                                                             <template x-if="errors.return_condition">
@@ -794,6 +742,74 @@
                     </div>
                 </div>
                 @endif
+            
+                <!-- Similar Items Section -->
+                <div class="col-span-1 lg:col-span-3 {{ $sparepart->type === 'asset' ? 'mt-6' : '' }}">
+                    <div class="card p-6">
+                        <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2 flex items-center justify-between">
+                            <span>Item Serupa</span>
+                            @if(isset($similarItems) && $similarItems->count() > 0)
+                                <span class="text-xs font-normal text-secondary-500 bg-secondary-100 px-2 py-1 rounded-full">{{ $similarItems->total() }} item ditemukan</span>
+                            @endif
+                        </h3>
+                        
+                        @if(isset($similarItems) && $similarItems->count() > 0)
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            @foreach($similarItems as $item)
+                            <a href="{{ route('superadmin.inventory.show', $item) }}" class="group block border border-secondary-200 rounded-xl hover:border-primary-500 hover:shadow-md transition-all duration-200 bg-white overflow-hidden">
+                                <div class="flex items-start p-4 gap-4">
+                                    <!-- Thumbnail -->
+                                    <div class="w-20 h-20 bg-secondary-100 rounded-lg flex-shrink-0 overflow-hidden relative">
+                                        @if($item->image)
+                                            <img src="{{ asset('storage/' . $item->image) }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        @else
+                                            <div class="flex items-center justify-center h-full text-secondary-400">
+                                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <h4 class="text-sm font-bold text-secondary-900 truncate group-hover:text-primary-600 transition-colors">{{ $item->name }}</h4>
+                                        <p class="text-xs text-secondary-500 mb-2 truncate">{{ $item->brand ?? 'Tanpa Merk' }} • {{ $item->category }}</p>
+                                        
+                                        <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-xs">
+                                            <div>
+                                                <span class="text-secondary-400 block text-[10px] uppercase">Warna</span>
+                                                <span class="font-medium text-secondary-700">{{ $item->color ?? '-' }}</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-secondary-400 block text-[10px] uppercase">Kondisi</span>
+                                                <span class="font-medium text-secondary-700">{{ $item->condition }}</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-secondary-400 block text-[10px] uppercase">Lokasi</span>
+                                                <span class="font-medium text-secondary-700 truncate">{{ $item->location }}</span>
+                                            </div>
+                                            <div>
+                                                <span class="text-secondary-400 block text-[10px] uppercase">Stok</span>
+                                                <span class="font-bold {{ $item->stock <= ($item->minimum_stock ?? 0) ? 'text-danger-600' : 'text-success-600' }}">
+                                                    {{ $item->stock }} {{ $item->unit ?? 'Pcs' }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                            @endforeach
+                        </div>
+                        <div class="mt-4">
+                            {{ $similarItems->links() }}
+                        </div>
+                        @else
+                            <div class="text-center py-8 text-secondary-400 bg-secondary-50 rounded-lg border border-dashed border-secondary-200">
+                                <svg class="w-10 h-10 mx-auto mb-2 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path></svg>
+                                <p class="text-sm">Tidak ada varian atau item serupa lainnya.</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
     </div>

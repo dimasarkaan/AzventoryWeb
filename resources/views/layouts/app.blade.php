@@ -35,6 +35,9 @@
                 {{ $slot }}
             </main>
         </div>
+        
+        <x-spotlight-search />
+
         @stack('scripts')
         <style>
             /* Solid Premium Toast Override */

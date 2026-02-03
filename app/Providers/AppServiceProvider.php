@@ -23,5 +23,7 @@ class AppServiceProvider extends ServiceProvider
         \Carbon\Carbon::setLocale('id');
         date_default_timezone_set('Asia/Jakarta');
         $this->app['translator']->addJsonPath(lang_path());
+
+        \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
     }
 }

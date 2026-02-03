@@ -45,6 +45,19 @@ Route::middleware(['auth', 'verified', 'role:superadmin'])->prefix('superadmin')
     // Return borrowing (from blade: superadmin/inventory/borrow/{id}/return)
     Route::post('inventory/borrow/{borrowing}/return', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'returnItem'])->name('inventory.borrow.return');
     
+    // Soft Deletes
+    Route::post('inventory/bulk-restore', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'bulkRestore'])->name('inventory.bulk-restore');
+    Route::delete('inventory/bulk-force-delete', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'bulkForceDelete'])->name('inventory.bulk-force-delete');
+    Route::patch('inventory/{id}/restore', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'restore'])->name('inventory.restore');
+    Route::delete('inventory/force-delete-all', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'forceDeleteAll'])->name('inventory.force-delete-all');
+    Route::delete('inventory/{id}/force-delete', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'forceDelete'])->name('inventory.force-delete');
+    
+    // User Soft Deletes
+    Route::post('users/bulk-restore', [\App\Http\Controllers\SuperAdmin\UserController::class, 'bulkRestore'])->name('users.bulk-restore');
+    Route::delete('users/bulk-force-delete', [\App\Http\Controllers\SuperAdmin\UserController::class, 'bulkForceDelete'])->name('users.bulk-force-delete');
+    Route::patch('users/{id}/restore', [\App\Http\Controllers\SuperAdmin\UserController::class, 'restore'])->name('users.restore');
+    Route::delete('users/{id}/force-delete', [\App\Http\Controllers\SuperAdmin\UserController::class, 'forceDelete'])->name('users.force-delete');
+
     Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class);
     Route::resource('inventory', \App\Http\Controllers\SuperAdmin\InventoryController::class);
 });
@@ -74,6 +87,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Global Search
+    Route::get('/global-search', \App\Http\Controllers\GlobalSearchController::class)->name('global-search');
 });
 
 require __DIR__.'/auth.php';

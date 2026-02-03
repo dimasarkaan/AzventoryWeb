@@ -1,7 +1,7 @@
 <x-app-layout>
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center justify-between mb-6">
                 <div>
                      <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('Notifikasi') }}
@@ -22,46 +22,50 @@
                 @endif
             </div>
 
-            <div class="space-y-4">
+            <div class="space-y-3">
                 @forelse($notifications as $notification)
-                    <div class="card p-5 transition-all duration-200 hover:shadow-md border-l-4 {{ $notification->read_at ? 'border-l-transparent bg-white' : 'border-l-primary-500 bg-primary-50/10' }}">
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="flex gap-4">
-                                <div class="flex-shrink-0 mt-1">
-                                    @if($notification->type === 'App\Notifications\LowStockNotification')
-                                        <div class="h-10 w-10 rounded-full bg-warning-100 flex items-center justify-center text-warning-600">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                        </div>
-                                    @else
-                                        <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-600">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                                        </div>
-                                    @endif
-                                </div>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="text-base font-semibold text-secondary-900">
+                    <div x-data="{ 
+                            read: {{ $notification->read_at ? 'true' : 'false' }},
+                            markRead() {
+                                if (this.read) return;
+                                axios.patch('{{ route('notifications.read', $notification->id) }}')
+                                    .then(() => { 
+                                        this.read = true; 
+                                        window.dispatchEvent(new CustomEvent('notification-read'));
+                                    })
+                                    .catch(err => console.error(err));
+                            }
+                        }"
+                        }"
+                        @click="markRead()"
+                        class="card group relative transition-all duration-200 overflow-hidden cursor-pointer"
+                        :class="read ? 'bg-white opacity-60 border border-secondary-100' : 'bg-white shadow-md border-l-4 border-l-primary-500 border-y border-r border-secondary-100'"
+                    >
+                        <div class="p-4 flex items-start justify-between gap-4">
+                            <div class="flex gap-4 w-full">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <h4 class="text-sm font-semibold text-secondary-900" :class="{ 'font-normal text-secondary-600': read }">
                                             {{ $notification->data['title'] ?? 'Notifikasi Baru' }}
                                         </h4>
-                                        @if(!$notification->read_at)
-                                            <span class="badge badge-primary">Baru</span>
-                                        @endif
                                     </div>
-                                    <p class="text-sm text-secondary-600 mt-1 leading-relaxed">
+                                    <p class="text-sm text-secondary-600 mb-2 leading-relaxed" :class="{ 'text-secondary-400': read }">
                                         {{ $notification->data['message'] ?? 'Tidak ada pesan detail.' }}
                                     </p>
-                                    <p class="text-xs text-secondary-400 mt-2 font-medium">
+                                    <p class="text-xs text-secondary-400">
                                         {{ $notification->created_at->diffForHumans() }} &bull; {{ $notification->created_at->format('d M Y, H:i') }}
                                     </p>
                                 </div>
                             </div>
-                            
-                            <div class="flex-shrink-0">
+
+                            <!-- Action Button (Detail) -->
+                            <div class="flex-shrink-0 pointer-events-auto self-center" @click.stop>
                                 <form action="{{ route('notifications.read', $notification->id) }}" method="POST" {{ $notification->type === 'App\Notifications\ReportReadyNotification' ? 'target=_blank' : '' }}>
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-ghost text-xs group" title="Lihat Detail">
-                                        <span class="group-hover:text-primary-600">Detail &rarr;</span>
+                                    <button type="submit" class="inline-flex items-center px-3 py-1.5 border border-secondary-200 text-xs font-medium rounded-lg text-secondary-600 bg-white hover:bg-secondary-50 hover:text-primary-600 transition-colors shadow-sm">
+                                        Detail
+                                        <svg class="ml-1.5 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                     </button>
                                 </form>
                             </div>
@@ -69,13 +73,11 @@
                     </div>
                 @empty
                     <div class="card p-12 text-center flex flex-col items-center">
-                        <div class="h-16 w-16 bg-secondary-100 rounded-full flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                         <div class="h-12 w-12 bg-secondary-50 rounded-full flex items-center justify-center mb-3">
+                            <svg class="w-6 h-6 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         </div>
-                        <h3 class="text-lg font-medium text-secondary-900">Belum ada notifikasi</h3>
-                        <p class="text-secondary-500 mt-1 max-w-sm">
-                            Saat ini belum ada aktivitas atau peringatan baru untuk Anda.
-                        </p>
+                        <h3 class="text-base font-medium text-secondary-900">Belum ada notifikasi</h3>
+                        <p class="text-sm text-secondary-500 mt-1">Semua aman terkendali.</p>
                     </div>
                 @endforelse
 
