@@ -437,14 +437,16 @@
                                     @foreach($borrowings as $borrowing)
                                         @php
                                             $user = auth()->user();
-                                            $isSuperAdmin = $user->role === 'superadmin';
-                                            $isAdmin = $user->role === 'admin';
-                                            $borrowerRole = $borrowing->user->role ?? 'user';
+                                            $isSuperAdmin = $user->role === \App\Enums\UserRole::SUPERADMIN;
+                                            $isAdmin = $user->role === \App\Enums\UserRole::ADMIN;
+                                            $borrowerRole = $borrowing->user->role ?? null;
                                             $isOwn = $borrowing->user_id === $user->id;
 
                                             // Visibility Logic
+                                            // Admin can see operators (if borrower is operator)
+                                            // SuperAdmin sees all
                                             $canView = $isSuperAdmin 
-                                                || ($isAdmin && ($isOwn || $borrowerRole === 'operator')) 
+                                                || ($isAdmin && ($isOwn || ($borrowerRole === \App\Enums\UserRole::OPERATOR))) 
                                                 || $isOwn;
                                         @endphp
                                         

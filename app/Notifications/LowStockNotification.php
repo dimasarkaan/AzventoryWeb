@@ -53,11 +53,10 @@ class LowStockNotification extends Notification implements ShouldQueue, ShouldBr
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'data' => [
-                'message' => 'Stok untuk ' . $this->sparepart->name . ' menipis!',
-                'url' => route('superadmin.inventory.show', $this->sparepart->id),
-                'sparepart_id' => $this->sparepart->id,
-            ]
+            'title' => 'Stok Menipis!',
+            'message' => 'Stok untuk ' . $this->sparepart->name . ' menipis!',
+            'url' => route('superadmin.inventory.show', $this->sparepart->id),
+            'sparepart_id' => $this->sparepart->id,
         ]);
     }
 }

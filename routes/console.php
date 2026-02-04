@@ -9,4 +9,6 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('app:send-overdue-notifications')->dailyAt('08:00');
-Schedule::command('activitylog:clean')->daily();
+Schedule::command('model:prune', [
+    '--model' => [App\Models\ActivityLog::class],
+])->daily();

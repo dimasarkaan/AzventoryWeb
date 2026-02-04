@@ -28,7 +28,7 @@ class StockRequestController extends Controller
         ]);
 
         $user = Auth::user();
-        $isAutoApproved = in_array($user->role, ['superadmin', 'admin']);
+        $isAutoApproved = in_array($user->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]);
         $status = $isAutoApproved ? 'approved' : 'pending';
         $approvedBy = $isAutoApproved ? $user->id : null;
 
@@ -66,7 +66,7 @@ class StockRequestController extends Controller
                 
                 // Low Stock Notification Check (if reduced)
                 if ($request->type === 'keluar' && $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
-                    $admins = User::whereIn('role', ['superadmin', 'admin'])->get();
+                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                      Notification::send($admins, new \App\Notifications\LowStockNotification($sparepart));
                 }
 
@@ -75,7 +75,7 @@ class StockRequestController extends Controller
                 $this->logActivity('Pengajuan Stok', "Pengajuan stok {$request->type} sebanyak {$request->quantity} untuk '{$sparepart->name}' dengan alasan '{$request->reason}'.");
                 
                 // Notify admins
-                $admins = User::whereIn('role', ['admin', 'superadmin'])->get();
+                $admins = User::whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::SUPERADMIN])->get();
                 $message = "Pengajuan stok {$stockLog->type} baru untuk {$sparepart->name} oleh " . $user->name;
                 Notification::send($admins, new StockRequestNotification($stockLog, $message));
             }

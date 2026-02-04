@@ -14,11 +14,21 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('username')->unique();
             $table->string('email')->unique();
+            $table->enum('role', ['superadmin', 'admin', 'operator'])->default('operator');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->timestamp('password_changed_at')->nullable();
+            $table->boolean('is_username_changed')->default(false);
+            $table->string('jabatan')->nullable();
+            $table->string('status')->default('active'); // active, inactive
+            $table->string('avatar')->nullable();
+            $table->string('phone')->nullable();
+            $table->text('address')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

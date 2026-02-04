@@ -29,18 +29,18 @@
                             <div class="col-span-1 md:col-span-2">
                                 <label class="input-label mb-3 block">Tipe Barang <span class="text-danger-500">*</span></label>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <label class="cursor-pointer border rounded-xl p-4 flex items-start gap-4 hover:bg-secondary-50 transition-all duration-200" :class="{ 'border-primary-500 bg-primary-50 ring-1 ring-primary-500': type === 'sale', 'border-secondary-200': type !== 'sale', 'opacity-50 cursor-not-allowed': isLocked }">
+                                    <label class="cursor-pointer border rounded-xl p-4 flex items-start gap-4 hover:bg-secondary-50 transition-all duration-200" :class="{ 'border-primary-500 bg-primary-50 ring-1 ring-primary-500': type === 'sale', 'border-secondary-200': type !== 'sale' }">
                                         <div class="mt-1">
-                                            <input type="radio" name="type" value="sale" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5" :disabled="isLocked">
+                                            <input type="radio" name="type" value="sale" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5">
                                         </div>
                                         <div>
                                             <span class="block font-semibold text-secondary-900 text-base">Barang Dijual (Sale)</span>
                                             <span class="block text-sm text-secondary-500 mt-1">Barang dagangan dengan stok dan harga jual.</span>
                                         </div>
                                     </label>
-                                    <label class="cursor-pointer border rounded-xl p-4 flex items-start gap-4 hover:bg-secondary-50 transition-all duration-200" :class="{ 'border-primary-500 bg-primary-50 ring-1 ring-primary-500': type === 'asset', 'border-secondary-200': type !== 'asset', 'opacity-50 cursor-not-allowed': isLocked }">
+                                    <label class="cursor-pointer border rounded-xl p-4 flex items-start gap-4 hover:bg-secondary-50 transition-all duration-200" :class="{ 'border-primary-500 bg-primary-50 ring-1 ring-primary-500': type === 'asset', 'border-secondary-200': type !== 'asset' }">
                                         <div class="mt-1">
-                                            <input type="radio" name="type" value="asset" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5" :disabled="isLocked">
+                                            <input type="radio" name="type" value="asset" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5">
                                         </div>
                                         <div>
                                             <span class="block font-semibold text-secondary-900 text-base">Inventaris (Asset)</span>
@@ -754,7 +754,7 @@
                                     </template>
 
                                     <!-- Create New Option (Superadmin Only) -->
-                                    @if(auth()->user()->role === 'superadmin')
+                                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                                         <div x-show="search.length > 0 && !filteredOptions.includes(search)" 
                                              @click="select(search); open = false"
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">

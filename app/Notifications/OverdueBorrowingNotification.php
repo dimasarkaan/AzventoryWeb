@@ -4,11 +4,10 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
-use App\Models\Borrowing;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class OverdueBorrowingNotification extends Notification
+class OverdueBorrowingNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
@@ -29,7 +28,7 @@ class OverdueBorrowingNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -42,8 +41,18 @@ class OverdueBorrowingNotification extends Notification
         return [
             'title' => 'Peminjaman Terlambat',
             'message' => "Barang {$this->borrowing->sparepart->name} seharusnya dikembalikan pada {$this->borrowing->expected_return_at->format('d M Y')}.",
-            'link' => route('superadmin.inventory.show', $this->borrowing->sparepart_id), // Or relevant user link
+            'url' => route('borrowings.index'), // Adjusted to general route or specific
             'type' => 'warning',
         ];
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'title' => 'Peminjaman Terlambat',
+            'message' => "Barang {$this->borrowing->sparepart->name} seharusnya dikembalikan pada {$this->borrowing->expected_return_at->format('d M Y')}.",
+            'url' => route('borrowings.index'),
+            'type' => 'warning',
+        ]);
     }
 }

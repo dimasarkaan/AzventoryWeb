@@ -81,7 +81,7 @@
             <!-- Email -->
             <div class="sm:col-span-3">
                  <label for="email" class="input-label">Email</label>
-                 @if(auth()->user()->role === 'superadmin')
+                 @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                     <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('email', $user->email) }}" :disabled="!isEditing" required>
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
                  @else

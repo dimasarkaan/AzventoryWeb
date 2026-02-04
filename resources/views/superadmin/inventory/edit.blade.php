@@ -573,7 +573,7 @@
                                     </template>
 
                                     <!-- Create New Option (Superadmin Only) -->
-                                    @if(auth()->user()->role === 'superadmin')
+                                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                                         <div x-show="search.length > 0 && !filteredOptions.includes(search)" 
                                              @click="select(search); open = false"
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">

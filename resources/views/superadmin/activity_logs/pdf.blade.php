@@ -74,15 +74,16 @@
                     <td>{{ $log->user->name ?? 'System' }}</td>
                     <td style="text-align: center;">
                         @php
-                            $role = $log->user->role ?? '-';
+                            $role = $log->user->role ?? null;
                             $badgeClass = match($role) {
-                                'superadmin' => 'badge-danger',
-                                'admin' => 'badge-warning',
-                                'operator' => 'badge-info',
+                                \App\Enums\UserRole::SUPERADMIN => 'badge-danger',
+                                \App\Enums\UserRole::ADMIN => 'badge-warning',
+                                \App\Enums\UserRole::OPERATOR => 'badge-info',
                                 default => 'badges'
                             };
+                            $roleLabel = $role instanceof \App\Enums\UserRole ? $role->label() : ($role ?? '-');
                         @endphp
-                        <span class="badges {{ $badgeClass }}">{{ ucfirst($role) }}</span>
+                        <span class="badges {{ $badgeClass }}">{{ $roleLabel }}</span>
                     </td>
                     <td>
                         <span style="font-weight: bold; color: #4b5563;">{{ $log->action }}</span>

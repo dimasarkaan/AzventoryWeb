@@ -55,6 +55,7 @@ class ReportReadyNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
+            'title' => 'Laporan Siap!',
             'message' => 'Laporan "' . $this->title . '" siap diunduh.',
             'url' => $this->downloadUrl,
             'icon' => 'document-text', // Frontend can use this to show icon
@@ -68,10 +69,10 @@ class ReportReadyNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'data' => [
-                'message' => 'Laporan "' . $this->title . '" siap diunduh.',
-                'url' => $this->downloadUrl,
-            ]
+            'title' => 'Laporan Siap!',
+            'message' => 'Laporan "' . $this->title . '" siap diunduh.',
+            'url' => $this->downloadUrl,
+            'type' => 'success',
         ]);
     }
 }

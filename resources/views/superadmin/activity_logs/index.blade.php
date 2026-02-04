@@ -75,9 +75,9 @@
                             <label for="role" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Role</label>
                             @php
                                 $roleOptions = [
-                                    'superadmin' => 'Super Admin',
-                                    'admin' => 'Admin',
-                                    'operator' => 'Operator',
+                                    \App\Enums\UserRole::SUPERADMIN->value => \App\Enums\UserRole::SUPERADMIN->label(),
+                                    \App\Enums\UserRole::ADMIN->value => \App\Enums\UserRole::ADMIN->label(),
+                                    \App\Enums\UserRole::OPERATOR->value => \App\Enums\UserRole::OPERATOR->label(),
                                 ];
                             @endphp
                             <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="Semua Role" width="w-full" />
@@ -167,7 +167,7 @@
                                 <th>Waktu</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="desktop-logs-body">
                             @forelse ($activityLogs as $log)
                                 <tr class="group hover:bg-secondary-50 transition-colors">
                                     <td>
@@ -212,7 +212,7 @@
             </div>
 
             <!-- Mobile Card View -->
-            <div class="md:hidden space-y-4">
+            <div id="mobile-logs-container" class="md:hidden space-y-4">
                 @forelse ($activityLogs as $log)
                     <div class="card p-4 flex flex-col gap-3">
                         <div class="flex items-start justify-between">
@@ -252,4 +252,86 @@
             </div>
         </div>
     </div>
+
+    <!-- Script Realtime Log -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.Echo) {
+                window.Echo.channel('activity-logs')
+                    .listen('ActivityLogged', (e) => {
+                        console.log('Log received:', e);
+                        
+                        // 1. Desktop Update
+                        const desktopBody = document.getElementById('desktop-logs-body');
+                        if (desktopBody) {
+                             // Remove 'Tidak ada aktivitas' if exists
+                             const emptyRow = desktopBody.querySelector('td[colspan="4"]');
+                             if (emptyRow) emptyRow.closest('tr').remove();
+
+                             const newRow = `
+                                <tr class="group hover:bg-secondary-50 transition-colors animate-fade-in-down">
+                                    <td>
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-8 w-8 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0">
+                                                <span class="font-bold text-xs">${e.user_name.charAt(0)}</span>
+                                            </div>
+                                            <div>
+                                                <div class="font-medium text-secondary-900">${e.user_name}</div>
+                                                <div class="text-xs text-secondary-500 font-mono">${e.user_role}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-secondary-100 text-secondary-800">
+                                            ${e.action}
+                                        </span>
+                                    </td>
+                                    <td class="text-sm text-secondary-600">
+                                        <div class="max-w-lg whitespace-normal break-words">
+                                            ${e.description}
+                                        </div>
+                                    </td>
+                                    <td class="text-sm text-secondary-500 whitespace-nowrap">
+                                        ${new Date().toLocaleString('id-ID')}
+                                    </td>
+                                </tr>
+                             `;
+                             desktopBody.insertAdjacentHTML('afterbegin', newRow);
+                        }
+
+                        // 2. Mobile Update
+                        const mobileContainer = document.getElementById('mobile-logs-container');
+                        if (mobileContainer) {
+                             // Remove empty placeholder
+                             const emptyCard = mobileContainer.querySelector('.text-center');
+                             if (emptyCard) emptyCard.parentElement.remove();
+
+                             const newCard = `
+                                <div class="card p-4 flex flex-col gap-3 animate-fade-in-down">
+                                    <div class="flex items-start justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="h-10 w-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0 font-bold overflow-hidden">
+                                                ${e.user_name.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <div class="font-bold text-secondary-900">${e.user_name}</div>
+                                                <div class="text-xs text-secondary-500">Baru saja</div>
+                                            </div>
+                                        </div>
+                                        <span class="badge badge-secondary text-[10px]">${e.action}</span>
+                                    </div>
+                                    <div class="text-sm text-secondary-600 bg-secondary-50 p-3 rounded-lg border border-secondary-100">
+                                        ${e.description}
+                                    </div>
+                                    <div class="text-xs text-secondary-400 text-right">
+                                        ${new Date().toLocaleString('id-ID')}
+                                    </div>
+                                </div>
+                             `;
+                             mobileContainer.insertAdjacentHTML('afterbegin', newCard);
+                        }
+                    });
+            }
+        });
+    </script>
 </x-app-layout>

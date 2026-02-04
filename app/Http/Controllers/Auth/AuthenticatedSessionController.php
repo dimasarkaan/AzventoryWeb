@@ -35,9 +35,9 @@ class AuthenticatedSessionController extends Controller
 
         $user = $request->user();
         $redirectPath = match ($user->role) {
-            'superadmin' => '/superadmin/dashboard',
-            'admin' => '/admin/dashboard',
-            'operator' => '/operator/dashboard',
+            \App\Enums\UserRole::SUPERADMIN => '/superadmin/dashboard',
+            \App\Enums\UserRole::ADMIN => '/admin/dashboard',
+            \App\Enums\UserRole::OPERATOR => '/operator/dashboard',
             default => route('dashboard', absolute: false),
         };
 

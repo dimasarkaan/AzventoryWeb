@@ -52,9 +52,9 @@
                                 <label for="role" class="input-label">Role Akses <span class="text-danger-500">*</span></label>
                                 @php
                                     $roleOptions = [
-                                        'operator' => 'Operator (Gudang)',
-                                        'admin' => 'Admin (Manajemen)',
-                                        'superadmin' => 'Super Admin (Full Akses)',
+                                        \App\Enums\UserRole::OPERATOR->value => 'Operator (Gudang)',
+                                        \App\Enums\UserRole::ADMIN->value => 'Admin (Manajemen)',
+                                        \App\Enums\UserRole::SUPERADMIN->value => 'Super Admin (Full Akses)',
                                     ];
                                 @endphp
                                 <x-select name="role" :options="$roleOptions" :selected="old('role')" placeholder="Pilih Role" width="w-full" />

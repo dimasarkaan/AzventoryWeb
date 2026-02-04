@@ -54,7 +54,7 @@ class StockApprovalController extends Controller
 
                 // Check for low stock after update
                 if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
-                    $admins = User::whereIn('role', ['superadmin', 'admin'])->get();
+                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                     Notification::send($admins, new LowStockNotification($sparepart));
                 }
             }

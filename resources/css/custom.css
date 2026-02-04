@@ -1,0 +1,123 @@
+/* Solid Premium Toast Override */
+
+/* GLOBAL CONTAINER OVERRIDE for Toasts */
+div.swal2-container.swal2-top-end,
+div.swal2-container.swal2-top-right {
+    align-items: flex-start !important;
+    justify-content: flex-end !important;
+}
+
+div.swal2-popup.swal2-toast.solid-toast-popup {
+    /* Visual Style */
+    background: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid #f3f4f6 !important;
+    border-left: 4px solid #3b82f6 !important;
+    /* Thinner accent */
+    border-radius: 6px !important;
+    /* Slightly sharper */
+    padding: 0.75rem 1rem !important;
+    /* Compact padding */
+
+    /* Layout */
+    display: flex !important;
+    /* Back to flex for simplicity */
+    align-items: center !important;
+    gap: 0.75rem !important;
+
+    /* Sizing */
+    width: auto !important;
+    min-width: 250px !important;
+    /* Smaller min-width */
+    max-width: 350px !important;
+
+    /* Positioning */
+    margin: 1rem !important;
+    transform: translateY(0) !important;
+}
+
+/* Custom Icon Styling */
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon {
+    border: none !important;
+    /* Remove circle border */
+    margin: 0 !important;
+    min-width: 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+}
+
+/* Remove check for standard classes instead of wildcard to avoid hiding our SVG */
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-ring,
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-line-tip,
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-line-long,
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-circular-line-left,
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-circular-line-right,
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-success-fix,
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-icon .swal2-x-mark {
+    display: none !important;
+}
+
+/* Success Variation */
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-success {
+    border-left-color: #10b981 !important;
+}
+
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-success .swal2-icon {
+    color: #10b981 !important;
+}
+
+/* Error Variation */
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-error {
+    border-left-color: #ef4444 !important;
+}
+
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-error .swal2-icon {
+    color: #ef4444 !important;
+}
+
+/* Warning Variation */
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-warning {
+    border-left-color: #f59e0b !important;
+}
+
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-warning .swal2-icon {
+    color: #f59e0b !important;
+}
+
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-warning .swal2-timer-progress-bar {
+    background: #f59e0b !important;
+}
+
+/* Typography */
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-title {
+    color: #374151 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+    text-align: left !important;
+    line-height: 1.25 !important;
+}
+
+/* Progress Bar Styling */
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-timer-progress-bar {
+    height: 2px !important;
+    bottom: 0 !important;
+}
+
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-success .swal2-timer-progress-bar {
+    background: #10b981 !important;
+}
+
+div.swal2-popup.swal2-toast.solid-toast-popup.toast-error .swal2-timer-progress-bar {
+    background: #ef4444 !important;
+}
+
+/* Hide unnecessary elements */
+div.swal2-popup.swal2-toast.solid-toast-popup .swal2-close {
+    display: none !important;
+}

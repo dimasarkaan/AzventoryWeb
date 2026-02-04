@@ -60,12 +60,12 @@
                                         <label for="role" class="input-label">Role Akses <span class="text-danger-500">*</span></label>
                                         @php
                                             $roleOptions = [
-                                                'operator' => 'Operator',
-                                                'admin' => 'Admin',
-                                                'superadmin' => 'Super Admin',
+                                                \App\Enums\UserRole::OPERATOR->value => 'Operator',
+                                                \App\Enums\UserRole::ADMIN->value => 'Admin',
+                                                \App\Enums\UserRole::SUPERADMIN->value => 'Super Admin',
                                             ];
                                         @endphp
-                                        <x-select name="role" :options="$roleOptions" :selected="old('role', $user->role)" placeholder="Pilih Role" width="w-full" />
+                                        <x-select name="role" :options="$roleOptions" :selected="old('role', $user->role->value)" placeholder="Pilih Role" width="w-full" />
                                         <x-input-error :messages="$errors->get('role')" class="mt-2" />
                                     </div>
             

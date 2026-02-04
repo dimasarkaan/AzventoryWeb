@@ -52,9 +52,9 @@
                     <div class="w-full md:w-auto min-w-[150px]">
                         @php
                             $roleOptions = [
-                                'superadmin' => 'Super Admin',
-                                'admin' => 'Admin',
-                                'operator' => 'Operator',
+                                \App\Enums\UserRole::SUPERADMIN->value => \App\Enums\UserRole::SUPERADMIN->label(),
+                                \App\Enums\UserRole::ADMIN->value => \App\Enums\UserRole::ADMIN->label(),
+                                \App\Enums\UserRole::OPERATOR->value => \App\Enums\UserRole::OPERATOR->label(),
                             ];
                         @endphp
                         <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="Semua Role" :submitOnChange="true" width="w-full md:w-auto" />
@@ -128,13 +128,13 @@
                                     <td>
                                         @php
                                             $roleColors = [
-                                                'superadmin' => 'bg-purple-100 text-purple-800',
-                                                'admin' => 'bg-blue-100 text-blue-800',
-                                                'operator' => 'bg-secondary-100 text-secondary-800'
+                                                \App\Enums\UserRole::SUPERADMIN->value => 'bg-purple-100 text-purple-800',
+                                                \App\Enums\UserRole::ADMIN->value => 'bg-blue-100 text-blue-800',
+                                                \App\Enums\UserRole::OPERATOR->value => 'bg-secondary-100 text-secondary-800'
                                             ];
                                         @endphp
-                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800' }}">
-                                            {{ ucfirst($user->role) }}
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium {{ $roleColors[$user->role->value] ?? 'bg-gray-100 text-gray-800' }}">
+                                            {{ $user->role->label() }}
                                         </span>
                                     </td>
                                     <td>
@@ -668,13 +668,13 @@
                                 <span class="text-xs text-secondary-400 block">Role</span>
                                 @php
                                     $roleColors = [
-                                        'superadmin' => 'text-purple-700 bg-purple-50',
-                                        'admin' => 'text-blue-700 bg-blue-50',
-                                        'operator' => 'text-secondary-700 bg-secondary-50'
+                                        \App\Enums\UserRole::SUPERADMIN->value => 'text-purple-700 bg-purple-50',
+                                        \App\Enums\UserRole::ADMIN->value => 'text-blue-700 bg-blue-50',
+                                        \App\Enums\UserRole::OPERATOR->value => 'text-secondary-700 bg-secondary-50'
                                     ];
                                 @endphp
-                                <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $roleColors[$user->role] ?? 'text-gray-700 bg-gray-50' }}">
-                                    {{ ucfirst($user->role) }}
+                                <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $roleColors[$user->role->value] ?? 'text-gray-700 bg-gray-50' }}">
+                                    {{ $user->role->label() }}
                                 </span>
                             </div>
                             <div class="text-right">
