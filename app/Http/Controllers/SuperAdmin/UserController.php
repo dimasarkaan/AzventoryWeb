@@ -60,15 +60,8 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\SuperAdmin\User\StoreUserRequest $request)
     {
-        $request->validate([
-            'email' => 'required|string|email|max:255|unique:users',
-            'role' => 'required|in:superadmin,admin,operator',
-            'jabatan' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
-        ]);
-
         // Auto-generate temporary username based on email
         $username = explode('@', $request->email)[0] . rand(100, 999);
         // Ensure uniqueness (simple check, collision rare for low volume)
@@ -115,14 +108,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, \App\Models\User $user)
+    public function update(\App\Http\Requests\SuperAdmin\User\UpdateUserRequest $request, \App\Models\User $user)
     {
-        $request->validate([
-            'role' => 'required|in:superadmin,admin,operator',
-            'jabatan' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
-        ]);
-
         $user->update([
             'role' => $request->role,
             'jabatan' => $request->jabatan,
