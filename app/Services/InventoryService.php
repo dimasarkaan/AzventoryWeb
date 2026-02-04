@@ -12,6 +12,7 @@ use chillerlan\QRCode\QROptions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -19,6 +20,14 @@ use Illuminate\Support\Str;
 class InventoryService
 {
     use ActivityLogger;
+
+    protected $qrCodeService;
+
+    public function __construct(ImageOptimizationService $imageOptimizer, QrCodeService $qrCodeService)
+    {
+        $this->imageOptimizer = $imageOptimizer;
+        $this->qrCodeService = $qrCodeService;
+    }
 
     /**
      * Get filtered spareparts with pagination.
@@ -62,96 +71,96 @@ class InventoryService
      */
     public function createSparepart(array $data)
     {
-        App::setLocale('id');
+        return DB::transaction(function () use ($data) {
+            // Check for exact duplicate
+            $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
+                ->where('name', $data['name'])
+                ->where('brand', $data['brand'])
+                ->where('category', $data['category'])
+                ->where('location', $data['location'])
+                ->where('condition', $data['condition'])
+                ->where('type', $data['type']);
 
-        // Check for exact duplicate
-        $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
-            ->where('name', $data['name'])
-            ->where('brand', $data['brand'])
-            ->where('category', $data['category'])
-            ->where('location', $data['location'])
-            ->where('condition', $data['condition'])
-            ->where('type', $data['type']);
-
-        foreach (['color', 'price', 'unit'] as $field) {
-            if (isset($data[$field])) {
-                $existingItemQuery->where($field, $data[$field]);
-            } else {
-                $existingItemQuery->whereNull($field);
+            foreach (['color', 'price', 'unit'] as $field) {
+                if (isset($data[$field])) {
+                    $existingItemQuery->where($field, $data[$field]);
+                } else {
+                    $existingItemQuery->whereNull($field);
+                }
             }
-        }
 
-        $existingItem = $existingItemQuery->first();
+            $existingItem = $existingItemQuery->lockForUpdate()->first();
 
-        if ($existingItem) {
-            // DUPLICATE FOUND: Merge Stock
-            if ($data['stock'] > 0) {
-                $existingItem->stock += $data['stock'];
-                $existingItem->save();
+            if ($existingItem) {
+                // DUPLICATE FOUND: Merge Stock
+                if ($data['stock'] > 0) {
+                    $existingItem->stock += $data['stock'];
+                    $existingItem->save();
 
-                $message = "Stok sparepart '{$existingItem->name}' (PN: {$existingItem->part_number}) berhasil ditambahkan ke item yang sudah ada.";
+                    $message = "Stok sparepart '{$existingItem->name}' (PN: {$existingItem->part_number}) berhasil ditambahkan ke item yang sudah ada.";
 
-                // Log Stock Addition
+                    // Log Stock Addition
+                    StockLog::create([
+                        'sparepart_id' => $existingItem->id,
+                        'user_id' => auth()->id(),
+                        'type' => 'masuk',
+                        'quantity' => $data['stock'],
+                        'reason' => 'Penambahan stok (Duplicate Entry)',
+                        'status' => 'approved',
+                        'approved_by' => auth()->id(),
+                        'approved_at' => now(),
+                    ]);
+
+                    $this->logActivity('Stok Diupdate', $message);
+                    $this->clearCache();
+
+                    return ['status' => 'merged', 'message' => $message, 'data' => $existingItem];
+                } else {
+                    // Duplicate input but 0 stock - No Action
+                    $message = "Item '{$existingItem->name}' (PN: {$existingItem->part_number}) sudah ada di inventaris dan stok input adalah 0. Silakan periksa kembali jumlah stok.";
+                    return ['status' => 'error_zero_stock', 'message' => $message, 'data' => $existingItem];
+                }
+            }
+
+            // NEW ITEM
+            if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+                $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
+            } elseif (!empty($data['existing_image'])) {
+                // Copy existing image logic
+                $existingPath = $data['existing_image'];
+                if (Storage::disk('public')->exists($existingPath)) {
+                    $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
+                    $newPath = 'spareparts/' . Str::random(40) . '.' . $extension;
+                    Storage::disk('public')->copy($existingPath, $newPath);
+                    $data['image'] = $newPath;
+                }
+            }
+
+            $sparepart = Sparepart::create($data);
+
+            // Generate QR Code via Service
+            $this->qrCodeService->generate($sparepart);
+
+            // Log Initial Stock
+            if ($sparepart->stock > 0) {
                 StockLog::create([
-                    'sparepart_id' => $existingItem->id,
+                    'sparepart_id' => $sparepart->id,
                     'user_id' => auth()->id(),
                     'type' => 'masuk',
-                    'quantity' => $data['stock'],
-                    'reason' => 'Penambahan stok (Duplicate Entry)',
+                    'quantity' => $sparepart->stock,
+                    'reason' => 'Stok awal (Item baru)',
                     'status' => 'approved',
                     'approved_by' => auth()->id(),
                     'approved_at' => now(),
                 ]);
-
-                $this->logActivity('Stok Diupdate', $message);
-                $this->clearCache();
-
-                return ['status' => 'merged', 'message' => $message, 'data' => $existingItem];
-            } else {
-                // Duplicate input but 0 stock - No Action
-                $message = "Item '{$existingItem->name}' (PN: {$existingItem->part_number}) sudah ada di inventaris dan stok input adalah 0. Silakan periksa kembali jumlah stok.";
-                return ['status' => 'error_zero_stock', 'message' => $message, 'data' => $existingItem];
             }
-        }
 
-        // NEW ITEM
-        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-            $data['image'] = $data['image']->store('spareparts', 'public');
-        } elseif (!empty($data['existing_image'])) {
-             // Copy existing image logic
-            $existingPath = $data['existing_image'];
-            if (Storage::disk('public')->exists($existingPath)) {
-                $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
-                $newPath = 'spareparts/' . Str::random(40) . '.' . $extension;
-                Storage::disk('public')->copy($existingPath, $newPath);
-                $data['image'] = $newPath;
-            }
-        }
+            $message = "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah ditambahkan.";
+            $this->logActivity('Sparepart Dibuat', $message);
+            $this->clearCache();
 
-        $sparepart = Sparepart::create($data);
-
-        // Generate QR Code
-        $this->generateQrCode($sparepart);
-
-        // Log Initial Stock
-        if ($sparepart->stock > 0) {
-            StockLog::create([
-                'sparepart_id' => $sparepart->id,
-                'user_id' => auth()->id(),
-                'type' => 'masuk',
-                'quantity' => $sparepart->stock,
-                'reason' => 'Stok awal (Item baru)',
-                'status' => 'approved',
-                'approved_by' => auth()->id(),
-                'approved_at' => now(),
-            ]);
-        }
-
-        $message = "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah ditambahkan.";
-        $this->logActivity('Sparepart Dibuat', $message);
-        $this->clearCache();
-
-        return ['status' => 'created', 'message' => $message, 'data' => $sparepart];
+            return ['status' => 'created', 'message' => $message, 'data' => $sparepart];
+        });
     }
 
     /**
@@ -159,75 +168,176 @@ class InventoryService
      */
     public function updateSparepart(Sparepart $sparepart, array $data)
     {
-        App::setLocale('id');
-        
-        // Handle Image Upload
-        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-            if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
-                Storage::disk('public')->delete($sparepart->image);
+        return DB::transaction(function () use ($sparepart, $data) {
+            // Handle Image Upload
+            if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+                if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+                    Storage::disk('public')->delete($sparepart->image);
+                }
+                $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
             }
-            $data['image'] = $data['image']->store('spareparts', 'public');
-        }
 
-        $sparepart->fill($data);
+            $sparepart->fill($data);
 
-        // Check if QR regeneration needed
-        if ($sparepart->wasChanged('part_number') || !$sparepart->qr_code_path) {
-            if ($sparepart->getOriginal('qr_code_path') && Storage::disk('public')->exists($sparepart->getOriginal('qr_code_path'))) {
-                Storage::disk('public')->delete($sparepart->getOriginal('qr_code_path'));
+            // Check if QR regeneration needed
+            if ($sparepart->wasChanged('part_number') || !$sparepart->qr_code_path) {
+                if ($sparepart->getOriginal('qr_code_path') && Storage::disk('public')->exists($sparepart->getOriginal('qr_code_path'))) {
+                    Storage::disk('public')->delete($sparepart->getOriginal('qr_code_path'));
+                }
+                $this->qrCodeService->generate($sparepart);
             }
-            $this->generateQrCode($sparepart);
-        }
 
-        // Low Stock Notification
-        if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && $sparepart->wasChanged('stock')) {
-            $admins = User::whereIn('role', ['superadmin', 'admin'])->get();
-            Notification::send($admins, new LowStockNotification($sparepart));
-        }
-
-        // Logging Changes
-        $changes = [];
-        if ($sparepart->isDirty()) {
-            foreach ($sparepart->getDirty() as $key => $value) {
-                $original = $sparepart->getOriginal($key);
-                $changes[$key] = ['old' => $original, 'new' => $value];
+            // Low Stock Notification
+            if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && $sparepart->wasChanged('stock')) {
+                $admins = User::whereIn('role', ['superadmin', 'admin'])->get();
+                Notification::send($admins, new LowStockNotification($sparepart));
             }
-        }
 
-        $sparepart->save();
-        $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah diperbarui.", $changes);
-        $this->clearCache();
+            // Logging Changes
+            $changes = [];
+            if ($sparepart->isDirty()) {
+                foreach ($sparepart->getDirty() as $key => $value) {
+                    $original = $sparepart->getOriginal($key);
+                    $changes[$key] = ['old' => $original, 'new' => $value];
+                }
+            }
 
-        return ['status' => 'updated', 'message' => 'Data sparepart berhasil diperbarui.', 'data' => $sparepart];
+            $sparepart->save();
+            $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah diperbarui.", $changes);
+            $this->clearCache();
+
+            return ['status' => 'updated', 'message' => 'Data sparepart berhasil diperbarui.', 'data' => $sparepart];
+        });
     }
 
     /**
-     * Delete a sparepart.
+     * Soft delete a sparepart.
      */
     public function deleteSparepart(Sparepart $sparepart)
     {
-        // Don't delete files here for Soft Delete. 
-        // Files should only be deleted during Force Delete.
+        return DB::transaction(function () use ($sparepart) {
+            $this->logActivity('Sparepart Dihapus', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dipindahkan ke tong sampah.");
+            $sparepart->delete();
+            $this->clearCache();
 
-        $this->logActivity('Sparepart Dihapus', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dipindahkan ke tong sampah.");
-        $sparepart->delete();
-        $this->clearCache();
-
-        return ['status' => 'deleted', 'message' => 'Data sparepart berhasil dipindahkan ke tong sampah.'];
+            return ['status' => 'deleted', 'message' => 'Data sparepart berhasil dipindahkan ke tong sampah.'];
+        });
     }
 
     /**
-     * Generate QR Code for a sparepart.
+     * Restore a soft-deleted sparepart.
      */
-    private function generateQrCode(Sparepart $sparepart)
+    public function restoreSparepart($id)
     {
-        $options = new QROptions(['outputBase64' => false]);
-        $qrCodeUrl = route('superadmin.inventory.show', $sparepart);
-        $qrCodeOutput = (new QRCode($options))->render($qrCodeUrl);
-        $qrCodePath = 'qrcodes/' . $sparepart->part_number . '_' . $sparepart->id . '.svg';
-        Storage::disk('public')->put($qrCodePath, $qrCodeOutput); // put handles string content
+        return DB::transaction(function () use ($id) {
+            $sparepart = Sparepart::onlyTrashed()->findOrFail($id);
+            $sparepart->restore();
+            
+            $this->logActivity('Sparepart Dipulihkan', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dipulihkan dari tong sampah.");
+            $this->clearCache();
 
-        $sparepart->update(['qr_code_path' => $qrCodePath]);
+            return ['status' => 'restored', 'message' => 'Data sparepart berhasil dipulihkan.'];
+        });
+    }
+
+    /**
+     * Permanently delete a sparepart.
+     */
+    public function forceDeleteSparepart($id)
+    {
+        return DB::transaction(function () use ($id) {
+            $sparepart = Sparepart::onlyTrashed()->findOrFail($id);
+            
+            // Delete associated files
+            if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
+                Storage::disk('public')->delete($sparepart->qr_code_path);
+            }
+            if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+                Storage::disk('public')->delete($sparepart->image);
+            }
+
+            $sparepart->forceDelete();
+            
+            $this->logActivity('Sparepart Dihapus Permanen', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dihapus permanen.");
+            $this->clearCache();
+
+            return ['status' => 'force_deleted', 'message' => 'Data sparepart berhasil dihapus permanen.'];
+        });
+    }
+
+    /**
+     * Permanently delete all spareparts in trash.
+     */
+    public function forceDeleteAllSpareparts()
+    {
+        return DB::transaction(function () {
+            $spareparts = Sparepart::onlyTrashed()->get();
+
+            if ($spareparts->isEmpty()) {
+                return ['status' => 'empty', 'message' => 'Tempat sampah sudah kosong.'];
+            }
+
+            foreach ($spareparts as $sparepart) {
+                if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
+                    Storage::disk('public')->delete($sparepart->qr_code_path);
+                }
+                if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+                    Storage::disk('public')->delete($sparepart->image);
+                }
+                $sparepart->forceDelete();
+            }
+
+            $this->logActivity('Tong Sampah Dikosongkan', "Semua item di tong sampah (" . $spareparts->count() . " item) telah dihapus permanen.");
+            $this->clearCache();
+
+            return ['status' => 'all_deleted', 'message' => 'Semua data di tong sampah berhasil dihapus permanen.'];
+        });
+    }
+
+    /**
+     * Bulk restore spareparts.
+     */
+    public function bulkRestore(array $ids)
+    {
+        return DB::transaction(function () use ($ids) {
+            $count = Sparepart::onlyTrashed()->whereIn('id', $ids)->count();
+            if ($count === 0) return ['status' => 'empty', 'message' => 'Tidak ada item yang dipilih.'];
+
+            Sparepart::onlyTrashed()->whereIn('id', $ids)->restore();
+
+            $this->logActivity('Bulk Restore', "$count item berhasil dipulihkan dari tong sampah.");
+            $this->clearCache();
+
+            return ['status' => 'success', 'message' => "$count item berhasil dipulihkan."];
+        });
+    }
+
+    /**
+     * Bulk force delete spareparts.
+     */
+    public function bulkForceDelete(array $ids)
+    {
+        return DB::transaction(function () use ($ids) {
+            $spareparts = Sparepart::onlyTrashed()->whereIn('id', $ids)->get();
+            if ($spareparts->isEmpty()) return ['status' => 'empty', 'message' => 'Tidak ada item yang dipilih.'];
+
+            $count = $spareparts->count();
+
+            foreach ($spareparts as $sparepart) {
+                if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
+                    Storage::disk('public')->delete($sparepart->qr_code_path);
+                }
+                if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+                    Storage::disk('public')->delete($sparepart->image);
+                }
+                $sparepart->forceDelete();
+            }
+
+            $this->logActivity('Bulk Force Delete', "$count item telah dihapus permanen dari tong sampah.");
+            $this->clearCache();
+
+            return ['status' => 'success', 'message' => "$count item berhasil dihapus permanen."];
+        });
     }
 
     /**

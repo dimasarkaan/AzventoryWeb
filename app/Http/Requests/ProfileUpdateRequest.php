@@ -20,7 +20,7 @@ class ProfileUpdateRequest extends FormRequest
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($this->user()->id)],
             'phone' => ['nullable', 'string', 'max:20'],
             'address' => ['nullable', 'string', 'max:500'],
-            'avatar' => ['nullable', 'image', 'max:1024'], // Max 1MB
+            'avatar' => ['nullable', 'image', 'max:10240'], // Max 10MB (Optimized on save)
         ];
 
         if (! $this->user()->is_username_changed) {

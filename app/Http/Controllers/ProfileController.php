@@ -11,9 +11,18 @@ use Illuminate\View\View;
 
 use App\Traits\ActivityLogger;
 
+use App\Services\ImageOptimizationService;
+
 class ProfileController extends Controller
 {
     use ActivityLogger;
+
+    protected $imageOptimizer;
+
+    public function __construct(ImageOptimizationService $imageOptimizer)
+    {
+        $this->imageOptimizer = $imageOptimizer;
+    }
     /**
      * Display the user's profile form.
      */
@@ -46,7 +55,7 @@ class ProfileController extends Controller
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($request->user()->avatar);
             }
             
-            $path = $request->file('avatar')->store('avatars', 'public');
+            $path = $this->imageOptimizer->optimizeAndSave($request->file('avatar'), 'avatars');
             $request->user()->avatar = $path;
         }
 
