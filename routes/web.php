@@ -11,11 +11,11 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function () {
     $user = auth()->user();
-    if ($user->role === 'superadmin') {
+    if ($user->role === \App\Enums\UserRole::SUPERADMIN) {
         return redirect()->route('superadmin.dashboard');
-    } elseif ($user->role === 'admin') {
+    } elseif ($user->role === \App\Enums\UserRole::ADMIN) {
         return redirect()->route('admin.dashboard');
-    } elseif ($user->role === 'operator') {
+    } elseif ($user->role === \App\Enums\UserRole::OPERATOR) {
         return redirect()->route('operator.dashboard');
     }
     abort(403, 'Unauthorized action.');

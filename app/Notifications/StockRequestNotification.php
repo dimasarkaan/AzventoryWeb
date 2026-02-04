@@ -47,6 +47,7 @@ class StockRequestNotification extends Notification implements ShouldQueue
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
+            'title' => 'Permintaan Stok Baru',
             'message' => $this->message,
             'url' => route('superadmin.stock-approvals.index'),
             'unread_count' => $notifiable->unreadNotifications()->count() + 1,

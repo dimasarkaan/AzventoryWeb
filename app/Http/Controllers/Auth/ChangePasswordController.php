@@ -57,9 +57,9 @@ class ChangePasswordController extends Controller
 
         // Redirect based on role after successful password change
         $redirectPath = match ($user->role) {
-            'superadmin' => '/superadmin/dashboard',
-            'admin' => '/admin/dashboard',
-            'operator' => '/operator/dashboard',
+            \App\Enums\UserRole::SUPERADMIN => '/superadmin/dashboard',
+            \App\Enums\UserRole::ADMIN => '/admin/dashboard',
+            \App\Enums\UserRole::OPERATOR => '/operator/dashboard',
             default => '/dashboard',
         };
 

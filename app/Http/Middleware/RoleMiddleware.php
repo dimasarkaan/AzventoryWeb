@@ -15,7 +15,7 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!auth()->check() || !in_array(auth()->user()->role, $roles)) {
+        if (!auth()->check() || !in_array(auth()->user()->role->value, $roles)) {
             abort(403, 'ANDA TIDAK MEMILIKI AKSES.');
         }
 

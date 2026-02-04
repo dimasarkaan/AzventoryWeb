@@ -6,9 +6,9 @@
                 <div class="shrink-0 flex items-center">
                     @php
                         $dashboardRoute = match(Auth::user()->role) {
-                            'superadmin' => route('superadmin.dashboard'),
-                            'admin' => route('admin.dashboard'),
-                            'operator' => route('operator.dashboard'),
+                            \App\Enums\UserRole::SUPERADMIN => route('superadmin.dashboard'),
+                            \App\Enums\UserRole::ADMIN => route('admin.dashboard'),
+                            \App\Enums\UserRole::OPERATOR => route('operator.dashboard'),
                             default => route('dashboard'),
                         };
                     @endphp
@@ -23,14 +23,14 @@
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-1 sm:-my-px sm:ms-10 sm:flex items-center">
+                <div class="hidden space-x-1 lg:-my-px lg:ms-10 lg:flex items-center">
                     @php
                         $navClass = "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md transition duration-150 ease-in-out gap-2";
                         $activeClass = "bg-primary-50 text-primary-700";
                         $inactiveClass = "text-secondary-600 hover:text-secondary-900 hover:bg-secondary-50";
                     @endphp
 
-                    @if (Auth::user()->role === 'superadmin')
+                    @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <a href="{{ route('superadmin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.dashboard') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                             {{ __('Dashboard') }}
@@ -53,13 +53,13 @@
                         </a>
                     @endif
                     
-                     @if (Auth::user()->role === 'admin')
+                     @if (Auth::user()->role === \App\Enums\UserRole::ADMIN)
                         <a href="{{ route('admin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('admin.dashboard') ? $activeClass : $inactiveClass }}">
                             Dashboard
                         </a>
                      @endif
                      
-                     @if (Auth::user()->role === 'operator')
+                     @if (Auth::user()->role === \App\Enums\UserRole::OPERATOR)
                         <a href="{{ route('operator.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('operator.dashboard') ? $activeClass : $inactiveClass }}">
                             Dashboard
                         </a>
@@ -67,61 +67,11 @@
                 </div>
             </div>
 
-            <div class="hidden sm:flex sm:items-center sm:ms-6 gap-3">
-                <!-- Notifications Dropdown -->
-                <div x-data="{ 
-                    notificationOpen: false, 
-                    unreadCount: {{ auth()->user()->unreadNotifications()->count() }},
-                    notifications: [],
-                    init() { this.fetchNotifications(); },
-                    fetchNotifications() {
-                        axios.get('/notifications?_=' + new Date().getTime())
-                            .then(response => {
-                                this.notifications = response.data;
-                                // Since API only returns unread, count is length
-                                this.unreadCount = this.notifications.length;
-                            })
-                            .catch(error => console.error(error));
-                    },
-                    markAsRead(id, url, type) {
-                         axios.patch('/notifications/' + id + '/read')
-                            .then(response => {
-                                // If AJAX success, update local state immediately
-                                this.unreadCount = Math.max(0, this.unreadCount - 1);
-                                this.notifications = this.notifications.map(n => 
-                                    n.id === id ? { ...n, read_at: new Date().toISOString() } : n
-                                );
-                                
-                                const targetUrl = response.data.url || url;
-                                if (targetUrl) {
-                                    if (type === 'App\\Notifications\\ReportReadyNotification') {
-                                        window.open(targetUrl, '_blank');
-                                    } else {
-                                        window.location.href = targetUrl;
-                                    }
-                                }
-                            })
-                            .catch(error => console.error(error));
-                    },
-                    markAllRead() {
-                        // Optimistic UI update
-                        this.unreadCount = 0;
-                        this.notifications = this.notifications.map(n => ({ ...n, read_at: new Date().toISOString() }));
+            <div class="flex items-center ms-auto gap-2 sm:gap-4 lg:ms-6">
 
-                        axios.patch('/notifications/read-all')
-                            .then(response => {
-                                // Optional: fetch to ensure sync, but UI is already updated
-                                this.fetchNotifications();
-                            })
-                            .catch(error => {
-                                console.error(error);
-                                // Revert on error if needed, or just fetch
-                                this.fetchNotifications(); 
-                            });
-                    }
-                }" 
-                @notification-read.window="unreadCount = Math.max(0, unreadCount - 1)"
-                class="relative">
+                <!-- Notifications Dropdown -->
+                <!-- Notifications Dropdown -->
+                <div x-data="notificationComponent()" class="relative">
                     <button @click="notificationOpen = !notificationOpen" class="relative p-2 text-secondary-500 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none transition-all duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         <span x-show="unreadCount > 0" x-text="unreadCount" style="display: none;" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]">
@@ -154,7 +104,7 @@
                                                 <div class="flex-1">
                                                     <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors" x-text="notification.data.title || 'Notifikasi Baru'"></p>
                                                     <p class="text-xs text-secondary-500 line-clamp-2 mt-0.5" x-text="notification.data.message"></p>
-                                                    <p class="text-[10px] text-secondary-400 mt-1" x-text="new Date(notification.created_at).toLocaleString('id-ID')"></p>
+                                                    <p class="text-[10px] text-secondary-400 mt-1" x-text="timeAgo(notification.created_at) + ' • ' + new Date(notification.created_at).toLocaleString('id-ID')"></p>
                                                 </div>
                                             </div>
                                             <!-- Manual Mark Read Button -->
@@ -176,11 +126,12 @@
                 </div>
 
                 <!-- Settings Dropdown -->
-            <div x-data="{ profileOpen: false }" class="relative">
+            <div x-data="{ profileOpen: false }" class="relative hidden lg:block">
                 <button @click="profileOpen = !profileOpen" class="inline-flex items-center gap-3 px-1 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-secondary-500 hover:text-secondary-700 focus:outline-none transition ease-in-out duration-150 group">
-                    <div class="flex flex-col items-end hidden md:flex text-right">
-                        <span class="font-bold text-secondary-800 text-sm group-hover:text-primary-600 transition-colors">{{ Auth::user()->name }}</span>
-                        <span class="text-xs text-secondary-500 font-normal">{{ ucfirst(Auth::user()->role) }}</span>
+                    <!-- Profile Info: 2 Lines (Name Top, Role Bottom) -->
+                    <div class="hidden md:flex flex-col items-end text-right mr-3">
+                        <span class="font-bold text-secondary-800 text-sm group-hover:text-primary-600 transition-colors whitespace-nowrap">{{ Auth::user()->name }}</span>
+                        <span class="text-xs text-secondary-500 font-normal">{{ Auth::user()->role->label() }}</span>
                     </div>
                     <div class="h-9 w-9 rounded-full overflow-hidden border-2 border-secondary-200 group-hover:border-primary-200 transition-colors shadow-sm relative">
                          @if(Auth::user()->avatar)
@@ -192,6 +143,109 @@
                          @endif
                     </div>
                 </button>
+                
+                <!-- Added Script at the request of refactoring -->
+                <script>
+                    function notificationComponent() {
+                        return {
+                            notificationOpen: false, 
+                            unreadCount: {{ auth()->user()->unreadNotifications()->count() }},
+                            notifications: [],
+                            init() { 
+                                this.fetchNotifications(); 
+                                
+                                // Real-time Listener
+                                if (window.Echo) {
+                                    window.Echo.private('App.Models.User.{{ auth()->id() }}')
+                                        .notification((notification) => {
+                                            // Update Count
+                                            this.unreadCount++;
+
+                                            // Add to List
+                                            this.notifications.unshift({
+                                                id: notification.id,
+                                                type: notification.type,
+                                                read_at: null,
+                                                created_at: new Date().toISOString(),
+                                                data: {
+                                                    title: notification.title,
+                                                    message: notification.message,
+                                                    url: notification.url
+                                                }
+                                            });
+
+                                            // Show Toast
+                                            const Toast = Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 4000,
+                                                timerProgressBar: true,
+                                                customClass: { popup: 'solid-toast-popup' }
+                                            });
+
+                                            Toast.fire({
+                                                icon: 'info',
+                                                // Safe HTML string without conflicting quotes
+                                                iconHtml: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>`,
+                                                title: notification.title || 'Notifikasi Baru',
+                                                text: notification.message
+                                            });
+                                        });
+                                }
+                            },
+                            timeAgo(dateString) {
+                                const date = new Date(dateString);
+                                const now = new Date();
+                                const seconds = Math.floor((now - date) / 1000);
+
+                                let interval = seconds / 31536000;
+                                if (interval > 1) return Math.floor(interval) + " tahun yang lalu";
+                                
+                                interval = seconds / 2592000;
+                                if (interval > 1) return Math.floor(interval) + " bulan yang lalu";
+                                
+                                interval = seconds / 86400;
+                                if (interval > 1) return Math.floor(interval) + " hari yang lalu";
+                                
+                                interval = seconds / 3600;
+                                if (interval > 1) return Math.floor(interval) + " jam yang lalu";
+                                
+                                interval = seconds / 60;
+                                if (interval > 1) return Math.floor(interval) + " menit yang lalu";
+                                
+                                return "Baru saja";
+                            },
+                            fetchNotifications() {
+                                axios.get('/notifications?_=' + new Date().getTime())
+                                    .then(response => {
+                                        this.notifications = response.data;
+                                        this.unreadCount = this.notifications.filter(n => !n.read_at).length;
+                                    })
+                                    .catch(error => console.error(error));
+                            },
+                            markAsRead(id, url, type) {
+                                 axios.patch('/notifications/' + id + '/read')
+                                    .then(response => {
+                                        this.unreadCount = Math.max(0, this.unreadCount - 1);
+                                        this.notifications = this.notifications.map(n => 
+                                            n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+                                        );
+                                        
+                                        const targetUrl = response.data.url || url;
+                                        if (targetUrl) {
+                                            if (type === 'App\\Notifications\\ReportReadyNotification') {
+                                                window.open(targetUrl, '_blank');
+                                            } else {
+                                                window.location.href = targetUrl;
+                                            }
+                                        }
+                                    })
+                                    .catch(error => console.error(error));
+                            }
+                        }
+                    }
+                </script>
 
                 <div x-show="profileOpen" @click.away="profileOpen = false"
                      x-transition:enter="transition ease-out duration-200"
@@ -228,22 +282,24 @@
                     </form>
                 </div>
             </div>
+            
+            <!-- Hamburger (lg:hidden, static inside flex) -->
+            <div class="-me-2 flex items-center lg:hidden">
+                <button @click="mobileMenuOpen = ! mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-secondary-500 hover:text-secondary-900 hover:bg-secondary-100 focus:outline-none focus:bg-secondary-100 focus:text-secondary-900 transition duration-150 ease-in-out">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path :class="{'hidden': mobileMenuOpen, 'inline-flex': ! mobileMenuOpen }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{'hidden': ! mobileMenuOpen, 'inline-flex': mobileMenuOpen }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
-        <!-- Hamburger -->
-        <div class="-me-2 flex items-center sm:hidden absolute right-4 top-4">
-            <button @click="mobileMenuOpen = ! mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-secondary-500 hover:text-secondary-900 hover:bg-secondary-100 focus:outline-none focus:bg-secondary-100 focus:text-secondary-900 transition duration-150 ease-in-out">
-                <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                    <path :class="{'hidden': mobileMenuOpen, 'inline-flex': ! mobileMenuOpen }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    <path :class="{'hidden': ! mobileMenuOpen, 'inline-flex': mobileMenuOpen }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
+
     </div>
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div x-show="mobileMenuOpen" style="display: none;" class="sm:hidden bg-white border-t border-secondary-100">
+    <div x-show="mobileMenuOpen" style="display: none;" class="lg:hidden bg-white border-t border-secondary-100">
         <div class="pt-2 pb-3 space-y-1">
              @php
                 $resNavClass = "block w-full ps-3 pe-4 py-2 border-l-4 text-start text-base font-medium transition duration-150 ease-in-out";
@@ -251,7 +307,7 @@
                 $resInactiveClass = "border-transparent text-secondary-600 hover:text-secondary-800 hover:bg-secondary-50 hover:border-secondary-300 focus:outline-none focus:text-secondary-800 focus:bg-secondary-50 focus:border-secondary-300";
             @endphp
 
-            @if (Auth::user()->role === 'superadmin')
+            @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                 <a href="{{ route('superadmin.dashboard') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.dashboard') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('Dashboard') }}
                 </a>

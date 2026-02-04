@@ -39,9 +39,9 @@ class GlobalSearchController extends Controller
             ->map(function ($item) use ($role) {
                 // Determine route based on role
                 $routePrefix = match($role) {
-                    'superadmin' => 'superadmin.inventory.show',
-                    'admin' => 'admin.inventory.show', // Assuming these exist, otherwise fallback?
-                    'operator' => 'operator.inventory.show', // Operator might not have show?
+                    \App\Enums\UserRole::SUPERADMIN => 'superadmin.inventory.show',
+                    \App\Enums\UserRole::ADMIN => 'admin.inventory.show',
+                    \App\Enums\UserRole::OPERATOR => 'operator.inventory.show',
                     default => 'dashboard'
                 };
                 
@@ -60,7 +60,7 @@ class GlobalSearchController extends Controller
 
         // 3. Search Users (Superadmin Only)
         $users = [];
-        if ($role === 'superadmin') {
+        if ($role === \App\Enums\UserRole::SUPERADMIN) {
             $users = User::where('name', 'like', "%{$query}%")
                 ->orWhere('email', 'like', "%{$query}%")
                 ->limit(3)
@@ -69,7 +69,7 @@ class GlobalSearchController extends Controller
                     return [
                         'id' => $item->id,
                         'title' => $item->name,
-                        'subtitle' => $item->email . ' • ' . ucfirst($item->role),
+                        'subtitle' => $item->email . ' • ' . $item->role->label(),
                         'image' => null, // Avatar logic if needed
                         'url' => route('superadmin.users.edit', $item),
                         'type' => 'Pengguna'
@@ -92,7 +92,7 @@ class GlobalSearchController extends Controller
         ];
 
         $roleMenus = match($role) {
-            'superadmin' => [
+            \App\Enums\UserRole::SUPERADMIN => [
                 ['title' => 'Manajemen Inventaris', 'url' => route('superadmin.inventory.index'), 'icon' => 'cube'],
                 ['title' => 'Tambah Sparepart', 'url' => route('superadmin.inventory.create'), 'icon' => 'plus'],
                 ['title' => 'Manajemen Users', 'url' => route('superadmin.users.index'), 'icon' => 'users'],
@@ -101,10 +101,10 @@ class GlobalSearchController extends Controller
                 ['title' => 'Riwayat Aktivitas', 'url' => route('superadmin.activity-logs.index'), 'icon' => 'clock'],
                 ['title' => 'Persetujuan Stok', 'url' => route('superadmin.stock-approvals.index'), 'icon' => 'check-circle'],
             ],
-            'admin' => [
+            \App\Enums\UserRole::ADMIN => [
                  // Add admin specific routes here if known
             ],
-            'operator' => [
+            \App\Enums\UserRole::OPERATOR => [
                 ['title' => 'Dashboard Operator', 'url' => route('operator.dashboard'), 'icon' => 'home'],
             ],
             default => []

@@ -168,12 +168,12 @@ class DashboardController extends Controller
         $user = auth()->user();
         $borrowQuery = \App\Models\Borrowing::query();
 
-        if ($user->role === 'admin') {
+        if ($user->role === \App\Enums\UserRole::ADMIN) {
             // Admin sees Own + Operators
-            $operatorIds = \App\Models\User::where('role', 'operator')->pluck('id');
+            $operatorIds = \App\Models\User::where('role', \App\Enums\UserRole::OPERATOR)->pluck('id');
             $allowedUserIds = $operatorIds->push($user->id);
             $borrowQuery->whereIn('user_id', $allowedUserIds);
-        } elseif ($user->role === 'operator' || $user->role === 'user') {
+        } elseif ($user->role === \App\Enums\UserRole::OPERATOR) {
             // Operator/User sees Own only
             $borrowQuery->where('user_id', $user->id);
         }

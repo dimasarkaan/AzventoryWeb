@@ -46,13 +46,13 @@
                         <div class="flex items-center gap-2 mb-6">
                             @php
                                 $roleColors = [
-                                    'superadmin' => 'bg-purple-100 text-purple-800',
-                                    'admin' => 'bg-blue-100 text-blue-800',
-                                    'operator' => 'bg-secondary-100 text-secondary-800'
+                                    \App\Enums\UserRole::SUPERADMIN->value => 'bg-purple-100 text-purple-800',
+                                    \App\Enums\UserRole::ADMIN->value => 'bg-blue-100 text-blue-800',
+                                    \App\Enums\UserRole::OPERATOR->value => 'bg-secondary-100 text-secondary-800'
                                 ];
                             @endphp
-                            <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $roleColors[$user->role] ?? 'bg-gray-100 text-gray-800' }}">
-                                {{ ucfirst($user->role) }}
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $roleColors[$user->role->value] ?? 'bg-gray-100 text-gray-800' }}">
+                                {{ $user->role->label() }}
                             </span>
                         </div>
 

@@ -1,3 +1,4 @@
+@import 'custom.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,15 +18,15 @@
     }
 
     .btn-primary {
-        @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 shadow-sm hover:shadow-md active:transform active:scale-95;
+        @apply bg-primary-600 text-white hover:bg-primary-800 focus:ring-primary-500 shadow-sm hover:shadow-lg active:transform active:scale-95;
     }
 
     .btn-secondary {
-        @apply bg-white text-secondary-700 border-secondary-300 hover:bg-secondary-50 focus:ring-primary-500 shadow-sm;
+        @apply bg-white text-secondary-700 border-secondary-300 hover:bg-secondary-100 hover:text-secondary-900 hover:border-secondary-400 focus:ring-primary-500 shadow-sm;
     }
 
     .btn-danger {
-        @apply bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500 shadow-sm;
+        @apply bg-danger-600 text-white hover:bg-danger-800 focus:ring-danger-500 shadow-sm hover:shadow-lg;
     }
 
     .btn-ghost {

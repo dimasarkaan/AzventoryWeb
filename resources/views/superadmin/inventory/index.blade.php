@@ -11,7 +11,7 @@
                     </h2>
                     <p class="mt-1 text-sm text-secondary-500">Kelola semua data sparepart, stok, dan lokasi.</p>
                 </div>
-                <div class="flex gap-2">
+                <div class="flex items-center gap-2">
                      <!-- Trash Toggle Button -->
                      <a href="{{ request('trash') ? route('superadmin.inventory.index') : route('superadmin.inventory.index', ['trash' => 'true']) }}" 
                         class="btn flex items-center justify-center p-2.5 {{ request('trash') ? 'btn-danger' : 'btn-secondary' }}" 

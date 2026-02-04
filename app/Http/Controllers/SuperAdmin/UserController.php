@@ -81,7 +81,7 @@ class UserController extends Controller
             'status' => $request->status,
         ]);
 
-        $this->logActivity('User Dibuat', "Menambahkan user baru: {$user->name} ({$user->role})");
+        $this->logActivity('User Dibuat', "Menambahkan user baru: {$user->name} ({$user->role->label()})");
 
         return redirect()->route('superadmin.users.index')
             ->with('success', "User berhasil dibuat. Username Sementara: {$username}, Password Default: {$password}");

@@ -67,6 +67,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'password_changed_at' => 'datetime',
+            'role' => \App\Enums\UserRole::class,
         ];
     }
     public function borrowings()
