@@ -18,7 +18,9 @@
 
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="min-h-screen bg-gray-100 transition-opacity duration-300 opacity-0"
+             x-data="{}"
+             x-init="$el.classList.remove('opacity-0')">
             @include('layouts.navigation')
 
             <!-- Page Heading -->

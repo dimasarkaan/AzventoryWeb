@@ -50,10 +50,11 @@ class InventoryService
         }
 
         // Filters
-        $this->applyExactFilter($query, 'brand', $filters['brand'] ?? null, 'Semua Merk');
-        $this->applyExactFilter($query, 'category', $filters['category'] ?? null, 'Semua Kategori');
-        $this->applyExactFilter($query, 'location', $filters['location'] ?? null, 'Semua Lokasi');
-        $this->applyExactFilter($query, 'color', $filters['color'] ?? null, 'Semua Warna');
+        $this->applyExactFilter($query, 'brand', $filters['brand'] ?? null, __('messages.all_brands'));
+        $this->applyExactFilter($query, 'category', $filters['category'] ?? null, __('messages.all_categories'));
+        $this->applyExactFilter($query, 'location', $filters['location'] ?? null, __('messages.all_locations'));
+        $this->applyExactFilter($query, 'color', $filters['color'] ?? null, __('messages.all_colors'));
+        $this->applyExactFilter($query, 'type', $filters['type'] ?? null, __('messages.all_types'));
 
         // Special Filter
         if (($filters['filter'] ?? '') === 'low_stock') {
@@ -73,23 +74,7 @@ class InventoryService
     {
         return DB::transaction(function () use ($data) {
             // Check for exact duplicate
-            $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
-                ->where('name', $data['name'])
-                ->where('brand', $data['brand'])
-                ->where('category', $data['category'])
-                ->where('location', $data['location'])
-                ->where('condition', $data['condition'])
-                ->where('type', $data['type']);
-
-            foreach (['color', 'price', 'unit'] as $field) {
-                if (isset($data[$field])) {
-                    $existingItemQuery->where($field, $data[$field]);
-                } else {
-                    $existingItemQuery->whereNull($field);
-                }
-            }
-
-            $existingItem = $existingItemQuery->lockForUpdate()->first();
+            $existingItem = $this->findExactDuplicate($data);
 
             if ($existingItem) {
                 // DUPLICATE FOUND: Merge Stock
@@ -97,7 +82,7 @@ class InventoryService
                     $existingItem->stock += $data['stock'];
                     $existingItem->save();
 
-                    $message = "Stok sparepart '{$existingItem->name}' (PN: {$existingItem->part_number}) berhasil ditambahkan ke item yang sudah ada.";
+                    $message = __('messages.stock_merged', ['name' => $existingItem->name, 'part_number' => $existingItem->part_number]);
 
                     // Log Stock Addition
                     StockLog::create([
@@ -105,7 +90,7 @@ class InventoryService
                         'user_id' => auth()->id(),
                         'type' => 'masuk',
                         'quantity' => $data['stock'],
-                        'reason' => 'Penambahan stok (Duplicate Entry)',
+                        'reason' => __('messages.log_stock_added_duplicate'),
                         'status' => 'approved',
                         'approved_by' => auth()->id(),
                         'approved_at' => now(),
@@ -117,7 +102,7 @@ class InventoryService
                     return ['status' => 'merged', 'message' => $message, 'data' => $existingItem];
                 } else {
                     // Duplicate input but 0 stock - No Action
-                    $message = "Item '{$existingItem->name}' (PN: {$existingItem->part_number}) sudah ada di inventaris dan stok input adalah 0. Silakan periksa kembali jumlah stok.";
+                    $message = __('messages.stock_zero_duplicate', ['name' => $existingItem->name, 'part_number' => $existingItem->part_number]);
                     return ['status' => 'error_zero_stock', 'message' => $message, 'data' => $existingItem];
                 }
             }
@@ -148,14 +133,14 @@ class InventoryService
                     'user_id' => auth()->id(),
                     'type' => 'masuk',
                     'quantity' => $sparepart->stock,
-                    'reason' => 'Stok awal (Item baru)',
+                    'reason' => __('messages.log_stock_initial'),
                     'status' => 'approved',
                     'approved_by' => auth()->id(),
                     'approved_at' => now(),
                 ]);
             }
 
-            $message = "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah ditambahkan.";
+            $message = __('messages.item_created', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]);
             $this->logActivity('Sparepart Dibuat', $message);
             $this->clearCache();
 
@@ -203,10 +188,10 @@ class InventoryService
             }
 
             $sparepart->save();
-            $this->logActivity('Sparepart Diperbarui', "Data sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah diperbarui.", $changes);
+            $this->logActivity('Sparepart Diperbarui', __('messages.log_item_updated', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]), $changes);
             $this->clearCache();
 
-            return ['status' => 'updated', 'message' => 'Data sparepart berhasil diperbarui.', 'data' => $sparepart];
+            return ['status' => 'updated', 'message' => __('messages.item_updated'), 'data' => $sparepart];
         });
     }
 
@@ -216,11 +201,16 @@ class InventoryService
     public function deleteSparepart(Sparepart $sparepart)
     {
         return DB::transaction(function () use ($sparepart) {
-            $this->logActivity('Sparepart Dihapus', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dipindahkan ke tong sampah.");
+            // Check for active borrowings
+            if ($sparepart->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
+                 return ['status' => 'error', 'message' => __('messages.cannot_delete_borrowed_item')];
+            }
+
+            $this->logActivity('Sparepart Dihapus', __('messages.log_item_deleted_soft', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]));
             $sparepart->delete();
             $this->clearCache();
 
-            return ['status' => 'deleted', 'message' => 'Data sparepart berhasil dipindahkan ke tong sampah.'];
+            return ['status' => 'deleted', 'message' => __('messages.item_deleted')];
         });
     }
 
@@ -233,10 +223,10 @@ class InventoryService
             $sparepart = Sparepart::onlyTrashed()->findOrFail($id);
             $sparepart->restore();
             
-            $this->logActivity('Sparepart Dipulihkan', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dipulihkan dari tong sampah.");
+            $this->logActivity('Sparepart Dipulihkan', __('messages.log_item_restored', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]));
             $this->clearCache();
 
-            return ['status' => 'restored', 'message' => 'Data sparepart berhasil dipulihkan.'];
+            return ['status' => 'restored', 'message' => __('messages.item_restored')];
         });
     }
 
@@ -248,6 +238,11 @@ class InventoryService
         return DB::transaction(function () use ($id) {
             $sparepart = Sparepart::onlyTrashed()->findOrFail($id);
             
+            // Check for active borrowings (active or overdue)
+            if ($sparepart->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
+                 return ['status' => 'error', 'message' => __('messages.cannot_delete_borrowed_item')];
+            }
+            
             // Delete associated files
             if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
                 Storage::disk('public')->delete($sparepart->qr_code_path);
@@ -258,10 +253,10 @@ class InventoryService
 
             $sparepart->forceDelete();
             
-            $this->logActivity('Sparepart Dihapus Permanen', "Sparepart '{$sparepart->name}' (PN: {$sparepart->part_number}) telah dihapus permanen.");
+            $this->logActivity('Sparepart Dihapus Permanen', __('messages.log_item_deleted_force', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]));
             $this->clearCache();
 
-            return ['status' => 'force_deleted', 'message' => 'Data sparepart berhasil dihapus permanen.'];
+            return ['status' => 'force_deleted', 'message' => __('messages.item_force_deleted')];
         });
     }
 
@@ -274,7 +269,7 @@ class InventoryService
             $spareparts = Sparepart::onlyTrashed()->get();
 
             if ($spareparts->isEmpty()) {
-                return ['status' => 'empty', 'message' => 'Tempat sampah sudah kosong.'];
+                return ['status' => 'empty', 'message' => __('messages.trash_empty')];
             }
 
             foreach ($spareparts as $sparepart) {
@@ -287,10 +282,10 @@ class InventoryService
                 $sparepart->forceDelete();
             }
 
-            $this->logActivity('Tong Sampah Dikosongkan', "Semua item di tong sampah (" . $spareparts->count() . " item) telah dihapus permanen.");
+            $this->logActivity('Tong Sampah Dikosongkan', __('messages.log_trash_cleared', ['count' => $spareparts->count()]));
             $this->clearCache();
 
-            return ['status' => 'all_deleted', 'message' => 'Semua data di tong sampah berhasil dihapus permanen.'];
+            return ['status' => 'all_deleted', 'message' => __('messages.trash_cleared')];
         });
     }
 
@@ -301,14 +296,14 @@ class InventoryService
     {
         return DB::transaction(function () use ($ids) {
             $count = Sparepart::onlyTrashed()->whereIn('id', $ids)->count();
-            if ($count === 0) return ['status' => 'empty', 'message' => 'Tidak ada item yang dipilih.'];
+            if ($count === 0) return ['status' => 'empty', 'message' => __('messages.no_item_selected')];
 
             Sparepart::onlyTrashed()->whereIn('id', $ids)->restore();
 
-            $this->logActivity('Bulk Restore', "$count item berhasil dipulihkan dari tong sampah.");
+            $this->logActivity('Bulk Restore', __('messages.log_bulk_restored', ['count' => $count]));
             $this->clearCache();
 
-            return ['status' => 'success', 'message' => "$count item berhasil dipulihkan."];
+            return ['status' => 'success', 'message' => __('messages.bulk_restored', ['count' => $count])];
         });
     }
 
@@ -319,7 +314,7 @@ class InventoryService
     {
         return DB::transaction(function () use ($ids) {
             $spareparts = Sparepart::onlyTrashed()->whereIn('id', $ids)->get();
-            if ($spareparts->isEmpty()) return ['status' => 'empty', 'message' => 'Tidak ada item yang dipilih.'];
+            if ($spareparts->isEmpty()) return ['status' => 'empty', 'message' => __('messages.no_item_selected')];
 
             $count = $spareparts->count();
 
@@ -333,10 +328,10 @@ class InventoryService
                 $sparepart->forceDelete();
             }
 
-            $this->logActivity('Bulk Force Delete', "$count item telah dihapus permanen dari tong sampah.");
+            $this->logActivity('Bulk Force Delete', __('messages.log_bulk_deleted_force', ['count' => $count]));
             $this->clearCache();
 
-            return ['status' => 'success', 'message' => "$count item berhasil dihapus permanen."];
+            return ['status' => 'success', 'message' => __('messages.bulk_force_deleted', ['count' => $count])];
         });
     }
 
@@ -394,5 +389,29 @@ class InventoryService
             case 'oldest': $query->oldest(); break;
             case 'newest': default: $query->latest(); break;
         }
+    }
+
+    /**
+     * Find exact duplicate item in database.
+     */
+    private function findExactDuplicate(array $data)
+    {
+        $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
+            ->where('name', $data['name'])
+            ->where('brand', $data['brand'])
+            ->where('category', $data['category'])
+            ->where('location', $data['location'])
+            ->where('condition', $data['condition'])
+            ->where('type', $data['type']);
+
+        foreach (['color', 'price', 'unit'] as $field) {
+            if (isset($data[$field])) {
+                $existingItemQuery->where($field, $data[$field]);
+            } else {
+                $existingItemQuery->whereNull($field);
+            }
+        }
+
+        return $existingItemQuery->lockForUpdate()->first();
     }
 }

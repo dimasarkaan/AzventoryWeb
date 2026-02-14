@@ -79,12 +79,13 @@ class UserController extends Controller
             'role' => $request->role,
             'jabatan' => $request->jabatan,
             'status' => $request->status,
+            'password_changed_at' => null, // Force password change on first login
         ]);
 
-        $this->logActivity('User Dibuat', "Menambahkan user baru: {$user->name} ({$user->role->label()})");
+        $this->logActivity('User Dibuat', __('messages.log_user_created', ['name' => $user->name, 'role' => $user->role->label()]));
 
         return redirect()->route('superadmin.users.index')
-            ->with('success', "User berhasil dibuat. Username Sementara: {$username}, Password Default: {$password}");
+            ->with('success', __('messages.user_created', ['username' => $username, 'password' => $password]));
     }
 
     /**
@@ -116,10 +117,10 @@ class UserController extends Controller
             'status' => $request->status,
         ]);
 
-        $this->logActivity('User Diupdate', "Mengupdate data user: {$user->name}");
+        $this->logActivity('User Diupdate', __('messages.log_user_updated', ['name' => $user->name]));
 
         return redirect()->route('superadmin.users.index')
-            ->with('success', "Akun pengguna {$user->name} berhasil diperbarui.");
+            ->with('success', __('messages.user_updated', ['name' => $user->name]));
     }
 
     /**
@@ -130,11 +131,12 @@ class UserController extends Controller
         $defaultPassword = 'password123';
         $user->update([
             'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
+            'password_changed_at' => null, // Force password change on next login
         ]);
 
-        $this->logActivity('Reset Password', "Mereset password user: {$user->name} ke default.");
+        $this->logActivity('Reset Password', __('messages.log_user_password_reset', ['name' => $user->name]));
 
-        return back()->with('success', "Password untuk {$user->name} telah direset menjadi: {$defaultPassword}");
+        return back()->with('success', __('messages.user_password_reset', ['name' => $user->name, 'password' => $defaultPassword]));
     }
 
     /**
@@ -144,15 +146,15 @@ class UserController extends Controller
     {
          // Prevent deleting own account
          if (auth()->id() === $user->id) {
-            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            return back()->with('error', __('messages.cannot_delete_self'));
         }
 
-        $this->logActivity('User Dihapus', "Menghapus user: {$user->name}");
+        $this->logActivity('User Dihapus', __('messages.log_user_deleted_soft', ['name' => $user->name]));
 
         $user->delete();
 
         return redirect()->route('superadmin.users.index')
-            ->with('success', 'User berhasil dihapus.');
+            ->with('success', __('messages.user_deleted'));
     }
 
     public function restore($id)
@@ -160,10 +162,10 @@ class UserController extends Controller
         $user = \App\Models\User::withTrashed()->findOrFail($id);
         $user->restore();
 
-        $this->logActivity('User Dipulihkan', "Memulihkan user: {$user->name}");
+        $this->logActivity('User Dipulihkan', __('messages.log_user_restored', ['name' => $user->name]));
 
         return redirect()->route('superadmin.users.index', ['trash' => 'true'])
-            ->with('success', 'User berhasil dipulihkan.');
+            ->with('success', __('messages.user_restored'));
     }
 
     public function forceDelete($id)
@@ -172,7 +174,7 @@ class UserController extends Controller
         
         // Final check to prevent self-deletion even if force
         if (auth()->id() === $user->id) {
-            return back()->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
+            return back()->with('error', __('messages.cannot_delete_self'));
         }
 
         // Delete avatar if exists
@@ -180,12 +182,12 @@ class UserController extends Controller
              \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
         }
 
-        $this->logActivity('User Dihapus Permanen', "Menghapus permanen user: {$user->name}");
+        $this->logActivity('User Dihapus Permanen', __('messages.log_user_deleted_force', ['name' => $user->name]));
         
         $user->forceDelete();
 
         return redirect()->route('superadmin.users.index', ['trash' => 'true'])
-            ->with('success', 'User berhasil dihapus permanen.');
+            ->with('success', __('messages.user_force_deleted'));
     }
 
     /**
@@ -202,14 +204,14 @@ class UserController extends Controller
         $count = \App\Models\User::onlyTrashed()->whereIn('id', $ids)->count();
         
         if ($count === 0) {
-             return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk dipulihkan.');
+             return redirect()->back()->with('error', __('messages.no_user_selected_restore'));
         }
 
         \App\Models\User::onlyTrashed()->whereIn('id', $ids)->restore();
 
-        $this->logActivity('Bulk Restore User', "$count user berhasil dipulihkan.");
+        $this->logActivity('Bulk Restore User', __('messages.log_bulk_user_restored', ['count' => $count]));
 
-        return redirect()->back()->with('success', "$count user berhasil dipulihkan.");
+        return redirect()->back()->with('success', __('messages.bulk_user_restored', ['count' => $count]));
     }
 
     /**
@@ -226,7 +228,7 @@ class UserController extends Controller
         $users = \App\Models\User::onlyTrashed()->whereIn('id', $ids)->get();
 
         if ($users->isEmpty()) {
-            return redirect()->back()->with('error', 'Tidak ada item yang dipilih untuk dihapus.');
+            return redirect()->back()->with('error', __('messages.no_user_selected_delete'));
         }
 
         $count = 0;
@@ -241,8 +243,8 @@ class UserController extends Controller
             $count++;
         }
 
-        $this->logActivity('Bulk Force Delete User', "$count user dihapus permanen.");
+        $this->logActivity('Bulk Force Delete User', __('messages.log_bulk_user_deleted_force', ['count' => $count]));
 
-        return redirect()->back()->with('success', "$count user berhasil dihapus permanen.");
+        return redirect()->back()->with('success', __('messages.bulk_user_force_deleted', ['count' => $count]));
     }
 }

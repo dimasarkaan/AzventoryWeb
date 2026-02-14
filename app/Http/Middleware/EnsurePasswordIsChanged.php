@@ -15,7 +15,7 @@ class EnsurePasswordIsChanged
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && ! $request->user()->password_changed_at && ! $request->routeIs('password.change', 'logout')) {
+        if ($request->user() && ! $request->user()->password_changed_at && ! $request->routeIs('password.change', 'password.change.store', 'logout')) {
             return redirect()->route('password.change')->with('warning', 'Anda harus mengganti kata sandi default sebelum melanjutkan.');
         }
 

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Ajukan Perubahan Stok untuk: ') }} {{ $sparepart->name }}
+            {{ __('ui.request_stock_change_for') }} {{ $sparepart->name }}
         </h2>
     </x-slot>
 
@@ -13,29 +13,29 @@
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Tipe Transaksi -->
                         <div>
-                            <x-input-label for="type" :value="__('Tipe Transaksi')" :required="true" />
+                            <x-input-label for="type" :value="__('ui.transaction_type')" :required="true" />
                             @php
                                 $typeOptions = [
-                                    'masuk' => 'Stok Masuk',
-                                    'keluar' => 'Stok Keluar',
+                                    'masuk' => __('ui.stock_in_simple'),
+                                    'keluar' => __('ui.stock_out_simple'),
                                 ];
                             @endphp
-                            <x-select name="type" :options="$typeOptions" :selected="old('type', 'masuk')" placeholder="Pilih Tipe Transaksi" width="w-full" />
+                            <x-select name="type" :options="$typeOptions" :selected="old('type', 'masuk')" placeholder="{{ __('ui.select_transaction_type') }}" width="w-full" />
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
 
                         <!-- Jumlah -->
                         <div>
-                            <x-input-label for="quantity" :value="__('Jumlah')" :required="true" />
+                            <x-input-label for="quantity" :value="__('ui.quantity')" :required="true" />
                             <x-text-input id="quantity" class="block mt-1 w-full" type="number" name="quantity" :value="old('quantity')" min="1" />
                             <x-input-error :messages="$errors->get('quantity')" class="mt-2" />
                         </div>
 
                         <!-- Alasan -->
                         <div>
-                            <x-input-label for="reason" :value="__('Alasan')" :required="true" />
+                            <x-input-label for="reason" :value="__('ui.reason')" :required="true" />
                             <x-text-input id="reason" class="block mt-1 w-full" type="text" name="reason" :value="old('reason')" />
-                            <x-input-helper>{{ __('Contoh: Restock bulanan, Dipinjam untuk perbaikan, Dijual') }}</x-input-helper>
+                            <x-input-helper>{{ __('ui.reason_placeholder') }}</x-input-helper>
                             <x-input-error :messages="$errors->get('reason')" class="mt-2" />
                         </div>
                     </div>
@@ -43,12 +43,12 @@
                     <div class="flex items-center justify-end mt-6">
                         <a href="{{ route('superadmin.inventory.show', $sparepart) }}">
                             <x-button type="button" variant="secondary">
-                                {{ __('Batal') }}
+                                {{ __('ui.cancel') }}
                             </x-button>
                         </a>
 
                         <x-button type="submit" variant="primary" class="ms-4">
-                            {{ __('Kirim Pengajuan') }}
+                            {{ __('ui.submit_request') }}
                         </x-button>
                     </div>
                 </form>

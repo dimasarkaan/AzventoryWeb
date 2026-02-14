@@ -31,19 +31,19 @@
                         </div>
                         <h1 class="text-4xl font-bold tracking-tight">Azventory</h1>
                     </div>
-                    <h2 class="text-3xl font-bold leading-tight mb-6">Sistem Informasi Inventaris Azzahra Computer.</h2>
+                    <h2 class="text-3xl font-bold leading-tight mb-6">{{ __('ui.guest_welcome_title') }}</h2>
                     <p class="text-primary-100 text-lg leading-relaxed">
-                        Sistem informasi manajemen inventaris sparepart berbasis web yang terstruktur dan terpusat.
+                        {{ __('ui.guest_welcome_desc') }}
                     </p>
                     
                      <div class="mt-12 flex gap-4 text-sm font-medium text-primary-200">
                         <div class="flex items-center gap-2">
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                             <span>Pemantauan Stok</span>
+                             <span>{{ __('ui.guest_feature_stock') }}</span>
                         </div>
                         <div class="flex items-center gap-2">
                              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                             <span>QR Code Support</span>
+                             <span>{{ __('ui.guest_feature_qr') }}</span>
                         </div>
                     </div>
                 </div>

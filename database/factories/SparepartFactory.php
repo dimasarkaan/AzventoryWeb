@@ -22,7 +22,9 @@ class SparepartFactory extends Factory
             'brand' => $this->faker->company(), // Added brand
             'category' => $this->faker->randomElement(['Processor', 'RAM', 'Motherboard', 'Storage', 'PSU']),
             'location' => $this->faker->randomElement(['Gudang A', 'Rak B', 'Etalase Depan']),
-            'condition' => $this->faker->randomElement(['Baru', 'Bekas', 'Rusak']),
+            'age' => $this->faker->randomElement(['Baru', 'Pernah Dipakai (Bekas)']), // Added age
+            'condition' => $this->faker->randomElement(['Baik', 'Rusak', 'Hilang']), // Updated values
+            'color' => $this->faker->safeColorName(), // Added color
             'type' => $this->faker->randomElement(['sale', 'asset']), // Added type
             'price' => $this->faker->numberBetween(100000, 5000000),
             'stock' => $this->faker->numberBetween(0, 100),

@@ -43,6 +43,7 @@ class InventoryController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Sparepart::class);
         $options = $this->inventoryService->getDropdownOptions();
         return view('superadmin.inventory.create', $options);
     }
@@ -52,6 +53,8 @@ class InventoryController extends Controller
      */
     public function store(\App\Http\Requests\SuperAdmin\Inventory\StoreSparepartRequest $request)
     {
+        $this->authorize('create', Sparepart::class);
+
         $result = $this->inventoryService->createSparepart($request->validated());
 
         if ($result['status'] === 'error_zero_stock') {
@@ -68,7 +71,7 @@ class InventoryController extends Controller
     {
         // Fetch borrowings with pagination (5 per page)
         $borrowings = $inventory->borrowings()
-            ->with('user')
+            ->with(['user', 'returns'])
             ->latest()
             ->paginate(5, ['*'], 'history_page');
 
@@ -89,6 +92,7 @@ class InventoryController extends Controller
      */
     public function edit(Sparepart $inventory)
     {
+        $this->authorize('update', $inventory);
         $options = $this->inventoryService->getDropdownOptions();
         return view('superadmin.inventory.edit', array_merge(['sparepart' => $inventory], $options));
     }
@@ -98,6 +102,8 @@ class InventoryController extends Controller
      */
     public function update(\App\Http\Requests\SuperAdmin\Inventory\UpdateSparepartRequest $request, Sparepart $inventory)
     {
+        $this->authorize('update', $inventory);
+
         $result = $this->inventoryService->updateSparepart($inventory, $request->validated());
 
         return redirect()->route('superadmin.inventory.index')
@@ -110,7 +116,13 @@ class InventoryController extends Controller
     public function destroy($id)
     {
         $inventory = Sparepart::findOrFail($id);
+        $this->authorize('delete', $inventory);
+
         $result = $this->inventoryService->deleteSparepart($inventory);
+
+        if ($result['status'] === 'error') {
+            return redirect()->back()->with('error', $result['message']);
+        }
 
         return redirect()->route('superadmin.inventory.index')
             ->with('success', $result['message']);
@@ -120,16 +132,8 @@ class InventoryController extends Controller
     {
         $svgResponse = $this->qrCodeService->generateLabelSvg($inventory);
 
-        // Generate structured filename: Label-[Category]-[Brand]-[PartNumber].svg
-        $cat = Str::title($inventory->category);
-        $brand = Str::title($inventory->brand);
-        $pn = strtoupper($inventory->part_number);
-        
-        $catSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $cat);
-        $brandSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $brand);
-        $pnSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $pn);
+        $filename = $this->qrCodeService->getLabelFilename($inventory);
 
-        $filename = "Label-{$catSlug}-{$brandSlug}-{$pnSlug}.svg";
 
         return response($svgResponse, 200, [
             'Content-Type' => 'image/svg+xml',
@@ -140,7 +144,7 @@ class InventoryController extends Controller
     public function printQrCode(Sparepart $inventory)
     {
         if (!$inventory->qr_code_path) {
-            abort(404, 'QR Code tidak ditemukan.');
+            abort(404, __('messages.qr_code_not_found'));
         }
 
         return view('superadmin.inventory.print_label', ['sparepart' => $inventory]);
@@ -175,6 +179,9 @@ class InventoryController extends Controller
      */
     public function restore($id)
     {
+        $inventory = Sparepart::onlyTrashed()->findOrFail($id);
+        $this->authorize('restore', $inventory);
+
         $result = $this->inventoryService->restoreSparepart($id);
 
         return redirect()->route('superadmin.inventory.index', ['trash' => 'true'])
@@ -186,7 +193,14 @@ class InventoryController extends Controller
      */
     public function forceDelete($id)
     {
+        $inventory = Sparepart::onlyTrashed()->findOrFail($id);
+        $this->authorize('forceDelete', $inventory);
+
         $result = $this->inventoryService->forceDeleteSparepart($id);
+
+        if ($result['status'] === 'error') {
+            return redirect()->back()->with('error', $result['message']);
+        }
 
         return redirect()->route('superadmin.inventory.index', ['trash' => 'true'])
             ->with('success', $result['message']);
@@ -197,6 +211,7 @@ class InventoryController extends Controller
      */
     public function forceDeleteAll()
     {
+        $this->authorize('forceDelete', new Sparepart());
         $result = $this->inventoryService->forceDeleteAllSpareparts();
 
         return redirect()->route('superadmin.inventory.index', ['trash' => 'true'])
@@ -208,6 +223,7 @@ class InventoryController extends Controller
      */
     public function bulkRestore(Request $request)
     {
+        $this->authorize('restore', new Sparepart());
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:spareparts,id',
@@ -227,6 +243,7 @@ class InventoryController extends Controller
      */
     public function bulkForceDelete(Request $request)
     {
+         $this->authorize('forceDelete', new Sparepart());
          $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:spareparts,id',

@@ -78,4 +78,16 @@ class QrCodeService
 
         return $svg;
     }
+    public function getLabelFilename(Sparepart $inventory)
+    {
+        $cat = Str::title($inventory->category);
+        $brand = Str::title($inventory->brand);
+        $pn = strtoupper($inventory->part_number);
+        
+        $catSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $cat);
+        $brandSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $brand);
+        $pnSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $pn);
+
+        return "Label-{$catSlug}-{$brandSlug}-{$pnSlug}.svg";
+    }
 }

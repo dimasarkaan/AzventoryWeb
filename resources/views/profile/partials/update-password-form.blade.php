@@ -5,19 +5,19 @@
 
         <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-6">
              <div class="sm:col-span-6">
-                <label for="update_password_current_password" class="input-label">Password Saat Ini</label>
+                <label for="update_password_current_password" class="input-label">{{ __('ui.profile_label_current_password') }}</label>
                 <input type="password" name="current_password" id="update_password_current_password" class="input-field w-full" autocomplete="current-password">
                 <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
             </div>
 
             <div class="sm:col-span-3">
-                <label for="update_password_password" class="input-label">Password Baru</label>
+                <label for="update_password_password" class="input-label">{{ __('ui.profile_label_new_password') }}</label>
                 <input type="password" name="password" id="update_password_password" class="input-field w-full" autocomplete="new-password">
                 <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
             </div>
 
             <div class="sm:col-span-3">
-                <label for="update_password_password_confirmation" class="input-label">Konfirmasi Password Baru</label>
+                <label for="update_password_password_confirmation" class="input-label">{{ __('ui.profile_label_confirm_password') }}</label>
                 <input type="password" name="password_confirmation" id="update_password_password_confirmation" class="input-field w-full" autocomplete="new-password">
                 <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
             </div>
@@ -25,7 +25,7 @@
 
         <div class="flex items-center gap-4 pt-2 border-t border-secondary-100">
             <button type="submit" class="btn btn-primary">
-                {{ __('Simpan Password') }}
+                {{ __('ui.profile_btn_save_password') }}
             </button>
 
             @if (session('status') === 'password-updated')
@@ -36,7 +36,7 @@
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-success-600 bg-success-50 px-3 py-1 rounded-full border border-success-100"
                 >
-                    {{ __('Password berhasil diubah.') }}
+                    {{ __('ui.profile_password_success') }}
                 </p>
             @endif
         </div>

@@ -40,4 +40,14 @@ class Borrowing extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function returns()
+    {
+        return $this->hasMany(BorrowingReturn::class);
+    }
+
+    public function getRemainingQuantityAttribute()
+    {
+        return $this->quantity - $this->returns()->sum('quantity');
+    }
 }

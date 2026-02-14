@@ -17,6 +17,7 @@ class Sparepart extends Model
         'brand',
         'category',
         'location',
+        'age',
         'condition',
         'color',
         'price', // nullable

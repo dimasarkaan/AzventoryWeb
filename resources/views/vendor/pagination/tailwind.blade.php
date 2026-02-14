@@ -1,7 +1,7 @@
 @if ($paginator->hasPages())
-    <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="flex items-center justify-between">
+    <nav role="navigation" aria-label="{{ __('Pagination Navigation') }}" class="flex items-center justify-between flex-col md:flex-row gap-4 md:gap-0">
         <!-- Mobile "Simple" View (Previous/Next Text) - Hidden because we want numbers -->
-        <div class="flex justify-between flex-1 sm:hidden hidden">
+        <div class="flex justify-between flex-1 md:hidden w-full">
             @if ($paginator->onFirstPage())
                 <span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">
                     {!! __('pagination.previous') !!}
@@ -25,7 +25,7 @@
 
         <!-- Full View (Numbers) - Visible on ALL screens (removed 'hidden sm:flex') -->
         <div class="flex-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
-            <div>
+            <div class="hidden sm:block">
                 <p class="text-sm text-gray-700 leading-5 dark:text-gray-600 text-center sm:text-left">
                     {!! __('Showing') !!}
                     @if ($paginator->firstItem())
@@ -41,7 +41,7 @@
                 </p>
             </div>
 
-            <div class="flex justify-center sm:justify-end">
+            <div class="hidden md:flex justify-center sm:justify-end">
                 <span class="relative z-0 inline-flex shadow-sm rounded-md overflow-x-auto max-w-full">
                     {{-- Previous Page Link --}}
                     @if ($paginator->onFirstPage())

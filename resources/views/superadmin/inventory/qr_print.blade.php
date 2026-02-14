@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cetak QR - {{ $sparepart->name }}</title>
+    <title>{{ __('ui.print_qr') }} - {{ $sparepart->name }}</title>
     <!-- Use Tailwind via CDN for consistent styling with main app -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -136,11 +136,11 @@
     <div class="action-buttons">
         <button onclick="window.print()" class="btn btn-primary shadow-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-            Cetak Label
+            {{ __('ui.print_label') }}
         </button>
         <button onclick="window.close()" class="btn btn-secondary flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            Tutup
+            {{ __('ui.close') }}
         </button>
     </div>
 

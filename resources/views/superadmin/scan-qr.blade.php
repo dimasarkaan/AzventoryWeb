@@ -6,14 +6,14 @@
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
-                        {{ __('Scan QR Code') }}
+                        {{ __('ui.scan_qr_title') }}
                     </h2>
-                    <p class="mt-1 text-sm text-secondary-500">Gunakan kamera atau upload gambar untuk mencari data sparepart.</p>
+                    <p class="mt-1 text-sm text-secondary-500">{{ __('ui.scan_qr_desc') }}</p>
                 </div>
                 <div>
                      <a href="{{ route('superadmin.inventory.index') }}" class="btn btn-secondary flex items-center gap-2">
                         <svg class="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        {{ __('Kembali ke Inventaris') }}
+                        {{ __('ui.back_to_inventory') }}
                     </a>
                 </div>
             </div>
@@ -32,7 +32,7 @@
                                 <span class="bg-green-500 w-2.5 h-2.5 rounded-full block"></span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-[10px] font-mono text-secondary-500 uppercase tracking-wider">Camera_Feed_Live</span>
+                                <span class="text-[10px] font-mono text-secondary-500 uppercase tracking-wider">{{ __('ui.camera_feed_live') }}</span>
                                 <button onclick="flipCamera()" class="p-1 rounded-md hover:bg-secondary-200 text-secondary-600 transition-colors" title="Ganti Kamera">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                 </button>
@@ -60,10 +60,10 @@
                                 <div class="w-16 h-16 bg-secondary-800 rounded-full flex items-center justify-center mb-4">
                                     <svg class="w-8 h-8 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
                                 </div>
-                                <h3 class="text-white font-medium text-base">Kamera Belum Aktif</h3>
-                                <p class="text-secondary-400 text-xs mt-1 max-w-xs">Pastikan Anda telah memberikan izin akses kamera pada browser ini.</p>
+                                <h3 class="text-white font-medium text-base">{{ __('ui.camera_inactive') }}</h3>
+                                <p class="text-secondary-400 text-xs mt-1 max-w-xs">{{ __('ui.camera_permission_desc') }}</p>
                                 <button onclick="startCamera()" id="btn-start-placeholder" class="mt-4 btn btn-primary px-5 py-2 rounded-full shadow-lg shadow-primary-500/20 hover:scale-105 transition-transform text-sm">
-                                    Mulai Scan
+                                    {{ __('ui.start_scan') }}
                                 </button>
                             </div>
                         </div>
@@ -76,8 +76,8 @@
                                 <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             </div>
                             <div>
-                                <h4 class="text-base font-bold text-gray-900">QR Code Ditemukan!</h4>
-                                <p class="text-xs text-gray-500">Mengarahkan Anda ke halaman detail inventaris...</p>
+                                <h4 class="text-base font-bold text-gray-900">{{ __('ui.qr_found') }}</h4>
+                                <p class="text-xs text-gray-500">{{ __('ui.redirecting_to_inventory') }}</p>
                             </div>
                         </div>
                     </div>
@@ -88,7 +88,7 @@
                                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                             <div>
-                                <h4 class="font-bold text-gray-900 text-xs">Gagal Memindai</h4>
+                                <h4 class="font-bold text-gray-900 text-xs">{{ __('ui.scan_failed') }}</h4>
                                 <p class="text-danger-600 text-xs mt-0.5" id="error-text"></p>
                             </div>
                         </div>
@@ -102,17 +102,17 @@
                     <div class="bg-white rounded-xl shadow-sm border border-secondary-200 p-5">
                         <h3 class="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm">
                             <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                            Kontrol
+                            {{ __('ui.camera_control') }}
                         </h3>
                         
                         <div class="space-y-3">
                             <button onclick="toggleCamera()" id="btn-camera" class="w-full btn btn-outline-primary justify-center py-2 text-sm">
-                                <span id="btn-camera-text">Matikan Kamera</span>
+                                <span id="btn-camera-text">{{ __('ui.stop_camera') }}</span>
                             </button>
                             
                             <button onclick="flipCamera()" class="w-full btn btn-outline-secondary justify-center py-2 text-sm group">
                                 <svg class="w-4 h-4 mr-2 text-secondary-500 group-hover:text-secondary-700 transition-transform duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                Putar Kamera
+                                {{ __('ui.flip_camera') }}
                             </button>
 
                             <div class="relative py-1">
@@ -120,13 +120,13 @@
                                     <div class="w-full border-t border-gray-200"></div>
                                 </div>
                                 <div class="relative flex justify-center">
-                                    <span class="px-2 bg-white text-[10px] text-gray-400 font-medium">ATAU</span>
+                                    <span class="px-2 bg-white text-[10px] text-gray-400 font-medium">{{ __('ui.or') }}</span>
                                 </div>
                             </div>
 
                              <label for="qr-input-file" class="w-full btn btn-secondary justify-center cursor-pointer py-2 bg-gray-50 hover:bg-gray-100 border-dashed border-2 border-gray-300 text-sm">
                                 <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                <span class="text-gray-600">Upload File Gambar</span>
+                                <span class="text-gray-600">{{ __('ui.upload_image') }}</span>
                                 <input type="file" id="qr-input-file" accept="image/*" class="hidden" onchange="scanFromFile(this)">
                             </label>
                         </div>
@@ -136,12 +136,12 @@
                     <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
                         <h4 class="text-blue-800 font-semibold mb-2 text-xs flex items-center gap-2">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            Panduan
+                            {{ __('ui.guide') }}
                         </h4>
                         <ul class="text-xs text-blue-700 space-y-1.5 list-disc pl-4">
-                            <li>Pastikan pencahayaan cukup terang.</li>
-                            <li>Jaga jarak kamera sekitar 10-20 cm dari QR Code.</li>
-                            <li>Posisikan QR Code tepat di dalam kotak tengah.</li>
+                            <li>{{ __('ui.guide_1') }}</li>
+                            <li>{{ __('ui.guide_2') }}</li>
+                            <li>{{ __('ui.guide_3') }}</li>
                         </ul>
                     </div>
                 </div>
@@ -210,7 +210,7 @@
                 updateButtonState(true);
             })
             .catch(err => {
-                 document.getElementById('error-text').innerText = "Gagal mengakses kamera: " + err;
+                 document.getElementById('error-text').innerText = "{{ __('ui.error_access_camera') }} " + err;
                  errorDiv.classList.remove('hidden');
             });
         };
@@ -249,10 +249,10 @@
         const updateButtonState = (isRunning) => {
             const btn = document.getElementById('btn-camera');
             if (isRunning) {
-                btnCameraText.innerText = "Matikan Kamera";
+                btnCameraText.innerText = "{{ __('ui.stop_camera') }}";
                 btn.classList.replace('btn-outline-primary', 'btn-outline-danger');
             } else {
-                btnCameraText.innerText = "Aktifkan Kamera";
+                btnCameraText.innerText = "{{ __('ui.start_camera') }}";
                 btn.classList.replace('btn-outline-danger', 'btn-outline-primary');
             }
         }
@@ -270,7 +270,7 @@
                     convertSvgToPng(file).then(pngFile => {
                         scanFile(pngFile);
                     }).catch(err => {
-                         document.getElementById('error-text').innerText = "Gagal memproses gambar SVG.";
+                         document.getElementById('error-text').innerText = "{{ __('ui.error_process_svg') }}";
                          errorDiv.classList.remove('hidden');
                     });
                 } else {
@@ -286,7 +286,7 @@
                 })
                 .catch(err => {
                     const errorDiv = document.getElementById('error-message');
-                    document.getElementById('error-text').innerText = "Gagal memindai gambar. Pastikan QR Code terlihat jelas.";
+                    document.getElementById('error-text').innerText = "{{ __('ui.error_scan_image') }}";
                     errorDiv.classList.remove('hidden');
                     console.error(err);
                 });

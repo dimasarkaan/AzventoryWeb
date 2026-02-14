@@ -23,33 +23,33 @@
 </head>
 <body>
     <div class="header">
-        <h1 style="text-transform: uppercase;">Laporan Aktivitas Sistem</h1>
+        <h1 style="text-transform: uppercase;">{{ __('ui.report_activity_title') }}</h1>
         <p>
-            Periode: 
+            {{ __('ui.period_label') }} 
             @if(request('start_date') && request('end_date'))
                 {{ \Carbon\Carbon::parse(request('start_date'))->translatedFormat('d F Y') }} - {{ \Carbon\Carbon::parse(request('end_date'))->translatedFormat('d F Y') }}
             @elseif(request('start_date'))
-                Sejak {{ \Carbon\Carbon::parse(request('start_date'))->translatedFormat('d F Y') }}
+                {{ __('ui.since_date', ['date' => \Carbon\Carbon::parse(request('start_date'))->translatedFormat('d F Y')]) }}
             @elseif(request('end_date'))
-                Hingga {{ \Carbon\Carbon::parse(request('end_date'))->translatedFormat('d F Y') }}
+                {{ __('ui.until_date', ['date' => \Carbon\Carbon::parse(request('end_date'))->translatedFormat('d F Y')]) }}
             @else
-                Semua Riwayat
+                {{ __('ui.all_history') }}
             @endif
         </p>
     </div>
 
     <div class="meta">
         @if(request('role') && request('role') !== 'Semua Role')
-            <strong>Role:</strong> {{ ucfirst(request('role')) }} &nbsp; | &nbsp;
+            <strong>{{ __('ui.role_filter') }}:</strong> {{ ucfirst(request('role')) }} &nbsp; | &nbsp;
         @endif
         @if(request('user_id'))
             <strong>User ID:</strong> {{ request('user_id') }} &nbsp; | &nbsp;
         @endif
         @if(request('action'))
-            <strong>Jenis Aksi:</strong> {{ request('action') }} &nbsp; | &nbsp;
+            <strong>{{ __('ui.action_type') }}:</strong> {{ request('action') }} &nbsp; | &nbsp;
         @endif
         @if(request('search'))
-            <strong>Kata Kunci:</strong> "{{ request('search') }}"
+            <strong>{{ __('ui.keyword_label') }}</strong> "{{ request('search') }}"
         @endif
     </div>
 
@@ -60,18 +60,18 @@
     <table style="width: {{ $isPdf ? '100%' : 'auto' }};">
         <thead>
             <tr>
-                <th style="{{ $isPdf ? 'width: 15%' : 'width: 120px' }}">Waktu</th>
-                <th style="{{ $isPdf ? 'width: 20%' : 'width: 150px' }}">Pengguna</th>
-                <th style="{{ $isPdf ? 'width: 10%' : 'width: 100px' }}">Role</th>
-                <th style="{{ $isPdf ? 'width: 20%' : 'width: 180px' }}">Aksi</th>
-                <th style="{{ $isPdf ? 'width: 35%' : 'width: 400px' }}">Deskripsi</th>
+                <th style="{{ $isPdf ? 'width: 15%' : 'width: 120px' }}">{{ __('ui.time_header') }}</th>
+                <th style="{{ $isPdf ? 'width: 20%' : 'width: 150px' }}">{{ __('ui.user_header') }}</th>
+                <th style="{{ $isPdf ? 'width: 10%' : 'width: 100px' }}">{{ __('ui.role_filter') }}</th>
+                <th style="{{ $isPdf ? 'width: 20%' : 'width: 180px' }}">{{ __('ui.action_header') }}</th>
+                <th style="{{ $isPdf ? 'width: 35%' : 'width: 400px' }}">{{ __('ui.description_header') }}</th>
             </tr>
         </thead>
         <tbody>
             @forelse($logs as $log)
                 <tr>
                     <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
-                    <td>{{ $log->user->name ?? 'System' }}</td>
+                    <td>{{ $log->user->name ?? __('ui.system_user') }}</td>
                     <td style="text-align: center;">
                         @php
                             $role = $log->user->role ?? null;
@@ -92,7 +92,7 @@
                         {{ $log->description }}
                         @if($log->properties && is_array($log->properties))
                             <div style="margin-top: 5px; font-size: 8.5pt; color: #555; background: #fff; padding: 4px; border: 1px dashed #ccc;">
-                                <strong>Detail Perubahan:</strong><br>
+                                <strong>{{ __('ui.change_details') }}</strong><br>
                                 @foreach($log->properties as $key => $change)
                                     @if(is_array($change) && isset($change['old'], $change['new']))
                                         &bull; {{ ucfirst($key) }}: <span style="text-decoration: line-through; color: #ef4444;">{{ $change['old'] }}</span> &rarr; <span style="color: #10b981; font-weight: bold;">{{ $change['new'] }}</span><br>
@@ -104,14 +104,14 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 20px;">Tidak ada data aktivitas yang sesuai filter.</td>
+                    <td colspan="5" style="text-align: center; padding: 20px;">{{ __('ui.no_data_filtered') }}</td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
     <div class="footer">
-        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
+        <p>Azventory &bull; {{ __('ui.report_footer_printed_by', ['name' => auth()->user()->name, 'date' => now()->translatedFormat('d F Y H:i')]) }}</p>
     </div>
 </body>
 </html>
