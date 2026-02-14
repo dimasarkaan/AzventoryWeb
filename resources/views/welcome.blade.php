@@ -51,18 +51,18 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative w-full">
                     <div class="text-center max-w-5xl mx-auto">
                         <h1 class="text-5xl md:text-7xl font-extrabold text-secondary-900 leading-tight tracking-tight mb-8">
-                            Solusi Manajemen Stok <br />
+                            {{ __('ui.landing_hero_title') }} <br />
                             <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-400">Azzahra Computer</span>
                         </h1>
                         <p class="text-xl text-secondary-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-                            Platform terintegrasi untuk mengelola inventaris sparepart di Azzahra Computer Tegal.
+                            {{ __('ui.landing_hero_desc') }}
                         </p>
                         <div class="flex flex-col sm:flex-row gap-4 justify-center">
                             <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-8 py-4 text-lg shadow-xl shadow-primary-500/20 hover:shadow-primary-500/40 transform hover:-translate-y-1 transition-all duration-200">
-                                Masuk Aplikasi
+                                {{ __('ui.landing_btn_login') }}
                             </a>
                             <a href="#features" class="btn btn-secondary btn-lg px-8 py-4 text-lg bg-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
-                                Fitur Utama
+                                {{ __('ui.landing_btn_features') }}
                             </a>
                         </div>
                     </div>
@@ -78,8 +78,8 @@
                             <div class="w-14 h-14 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                             </div>
-                            <h3 class="text-xl font-bold text-secondary-900 mb-3">Manajemen Stok Terpusat</h3>
-                            <p class="text-secondary-500 leading-relaxed">Pantau ketersediaan barang di berbagai lokasi gudang secara terintegrasi dan terpantau.</p>
+                            <h3 class="text-xl font-bold text-secondary-900 mb-3">{{ __('ui.landing_feature_1_title') }}</h3>
+                            <p class="text-secondary-500 leading-relaxed">{{ __('ui.landing_feature_1_desc') }}</p>
                         </div>
                         
                         <!-- Card 2 -->
@@ -87,8 +87,8 @@
                             <div class="w-14 h-14 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                             </div>
-                            <h3 class="text-xl font-bold text-secondary-900 mb-3">QR Code Scanner</h3>
-                            <p class="text-secondary-500 leading-relaxed">Identifikasi aset dengan teknologi pemindaian QR Code yang telah disesuaikan.</p>
+                            <h3 class="text-xl font-bold text-secondary-900 mb-3">{{ __('ui.landing_feature_2_title') }}</h3>
+                            <p class="text-secondary-500 leading-relaxed">{{ __('ui.landing_feature_2_desc') }}</p>
                         </div>
 
                         <!-- Card 3 -->
@@ -96,8 +96,8 @@
                             <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
-                            <h3 class="text-xl font-bold text-secondary-900 mb-3">Monitoring Aktivitas</h3>
-                            <p class="text-secondary-500 leading-relaxed">Rekam jejak digital lengkap untuk setiap pergerakan barang (masuk/keluar) oleh pengguna.</p>
+                            <h3 class="text-xl font-bold text-secondary-900 mb-3">{{ __('ui.landing_feature_3_title') }}</h3>
+                            <p class="text-secondary-500 leading-relaxed">{{ __('ui.landing_feature_3_desc') }}</p>
                         </div>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
         <footer class="bg-white border-t border-secondary-100 relative z-10">
             <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 flex justify-center items-center">
                 <p class="text-secondary-500 text-sm font-medium">
-                    &copy; {{ date('Y') }} Azzahra Computer. dibuat oleh : dimasarkaan
+                    &copy; {{ date('Y') }} Azzahra Computer. {{ __('ui.landing_footer_credit') }} : dimasarkaan
                 </p>
             </div>
         </footer>

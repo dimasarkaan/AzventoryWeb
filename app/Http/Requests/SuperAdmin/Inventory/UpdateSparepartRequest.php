@@ -36,6 +36,43 @@ class UpdateSparepartRequest extends FormRequest
             'unit' => 'nullable|string|max:50',
             'status' => 'required|in:aktif,nonaktif',
             'image' => 'nullable|image|max:10240',
+            'age' => 'required|in:Baru,Pernah Dipakai (Bekas)',
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'age' => 'Status Pemakaian',
+            'price' => 'Harga Satuan',
+            'part_number' => 'Part Number',
+            'name' => 'Nama Barang',
+            'brand' => 'Merk',
+            'category' => 'Kategori',
+            'location' => 'Lokasi Penyimpanan',
+            'condition' => 'Kondisi Barang',
+            'color' => 'Warna',
+            'type' => 'Tipe Barang',
+            'stock' => 'Stok Saat Ini',
+            'minimum_stock' => 'Minimum Stok',
+            'unit' => 'Satuan',
+            'status' => 'Status',
+            'image' => 'Gambar',
+        ];
+    }
+
+    /**
+     * Get custom validation messages.
+     */
+    public function messages(): array
+    {
+        return [
+            'age.required' => 'Kolom Status Pemakaian wajib diisi.',
+            'age.in' => 'Status Pemakaian harus berisi "Baru" atau "Pernah Dipakai (Bekas)".',
+            'price.required_if' => 'Kolom Harga Satuan wajib diisi.',
         ];
     }
 }

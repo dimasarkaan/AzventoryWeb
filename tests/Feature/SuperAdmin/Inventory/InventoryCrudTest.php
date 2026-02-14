@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Inventory;
+namespace Tests\Feature\SuperAdmin\Inventory;
 
 use App\Models\User;
 use App\Models\Sparepart;
@@ -36,7 +36,9 @@ class InventoryCrudTest extends TestCase
             'brand' => 'Logitech', // Added
             'category' => 'Peripheral', 
             'location' => 'Rak A1',
-            'condition' => 'Baru',
+            'age' => 'Baru', // Added
+            'condition' => 'Baik', // Updated
+            'color' => 'Hitam', // Added
             'type' => 'asset', // Added
             'stock' => 10,
             'minimum_stock' => 2,
@@ -66,7 +68,9 @@ class InventoryCrudTest extends TestCase
             'brand' => $sparepart->brand, // Added
             'category' => $sparepart->category,
             'location' => $sparepart->location,
+            'age' => $sparepart->age, // Added
             'condition' => $sparepart->condition,
+            'color' => $sparepart->color, // Added
             'type' => $sparepart->type, // Added
             'stock' => 50, // Updated stock
             'minimum_stock' => 5,
@@ -98,6 +102,22 @@ class InventoryCrudTest extends TestCase
         //      dump(\App\Models\Sparepart::all()->toArray());
         // }
 
-        $this->assertDatabaseCount('spareparts', 0); // Should be 0
+        // $this->assertDatabaseCount('spareparts', 0); // Should be 0 if hard delete
+        $this->assertSoftDeleted('spareparts', ['id' => $sparepart->id]);
+    }
+    public function test_superadmin_can_check_part_number_availability()
+    {
+        // Create existing part
+        Sparepart::factory()->create(['part_number' => 'EXISTING-001']);
+
+        // Check for existing
+        $response = $this->actingAs($this->user)->get(route('superadmin.inventory.check-part-number', ['part_number' => 'EXISTING-001']));
+        $response->assertStatus(200);
+        $response->assertJson(['exists' => true]);
+
+        // Check for new
+        $response2 = $this->actingAs($this->user)->get(route('superadmin.inventory.check-part-number', ['part_number' => 'NEW-001']));
+        $response2->assertStatus(200);
+        $response2->assertJson(['exists' => false]);
     }
 }

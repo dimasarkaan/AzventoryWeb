@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Inventory;
+namespace Tests\Feature\SuperAdmin\Inventory;
 
 use App\Models\User;
 use App\Models\Sparepart;
@@ -46,6 +46,7 @@ class ComprehensiveInventoryTest extends TestCase
             'category' => 'Existing Category',
             'location' => 'Rak 1',
             'condition' => 'Baru',
+            'age' => 'Baru', // Added required field
             'type' => 'sale',
             'stock' => 5, // Adding 5
             'minimum_stock' => 1,
@@ -94,6 +95,7 @@ class ComprehensiveInventoryTest extends TestCase
             'category' => 'Existing Category',
             'location' => 'Rak 1',
             'condition' => 'Baru',
+            'age' => 'Baru', // Added required field
             'type' => 'sale',
             'stock' => 0, // Adding 0
             'minimum_stock' => 1,

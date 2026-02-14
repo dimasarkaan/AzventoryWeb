@@ -21,12 +21,12 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create([
             'role' => 'superadmin',
-            'password' => \Illuminate\Support\Facades\Hash::make('password'), // Explicit
+            'password' => 'password', // Explicit
             'password_changed_at' => now(),
         ]);
 
         $response = $this->post('/login', [
-            'email' => $user->email,
+            'login' => $user->email,
             'password' => 'password',
         ]);
 
@@ -40,7 +40,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
 
         $this->post('/login', [
-            'email' => $user->email,
+            'login' => $user->email,
             'password' => 'wrong-password',
         ]);
 

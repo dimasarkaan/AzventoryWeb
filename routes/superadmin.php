@@ -8,7 +8,8 @@ use App\Http\Controllers\SuperAdmin\StockApprovalController;
 use App\Http\Controllers\SuperAdmin\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 
-// Super Admin Routes
+/*
+// Super Admin Routes (Moved to web.php)
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::resource('inventory', InventoryController::class);
 Route::get('/inventory/{inventory}/qr/download', [InventoryController::class, 'downloadQrCode'])->name('inventory.qr.download');
@@ -26,3 +27,4 @@ Route::post('/inventory/borrow/{borrowing}/return', [BorrowingController::class,
 Route::get('/stock-approvals', [StockApprovalController::class, 'index'])->name('stock-approvals.index');
 Route::patch('/stock-approvals/{stock_log}', [StockApprovalController::class, 'update'])->name('stock-approvals.update');
 Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+*/

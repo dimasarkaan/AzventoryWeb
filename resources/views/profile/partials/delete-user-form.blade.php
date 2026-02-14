@@ -6,9 +6,9 @@
             </div>
         </div>
         <div>
-            <h3 class="text-lg font-medium text-danger-900">Perhatian: Tindakan Permanen</h3>
+            <h3 class="text-lg font-medium text-danger-900">{{ __('ui.profile_delete_warning_title') }}</h3>
              <p class="mt-1 text-sm text-secondary-600 leading-relaxed">
-                Setelah akun dihapus, semua data akan hilang selamanya. Pastikan Anda sudah membackup data penting sebelum melanjutkan.
+                {{ __('ui.profile_delete_warning_desc') }}
             </p>
              <div class="mt-4">
                  <button 
@@ -16,7 +16,7 @@
                     x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
                     class="btn btn-danger"
                 >
-                    {{ __('Hapus Akun Saya') }}
+                    {{ __('ui.profile_btn_delete_account') }}
                 </button>
             </div>
         </div>
@@ -28,22 +28,22 @@
             @method('delete')
 
             <h2 class="text-lg font-bold text-secondary-900">
-                {{ __('Apakah Anda yakin ingin menghapus akun?') }}
+                {{ __('ui.profile_delete_confirm_title') }}
             </h2>
 
             <p class="mt-2 text-sm text-secondary-600">
-                {{ __('Setelah akun dihapus, data tidak bisa dikembalikan. Silakan masukkan password Anda untuk konfirmasi.') }}
+                {{ __('ui.profile_delete_confirm_desc') }}
             </p>
 
             <div class="mt-6">
-                <label for="password" class="sr-only">{{ __('Password') }}</label>
+                <label for="password" class="sr-only">{{ __('ui.auth_label_password') }}</label>
                 <div class="relative">
                     <input
                         id="password"
                         name="password"
                         type="password"
                         class="input-field w-3/4"
-                        placeholder="{{ __('Password Anda') }}"
+                        placeholder="{{ __('ui.profile_placeholder_password') }}"
                     />
                 </div>
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
@@ -51,11 +51,11 @@
 
             <div class="mt-6 flex justify-end gap-3">
                 <button type="button" x-on:click="$dispatch('close')" class="btn btn-secondary">
-                    {{ __('Batal') }}
+                    {{ __('ui.cancel') }}
                 </button>
 
                 <button type="submit" class="btn btn-danger">
-                    {{ __('Ya, Hapus Akun') }}
+                    {{ __('ui.profile_btn_confirm_delete') }}
                 </button>
             </div>
         </form>

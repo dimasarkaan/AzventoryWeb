@@ -33,35 +33,35 @@
                     @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <a href="{{ route('superadmin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.dashboard') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                            {{ __('Dashboard') }}
+                            {{ __('ui.dashboard') }}
                         </a>
                         <a href="{{ route('superadmin.inventory.index') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.inventory.*') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                            {{ __('Inventaris') }}
+                            {{ __('ui.inventory_list') }}
                         </a>
-                        <a href="{{ route('superadmin.users.index') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.users.*') ? $activeClass : $inactiveClass }}">
+                        <a href="{{ route('users.index') }}" class="{{ $navClass }} {{ request()->routeIs('users.*') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                            {{ __('Pengguna') }}
+                            {{ __('ui.user_management') }}
                         </a>
                         <a href="{{ route('superadmin.scan-qr') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.scan-qr') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                            {{ __('Scan QR') }}
+                            {{ __('ui.scan_qr') }}
                         </a>
-                        <a href="{{ route('superadmin.reports.index') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.reports.*') ? $activeClass : $inactiveClass }}">
+                        <a href="{{ route('reports.index') }}" class="{{ $navClass }} {{ request()->routeIs('reports.*') ? $activeClass : $inactiveClass }}">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            {{ __('Laporan') }}
+                            {{ __('ui.reports') }}
                         </a>
                     @endif
                     
                      @if (Auth::user()->role === \App\Enums\UserRole::ADMIN)
                         <a href="{{ route('admin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('admin.dashboard') ? $activeClass : $inactiveClass }}">
-                            Dashboard
+                            {{ __('ui.dashboard') }}
                         </a>
                      @endif
                      
                      @if (Auth::user()->role === \App\Enums\UserRole::OPERATOR)
                         <a href="{{ route('operator.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('operator.dashboard') ? $activeClass : $inactiveClass }}">
-                            Dashboard
+                            {{ __('ui.dashboard') }}
                         </a>
                      @endif
                 </div>
@@ -88,9 +88,9 @@
                          class="absolute right-0 z-50 mt-2 w-80 rounded-xl shadow-floating bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden" style="display: none;">
                         <div class="py-2">
                             <div class="px-4 py-3 border-b border-secondary-100 flex justify-between items-center bg-white">
-                                <span class="font-bold text-secondary-800 text-sm">Notifikasi</span>
+                                <span class="font-bold text-secondary-800 text-sm">{{ __('ui.notifications') }}</span>
                                 <div class="flex items-center gap-3">
-                                    <a href="{{ route('notifications.index') }}" class="text-xs text-secondary-400 hover:text-secondary-600 font-medium transition-colors">Lihat Semua</a>
+                                    <a href="{{ route('notifications.index') }}" class="text-xs text-secondary-400 hover:text-secondary-600 font-medium transition-colors">{{ __('ui.view_all') }}</a>
                                 </div>
                             </div>
                             <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
@@ -102,13 +102,13 @@
                                                      <div class="w-2 h-2 rounded-full" :class="notification.read_at ? 'bg-transparent' : 'bg-primary-500'"></div>
                                                 </div>
                                                 <div class="flex-1">
-                                                    <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors" x-text="notification.data.title || 'Notifikasi Baru'"></p>
+                                                    <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors" x-text="notification.data.title || '{{ __('ui.new_notification') }}'"></p>
                                                     <p class="text-xs text-secondary-500 line-clamp-2 mt-0.5" x-text="notification.data.message"></p>
                                                     <p class="text-[10px] text-secondary-400 mt-1" x-text="timeAgo(notification.created_at) + ' • ' + new Date(notification.created_at).toLocaleString('id-ID')"></p>
                                                 </div>
                                             </div>
                                             <!-- Manual Mark Read Button -->
-                                            <button @click.stop="markAsRead(notification.id, null, null)" x-show="!notification.read_at" class="absolute top-3 right-3 text-secondary-300 hover:text-primary-600 bg-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-secondary-100" title="Tandai Dibaca">
+                                            <button @click.stop="markAsRead(notification.id, null, null)" x-show="!notification.read_at" class="absolute top-3 right-3 text-secondary-300 hover:text-primary-600 bg-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-secondary-100" title="{{ __('ui.mark_as_read') }}">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                             </button>
                                         </div>
@@ -117,7 +117,7 @@
                                 <template x-if="notifications.length === 0">
                                     <div class="px-4 py-8 text-center text-sm text-secondary-500 flex flex-col items-center">
                                         <svg class="w-8 h-8 text-secondary-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                                        Tidak ada notifikasi baru.
+                                        {{ __('ui.no_new_notifications') }}
                                     </div>
                                 </template>
                             </div>
@@ -188,7 +188,7 @@
                                                 icon: 'info',
                                                 // Safe HTML string without conflicting quotes
                                                 iconHtml: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>`,
-                                                title: notification.title || 'Notifikasi Baru',
+                                                title: notification.title || '{{ __('ui.new_notification') }}',
                                                 text: notification.message
                                             });
                                         });
@@ -258,14 +258,14 @@
                      style="display: none;">
                     
                     <div class="px-4 py-3 border-b border-secondary-100 bg-secondary-50/50">
-                        <p class="text-sm font-semibold text-secondary-900">Akun Saya</p>
+                        <p class="text-sm font-semibold text-secondary-900">{{ __('ui.my_account') }}</p>
                         <p class="text-xs text-secondary-500 truncate" title="{{ Auth::user()->email }}">{{ Auth::user()->email }}</p>
                     </div>
                     
                     <div class="py-1">
                         <x-dropdown-link :href="route('profile.edit')" class="flex items-center gap-2 group">
                              <svg class="w-4 h-4 text-secondary-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                            {{ __('Profil Saya') }}
+                            {{ __('ui.my_profile') }}
                         </x-dropdown-link>
                     </div>
 
@@ -277,7 +277,7 @@
                                 onclick="event.preventDefault(); this.closest('form').submit();" 
                                 class="text-danger-600 hover:bg-danger-50 hover:text-danger-700 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                            {{ __('Keluar') }}
+                            {{ __('ui.logout') }}
                         </x-dropdown-link>
                     </form>
                 </div>
@@ -309,24 +309,24 @@
 
             @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                 <a href="{{ route('superadmin.dashboard') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.dashboard') ? $resActiveClass : $resInactiveClass }}">
-                    {{ __('Dashboard') }}
+                    {{ __('ui.dashboard') }}
                 </a>
                 <a href="{{ route('superadmin.inventory.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.inventory.*') ? $resActiveClass : $resInactiveClass }}">
-                    {{ __('Inventaris') }}
+                    {{ __('ui.inventory_list') }}
                 </a>
-                <a href="{{ route('superadmin.users.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.users.*') ? $resActiveClass : $resInactiveClass }}">
-                    {{ __('Pengguna') }}
+                <a href="{{ route('users.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('users.*') ? $resActiveClass : $resInactiveClass }}">
+                    {{ __('ui.user_management') }}
                 </a>
                  <a href="{{ route('superadmin.scan-qr') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.scan-qr') ? $resActiveClass : $resInactiveClass }}">
-                    {{ __('Scan QR') }}
+                    {{ __('ui.scan_qr') }}
                 </a>
-                <a href="{{ route('superadmin.reports.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.reports.*') ? $resActiveClass : $resInactiveClass }}">
-                    {{ __('Laporan') }}
+                <a href="{{ route('reports.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('reports.*') ? $resActiveClass : $resInactiveClass }}">
+                    {{ __('ui.reports') }}
                 </a>
             @endif
 
             <a href="{{ route('notifications.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('notifications.index') ? $resActiveClass : $resInactiveClass }} flex justify-between items-center">
-                {{ __('Notifikasi') }}
+                {{ __('ui.notifications') }}
                 @if(auth()->user()->unreadNotifications()->count() > 0)
                     <span class="bg-danger-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                         {{ auth()->user()->unreadNotifications()->count() }}
@@ -349,12 +349,12 @@
 
             <div class="mt-3 space-y-1">
                 <a href="{{ route('profile.edit') }}" class="{{ $resNavClass }} {{ $resInactiveClass }}">
-                    {{ __('Profil') }}
+                    {{ __('ui.profile') }}
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="{{ $resNavClass }} {{ $resInactiveClass }} text-danger-600">
-                        {{ __('Keluar') }}
+                        {{ __('ui.logout') }}
                     </a>
                 </form>
             </div>

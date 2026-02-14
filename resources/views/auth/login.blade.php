@@ -1,8 +1,8 @@
 <x-guest-layout>
     <div class="space-y-6">
         <div class="text-center lg:text-left">
-            <h3 class="text-2xl font-bold text-secondary-900">Selamat Datang Kembali!</h3>
-            <p class="text-secondary-500 mt-2">Masuk untuk mengelola inventaris Anda.</p>
+            <h3 class="text-2xl font-bold text-secondary-900">{{ __('ui.auth_welcome_title') }}</h3>
+            <p class="text-secondary-500 mt-2">{{ __('ui.auth_welcome_desc') }}</p>
         </div>
 
         <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -10,7 +10,7 @@
 
             <!-- Login Field -->
             <div>
-                <label for="login" class="input-label">Username atau Email</label>
+                <label for="login" class="input-label">{{ __('ui.auth_label_login') }}</label>
                 <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autofocus tabindex="1">
                 <x-input-error :messages="$errors->get('login')" class="mt-2" />
             </div>
@@ -18,10 +18,10 @@
             <!-- Password -->
             <div>
                 <div class="flex justify-between items-center mb-1">
-                    <label for="password" class="input-label mb-0">Kata Sandi</label>
+                    <label for="password" class="input-label mb-0">{{ __('ui.auth_label_password') }}</label>
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}" class="text-xs font-medium text-primary-600 hover:text-primary-500 transition-colors" tabindex="4">
-                            Lupa Kata Sandi?
+                            {{ __('ui.auth_forgot_password') }}
                         </a>
                     @endif
                 </div>
@@ -44,18 +44,18 @@
             <div class="block">
                 <label for="remember_me" class="inline-flex items-center group cursor-pointer">
                     <input id="remember_me" type="checkbox" name="remember" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition duration-150 ease-in-out cursor-pointer" tabindex="3">
-                    <span class="ml-2 text-sm text-secondary-600 group-hover:text-secondary-800 transition-colors">{{ __('Ingat saya di perangkat ini') }}</span>
+                    <span class="ml-2 text-sm text-secondary-600 group-hover:text-secondary-800 transition-colors">{{ __('ui.auth_remember_me') }}</span>
                 </label>
             </div>
 
             <button type="submit" class="w-full btn btn-primary justify-center py-3 text-base shadow-lg shadow-primary-500/20" tabindex="3">
-                {{ __('Masuk Sekarang') }}
+                {{ __('ui.auth_btn_login') }}
             </button>
 
             <div class="text-center mt-6">
                 <a href="/" class="text-sm font-medium text-secondary-500 hover:text-primary-600 transition-colors inline-flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Kembali ke Beranda
+                    {{ __('ui.auth_back_home') }}
                 </a>
             </div>
         </form>

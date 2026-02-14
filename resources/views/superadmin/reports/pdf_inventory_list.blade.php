@@ -23,25 +23,25 @@
         <h1 style="text-transform: uppercase;">{{ $title }}</h1>
         <p style="font-size: 10pt; margin-top: 5px;">
             @if($startDate && $endDate)
-                Periode: {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
+                {{ __('ui.period_label') }} {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
             @else
-                Periode: Semua Riwayat
+                {{ __('ui.period_label') }} {{ __('ui.all_history') }}
             @endif
             &nbsp; | &nbsp;
-            Lokasi: {{ $location == 'all' ? 'Semua Lokasi' : $location }}
+            {{ __('ui.location_label') }} {{ $location == 'all' ? __('ui.all_locations') : $location }}
         </p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 25%;">Nama Barang</th>
-                <th style="width: 15%;">Kategori</th>
-                <th style="width: 15%;">Merk</th>
-                <th style="width: 15%;">Lokasi</th>
-                <th style="width: 10%;">Stok</th>
-                <th style="width: 15%;">Status</th>
+                <th style="width: 5%;">{{ __('ui.no_column') }}</th>
+                <th style="width: 25%;">{{ __('ui.item_name_column') }}</th>
+                <th style="width: 15%;">{{ __('ui.category_column') }}</th>
+                <th style="width: 15%;">{{ __('ui.brand_column') }}</th>
+                <th style="width: 15%;">{{ __('ui.location_column') }}</th>
+                <th style="width: 10%;">{{ __('ui.stock_column') }}</th>
+                <th style="width: 15%;">{{ __('ui.status_column') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -58,11 +58,11 @@
                 <td style="text-align: center;">{{ $item->stock }} {{ $item->unit }}</td>
                 <td>
                     @if($item->stock == 0)
-                        <span class="badges badge-danger">Habis</span>
+                        <span class="badges badge-danger">{{ __('ui.stock_out') }}</span>
                     @elseif($item->minimum_stock > 0 && $item->stock <= $item->minimum_stock)
-                        <span class="badges badge-warning">Menipis</span>
+                        <span class="badges badge-warning">{{ __('ui.stock_low') }}</span>
                     @else
-                        <span class="badges badge-success">Aman</span>
+                        <span class="badges badge-success">{{ __('ui.stock_safe') }}</span>
                     @endif
                 </td>
             </tr>
@@ -71,7 +71,7 @@
     </table>
 
     <div class="footer">
-        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
+        <p>Azventory &bull; {{ __('ui.report_footer_printed_by', ['name' => auth()->user()->name, 'date' => now()->translatedFormat('d F Y H:i')]) }}</p>
     </div>
 </body>
 </html>

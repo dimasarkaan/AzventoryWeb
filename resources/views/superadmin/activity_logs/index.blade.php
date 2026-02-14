@@ -5,9 +5,9 @@
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
-                        {{ __('Log Aktivitas Sistem') }}
+                        {{ __('ui.activity_logs_title') }}
                     </h2>
-                    <p class="mt-1 text-sm text-secondary-500">Riwayat aktivitas pengguna dan perubahan data dalam sistem.</p>
+                    <p class="mt-1 text-sm text-secondary-500">{{ __('ui.activity_logs_desc') }}</p>
                 </div>
                 
                 <div class="flex gap-2">
@@ -17,19 +17,19 @@
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                             </svg>
-                            <span>Export Data</span>
+                            <span>{{ __('ui.export_data') }}</span>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                         </button>
                         <div x-show="open" 
                              class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-secondary-100"
                              style="display: none;">
-                            <a href="{{ route('superadmin.activity-logs.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 flex items-center gap-2">
+                            <a href="{{ route('activity-logs.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                Export PDF
+                                {{ __('ui.export_pdf') }}
                             </a>
-                            <a href="{{ route('superadmin.activity-logs.export', array_merge(request()->query(), ['format' => 'csv'])) }}" class="block px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 flex items-center gap-2">
+                            <a href="{{ route('activity-logs.export', array_merge(request()->query(), ['format' => 'csv'])) }}" class="px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Export Excel (CSV)
+                                {{ __('ui.export_excel') }}
                             </a>
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                             class="btn btn-secondary flex items-center gap-2"
                             :class="{ 'bg-secondary-100 ring-2 ring-secondary-200': showFilters }">
                         <svg class="w-5 h-5 text-secondary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                        <span>Filter & Pencarian</span>
+                        <span>{{ __('ui.filter_search') }}</span>
                         <svg class="w-4 h-4 text-secondary-400 transition-transform duration-200" :class="{ 'rotate-180': showFilters }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
                 </div>
@@ -55,12 +55,12 @@
                  class="mb-6"
                  style="display: none;">
                  
-                <form action="{{ route('superadmin.activity-logs.index') }}" method="GET" class="card p-6 border border-secondary-200 shadow-lg overflow-visible">
+                <form action="{{ route('activity-logs.index') }}" method="GET" class="card p-6 border border-secondary-200 shadow-lg overflow-visible">
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                         
                         <!-- Search -->
                         <div class="space-y-1">
-                            <label for="search" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Cari Kata Kunci</label>
+                            <label for="search" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.search_keyword') }}</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -72,7 +72,7 @@
 
                         <!-- Role Filter -->
                         <div class="space-y-1">
-                            <label for="role" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Role</label>
+                            <label for="role" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.role_filter') }}</label>
                             @php
                                 $roleOptions = [
                                     \App\Enums\UserRole::SUPERADMIN->value => \App\Enums\UserRole::SUPERADMIN->label(),
@@ -80,30 +80,30 @@
                                     \App\Enums\UserRole::OPERATOR->value => \App\Enums\UserRole::OPERATOR->label(),
                                 ];
                             @endphp
-                            <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="Semua Role" width="w-full" />
+                            <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="{{ __('ui.all_roles') }}" width="w-full" />
                         </div>
 
                         <!-- Action Filter -->
                         <div class="space-y-1">
-                            <label for="action" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Jenis Aksi</label>
+                            <label for="action" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.action_type') }}</label>
                             @php
                                 $actionOptions = $actions->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             @endphp
-                            <x-select name="action" :options="$actionOptions" :selected="request('action')" placeholder="Semua Aksi" width="w-full" />
+                            <x-select name="action" :options="$actionOptions" :selected="request('action')" placeholder="{{ __('ui.all_actions') }}" width="w-full" />
                         </div>
 
                         <!-- User Filter -->
                         <div class="space-y-1">
-                            <label for="user_id" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Pengguna</label>
+                            <label for="user_id" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.user_filter') }}</label>
                             @php
                                 $userOptions = $users->pluck('name', 'id')->toArray();
                             @endphp
-                            <x-select name="user_id" :options="$userOptions" :selected="request('user_id')" placeholder="Semua User" width="w-full" />
+                            <x-select name="user_id" :options="$userOptions" :selected="request('user_id')" placeholder="{{ __('ui.all_users') }}" width="w-full" />
                         </div>
 
                         <!-- Date Start -->
                         <div class="space-y-1">
-                            <label for="start_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Dari Tanggal</label>
+                            <label for="start_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.from_date') }}</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -115,7 +115,7 @@
 
                         <!-- Date End -->
                         <div class="space-y-1">
-                            <label for="end_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Sampai Tanggal</label>
+                            <label for="end_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.to_date') }}</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -127,25 +127,25 @@
 
                         <!-- NEW: Subject Type Filter -->
                         <div class="space-y-1">
-                            <label for="subject_type" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">Tipe Objek</label>
+                            <label for="subject_type" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.subject_type') }}</label>
                             @php
                                 $subjectOptions = [
-                                    'inventory' => 'Inventory / Barang',
-                                    'user' => 'Users / Pengguna',
-                                    'auth' => 'Authentication',
-                                    'report' => 'Reports / Laporan',
+                                    'inventory' => __('ui.subject_inventory'),
+                                    'user' => __('ui.subject_user'),
+                                    'auth' => __('ui.subject_auth'),
+                                    'report' => __('ui.subject_report'),
                                 ];
                             @endphp
-                            <x-select name="subject_type" :options="$subjectOptions" :selected="request('subject_type')" placeholder="Semua Tipe" width="w-full" />
+                            <x-select name="subject_type" :options="$subjectOptions" :selected="request('subject_type')" placeholder="{{ __('ui.all_types') }}" width="w-full" />
                         </div>
 
                         <!-- Buttons -->
                         <div class="flex gap-2 w-full">
                              <button type="submit" class="btn btn-primary flex-1 justify-center flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                Terapkan
+                                {{ __('ui.apply_filter') }}
                             </button>
-                            <a href="{{ route('superadmin.activity-logs.index') }}" class="btn btn-secondary flex items-center justify-center gap-2 px-3" title="Reset Filter">
+                            <a href="{{ route('activity-logs.index') }}" class="btn btn-secondary flex items-center justify-center gap-2 px-3" title="{{ __('ui.reset_filter') }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
@@ -155,16 +155,18 @@
                 </form>
             </div>
 
+
+
             <!-- Desktop Table View -->
             <div class="hidden md:block card overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="table-modern w-full">
                         <thead>
                             <tr>
-                                <th>Pengguna</th>
-                                <th>Aksi</th>
-                                <th>Deskripsi</th>
-                                <th>Waktu</th>
+                                <th>{{ __('ui.user_header') }}</th>
+                                <th>{{ __('ui.action_header') }}</th>
+                                <th>{{ __('ui.description_header') }}</th>
+                                <th>{{ __('ui.time_header') }}</th>
                             </tr>
                         </thead>
                         <tbody id="desktop-logs-body">
@@ -180,7 +182,7 @@
                                                 @endif
                                             </div>
                                             <div>
-                                                <div class="font-medium text-secondary-900">{{ $log->user->name ?? 'Sistem' }}</div>
+                                                <div class="font-medium text-secondary-900">{{ $log->user->name ?? __('ui.system_user') }}</div>
                                                 <div class="text-xs text-secondary-500 font-mono">{{ $log->user->email ?? '-' }}</div>
                                             </div>
                                         </div>
@@ -202,7 +204,7 @@
                             @empty
                                 <tr>
                                     <td colspan="4" class="p-8 text-center text-secondary-500">
-                                        Tidak ada aktivitas yang tercatat.
+                                        {{ __('ui.no_activity_logs') }}
                                     </td>
                                 </tr>
                             @endforelse
@@ -225,7 +227,7 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <div class="font-bold text-secondary-900">{{ $log->user->name ?? 'Sistem' }}</div>
+                                    <div class="font-bold text-secondary-900">{{ $log->user->name ?? __('ui.system_user') }}</div>
                                     <div class="text-xs text-secondary-500">{{ $log->created_at->diffForHumans() }}</div>
                                 </div>
                             </div>
@@ -242,7 +244,7 @@
                     </div>
                 @empty
                     <div class="card p-8 text-center text-secondary-500">
-                        <p class="text-sm">Tidak ada aktivitas yang tercatat.</p>
+                        <p class="text-sm">{{ __('ui.no_activity_logs') }}</p>
                     </div>
                 @endforelse
             </div>
@@ -315,7 +317,7 @@
                                             </div>
                                             <div>
                                                 <div class="font-bold text-secondary-900">${e.user_name}</div>
-                                                <div class="text-xs text-secondary-500">Baru saja</div>
+                                                <div class="text-xs text-secondary-500">{{ __('ui.just_now') }}</div>
                                             </div>
                                         </div>
                                         <span class="badge badge-secondary text-[10px]">${e.action}</span>

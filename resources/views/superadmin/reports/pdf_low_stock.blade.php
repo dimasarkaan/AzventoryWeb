@@ -19,22 +19,22 @@
     <div class="header">
         <h1 style="text-transform: uppercase;">{{ $title }}</h1>
         <p style="font-size: 10pt; margin-top: 5px;">
-            Periode: Saat Ini
+            {{ __('ui.period_label') }} {{ __('ui.current_period') }}
             &nbsp; | &nbsp;
-            Lokasi: {{ $location == 'all' ? 'Semua Gudang' : $location }}
+            {{ __('ui.location_label') }} {{ $location == 'all' ? __('ui.all_warehouses') : $location }}
         </p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 15%;">Kode Part</th>
-                <th style="width: 30%;">Nama Barang</th>
-                <th style="width: 20%;">Lokasi</th>
-                <th style="width: 10%;">Sisa Stok</th>
-                <th style="width: 10%;">Min. Stok</th>
-                <th style="width: 10%;">Status</th>
+                <th style="width: 5%;">{{ __('ui.no_column') }}</th>
+                <th style="width: 15%;">{{ __('ui.part_code_column') }}</th>
+                <th style="width: 30%;">{{ __('ui.item_name_column') }}</th>
+                <th style="width: 20%;">{{ __('ui.location_column') }}</th>
+                <th style="width: 10%;">{{ __('ui.remaining_stock_column') }}</th>
+                <th style="width: 10%;">{{ __('ui.min_stock_column') }}</th>
+                <th style="width: 10%;">{{ __('ui.status_column') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -46,14 +46,14 @@
                 <td>{{ $row->location }}</td>
                 <td class="critical" style="text-align: center; font-size: 11pt;">{{ $row->stock }}</td>
                 <td style="text-align: center;">{{ $row->minimum_stock }}</td>
-                <td class="critical">KRITIS</td>
+                <td class="critical">{{ strtoupper(__('ui.status_critical')) }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
 
     <div class="footer">
-        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
+        <p>Azventory &bull; {{ __('ui.report_footer_printed_by', ['name' => auth()->user()->name, 'date' => now()->translatedFormat('d F Y H:i')]) }}</p>
     </div>
 </body>
 </html>

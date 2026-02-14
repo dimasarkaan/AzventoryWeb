@@ -23,9 +23,9 @@
         <h1 style="text-transform: uppercase;">{{ $title }}</h1>
         <p style="font-size: 10pt; margin-top: 5px;">
             @if(isset($startDate) && isset($endDate))
-                Periode: {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
+                {{ __('ui.period_label') }} {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
             @else
-                Periode: Semua Riwayat
+                {{ __('ui.period_label') }} {{ __('ui.all_history') }}
             @endif
         </p>
     </div>
@@ -33,14 +33,14 @@
     <table>
         <thead>
             <tr>
-                <th style="width: 5%;">No</th>
-                <th style="width: 20%;">Peminjam</th>
-                <th style="width: 25%;">Barang</th>
-                <th style="width: 12%;">Tgl Pinjam</th>
-                <th style="width: 12%;">Jatuh Tempo</th>
-                <th style="width: 12%;">Tgl Kembali</th>
-                <th style="width: 10%;">Status</th>
-                <th style="width: 10%;">Kondisi</th>
+                <th style="width: 5%;">{{ __('ui.no_column') }}</th>
+                <th style="width: 20%;">{{ __('ui.borrower_column') }}</th>
+                <th style="width: 25%;">{{ __('ui.item_column') }}</th>
+                <th style="width: 12%;">{{ __('ui.borrow_date_column') }}</th>
+                <th style="width: 12%;">{{ __('ui.due_date_column') }}</th>
+                <th style="width: 12%;">{{ __('ui.return_date_column') }}</th>
+                <th style="width: 10%;">{{ __('ui.status_column') }}</th>
+                <th style="width: 10%;">{{ __('ui.condition_column') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -56,16 +56,16 @@
                 <td>
                     {{ $row->expected_return_at ? $row->expected_return_at->translatedFormat('d F Y') : '-' }}
                     @if($row->status == 'borrowed' && $row->expected_return_at && $row->expected_return_at < now())
-                        <span class="late">Telat {{ (int) $row->expected_return_at->diffInDays(now()) }} hari</span>
+                        <span class="late">{{ __('ui.late_days', ['days' => (int) $row->expected_return_at->diffInDays(now())]) }}</span>
                     @endif
                 </td>
                 <td>{{ $row->returned_at ? $row->returned_at->translatedFormat('d F Y H:i') : '-' }}</td>
                 <td>
                     @php
                         $statusLabels = [
-                            'borrowed' => 'Sedang Dipinjam',
-                            'returned' => 'Dikembalikan',
-                            'lost' => 'Hilang',
+                            'borrowed' => __('ui.status_borrowed'),
+                            'returned' => __('ui.status_returned'),
+                            'lost' => __('ui.status_lost'),
                         ];
                         $statusLabel = $statusLabels[$row->status] ?? ucfirst($row->status);
                     @endphp
@@ -74,9 +74,9 @@
                 <td>
                     @php
                         $conditionLabels = [
-                            'good' => 'Baik',
-                            'broken' => 'Rusak',
-                            'lost' => 'Hilang',
+                            'good' => __('ui.condition_good'),
+                            'broken' => __('ui.condition_broken'),
+                            'lost' => __('ui.condition_lost'),
                         ];
                         $conditionLabel = $row->return_condition ? ($conditionLabels[$row->return_condition] ?? ucfirst($row->return_condition)) : '-';
                     @endphp
@@ -88,7 +88,7 @@
     </table>
 
     <div class="footer">
-        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
+        <p>Azventory &bull; {{ __('ui.report_footer_printed_by', ['name' => auth()->user()->name, 'date' => now()->translatedFormat('d F Y H:i')]) }}</p>
     </div>
 </body>
 </html>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\SuperAdmin;
 
 use App\Models\User;
 use App\Models\Sparepart;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 use App\Jobs\GenerateReportJob;
 
-class AuditImplementationTest extends TestCase
+class AuditTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -34,7 +34,7 @@ class AuditImplementationTest extends TestCase
     public function inventory_index_uses_cache_for_dropdowns()
     {
         Cache::shouldReceive('remember')
-            ->times(4) // categories, brands, locations, colors
+            ->times(7) // categories, brands, locations, colors, units, names, partNumbers
             ->andReturn(collect(['Test']));
 
         $response = $this->actingAs($this->superAdmin)

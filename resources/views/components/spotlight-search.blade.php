@@ -104,7 +104,7 @@
                        @keydown.arrow-up.prevent="goUp()"
                        @keydown.enter.prevent="selectResult()"
                        class="h-12 w-full border-0 bg-transparent pl-11 pr-4 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm" 
-                       placeholder="Cari menu, inventaris, atau user..." 
+                       placeholder="{{ __('ui.search_placeholder') }}" 
                        role="combobox" 
                        aria-expanded="false" 
                        aria-controls="options">
@@ -120,7 +120,7 @@
                 <!-- Menus -->
                 <template x-if="results.menus.length > 0">
                     <li class="mb-2">
-                        <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">Menu</h2>
+                        <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">{{ __('ui.search_menu') }}</h2>
                         <ul class="text-sm text-gray-700">
                             <template x-for="(item, index) in results.menus" :key="item.url">
                                 <li class="group flex cursor-default select-none items-center rounded-md p-2 hover:bg-primary-50 hover:text-primary-700 transition"
@@ -136,7 +136,7 @@
                                         </svg>
                                     </div>
                                     <span class="ml-3 flex-auto truncate" x-text="item.title"></span>
-                                    <span class="ml-3 flex-none text-xs font-medium text-gray-400 group-hover:text-primary-400">JUMP TO</span>
+                                    <span class="ml-3 flex-none text-xs font-medium text-gray-400 group-hover:text-primary-400">{{ __('ui.search_jump_to') }}</span>
                                 </li>
                             </template>
                         </ul>
@@ -146,7 +146,7 @@
                 <!-- Inventory -->
                 <template x-if="results.spareparts.length > 0">
                     <li class="mb-2">
-                         <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">Inventaris</h2>
+                         <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">{{ __('ui.search_inventory') }}</h2>
                         <ul class="text-sm text-gray-700">
                             <template x-for="(item, index) in results.spareparts" :key="item.id">
                                 <li class="group flex cursor-default select-none items-center rounded-md p-2 hover:bg-primary-50 hover:text-primary-700 transition"
@@ -172,7 +172,7 @@
                  <!-- Users -->
                  <template x-if="results.users.length > 0">
                     <li class="mb-2">
-                         <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">Pengguna</h2>
+                         <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">{{ __('ui.search_users') }}</h2>
                         <ul class="text-sm text-gray-700">
                             <template x-for="(item, index) in results.users" :key="item.id">
                                 <li class="group flex cursor-default select-none items-center rounded-md p-2 hover:bg-primary-50 hover:text-primary-700 transition"
@@ -200,8 +200,8 @@
                 <svg class="mx-auto h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <p class="mt-4 font-semibold text-gray-900">Tidak ada hasil</p>
-                <p class="mt-2 text-gray-500">Kami tidak dapat menemukan apa pun dengan istilah pencarian tersebut.</p>
+                <p class="mt-4 font-semibold text-gray-900">{{ __('ui.search_no_results') }}</p>
+                <p class="mt-2 text-gray-500">{{ __('ui.search_no_results_desc') }}</p>
             </div>
             
              <!-- Loading State -->
@@ -255,12 +255,12 @@
 
             <!-- Footer -->
             <div class="flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-500">
-               <span class="mx-1 font-medium text-gray-900">Enter</span>
-               untuk memilih
+               <span class="mx-1 font-medium text-gray-900">{{ __('ui.search_enter') }}</span>
+               {{ __('ui.search_select') }}
                <span class="mx-1 ml-3 font-medium text-gray-900">↑↓</span>
-               untuk navigasi
-               <span class="mx-1 ml-3 font-medium text-gray-900">ESC</span>
-               untuk keluar
+               {{ __('ui.search_navigate') }}
+               <span class="mx-1 ml-3 font-medium text-gray-900">{{ __('ui.search_esc') }}</span>
+               {{ __('ui.search_close') }}
             </div>
         </div>
     </div>

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Inventory;
+namespace Tests\Feature\SuperAdmin\Inventory;
 
 use App\Models\Action;
 use App\Models\ActivityLog;
@@ -53,6 +53,7 @@ class InventoryTransactionTest extends TestCase
             'category' => 'Test Category',
             'location' => 'A1',
             'condition' => 'Baru',
+            'age' => 'Baru',
             'type' => 'asset',
             'stock' => 10,
             'minimum_stock' => 2,
@@ -106,6 +107,7 @@ class InventoryTransactionTest extends TestCase
             'category' => $sparepart->category,
             'location' => $sparepart->location,
             'condition' => $sparepart->condition,
+            'age' => 'Baru',
             'type' => $sparepart->type,
             'stock' => 10, // Unchanged stock
             'minimum_stock' => $sparepart->minimum_stock,
@@ -230,6 +232,7 @@ class InventoryTransactionTest extends TestCase
             'category' => 'Cat A',
             'location' => 'Loc A',
             'condition' => 'Baru',
+            'age' => 'Baru',
             'type' => 'asset',
             'color' => 'Hitam',
             'price' => 50000,

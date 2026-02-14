@@ -10,7 +10,7 @@
         <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-6 user-select-none">
             <!-- Avatar -->
             <div class="sm:col-span-6">
-                <label for="avatar" class="block text-sm font-medium text-secondary-700">Foto Profil</label>
+                <label for="avatar" class="block text-sm font-medium text-secondary-700">{{ __('ui.profile_label_photo') }}</label>
                 <div class="mt-2 flex items-center gap-x-3">
                     @if($user->avatar)
                         <img class="h-16 w-16 rounded-full object-cover ring-2 ring-secondary-200" src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" />
@@ -32,7 +32,7 @@
                         <!-- Buttons & Preview -->
                          <div class="flex items-center gap-2">
                             <label for="avatar" class="btn btn-secondary text-xs cursor-pointer" x-show="!avatarPreview">
-                                Pilih Foto Baru
+                                {{ __('ui.profile_btn_select_photo') }}
                             </label>
 
                             <template x-if="avatarPreview">
@@ -48,7 +48,7 @@
                                 </div>
                             </template>
                             
-                             <span x-show="!fileName" class="text-xs text-secondary-500">Tidak ada file dipilih</span>
+                             <span x-show="!fileName" class="text-xs text-secondary-500">{{ __('ui.profile_no_file') }}</span>
                          </div>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
 
             <!-- Username -->
             <div class="sm:col-span-3">
-                <label for="username" class="input-label">Username</label>
+                <label for="username" class="input-label">{{ __('ui.profile_label_username') }}</label>
                 @if(!$user->is_username_changed)
                     <input type="text" name="username" id="username" 
                            class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" 
@@ -74,13 +74,13 @@
                             <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
                     </div>
-                    <p x-show="isEditing" class="mt-1 text-xs text-secondary-400">Username telah dikunci permanen.</p>
+                    <p x-show="isEditing" class="mt-1 text-xs text-secondary-400">{{ __('ui.profile_username_locked') }}</p>
                 @endif
             </div>
 
             <!-- Email -->
             <div class="sm:col-span-3">
-                 <label for="email" class="input-label">Email</label>
+                 <label for="email" class="input-label">{{ __('ui.profile_label_email') }}</label>
                  @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                     <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('email', $user->email) }}" :disabled="!isEditing" required>
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
@@ -97,21 +97,21 @@
 
              <!-- Name -->
              <div class="sm:col-span-3">
-                <label for="name" class="input-label">Nama Lengkap</label>
+                <label for="name" class="input-label">{{ __('ui.profile_label_name') }}</label>
                 <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('name', $user->name) }}" :disabled="!isEditing" required>
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
              <!-- Phone -->
              <div class="sm:col-span-3">
-                <label for="phone" class="input-label">No. WhatsApp</label>
-                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('phone', $user->phone) }}" placeholder="Contoh: 08123456789" :disabled="!isEditing">
+                <label for="phone" class="input-label">{{ __('ui.profile_label_phone') }}</label>
+                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('phone', $user->phone) }}" placeholder="{{ __('ui.profile_placeholder_phone') }}" :disabled="!isEditing">
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
             </div>
 
             <!-- Address -->
             <div class="sm:col-span-6">
-                 <label for="address" class="input-label">Alamat</label>
+                 <label for="address" class="input-label">{{ __('ui.profile_label_address') }}</label>
                  <textarea id="address" name="address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" :disabled="!isEditing">{{ old('address', $user->address) }}</textarea>
                  <x-input-error class="mt-2" :messages="$errors->get('address')" />
             </div>
@@ -121,16 +121,16 @@
             <!-- Edit Button -->
             <button type="button" class="btn btn-secondary flex items-center gap-2" @click="isEditing = true; setTimeout(() => document.getElementById('name').focus(), 100)" x-show="!isEditing">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                {{ __('Edit Profil') }}
+                {{ __('ui.profile_btn_edit') }}
             </button>
 
             <!-- Save & Cancel Buttons -->
             <div class="flex items-center gap-2" x-show="isEditing" style="display: none;">
                 <button type="submit" class="btn btn-primary">
-                    {{ __('Simpan Perubahan') }}
+                    {{ __('ui.profile_btn_save') }}
                 </button>
                 <button type="button" class="btn btn-ghost text-secondary-600" @click="isEditing = false">
-                    {{ __('Batal') }}
+                    {{ __('ui.cancel') }}
                 </button>
             </div>
 
@@ -142,7 +142,7 @@
                     x-init="setTimeout(() => show = false, 2000)"
                     class="text-sm text-success-600 bg-success-50 px-3 py-1 rounded-full border border-success-100"
                 >
-                    {{ __('Data berhasil disimpan.') }}
+                    {{ __('ui.profile_save_success') }}
                 </p>
             @endif
         </div>

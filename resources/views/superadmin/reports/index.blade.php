@@ -4,19 +4,19 @@
             <!-- Header -->
             <div class="mb-6">
                 <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
-                    {{ __('Pusat Laporan') }}
+                    {{ __('ui.reports_center') }}
                 </h2>
-                <p class="mt-1 text-sm text-secondary-500">Generate dan download laporan sistem dalam format PDF atau Excel.</p>
+                <p class="mt-1 text-sm text-secondary-500">{{ __('ui.reports_desc') }}</p>
             </div>
 
             <!-- Main Form Card -->
             <div>
-                <form action="{{ route('superadmin.reports.download') }}" method="GET" class="bg-white rounded-xl border border-secondary-200 shadow-card p-6 overflow-visible" x-data="{ reportType: 'inventory_list', period: 'this_month' }">
+                <form action="{{ route('reports.download') }}" method="GET" class="bg-white rounded-xl border border-secondary-200 shadow-card p-6 overflow-visible" x-data="{ reportType: 'inventory_list', period: 'this_month' }">
                     @csrf
                     
                     <!-- Report Categories -->
                     <div class="mb-8">
-                        <label class="block text-sm font-bold text-secondary-900 mb-4">Pilih Jenis Laporan</label>
+                        <label class="block text-sm font-bold text-secondary-900 mb-4">{{ __('ui.choose_report_type') }}</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <!-- Inventaris -->
                             <label class="cursor-pointer relative group">
@@ -25,8 +25,8 @@
                                     <div class="w-12 h-12 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mb-3 group-hover:bg-primary-200 transition-colors">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                                     </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">Data Inventaris</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">Stok saat ini, aset, lokasi</span>
+                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.inventory_data') }}</span>
+                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.inventory_data_desc') }}</span>
                                 </div>
                                 <div class="absolute inset-0 border-2 border-primary-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
                             </label>
@@ -38,8 +38,8 @@
                                     <div class="w-12 h-12 rounded-full bg-warning-100 text-warning-600 flex items-center justify-center mb-3 group-hover:bg-warning-200 transition-colors">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
                                     </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">Riwayat Mutasi</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">Log masuk & keluar barang</span>
+                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.stock_mutation_history') }}</span>
+                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.stock_mutation_desc') }}</span>
                                 </div>
                                 <div class="absolute inset-0 border-2 border-primary-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
                             </label>
@@ -51,8 +51,8 @@
                                     <div class="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mb-3 group-hover:bg-sky-200 transition-colors">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">Riwayat Peminjaman</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">Log peminjaman user</span>
+                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.borrowing_history_report') }}</span>
+                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.borrowing_history_desc') }}</span>
                                 </div>
                                 <div class="absolute inset-0 border-2 border-sky-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
                             </label>
@@ -64,8 +64,8 @@
                                     <div class="w-12 h-12 rounded-full bg-danger-100 text-danger-600 flex items-center justify-center mb-3 group-hover:bg-danger-200 transition-colors">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                     </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">Stok Menipis</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">Barang perlu restock</span>
+                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.low_stock_report') }}</span>
+                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.low_stock_desc') }}</span>
                                 </div>
                                 <div class="absolute inset-0 border-2 border-primary-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
                             </label>
@@ -74,21 +74,21 @@
 
                     <!-- Filters Section -->
                     <div class="border-t border-secondary-200 pt-6">
-                        <h3 class="text-sm font-bold text-secondary-900 mb-4 uppercase tracking-wide">Konfigurasi Filter</h3>
+                        <h3 class="text-sm font-bold text-secondary-900 mb-4 uppercase tracking-wide">{{ __('ui.filter_configuration') }}</h3>
                         
                         <!-- Date Period (Hidden for Inventory/Low Stock snapshot) -->
                         <div class="mb-4 relative" x-show="['stock_mutation', 'borrowing_history'].includes(reportType)" x-transition>
-                            <label class="block text-sm font-medium text-secondary-700 mb-2">Periode Waktu</label>
+                            <label class="block text-sm font-medium text-secondary-700 mb-2">{{ __('ui.time_period') }}</label>
                             <input type="hidden" name="period" :value="period">
                             
                             <div x-data="{ 
                                 open: false, 
                                 labels: {
-                                    'this_month': 'Bulan Ini',
-                                    'last_month': 'Bulan Lalu',
-                                    'this_year': 'Tahun Ini',
-                                    'all': 'Semua Waktu',
-                                    'custom': 'Custom Tanggal'
+                                    'this_month': '{{ __('ui.this_month') }}',
+                                    'last_month': '{{ __('ui.last_month') }}',
+                                    'this_year': '{{ __('ui.this_year') }}',
+                                    'all': '{{ __('ui.all_time') }}',
+                                    'custom': '{{ __('ui.custom_date') }}'
                                 }
                             }">
                                 <button type="button" @click="open = !open" @click.away="open = false" 
@@ -122,11 +122,11 @@
                         <!-- Custom Date Range -->
                         <div class="grid grid-cols-2 gap-4 mb-4" x-show="period === 'custom' && ['stock_mutation', 'borrowing_history'].includes(reportType)" x-transition>
                             <div>
-                                <label class="block text-xs text-secondary-500 mb-1">Mulai</label>
+                                <label class="block text-xs text-secondary-500 mb-1">{{ __('ui.start_date') }}</label>
                                 <input type="date" name="start_date" class="input-field w-full">
                             </div>
                             <div>
-                                <label class="block text-xs text-secondary-500 mb-1">Sampai</label>
+                                <label class="block text-xs text-secondary-500 mb-1">{{ __('ui.end_date') }}</label>
                                 <input type="date" name="end_date" class="input-field w-full">
                             </div>
                         </div>
@@ -135,14 +135,14 @@
                         <div class="mb-4" x-data="{ 
                             open: false, 
                             selected: '{{ request('location') }}', 
-                            selectedLabel: '{{ request('location') ? request('location') : 'Semua Lokasi' }}',
+                            selectedLabel: '{{ request('location') ? request('location') : __('ui.all_locations') }}',
                             select(value, label) {
                                 this.selected = value;
                                 this.selectedLabel = label;
                                 this.open = false;
                             }
                         }">
-                            <label class="block text-sm font-medium text-secondary-700 mb-2">Lokasi Gudang / Rak</label>
+                            <label class="block text-sm font-medium text-secondary-700 mb-2">{{ __('ui.warehouse_location') }}</label>
                             <input type="hidden" name="location" :value="selected">
                             
                             <div class="relative">
@@ -165,10 +165,10 @@
                                         style="display: none;">
                                     <div class="max-h-60 overflow-y-auto p-2 space-y-1">
                                         <!-- Default Option -->
-                                        <div @click="select('', 'Semua Lokasi')" 
+                                        <div @click="select('', '{{ __('ui.all_locations') }}')" 
                                                 class="px-4 py-2 rounded-lg cursor-pointer hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                                 :class="{'bg-primary-50 text-primary-700 font-medium': selected === ''}">
-                                            Semua Lokasi
+                                            {{ __('ui.all_locations') }}
                                         </div>
                                         
                                         @foreach($locations as $loc)
@@ -181,26 +181,26 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-xs text-secondary-400 mt-1 italic">Pilih lokasi spesifik atau biarkan "Semua Lokasi".</p>
+                            <p class="text-xs text-secondary-400 mt-1 italic">{{ __('ui.location_placeholder_desc') }}</p>
                         </div>
                     </div>
 
                     <!-- Format & Action -->
                     <div class="bg-secondary-50 -mx-6 -mb-6 p-6 mt-8 rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-secondary-100">
                         <div class="flex items-center space-x-6">
-                            <span class="text-sm font-medium text-secondary-700">Format:</span>
+                            <span class="text-sm font-medium text-secondary-700">{{ __('ui.format_label') }}</span>
                                 <label class="inline-flex items-center cursor-pointer">
                                 <input type="radio" name="export_format" value="pdf" checked class="text-primary-600 focus:ring-primary-500 h-4 w-4 border-gray-300">
-                                <span class="ml-2 text-sm text-secondary-700 font-medium">PDF Document</span>
+                                <span class="ml-2 text-sm text-secondary-700 font-medium">{{ __('ui.pdf_document') }}</span>
                             </label>
                             <label class="inline-flex items-center cursor-pointer">
                                 <input type="radio" name="export_format" value="excel" class="text-success-600 focus:ring-success-500 h-4 w-4 border-gray-300">
-                                <span class="ml-2 text-sm text-secondary-700 font-medium">Excel (.xls)</span>
+                                <span class="ml-2 text-sm text-secondary-700 font-medium">{{ __('ui.excel_document') }}</span>
                             </label>
                         </div>
                         <button type="submit" class="btn btn-primary px-8 py-3 text-base flex items-center gap-2 shadow-lg shadow-primary-200">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            <span>Download Laporan</span>
+                            <span>{{ __('ui.download_report') }}</span>
                         </button>
                     </div>
                 </form>

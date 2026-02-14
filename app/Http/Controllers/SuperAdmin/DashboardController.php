@@ -91,6 +91,8 @@ class DashboardController extends Controller
             ->orderByDesc('total_qty')
             ->take(5)
             ->get();
+            
+        // dd($topEntered->toArray(), $start->toDateTimeString(), $end->toDateTimeString(), 'Status: approved', 'Type: masuk');
 
         // 3. Top Incoming Items (Most 'masuk')
         $topEntered = StockLog::join('spareparts', 'stock_logs.sparepart_id', '=', 'spareparts.id')
@@ -205,7 +207,7 @@ class DashboardController extends Controller
         $recentActivities = ActivityLog::with('user')
             ->whereBetween('created_at', [$start, $end])
             ->latest()
-            ->take(3) 
+            ->take(4) 
             ->get();
 
         return view('superadmin.dashboard', compact(

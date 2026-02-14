@@ -20,7 +20,7 @@ class UserManagementTest extends TestCase
         $this->superadmin = User::factory()->create([
             'role' => 'superadmin',
             'password_changed_at' => now(), // Bypass middleware
-             'password' => Hash::make('password'),
+            'password' => 'password',
         ]);
     }
 
@@ -78,5 +78,21 @@ class UserManagementTest extends TestCase
         $this->assertSoftDeleted('users', [
             'id' => $targetUser->id,
         ]);
+    }
+    public function test_superadmin_can_reset_user_password()
+    {
+        $targetUser = User::factory()->create([
+            'role' => 'admin',
+            'password_changed_at' => now(),
+            'password' => Hash::make('oldpassword'),
+        ]);
+
+        $response = $this->actingAs($this->superadmin)->patch(route('superadmin.users.reset-password', $targetUser));
+
+        $response->assertRedirect();
+        
+        // Verify password changed (default is 'password123')
+        $targetUser->refresh();
+        $this->assertTrue(Hash::check('password123', $targetUser->password));
     }
 }

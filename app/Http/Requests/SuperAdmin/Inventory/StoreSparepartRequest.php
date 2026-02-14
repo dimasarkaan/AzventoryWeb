@@ -27,6 +27,7 @@ class StoreSparepartRequest extends FormRequest
             'brand' => 'required|string|max:255',
             'category' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'age' => 'required|in:Baru,Pernah Dipakai (Bekas)',
             'condition' => 'required|string|max:255',
             'color' => 'nullable|string|max:50',
             'type' => 'required|in:sale,asset',
@@ -37,6 +38,42 @@ class StoreSparepartRequest extends FormRequest
             'status' => 'required|in:aktif,nonaktif',
             'image' => 'nullable|image|max:10240',
             'existing_image' => 'nullable|string',
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     */
+    public function attributes(): array
+    {
+        return [
+            'age' => 'Status Pemakaian',
+            'price' => 'Harga Satuan',
+            'part_number' => 'Part Number',
+            'name' => 'Nama Barang',
+            'brand' => 'Merk',
+            'category' => 'Kategori',
+            'location' => 'Lokasi Penyimpanan',
+            'condition' => 'Kondisi Barang',
+            'color' => 'Warna',
+            'type' => 'Tipe Barang',
+            'stock' => 'Stok Saat Ini',
+            'minimum_stock' => 'Minimum Stok',
+            'unit' => 'Satuan',
+            'status' => 'Status',
+            'image' => 'Gambar',
+        ];
+    }
+
+    /**
+     * Get custom validation messages.
+     */
+    public function messages(): array
+    {
+        return [
+            'age.required' => 'Kolom Status Pemakaian wajib diisi.',
+            'age.in' => 'Status Pemakaian harus berisi "Baru" atau "Pernah Dipakai (Bekas)".',
+            'price.required_if' => 'Kolom Harga Satuan wajib diisi.',
         ];
     }
 }

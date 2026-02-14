@@ -21,24 +21,24 @@
         <h1 style="text-transform: uppercase;">{{ $title }}</h1>
         <p style="font-size: 10pt; margin-top: 5px;">
             @if($startDate && $endDate)
-                Periode: {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
+                {{ __('ui.period_label') }} {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
             @else
-                Periode: Semua Riwayat
+                {{ __('ui.period_label') }} {{ __('ui.all_history') }}
             @endif
             &nbsp; | &nbsp;
-            Lokasi: {{ $location == 'all' ? 'Semua Lokasi' : $location }}
+            {{ __('ui.location_label') }} {{ $location == 'all' ? __('ui.all_locations') : $location }}
         </p>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th style="width: 15%;">Tanggal</th>
-                <th style="width: 25%;">Barang</th>
-                <th style="width: 10%;">Tipe</th>
-                <th style="width: 10%; text-align: right;">Jumlah</th>
-                <th style="width: 25%;">Keterangan</th>
-                <th style="width: 15%;">User</th>
+                <th style="width: 15%;">{{ __('ui.date_column') }}</th>
+                <th style="width: 25%;">{{ __('ui.item_column') }}</th>
+                <th style="width: 10%;">{{ __('ui.type_column') }}</th>
+                <th style="width: 10%; text-align: right;">{{ __('ui.amount_column') }}</th>
+                <th style="width: 25%;">{{ __('ui.description_column') }}</th>
+                <th style="width: 15%;">{{ __('ui.user_column') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -46,14 +46,14 @@
             <tr>
                 <td>{{ $log->created_at->translatedFormat('d F Y H:i') }}</td>
                 <td>
-                    <strong>{{ $log->sparepart->name ?? 'Unknown' }}</strong><br>
+                    <strong>{{ $log->sparepart->name ?? __('ui.unknown') }}</strong><br>
                     <small>PN: {{ $log->sparepart->part_number ?? '-' }}</small>
                 </td>
                 <td>
                     @if($log->type == 'masuk')
-                        <span style="color: green;">MASUK</span>
+                        <span style="color: green;">{{ __('ui.type_in') }}</span>
                     @else
-                        <span style="color: #dc2626;">KELUAR</span>
+                        <span style="color: #dc2626;">{{ __('ui.type_out') }}</span>
                     @endif
                 </td>
                 <td style="text-align: right;">
@@ -71,7 +71,7 @@
     </table>
 
     <div class="footer">
-        <p>Azventory &bull; Dicetak oleh {{ auth()->user()->name }} pada {{ now()->translatedFormat('d F Y H:i') }}</p>
+        <p>Azventory &bull; {{ __('ui.report_footer_printed_by', ['name' => auth()->user()->name, 'date' => now()->translatedFormat('d F Y H:i')]) }}</p>
     </div>
 </body>
 </html>
