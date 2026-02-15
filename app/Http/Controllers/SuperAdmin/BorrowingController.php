@@ -84,6 +84,20 @@ class BorrowingController extends Controller
      */
     public function returnItem(Request $request, Borrowing $borrowing)
     {
+        // Authorization Check: Start
+        // Allow if user is the borrower OR if user has elevated privileges (SuperAdmin, Admin, Operator)
+        $user = auth()->user();
+        $isOwner = $borrowing->user_id === $user->id;
+        $hasPrivilege = in_array($user->role, [
+            \App\Enums\UserRole::SUPERADMIN, 
+            \App\Enums\UserRole::ADMIN, 
+            \App\Enums\UserRole::OPERATOR
+        ]);
+
+        if (!$isOwner && !$hasPrivilege) {
+            abort(403, 'Anda tidak memiliki izin untuk mengembalikan barang ini.');
+        }
+        // Authorization Check: End
         // 1. Calculate Current State directly from DB
         $totalReturned = $borrowing->returns()->sum('quantity');
         $remaining = $borrowing->quantity - $totalReturned;
@@ -107,6 +121,19 @@ class BorrowingController extends Controller
                 'max:5'
             ],
             'return_photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB
+        ], [
+            'return_quantity.required' => 'Jumlah wajib diisi.',
+            'return_quantity.integer' => 'Jumlah harus berupa angka.',
+            'return_quantity.min' => 'Jumlah minimal 1.',
+            'return_quantity.max' => 'Jumlah tidak boleh melebihi sisa pinjaman (:max).',
+            'return_condition.required' => 'Kondisi barang wajib dipilih.',
+            'return_condition.in' => 'Kondisi tidak valid.',
+            'return_photos.array' => 'Format foto tidak valid.',
+            'return_photos.min' => 'Minimal unggah :min foto.',
+            'return_photos.max' => 'Maksimal unggah :max foto.',
+            'return_photos.*.image' => 'File harus berupa gambar.',
+            'return_photos.*.mimes' => 'Format file harus jpeg, png, jpg, atau gif.',
+            'return_photos.*.max' => 'Ukuran file maksimal 5MB.',
         ]);
 
         $returnPhotos = [];
@@ -195,7 +222,14 @@ class BorrowingController extends Controller
         });
 
         // 5. Final Log
-        $this->logActivity('Pengembalian Barang', "Mengembalikan {$request->return_quantity} unit '{$borrowing->sparepart->name} ({$request->return_condition}).");
+        $conditionMap = [
+            'good' => 'Baik',
+            'bad' => 'Rusak',
+            'lost' => 'Hilang'
+        ];
+        $translatedCondition = $conditionMap[$request->return_condition] ?? $request->return_condition;
+
+        $this->logActivity('Pengembalian Barang', "Mengembalikan {$request->return_quantity} unit '{$borrowing->sparepart->name}' (Kondisi: {$translatedCondition}).");
 
         $message = 'Barang berhasil dikembalikan.';
 

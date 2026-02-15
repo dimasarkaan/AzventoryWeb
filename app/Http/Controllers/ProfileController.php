@@ -28,8 +28,15 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $user = $request->user();
+        
+        $totalBorrowed = $user->borrowings()->count();
+        $activeBorrows = $user->borrowings()->whereNull('returned_at')->count();
+
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $user,
+            'totalBorrowed' => $totalBorrowed,
+            'activeBorrows' => $activeBorrows,
         ]);
     }
 
@@ -87,5 +94,17 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Display the user's borrowing history.
+     */
+    public function myInventory(Request $request): View
+    {
+        $user = $request->user();
+        $activeBorrowings = $user->borrowings()->whereNull('returned_at')->with('sparepart')->latest()->get();
+        $historyBorrowings = $user->borrowings()->whereNotNull('returned_at')->with('sparepart')->latest('returned_at')->get();
+
+        return view('profile.my_inventory', compact('user', 'activeBorrowings', 'historyBorrowings'));
     }
 }

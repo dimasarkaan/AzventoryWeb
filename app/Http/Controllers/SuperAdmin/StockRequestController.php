@@ -76,7 +76,12 @@ class StockRequestController extends Controller
                 
                 // Notify admins
                 $admins = User::whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::SUPERADMIN])->get();
-                $message = "Pengajuan stok {$stockLog->type} baru untuk {$sparepart->name} oleh " . $user->name;
+                $type = $request->type == 'masuk' ? __('ui.type_in') : __('ui.type_out');
+                $message = __('ui.notification_new_stock_request', [
+                    'type' => $type,
+                    'name' => $sparepart->name,
+                    'user' => $user->name,
+                ]);
                 Notification::send($admins, new StockRequestNotification($stockLog, $message));
             }
         });

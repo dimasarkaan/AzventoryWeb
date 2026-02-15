@@ -8,11 +8,10 @@
         'aktif' => 'bg-success-500',
         'active' => 'bg-success-500',
         'non-aktif' => 'bg-danger-500',
+        'nonaktif' => 'bg-danger-500', // Added for consistency
         'inactive' => 'bg-danger-500',
         'rusak' => 'bg-danger-500',
         'dijual' => 'bg-info-500',
-        'disewakan' => 'bg-warning-500',
-        'maintenance' => 'bg-warning-500',
     ];
     
     // Badge/Pill Colors (Background + Text)
@@ -20,11 +19,10 @@
         'aktif' => 'bg-success-100 text-success-800',
         'active' => 'bg-success-100 text-success-800',
         'non-aktif' => 'bg-danger-100 text-danger-800',
+        'nonaktif' => 'bg-danger-100 text-danger-800', // Added for consistency
         'inactive' => 'bg-danger-100 text-danger-800',
         'rusak' => 'bg-danger-100 text-danger-800',
         'dijual' => 'bg-info-100 text-info-800',
-        'disewakan' => 'bg-warning-100 text-warning-800',
-        'maintenance' => 'bg-warning-100 text-warning-800',
     ];
     
     $dotClass = $dotColors[$status] ?? 'bg-secondary-400';

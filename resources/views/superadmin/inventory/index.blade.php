@@ -12,6 +12,60 @@
                     <p class="mt-1 text-sm text-secondary-500">{{ __('ui.inventory_management_desc') }}</p>
                 </div>
                 <div class="flex items-center gap-2">
+                     <!-- Legend Popover -->
+                    <div x-data="{ showLegend: false }" class="relative z-30">
+                        <button @click="showLegend = !showLegend" class="btn btn-secondary flex items-center justify-center p-2.5" title="{{ __('ui.legend_title') }}">
+                            <svg class="w-5 h-5 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </button>
+
+                        <div x-show="showLegend" 
+                             @click.away="showLegend = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 translate-y-2"
+                             class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-secondary-200 p-4 z-50 text-left"
+                             style="display: none;">
+                            <div class="flex items-center justify-between mb-3 border-b border-secondary-100 pb-2">
+                                <h3 class="font-bold text-sm text-secondary-900">{{ __('ui.legend_title') }}</h3>
+                                <button @click="showLegend = false" class="text-secondary-400 hover:text-secondary-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
+                            </div>
+                            
+                            <!-- Tipe Barang -->
+                            <div class="mb-4">
+                                <span class="text-[10px] font-bold text-secondary-400 uppercase tracking-wider block mb-2">{{ __('ui.legend_type') }}</span>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1 h-6 rounded-full bg-blue-600"></div>
+                                        <span class="text-xs text-secondary-700 font-medium">{{ __('ui.legend_asset') }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-1 h-6 rounded-full bg-green-600"></div>
+                                        <span class="text-xs text-secondary-700 font-medium">{{ __('ui.legend_sale') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Status Dot -->
+                            <div>
+                                <span class="text-[10px] font-bold text-secondary-400 uppercase tracking-wider block mb-2">{{ __('ui.legend_status') }}</span>
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-success-500 border border-white ring-1 ring-secondary-100"></div>
+                                        <span class="text-xs text-secondary-700 font-medium">{{ __('ui.legend_active') }}</span>
+                                    </div>
+                                     <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-danger-500 border border-white ring-1 ring-secondary-100"></div>
+                                        <span class="text-xs text-secondary-700 font-medium">{{ __('ui.legend_damaged') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                      <!-- Trash Toggle Button -->
                      <a href="{{ request('trash') ? route('superadmin.inventory.index') : route('superadmin.inventory.index', ['trash' => 'true']) }}" 
                         class="btn flex items-center justify-center p-2.5 {{ request('trash') ? 'btn-danger' : 'btn-secondary' }}" 
