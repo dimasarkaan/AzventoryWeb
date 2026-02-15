@@ -9,17 +9,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    $user = auth()->user();
-    if ($user->role === \App\Enums\UserRole::SUPERADMIN) {
-        return redirect()->route('superadmin.dashboard');
-    } elseif ($user->role === \App\Enums\UserRole::ADMIN) {
-        return redirect()->route('admin.dashboard');
-    } elseif ($user->role === \App\Enums\UserRole::OPERATOR) {
-        return redirect()->route('operator.dashboard');
-    }
-    abort(403, 'Unauthorized action.');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', \App\Http\Controllers\DashboardRedirectController::class)
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
     // Protected SuperAdmin Routes
     Route::middleware(['auth', 'verified', 'role:superadmin'])->group(function () {
