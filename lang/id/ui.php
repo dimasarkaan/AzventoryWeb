@@ -737,4 +737,8 @@ return [
     'guest_welcome_desc' => 'Sistem informasi manajemen inventaris sparepart berbasis web yang terstruktur dan terpusat.',
     'guest_feature_stock' => 'Pemantauan Stok',
     'guest_feature_qr' => 'QR Code Support',
+    
+    // Filter Toggle
+    'show_filter' => 'Tampilkan Filter',
+    'hide_filter' => 'Sembunyikan Filter',
 ];
