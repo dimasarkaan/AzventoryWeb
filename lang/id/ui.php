@@ -143,9 +143,18 @@ return [
     'borrower' => 'Peminjam',
     'borrow_date' => 'Tgl Pinjam',
     'status_borrowed' => 'Dipinjam',
-    'status_returned' => 'Selesai',
-    'return_item' => 'Kembalikan',
+    'status_returned_badge' => 'Dikembalikan',
+    
+    // My Inventory
+    'return_action' => 'Kembalikan',
+    'confirm_return' => 'Konfirmasi Pengembalian',
+    'confirm_return_desc' => 'Apakah Anda yakin ingin mengembalikan barang ini? Pastikan barang dalam kondisi baik.',
+    'view_detail' => 'Lihat Detail',
+    'my_inventory_title' => 'Inventaris Saya',
     'view_return_evidence' => 'Lihat Bukti Pengembalian',
+    'upload_photo' => 'Unggah Foto Bukti',
+    'return_item' => 'Kembalikan Barang',
+    'return_item_title' => 'Kembalikan Barang',
     'history' => 'Riwayat',
     'no_borrowing_history' => 'Belum ada riwayat peminjaman untuk item ini.',
     
@@ -292,7 +301,7 @@ return [
     'due_date' => 'Tenggat',
     'item_deleted' => 'Item Terhapus',
     'status_overdue' => 'Terlambat',
-    'status_returned_badge' => 'Dikembali',
+    'status_returned_badge' => 'Dikembalikan',
     'borrowing_history_empty' => 'Belum ada riwayat peminjaman.',
     
     // Scan QR
@@ -338,6 +347,10 @@ return [
     'widget_top_contributors' => 'Top Kontributor',
     'widget_recent_activity' => 'Aktivitas Terbaru',
     'approvals' => 'Persetujuan',
+    'forecasting_title' => 'Prediksi Kebutuhan (Bulan Depan)',
+    'predicted_need' => 'Estimasi Kebutuhan',
+    'current_stock_label' => 'Stok saat ini',
+    'not_enough_data' => 'Belum cukup data untuk prediksi',
     'total_items' => 'Total Barang',
     'sku_items' => 'Item SKU',
     'total_physical_stock' => 'Total Stok Fisik',
@@ -598,6 +611,23 @@ return [
     'profile_email_hint' => 'Hubungi admin untuk ganti email.',
     'profile_label_name' => 'Nama Lengkap',
     'profile_label_phone' => 'No. WhatsApp',
+    
+    // Profile Stats
+    'stats_total_borrowed' => 'Total Peminjaman',
+    'stats_active_borrows' => 'Sedang Dipinjam',
+    'stats_joined_at' => 'Bergabung Sejak',
+    'stats_status' => 'Status Akun',
+
+    // My Inventory
+    'my_inventory_title' => 'Inventaris Saya',
+    'my_inventory_desc' => 'Daftar barang yang sedang dipinjam dan riwayat peminjaman Anda.',
+    'back_to_profile' => 'Kembali ke Profil',
+    'tab_active_borrowings' => 'Sedang Dipinjam',
+    'tab_history' => 'Riwayat',
+    'no_active_borrowings' => 'Tidak ada peminjaman aktif',
+    'no_active_borrowings_desc' => 'Anda tidak sedang meminjam barang apapun saat ini.',
+    'no_history_borrowings' => 'Belum ada riwayat',
+    'no_history_borrowings_desc' => 'Anda belum pernah meminjam barang sebelumnya.',
 
     // User Management
     'user_management' => 'Pengguna',
@@ -653,6 +683,19 @@ return [
     'notification_action_detail' => 'Detail',
     'notification_empty_title' => 'Belum ada notifikasi',
     'notification_empty_desc' => 'Semua aman terkendali.',
+    'notification_low_stock' => 'Stok untuk :name menipis!',
+    'notification_stock_request' => 'Permintaan Stok Baru',
+    'notification_stock_request_body' => 'Pengajuan stok :type Anda untuk :name telah :status.',
+    'notification_new_stock_request' => 'Pengajuan stok :type baru untuk :name oleh :user.',
+
+    // Legend / Keterangan Simbol
+    'legend_title' => 'Keterangan Simbol',
+    'legend_type' => 'Tipe Barang (Garis)',
+    'legend_status' => 'Status (Dot)',
+    'legend_asset' => 'Inventaris / Aset',
+    'legend_sale' => 'Barang Dijual',
+    'legend_active' => 'Aktif',
+    'legend_damaged' => 'Non-Aktif',
 
     // Error Pages
     'error_404_title' => 'Halaman Tidak Ditemukan',

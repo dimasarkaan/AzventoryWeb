@@ -37,6 +37,13 @@ class StockApprovalController extends Controller
                 ->with('error', 'Pengajuan ini sudah diproses sebelumnya.');
         }
 
+        if ($request->status === 'approved' && $stock_log->type === 'keluar') {
+            // Pre-check stock availability
+            if ($stock_log->sparepart->stock < $stock_log->quantity) {
+                return redirect()->back()->with('error', 'Stok tidak mencukupi untuk menyetujui permintaan ini. Sisa stok: ' . $stock_log->sparepart->stock);
+            }
+        }
+
         DB::transaction(function () use ($request, $stock_log) {
             if ($request->status === 'approved') {
                 $sparepart = $stock_log->sparepart;
@@ -44,9 +51,11 @@ class StockApprovalController extends Controller
                 if ($stock_log->type === 'masuk') {
                     $sparepart->stock += $stock_log->quantity;
                 } else { // keluar
+                    // Double check inside transaction to be safe from race conditions, 
+                    // though for this app level it might be overkill, but good practice.
+                    // If it fails here, it will rollback.
                     if ($sparepart->stock < $stock_log->quantity) {
-                        // Batalkan transaksi jika stok tidak mencukupi
-                        throw new \Exception('Stok tidak mencukupi untuk transaksi ini.');
+                         throw new \Exception('Stok berubah saat pemrosesan. Transaksi dibatalkan.');
                     }
                     $sparepart->stock -= $stock_log->quantity;
                 }
@@ -73,7 +82,11 @@ class StockApprovalController extends Controller
 
         // Notify the user who made the request
         $requester = $stock_log->user;
-        $message = "Pengajuan stok {$stock_log->type} Anda untuk {$stock_log->sparepart->name} telah {$statusText}.";
+        $message = __('ui.notification_stock_request_body', [
+            'type' => $stock_log->type,
+            'name' => $stock_log->sparepart->name,
+            'status' => $statusText
+        ]);
         Notification::send($requester, new StockRequestNotification($stock_log, $message));
 
         return redirect()->route('superadmin.stock-approvals.index')

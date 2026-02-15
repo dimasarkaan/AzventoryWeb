@@ -37,13 +37,8 @@ class GlobalSearchController extends Controller
             ->limit(5)
             ->get()
             ->map(function ($item) use ($role) {
-                // Determine route based on role
-                $routePrefix = match($role) {
-                    \App\Enums\UserRole::SUPERADMIN => 'superadmin.inventory.show',
-                    \App\Enums\UserRole::ADMIN => 'admin.inventory.show',
-                    \App\Enums\UserRole::OPERATOR => 'operator.inventory.show',
-                    default => 'dashboard'
-                };
+                // Determine route based on role (Shared Route)
+                $routePrefix = 'superadmin.inventory.show';
                 
                 // Fallback if route doesn't exist for role (safe check)
                 $url = Route::has($routePrefix) ? route($routePrefix, $item) : '#';
