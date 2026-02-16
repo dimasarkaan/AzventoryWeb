@@ -32,7 +32,7 @@ class AuthenticationTest extends TestCase
 
         $this->assertAuthenticated();
         // The dashboard route redirects superadmins to superadmin.dashboard
-        $response->assertRedirect(route('superadmin.dashboard')); 
+        $response->assertRedirect(route('dashboard.superadmin')); 
     }
 
     public function test_users_can_not_authenticate_with_invalid_password()

@@ -47,4 +47,23 @@ class Sparepart extends Model
     {
         return $this->type === 'sale';
     }
+
+    /**
+     * Check if item can be borrowed.
+     * 
+     * @param int $quantity
+     * @return bool|\Illuminate\Support\Collection
+     */
+    public function canBeBorrowed(int $quantity)
+    {
+        if ($this->condition !== 'Baik') {
+            return 'Hanya barang dengan kondisi "Baik" yang dapat dipinjam.';
+        }
+
+        if ($this->stock < $quantity) {
+             return 'Stok tidak mencukupi untuk peminjaman ini.';
+        }
+
+        return true;
+    }
 }

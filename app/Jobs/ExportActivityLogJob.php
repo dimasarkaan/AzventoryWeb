@@ -65,7 +65,7 @@ class ExportActivityLogJob implements ShouldQueue
         $logs = $query->latest()->get();
 
         // Generate PDF
-        $pdf = Pdf::loadView('superadmin.activity_logs.pdf', [
+        $pdf = Pdf::loadView('activity_logs.pdf', [
             'logs' => $logs,
             'isPdf' => true,
             // Pass params to view so header info is correct (Request parameters won't exist in Job)

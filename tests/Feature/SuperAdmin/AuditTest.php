@@ -38,7 +38,7 @@ class AuditTest extends TestCase
             ->andReturn(collect(['Test']));
 
         $response = $this->actingAs($this->superAdmin)
-            ->get(route('superadmin.inventory.index'));
+            ->get(route('inventory.index'));
 
         $response->assertStatus(200);
     }
@@ -49,7 +49,7 @@ class AuditTest extends TestCase
         Queue::fake();
 
         $response = $this->actingAs($this->superAdmin)
-            ->get(route('superadmin.reports.download', [
+            ->get(route('reports.download', [
                 'report_type' => 'inventory_list',
                 'export_format' => 'pdf'
             ]));
@@ -68,7 +68,7 @@ class AuditTest extends TestCase
         Queue::fake();
 
         $response = $this->actingAs($this->superAdmin)
-            ->get(route('superadmin.reports.download', [
+            ->get(route('reports.download', [
                 'report_type' => 'inventory_list',
                 'export_format' => 'excel'
             ]));

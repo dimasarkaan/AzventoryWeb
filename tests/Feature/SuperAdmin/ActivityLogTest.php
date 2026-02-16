@@ -17,7 +17,7 @@ class ActivityLogTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->superAdmin = User::factory()->create(['role' => 'superadmin']);
+        $this->superAdmin = User::factory()->create(['role' => \App\Enums\UserRole::SUPERADMIN]);
     }
 
     /** @test */
@@ -39,20 +39,22 @@ class ActivityLogTest extends TestCase
         ]);
 
         // Filter by User Alice
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.activity-logs.index', [
+        $response = $this->actingAs($this->superAdmin)->get(route('activity-logs.index', [
             'user_id' => $user1->id
         ]));
         
-        $response->assertSee('User Alice logged in');
-        $response->assertDontSee('User Bob updated profile');
+        $response->assertViewHas('activityLogs', function ($logs) use ($user1) {
+            return $logs->count() === 1 && $logs->first()->user_id === $user1->id;
+        });
 
         // Filter by Action 'Update Profile'
-        $response2 = $this->actingAs($this->superAdmin)->get(route('superadmin.activity-logs.index', [
+        $response2 = $this->actingAs($this->superAdmin)->get(route('activity-logs.index', [
             'action' => 'Update Profile'
         ]));
 
-        $response2->assertSee('User Bob updated profile');
-        $response2->assertDontSee('User Alice logged in');
+        $response2->assertViewHas('activityLogs', function ($logs) use ($user2) {
+             return $logs->count() === 1 && $logs->first()->description === 'User Bob updated profile';
+        });
     }
 
     /** @test */
@@ -60,7 +62,7 @@ class ActivityLogTest extends TestCase
     {
         ActivityLog::factory()->count(5)->create();
 
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.activity-logs.export', [
+        $response = $this->actingAs($this->superAdmin)->get(route('activity-logs.export', [
             'format' => 'excel'
         ]));
 
@@ -73,7 +75,7 @@ class ActivityLogTest extends TestCase
     {
         Queue::fake();
 
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.activity-logs.export', [
+        $response = $this->actingAs($this->superAdmin)->get(route('activity-logs.export', [
             'format' => 'pdf'
         ]));
 

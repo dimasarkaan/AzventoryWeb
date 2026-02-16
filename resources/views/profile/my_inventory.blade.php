@@ -171,7 +171,7 @@
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach($activeBorrowings as $borrowing)
-                                            <tr class="flex flex-col sm:table-row hover:bg-gray-50 transition-colors cursor-pointer group relative" onclick="if(!event.target.closest('.no-click')) window.location='{{ route('superadmin.inventory.show', $borrowing->sparepart->id) }}'">
+                                            <tr class="flex flex-col sm:table-row hover:bg-gray-50 transition-colors cursor-pointer group relative" onclick="if(!event.target.closest('.no-click')) window.location='{{ route('inventory.show', $borrowing->sparepart->id) }}'">
                                                 <td class="px-6 py-4 whitespace-nowrap sm:w-1/3">
                                                     <div class="flex items-center">
                                                         <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 overflow-hidden">
@@ -254,7 +254,7 @@
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
                                         @foreach($historyBorrowings as $borrowing)
-                                            <tr class="flex flex-col sm:table-row hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{{ route('superadmin.inventory.show', $borrowing->sparepart->id) }}'">
+                                            <tr class="flex flex-col sm:table-row hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location='{{ route('inventory.show', $borrowing->sparepart->id) }}'">
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="flex items-center">
                                                         <div class="flex-shrink-0 h-10 w-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500 overflow-hidden">
@@ -476,7 +476,13 @@
                                                         this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                                                         this.$refs.video.srcObject = this.stream;
                                                     } catch (err) {
-                                                        alert('Tidak dapat mengakses kamera: ' + err.message);
+                                                        let msg = "{{ __('ui.camera_error_default') }}";
+                                                        const errStr = err.toString();
+                                                        if (errStr.includes('NotAllowedError') || errStr.includes('PermissionDeniedError')) msg = "{{ __('ui.camera_error_not_allowed') }}";
+                                                        else if (errStr.includes('NotFoundError')) msg = "{{ __('ui.camera_error_not_found') }}";
+                                                        else if (errStr.includes('NotReadableError')) msg = "{{ __('ui.camera_error_not_readable') }}";
+                                                        
+                                                        alert(msg);
                                                         this.cameraOpen = false;
                                                     }
                                                 });

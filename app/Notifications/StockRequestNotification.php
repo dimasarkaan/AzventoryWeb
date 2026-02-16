@@ -40,7 +40,7 @@ class StockRequestNotification extends Notification implements ShouldQueue
         return [
             'stock_log_id' => $this->stockLog->id,
             'message' => $this->message,
-            'url' => route('superadmin.stock-approvals.index'),
+            'url' => route('stock-approvals.index'),
         ];
     }
 
@@ -49,7 +49,7 @@ class StockRequestNotification extends Notification implements ShouldQueue
         return new BroadcastMessage([
             'title' => 'Permintaan Stok Baru',
             'message' => $this->message,
-            'url' => route('superadmin.stock-approvals.index'),
+            'url' => route('stock-approvals.index'),
             'unread_count' => $notifiable->unreadNotifications()->count() + 1,
         ]);
     }

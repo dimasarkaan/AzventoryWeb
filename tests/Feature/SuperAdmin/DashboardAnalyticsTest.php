@@ -31,7 +31,7 @@ class DashboardAnalyticsTest extends TestCase
         Sparepart::factory()->create(['stock' => 5]); // Total 35 stock
         
         // Act
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.dashboard'));
+        $response = $this->actingAs($this->superAdmin)->get(route('dashboard.superadmin'));
 
         // Assert
         $response->assertStatus(200);
@@ -60,7 +60,7 @@ class DashboardAnalyticsTest extends TestCase
         ]);
 
         // Act
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.dashboard'));
+        $response = $this->actingAs($this->superAdmin)->get(route('dashboard.superadmin'));
 
         // Assert
         $deadStockItems = $response->viewData('deadStockItems');
@@ -102,7 +102,7 @@ class DashboardAnalyticsTest extends TestCase
         ]);
 
         // Act
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.dashboard', ['period' => 'this_year']));
+        $response = $this->actingAs($this->superAdmin)->get(route('dashboard.superadmin', ['period' => 'this_year']));
 
         // Assert
         // Forecast logic: Average of last 3 months. (30+30+30)/3 = 30
@@ -149,7 +149,7 @@ class DashboardAnalyticsTest extends TestCase
 
         $this->assertDatabaseCount('stock_logs', 2);
         // Act: Filter for Jan 2025
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.dashboard', [
+        $response = $this->actingAs($this->superAdmin)->get(route('dashboard.superadmin', [
             'year' => 2025,
             'month' => 1
         ]));

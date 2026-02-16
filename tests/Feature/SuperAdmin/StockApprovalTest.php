@@ -41,7 +41,7 @@ class StockApprovalTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.stock-approvals.index'));
+        $response = $this->actingAs($this->superAdmin)->get(route('stock-approvals.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Restock');
@@ -63,7 +63,7 @@ class StockApprovalTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->superAdmin)
-            ->put(route('superadmin.stock-approvals.update', $log->id), [
+            ->put(route('stock-approvals.update', $log->id), [
                 'status' => 'approved'
             ]);
 
@@ -107,7 +107,7 @@ class StockApprovalTest extends TestCase
 
 
         $response = $this->actingAs($this->superAdmin)
-            ->put(route('superadmin.stock-approvals.update', $log->id), [
+            ->put(route('stock-approvals.update', $log->id), [
                 'status' => 'rejected'
             ]);
 

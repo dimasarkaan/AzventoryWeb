@@ -27,7 +27,7 @@ class ReportTest extends TestCase
         Queue::fake();
 
         $response = $this->actingAs($this->superAdmin)
-            ->get(route('superadmin.reports.download', [
+            ->get(route('reports.download', [
                 'report_type' => 'inventory_list',
                 'export_format' => 'pdf',
             ]));
@@ -43,7 +43,7 @@ class ReportTest extends TestCase
     public function superadmin_can_download_excel_report_directly()
     {
         $response = $this->actingAs($this->superAdmin)
-            ->get(route('superadmin.reports.download', [
+            ->get(route('reports.download', [
                 'report_type' => 'inventory_list',
                 'export_format' => 'excel',
             ]));
@@ -54,7 +54,7 @@ class ReportTest extends TestCase
     /** @test */
     public function superadmin_can_access_reports_page()
     {
-        $response = $this->actingAs($this->superAdmin)->get(route('superadmin.reports.index'));
+        $response = $this->actingAs($this->superAdmin)->get(route('reports.index'));
         $response->assertStatus(200);
     }
 
@@ -62,8 +62,8 @@ class ReportTest extends TestCase
     public function superadmin_can_access_qr_scan_page()
     {
         // Assuming route exists based on previous verification
-        if (\Illuminate\Support\Facades\Route::has('superadmin.scan-qr')) {
-             $response = $this->actingAs($this->superAdmin)->get(route('superadmin.scan-qr'));
+        if (\Illuminate\Support\Facades\Route::has('inventory.scan-qr')) {
+             $response = $this->actingAs($this->superAdmin)->get(route('inventory.scan-qr'));
              $response->assertStatus(200);
         }
     }

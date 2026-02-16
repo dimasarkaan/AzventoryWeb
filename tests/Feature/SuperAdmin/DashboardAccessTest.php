@@ -20,7 +20,7 @@ class DashboardAccessTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-                         ->get(route('superadmin.dashboard'));
+                         ->get(route('dashboard.superadmin'));
 
         $response->assertStatus(200);
         // $response->assertSee('Dashboard'); // Verify some text

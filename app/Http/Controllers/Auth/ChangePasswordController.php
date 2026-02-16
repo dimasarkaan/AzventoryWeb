@@ -57,10 +57,10 @@ class ChangePasswordController extends Controller
 
         // Redirect based on role after successful password change
         $redirectPath = match ($user->role) {
-            \App\Enums\UserRole::SUPERADMIN => '/superadmin/dashboard',
-            \App\Enums\UserRole::ADMIN => '/admin/dashboard',
-            \App\Enums\UserRole::OPERATOR => '/operator/dashboard',
-            default => '/dashboard',
+            \App\Enums\UserRole::SUPERADMIN => route('dashboard.superadmin'),
+            \App\Enums\UserRole::ADMIN => route('admin.dashboard'),
+            \App\Enums\UserRole::OPERATOR => route('operator.dashboard'),
+            default => route('dashboard'),
         };
 
         return redirect($redirectPath)->with('success', 'Kata sandi berhasil diperbarui.');

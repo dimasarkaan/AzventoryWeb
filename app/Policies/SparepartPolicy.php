@@ -29,11 +29,10 @@ class SparepartPolicy
      */
     public function create(User $user): bool
     {
-        // Operator, Admin, Superadmin can create
+        // Only Superadmin and Admin can create. Operator CANNOT.
         return in_array($user->role, [
             \App\Enums\UserRole::SUPERADMIN,
             \App\Enums\UserRole::ADMIN,
-            \App\Enums\UserRole::OPERATOR
         ]);
     }
 
@@ -42,11 +41,10 @@ class SparepartPolicy
      */
     public function update(User $user, Sparepart $sparepart): bool
     {
-        // Operator, Admin, Superadmin can update
+        // Only Superadmin and Admin can update. Operator CANNOT.
         return in_array($user->role, [
             \App\Enums\UserRole::SUPERADMIN,
             \App\Enums\UserRole::ADMIN,
-            \App\Enums\UserRole::OPERATOR
         ]);
     }
 

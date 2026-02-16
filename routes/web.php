@@ -15,58 +15,61 @@ Route::get('/dashboard', \App\Http\Controllers\DashboardRedirectController::clas
 
     // Protected SuperAdmin Routes
     Route::middleware(['auth', 'verified', 'role:superadmin'])->group(function () {
-        // User Management (Strict Superadmin)
-        Route::patch('users/{user}/reset-password', [\App\Http\Controllers\SuperAdmin\UserController::class, 'resetPassword'])->name('users.reset-password');
-        // User Soft Deletes
-        Route::post('users/bulk-restore', [\App\Http\Controllers\SuperAdmin\UserController::class, 'bulkRestore'])->name('users.bulk-restore');
-        Route::delete('users/bulk-force-delete', [\App\Http\Controllers\SuperAdmin\UserController::class, 'bulkForceDelete'])->name('users.bulk-force-delete');
-        Route::patch('users/{id}/restore', [\App\Http\Controllers\SuperAdmin\UserController::class, 'restore'])->name('users.restore');
-        Route::delete('users/{id}/force-delete', [\App\Http\Controllers\SuperAdmin\UserController::class, 'forceDelete'])->name('users.force-delete');
+        // Dashboard
+        Route::get('dashboard/superadmin', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard.superadmin');
 
-        Route::resource('users', \App\Http\Controllers\SuperAdmin\UserController::class);
-        
-        Route::get('reports/download', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'download'])->name('reports.download');
-        Route::get('reports', [\App\Http\Controllers\SuperAdmin\ReportController::class, 'index'])->name('reports.index');
+        Route::get('reports/download', [\App\Http\Controllers\ReportController::class, 'download'])->name('reports.download');
+        Route::get('reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
         
         // Activity Logs
-        Route::get('activity-logs/export', [\App\Http\Controllers\SuperAdmin\ActivityLogController::class, 'export'])->name('activity-logs.export');
-        Route::get('activity-logs', [\App\Http\Controllers\SuperAdmin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::get('activity-logs/export', [\App\Http\Controllers\ActivityLogController::class, 'export'])->name('activity-logs.export');
+        Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
         
         // Stock Approvals (Strict Superadmin)
-        Route::resource('stock-approvals', \App\Http\Controllers\SuperAdmin\StockApprovalController::class)
+        Route::resource('stock-approvals', \App\Http\Controllers\StockApprovalController::class)
             ->only(['index', 'update', 'destroy'])
             ->parameters(['stock-approvals' => 'stock_log']);
     });
 
-// SHARED ROUTES (Superadmin, Admin, Operator) - Keeping 'superadmin' prefix for URL compatibility
-Route::middleware(['auth', 'verified', 'role:superadmin,admin,operator'])->prefix('superadmin')->name('superadmin.')->group(function () {
-    Route::view('/scan-qr', 'superadmin.scan-qr')->name('scan-qr'); // Scan QR is useful for everyone
+    // User Management (Strict Superadmin) - Moved out of superadmin prefix
+    Route::middleware(['auth', 'verified', 'role:superadmin'])->group(function () {
+        Route::patch('users/{user}/reset-password', [\App\Http\Controllers\UserController::class, 'resetPassword'])->name('users.reset-password');
+        Route::post('users/bulk-restore', [\App\Http\Controllers\UserController::class, 'bulkRestore'])->name('users.bulk-restore');
+        Route::delete('users/bulk-force-delete', [\App\Http\Controllers\UserController::class, 'bulkForceDelete'])->name('users.bulk-force-delete');
+        Route::patch('users/{id}/restore', [\App\Http\Controllers\UserController::class, 'restore'])->name('users.restore');
+        Route::delete('users/{id}/force-delete', [\App\Http\Controllers\UserController::class, 'forceDelete'])->name('users.force-delete');
+        Route::resource('users', \App\Http\Controllers\UserController::class);
+    });
 
-    Route::get('/dashboard', [\App\Http\Controllers\SuperAdmin\DashboardController::class, 'index'])->name('dashboard');
+// SHARED ROUTES (Superadmin, Admin, Operator) - Prefix changed to 'inventory' for better semantics
+Route::middleware(['auth', 'verified', 'role:superadmin,admin,operator'])->prefix('inventory')->name('inventory.')->group(function () {
+    Route::view('/scan-qr', 'inventory.scan-qr')->name('scan-qr'); // Scan QR is useful for everyone
 
-    Route::get('inventory/check-part-number', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'checkPartNumber'])->name('inventory.check-part-number');
+ 
+
+    Route::get('/check-part-number', [\App\Http\Controllers\Inventory\InventoryController::class, 'checkPartNumber'])->name('check-part-number');
     
     // Inventory Requests & Borrowing
-    Route::post('inventory/{sparepart}/stock-request', [\App\Http\Controllers\SuperAdmin\StockRequestController::class, 'store'])->name('inventory.stock.request.store');
-    Route::post('inventory/{sparepart}/borrow', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'store'])->name('inventory.borrow.store');
+    Route::post('/{sparepart}/stock-request', [\App\Http\Controllers\Inventory\StockRequestController::class, 'store'])->name('stock.request.store');
+    Route::post('/{sparepart}/borrow', [\App\Http\Controllers\Inventory\BorrowingController::class, 'store'])->name('borrow.store');
     
     // Return borrowing
-    Route::post('inventory/borrow/{borrowing}/return', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'returnItem'])->name('inventory.borrow.return');
-    Route::get('inventory/borrow/{borrowing}/history', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'history'])->name('inventory.borrow.history');
-    Route::get('inventory/borrow/{borrowing}', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'show'])->name('inventory.borrow.show');
+    Route::post('/borrow/{borrowing}/return', [\App\Http\Controllers\Inventory\BorrowingController::class, 'returnItem'])->name('borrow.return');
+    Route::get('/borrow/{borrowing}/history', [\App\Http\Controllers\Inventory\BorrowingController::class, 'history'])->name('borrow.history');
+    Route::get('/borrow/{borrowing}', [\App\Http\Controllers\Inventory\BorrowingController::class, 'show'])->name('borrow.show');
     
     // Soft Deletes (Inventory) - Authorization handled in Controller via Policy
-    Route::post('inventory/bulk-restore', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'bulkRestore'])->name('inventory.bulk-restore');
-    Route::delete('inventory/bulk-force-delete', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'bulkForceDelete'])->name('inventory.bulk-force-delete');
-    Route::patch('inventory/{id}/restore', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'restore'])->name('inventory.restore');
-    Route::delete('inventory/force-delete-all', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'forceDeleteAll'])->name('inventory.force-delete-all');
-    Route::delete('inventory/{id}/force-delete', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'forceDelete'])->name('inventory.force-delete');
+    Route::post('/bulk-restore', [\App\Http\Controllers\Inventory\InventoryController::class, 'bulkRestore'])->name('bulk-restore');
+    Route::delete('/bulk-force-delete', [\App\Http\Controllers\Inventory\InventoryController::class, 'bulkForceDelete'])->name('bulk-force-delete');
+    Route::patch('/{id}/restore', [\App\Http\Controllers\Inventory\InventoryController::class, 'restore'])->name('restore');
+    Route::delete('/force-delete-all', [\App\Http\Controllers\Inventory\InventoryController::class, 'forceDeleteAll'])->name('force-delete-all');
+    Route::delete('/{id}/force-delete', [\App\Http\Controllers\Inventory\InventoryController::class, 'forceDelete'])->name('force-delete');
     
     // QR Code
-    Route::get('inventory/{inventory}/qr-code/download', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'downloadQrCode'])->name('inventory.qr.download');
-    Route::get('inventory/{inventory}/qr-code/print', [\App\Http\Controllers\SuperAdmin\InventoryController::class, 'printQrCode'])->name('inventory.qr.print');
+    Route::get('/{inventory}/qr-code/download', [\App\Http\Controllers\Inventory\InventoryController::class, 'downloadQrCode'])->name('qr.download');
+    Route::get('/{inventory}/qr-code/print', [\App\Http\Controllers\Inventory\InventoryController::class, 'printQrCode'])->name('qr.print');
 
-    Route::resource('inventory', \App\Http\Controllers\SuperAdmin\InventoryController::class);
+    Route::resource('/', \App\Http\Controllers\Inventory\InventoryController::class)->parameters(['' => 'inventory']);
 });
 
 Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -85,7 +88,7 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
     Route::get('/my-inventory', [ProfileController::class, 'myInventory'])->name('profile.inventory');
     
     // Allow users to return their own items (uses SuperAdmin controller logic with added auth check)
-    Route::post('/my-inventory/return/{borrowing}', [\App\Http\Controllers\SuperAdmin\BorrowingController::class, 'returnItem'])->name('profile.inventory.return');
+    Route::post('/my-inventory/return/{borrowing}', [\App\Http\Controllers\Inventory\BorrowingController::class, 'returnItem'])->name('profile.inventory.return');
 
     // Notification Routes
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
@@ -102,7 +105,4 @@ Route::middleware(['auth', 'password.changed'])->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Temporary route for UI testing
-Route::get('/test-error/{code}', function ($code) {
-    abort($code);
-});
+

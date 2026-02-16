@@ -24,7 +24,7 @@ class EdgeCaseTest extends TestCase
     public function system_prevents_negative_stock_input_on_create()
     {
         // Act: Attempt to create sparepart with negative stock
-        $response = $this->actingAs($this->superAdmin)->post(route('superadmin.inventory.store'), [
+        $response = $this->actingAs($this->superAdmin)->post(route('inventory.store'), [
             'name' => 'Negative Item',
             'part_number' => 'NEG-001',
             'category' => 'Test',
@@ -50,7 +50,7 @@ class EdgeCaseTest extends TestCase
         $user = User::factory()->create();
 
         // Act: Attempt to borrow 10 items
-        $response = $this->actingAs($this->superAdmin)->post(route('superadmin.inventory.borrow.store', $item->id), [
+        $response = $this->actingAs($this->superAdmin)->post(route('inventory.borrow.store', $item->id), [
             'user_id' => $user->id,
             'quantity' => 10, // Exceeds stock
             'borrower_name' => $user->name,
@@ -80,7 +80,7 @@ class EdgeCaseTest extends TestCase
         ]);
 
         // Act: Attempt to SOFT DELETE
-        $response = $this->actingAs($this->superAdmin)->delete(route('superadmin.inventory.destroy', $item->id));
+        $response = $this->actingAs($this->superAdmin)->delete(route('inventory.destroy', $item->id));
 
         // Assert
         $response->assertRedirect();
@@ -109,7 +109,7 @@ class EdgeCaseTest extends TestCase
         ]);
 
         // Act
-        $response = $this->actingAs($this->superAdmin)->post(route('superadmin.inventory.store'), [
+        $response = $this->actingAs($this->superAdmin)->post(route('inventory.store'), [
             'name' => 'Duplicate Item',
             'part_number' => 'EXISTING-001', // Same PN
             'brand' => 'Test Brand',
