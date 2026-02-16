@@ -27,7 +27,7 @@ class ReportService
             }
             $data = $query->get();
             $title = 'Laporan Data Inventaris Saat Ini';
-            $view = 'superadmin.reports.pdf_inventory_list';
+            $view = 'reports.pdf_inventory_list';
 
         } elseif ($type == 'stock_mutation') {
             $query = StockLog::with(['sparepart', 'user']);
@@ -40,7 +40,7 @@ class ReportService
             }
             $data = $query->latest()->get();
             $title = 'Laporan Riwayat Stok / Mutasi';
-            $view = 'superadmin.reports.pdf_stock_mutation';
+            $view = 'reports.pdf_stock_mutation';
 
         } elseif ($type == 'borrowing_history') {
             $query = Borrowing::with(['sparepart', 'user']);
@@ -48,7 +48,7 @@ class ReportService
             
             $data = $query->latest()->get();
             $title = 'Laporan Riwayat Peminjaman';
-            $view = 'superadmin.reports.pdf_borrowing_history';
+            $view = 'reports.pdf_borrowing_history';
 
         } elseif ($type == 'low_stock') {
             $query = Sparepart::whereColumn('stock', '<=', 'minimum_stock')->orderBy('stock', 'asc');
@@ -57,7 +57,7 @@ class ReportService
             }
             $data = $query->get();
             $title = 'Laporan Stok Menipis';
-            $view = 'superadmin.reports.pdf_low_stock';
+            $view = 'reports.pdf_low_stock';
         }
 
         return compact('data', 'title', 'view');

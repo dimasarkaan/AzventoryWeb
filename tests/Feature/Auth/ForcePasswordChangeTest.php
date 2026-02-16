@@ -17,7 +17,7 @@ class ForcePasswordChangeTest extends TestCase
             'role' => 'operator',
         ]);
 
-        $response = $this->actingAs($user)->get('/operator/dashboard');
+        $response = $this->actingAs($user)->get(route('operator.dashboard'));
 
         $response->assertRedirect(route('password.change'));
         $response->assertSessionHas('warning');
@@ -41,7 +41,7 @@ class ForcePasswordChangeTest extends TestCase
             'role' => 'operator',
         ]);
 
-        $response = $this->actingAs($user)->get('/operator/dashboard');
+        $response = $this->actingAs($user)->get(route('operator.dashboard'));
 
         $response->assertStatus(200);
     }

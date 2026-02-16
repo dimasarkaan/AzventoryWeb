@@ -328,6 +328,10 @@ return [
     'error_access_camera' => 'Gagal mengakses kamera:',
     'error_process_svg' => 'Gagal memproses gambar SVG.',
     'error_scan_image' => 'Gagal memindai gambar. Pastikan QR Code terlihat jelas.',
+    'camera_error_not_allowed' => 'Akses kamera ditolak. Mohon izinkan akses kamera pada browser Anda.',
+    'camera_error_not_found' => 'Kamera tidak ditemukan pada perangkat ini.',
+    'camera_error_not_readable' => 'Kamera mungkin sedang digunakan oleh aplikasi lain.',
+    'camera_error_default' => 'Terjadi kesalahan saat mengakses kamera.',
     
     // Dashboard
     'dashboard' => 'Dashboard',
@@ -521,9 +525,9 @@ return [
     'unit_pcs' => 'Pcs',
 
     // Role Descriptions (Create/Edit)
-    'role_operator_desc' => 'Operator (Gudang)',
-    'role_admin_desc' => 'Admin (Manajemen)',
-    'role_superadmin_desc' => 'Super Admin (Full Akses)',
+    'role_operator_desc' => 'Operator',
+    'role_admin_desc' => 'Admin',
+    'role_superadmin_desc' => 'Super Admin',
     'cancel' => 'Batal', // Generic Cancel
 
     // Navigation

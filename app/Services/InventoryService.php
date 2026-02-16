@@ -35,7 +35,6 @@ class InventoryService
     public function getFilteredSpareparts(array $filters, int $perPage = 10)
     {
         $query = Sparepart::query();
-
         if (($filters['trash'] ?? '') === 'true') {
             $query->onlyTrashed();
         }
@@ -72,6 +71,7 @@ class InventoryService
      */
     public function createSparepart(array $data)
     {
+
         return DB::transaction(function () use ($data) {
             // Check for exact duplicate
             $existingItem = $this->findExactDuplicate($data);

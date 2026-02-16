@@ -19,7 +19,7 @@
 
             <div class="min-w-0">
                 <div class="flex items-center gap-1.5 mb-0.5">
-                    <a href="{{ route('superadmin.inventory.show', $sparepart) }}" class="font-bold text-secondary-900 line-clamp-1 block leading-tight group-hover:text-primary-600 transition-colors">
+                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary flex items-center gap-2">900 line-clamp-1 block leading-tight group-hover:text-primary-600 transition-colors">
                         {{ $sparepart->name }}
                     </a>
                 </div>
@@ -86,9 +86,9 @@
     </div>
 
     <div class="flex items-center justify-end gap-2 pt-1 border-t border-secondary-100">
-         <a href="{{ route('superadmin.inventory.show', $sparepart) }}" class="btn btn-ghost text-xs p-2 h-8 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-colors">{{ __('ui.detail') }}</a>
-         <a href="{{ route('superadmin.inventory.edit', $sparepart) }}" class="btn btn-white text-xs p-2 h-8 border border-secondary-200 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-all">{{ __('ui.edit') }}</a>
-         <form action="{{ route('superadmin.inventory.destroy', $sparepart) }}" method="POST" class="inline-block">
+         <a href="{{ route('inventory.show', $sparepart) }}" class="btn btn-ghost text-xs p-2 h-8 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-colors">{{ __('ui.detail') }}</a>
+         <a href="{{ route('inventory.edit', $sparepart) }}" class="btn btn-white text-xs p-2 h-8 border border-secondary-200 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-all">{{ __('ui.edit') }}</a>
+         <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger text-xs p-2 h-8 bg-danger-50 text-danger-600 hover:bg-danger-600 hover:text-white border-transparent transition-all" onclick="confirmDelete(event)">{{ __('ui.delete') }}</button>

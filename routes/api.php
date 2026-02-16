@@ -16,6 +16,6 @@ use App\Http\Controllers\Api\InventoryController;
 */
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
-    Route::apiResource('inventory', InventoryController::class);
+    Route::apiResource('inventory', InventoryController::class)->names('api.inventory');
     Route::post('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock']);
 });

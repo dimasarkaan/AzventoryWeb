@@ -6,7 +6,7 @@
                 <div class="shrink-0 flex items-center">
                     @php
                         $dashboardRoute = match(Auth::user()->role) {
-                            \App\Enums\UserRole::SUPERADMIN => route('superadmin.dashboard'),
+                            \App\Enums\UserRole::SUPERADMIN => route('dashboard.superadmin'),
                             \App\Enums\UserRole::ADMIN => route('admin.dashboard'),
                             \App\Enums\UserRole::OPERATOR => route('operator.dashboard'),
                             default => route('dashboard'),
@@ -31,22 +31,31 @@
                     @endphp
 
                     @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
-                        <a href="{{ route('superadmin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.dashboard') ? $activeClass : $inactiveClass }}">
+                        <a href="{{ route('dashboard.superadmin') }}" class="{{ $navClass }} {{ request()->routeIs('dashboard.superadmin') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                             {{ __('ui.dashboard') }}
                         </a>
-                        <a href="{{ route('superadmin.inventory.index') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.inventory.*') ? $activeClass : $inactiveClass }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
-                            {{ __('ui.inventory_list') }}
-                        </a>
+                    @endif
+
+                    {{-- Shared Menu --}}
+                    <a href="{{ route('inventory.index') }}" class="{{ $navClass }} {{ request()->routeIs('inventory.*') ? $activeClass : $inactiveClass }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        {{ __('ui.inventory_list') }}
+                    </a>
+
+                    @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <a href="{{ route('users.index') }}" class="{{ $navClass }} {{ request()->routeIs('users.*') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             {{ __('ui.user_management') }}
                         </a>
-                        <a href="{{ route('superadmin.scan-qr') }}" class="{{ $navClass }} {{ request()->routeIs('superadmin.scan-qr') ? $activeClass : $inactiveClass }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
-                            {{ __('ui.scan_qr') }}
-                        </a>
+                    @endif
+
+                    <a href="{{ route('inventory.scan-qr') }}" class="{{ $navClass }} {{ request()->routeIs('inventory.scan-qr') ? $activeClass : $inactiveClass }}">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                        {{ __('ui.scan_qr') }}
+                    </a>
+
+                    @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <a href="{{ route('reports.index') }}" class="{{ $navClass }} {{ request()->routeIs('reports.*') ? $activeClass : $inactiveClass }}">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             {{ __('ui.reports') }}
@@ -308,18 +317,27 @@
             @endphp
 
             @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
-                <a href="{{ route('superadmin.dashboard') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.dashboard') ? $resActiveClass : $resInactiveClass }}">
+                <a href="{{ route('dashboard.superadmin') }}" class="{{ $resNavClass }} {{ request()->routeIs('dashboard.superadmin') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.dashboard') }}
                 </a>
-                <a href="{{ route('superadmin.inventory.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.inventory.*') ? $resActiveClass : $resInactiveClass }}">
-                    {{ __('ui.inventory_list') }}
-                </a>
+            @endif
+            
+            {{-- Shared Menu for All Roles --}}
+            <a href="{{ route('inventory.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('inventory.*') ? $resActiveClass : $resInactiveClass }}">
+                {{ __('ui.inventory_list') }}
+            </a>
+
+            @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                 <a href="{{ route('users.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('users.*') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.user_management') }}
                 </a>
-                 <a href="{{ route('superadmin.scan-qr') }}" class="{{ $resNavClass }} {{ request()->routeIs('superadmin.scan-qr') ? $resActiveClass : $resInactiveClass }}">
-                    {{ __('ui.scan_qr') }}
-                </a>
+            @endif
+            
+            <a href="{{ route('inventory.scan-qr') }}" class="{{ $resNavClass }} {{ request()->routeIs('inventory.scan-qr') ? $resActiveClass : $resInactiveClass }}">
+                {{ __('ui.scan_qr') }}
+            </a>
+
+            @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                 <a href="{{ route('reports.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('reports.*') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.reports') }}
                 </a>

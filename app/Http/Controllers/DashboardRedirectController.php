@@ -15,7 +15,7 @@ class DashboardRedirectController extends Controller
         $user = auth()->user();
 
         return match ($user->role) {
-            UserRole::SUPERADMIN => redirect()->route('superadmin.dashboard'),
+            UserRole::SUPERADMIN => redirect()->route('dashboard.superadmin'),
             UserRole::ADMIN => redirect()->route('admin.dashboard'),
             UserRole::OPERATOR => redirect()->route('operator.dashboard'),
             default => abort(403, 'Unauthorized action.'),

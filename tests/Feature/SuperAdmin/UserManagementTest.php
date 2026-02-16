@@ -26,20 +26,20 @@ class UserManagementTest extends TestCase
 
     public function test_superadmin_can_view_user_list()
     {
-        $response = $this->actingAs($this->superadmin)->get(route('superadmin.users.index'));
+        $response = $this->actingAs($this->superadmin)->get(route('users.index'));
         $response->assertStatus(200);
     }
 
     public function test_superadmin_can_create_new_admin()
     {
-        $response = $this->actingAs($this->superadmin)->post(route('superadmin.users.store'), [
+        $response = $this->actingAs($this->superadmin)->post(route('users.store'), [
             'email' => 'newadmin@example.com',
             'role' => 'admin',
             'jabatan' => 'Kepala Gudang',
             'status' => 'active',
         ]);
 
-        $response->assertRedirect(route('superadmin.users.index'));
+        $response->assertRedirect(route('users.index'));
         $this->assertDatabaseHas('users', [
             'email' => 'newadmin@example.com',
             'role' => 'admin',
@@ -49,14 +49,14 @@ class UserManagementTest extends TestCase
 
     public function test_superadmin_can_create_new_operator()
     {
-        $response = $this->actingAs($this->superadmin)->post(route('superadmin.users.store'), [
+        $response = $this->actingAs($this->superadmin)->post(route('users.store'), [
             'email' => 'newoperator@example.com',
             'role' => 'operator',
             'jabatan' => 'Staff Gudang',
             'status' => 'active',
         ]);
 
-        $response->assertRedirect(route('superadmin.users.index'));
+        $response->assertRedirect(route('users.index'));
         $this->assertDatabaseHas('users', [
             'email' => 'newoperator@example.com',
             'role' => 'operator',
@@ -72,9 +72,9 @@ class UserManagementTest extends TestCase
             'password_changed_at' => now(), 
         ]);
 
-        $response = $this->actingAs($this->superadmin)->delete(route('superadmin.users.destroy', $targetUser));
+        $response = $this->actingAs($this->superadmin)->delete(route('users.destroy', $targetUser));
 
-        $response->assertRedirect(route('superadmin.users.index'));
+        $response->assertRedirect(route('users.index'));
         $this->assertSoftDeleted('users', [
             'id' => $targetUser->id,
         ]);
@@ -87,7 +87,7 @@ class UserManagementTest extends TestCase
             'password' => Hash::make('oldpassword'),
         ]);
 
-        $response = $this->actingAs($this->superadmin)->patch(route('superadmin.users.reset-password', $targetUser));
+        $response = $this->actingAs($this->superadmin)->patch(route('users.reset-password', $targetUser));
 
         $response->assertRedirect();
         

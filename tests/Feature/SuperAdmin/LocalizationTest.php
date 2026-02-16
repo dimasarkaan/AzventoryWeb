@@ -32,12 +32,12 @@ class LocalizationTest extends TestCase
         $user = User::factory()->create(['role' => 'superadmin']);
 
         // Dashboard
-        $response = $this->actingAs($user)->get(route('superadmin.dashboard'));
+        $response = $this->actingAs($user)->get(route('dashboard.superadmin'));
         $response->assertStatus(200);
         $response->assertSee('Overview Status Inventaris'); // localized string in dashboard
 
         // Inventory Index
-        $response = $this->actingAs($user)->get(route('superadmin.inventory.index'));
+        $response = $this->actingAs($user)->get(route('inventory.index'));
         $response->assertStatus(200);
         $response->assertSee('Manajemen Inventaris'); // localized title
         $response->assertSee('Tambah Inventaris'); // localized button

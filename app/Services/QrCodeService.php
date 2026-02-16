@@ -16,7 +16,7 @@ class QrCodeService
     public function generate(Sparepart $sparepart)
     {
         $options = new QROptions(['outputBase64' => false]);
-        $qrCodeUrl = route('superadmin.inventory.show', $sparepart);
+        $qrCodeUrl = route('inventory.show', $sparepart);
         $qrCodeOutput = (new QRCode($options))->render($qrCodeUrl);
         
         $qrCodePath = 'qrcodes/' . $sparepart->part_number . '_' . $sparepart->id . '.svg';
@@ -48,7 +48,7 @@ class QrCodeService
             'outputBase64' => false,
             'imageTransparent' => false,
         ]);
-        $freshQr = (new QRCode($options))->render(route('superadmin.inventory.show', $inventory));
+        $freshQr = (new QRCode($options))->render(route('inventory.show', $inventory));
         
         // Extract inner content and viewBox
         preg_match('/viewBox="([^"]+)"/', $freshQr, $vbMatches);
