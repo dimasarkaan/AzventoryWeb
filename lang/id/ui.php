@@ -459,7 +459,7 @@ return [
     'condition_good' => 'Baik',
     'condition_broken' => 'Rusak',
     'condition_lost' => 'Hilang',
-    'stock_out' => 'Habis',
+
     'stock_low' => 'Menipis',
     'stock_safe' => 'Aman',
     'type_in' => 'MASUK',
@@ -745,4 +745,6 @@ return [
     // Filter Toggle
     'show_filter' => 'Tampilkan Filter',
     'hide_filter' => 'Sembunyikan Filter',
+    'error_cannot_delete_borrowed' => 'Tidak dapat menghapus item ini karena sedang dipinjam atau belum dikembalikan. Selesaikan peminjaman terlebih dahulu.',
+    'select_all' => 'Pilih Semua',
 ];

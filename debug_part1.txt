@@ -1,0 +1,21 @@
+﻿                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" :checked="showTopItems" @change="toggle('showTopItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_popular_items') }}</span>
+                                </label>
+
+                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" :checked="showDeadStock" @change="toggle('showDeadStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_dead_stock') }}</span>
+                                </label>
+                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" :checked="showLeaderboard" @change="toggle('showLeaderboard')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_top_contributors') }}</span>
+                                </label>
+                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" :checked="showRecent" @change="toggle('showRecent')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_recent_activity') }}</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {{-- Tombol Ekspor --}}

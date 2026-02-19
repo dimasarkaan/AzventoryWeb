@@ -26,7 +26,7 @@ class DuplicateItemTest extends TestCase
     /** @test */
     public function it_merges_stock_when_exact_duplicate_is_added()
     {
-        // 1. Create initial item
+        // 1. Buat item awal
         $data = [
             'name' => 'Keyboard Logitech K120',
             'part_number' => 'K120-LOGI',
@@ -47,7 +47,7 @@ class DuplicateItemTest extends TestCase
         $response->assertRedirect();
         $this->assertDatabaseHas('spareparts', ['part_number' => 'K120-LOGI', 'stock' => 10]);
 
-        // 2. Add EXACT duplicate (same data) with more stock
+        // 2. Tambahkan duplikat PERSIS (data sama) dengan stok lebih banyak
         $duplicateData = $data;
         $duplicateData['stock'] = 5;
 
@@ -56,24 +56,24 @@ class DuplicateItemTest extends TestCase
 
         $response2->assertRedirect();
         
-        // Assert session has success message about merging
+        // Pastikan sesi memiliki pesan sukses tentang penggabungan
         $response2->assertSessionHas('success');
         
-        // Assert stock is merged (10 + 5 = 15) and NO new row created
+        // Pastikan stok digabungkan (10 + 5 = 15) dan TIDAK ada baris baru dibuat
         $this->assertDatabaseCount('spareparts', 1);
         $this->assertDatabaseHas('spareparts', [
             'part_number' => 'K120-LOGI',
             'stock' => 15
         ]);
         
-        // Assert Stock Log was created for the addition
+        // Pastikan Log Stok dibuat untuk penambahan
         $this->assertDatabaseCount('stock_logs', 2); // 1 initial + 1 merge
     }
 
     /** @test */
     public function it_creates_new_item_if_one_attribute_differs()
     {
-        // 1. Create initial item
+        // 1. Buat item awal
         $data = [
             'name' => 'Keyboard Logitech K120',
             'part_number' => 'K120-LOGI',
@@ -91,7 +91,7 @@ class DuplicateItemTest extends TestCase
         $this->actingAs($this->user)
             ->post(route('inventory.store'), $data);
 
-        // 2. Add similar item but different CONDITION (e.g. Rusak)
+        // 2. Tambahkan item serupa tapi KONDISI beda (misal Rusak)
         $diffData = $data;
         $diffData['condition'] = 'Rusak';
         $diffData['stock'] = 3;
@@ -101,7 +101,7 @@ class DuplicateItemTest extends TestCase
 
         $response->assertRedirect();
 
-        // Assert NEW row created
+        // Pastikan baris BARU dibuat
         $this->assertDatabaseCount('spareparts', 2);
         $this->assertDatabaseHas('spareparts', ['part_number' => 'K120-LOGI', 'condition' => 'Baik', 'stock' => 10]);
         $this->assertDatabaseHas('spareparts', ['part_number' => 'K120-LOGI', 'condition' => 'Rusak', 'stock' => 3]);

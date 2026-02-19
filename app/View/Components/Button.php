@@ -8,24 +8,18 @@ use Illuminate\View\Component;
 
 class Button extends Component
 {
-    /**
-     * Create a new component instance.
-     */
+    // Variabel publik (props).
     public string $variant;
     public string $type;
 
-    /**
-     * Create a new component instance.
-     */
+    // Inisialisasi komponen dengan varian dan tipe.
     public function __construct($variant = 'primary', $type = 'button')
     {
         $this->variant = $variant;
         $this->type = $type;
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
+    // Render view komponen button.
     public function render(): View|Closure|string
     {
         return view('components.button');

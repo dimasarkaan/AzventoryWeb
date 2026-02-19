@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi.
      */
     public function up(): void
     {
-        // 1. Spareparts
+        // 1. Barang/Sparepart
         Schema::create('spareparts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -33,12 +33,12 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        // 2. Borrowings (Depends on Spareparts and Users)
+        // 2. Peminjaman (Bergantung pada Sparepart dan User)
         Schema::create('borrowings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sparepart_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
-            $table->string('borrower_name'); // Nama peminjam manual (jika tidak via user) atau nama user saat itu
+            $table->string('borrower_name'); // Nama peminjam manual (jika bukan user)
             $table->integer('quantity');
             $table->timestamp('borrowed_at');
             $table->timestamp('expected_return_at')->nullable();
@@ -54,7 +54,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 3. Stock Logs (Depends on Spareparts and Users)
+        // 3. Log Stok (Bergantung pada Sparepart dan User)
         Schema::create('stock_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sparepart_id')->constrained()->onDelete('cascade');
@@ -69,7 +69,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Kembalikan migrasi.
      */
     public function down(): void
     {

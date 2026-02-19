@@ -21,7 +21,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create([
             'role' => 'superadmin',
-            'password' => 'password', // Explicit
+            'password' => 'password', // Eksplisit
             'password_changed_at' => now(),
         ]);
 
@@ -31,7 +31,7 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        // The dashboard route redirects superadmins to superadmin.dashboard
+        // Rute dashboard mengarahkan superadmin ke superadmin.dashboard
         $response->assertRedirect(route('dashboard.superadmin')); 
     }
 

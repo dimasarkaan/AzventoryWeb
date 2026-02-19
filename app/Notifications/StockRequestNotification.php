@@ -12,29 +12,19 @@ class StockRequestNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    /**
-     * Create a new notification instance.
-     */
+    // Buat instance notifikasi baru.
     public function __construct(public StockLog $stockLog, public string $message)
     {
         //
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
+    // Tentukan channel pengiriman notifikasi.
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
+    // Representasi array dari notifikasi.
     public function toArray(object $notifiable): array
     {
         return [

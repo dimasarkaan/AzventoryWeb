@@ -24,21 +24,16 @@ class GenerateReportJob implements ShouldQueue
     protected $user;
     protected $params;
 
-    /**
-     * Create a new job instance.
-     * 
-     * @param User $user The user requesting the report
-     * @param array $params Filter parameters (type, period, location, etc.)
-     */
+    // Buat instance job baru.
+    // @param User $user User yang meminta laporan
+    // @param array $params Parameter filter (tipe, periode, lokasi, dll)
     public function __construct(User $user, array $params)
     {
         $this->user = $user;
         $this->params = $params;
     }
 
-    /**
-     * Execute the job.
-     */
+    // Eksekusi job.
     public function handle(ReportService $reportService): void
     {
         Log::info('GenerateReportJob: Starting job for user ' . $this->user->id . ' with params: ' . json_encode($this->params)); // Added Log call

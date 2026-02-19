@@ -58,7 +58,7 @@
                 <td style="text-align: center;">{{ $item->stock }} {{ $item->unit }}</td>
                 <td>
                     @if($item->stock == 0)
-                        <span class="badges badge-danger">{{ __('ui.stock_out') }}</span>
+                        <span class="badges badge-danger">{{ __('ui.status_out_of_stock') }}</span>
                     @elseif($item->minimum_stock > 0 && $item->stock <= $item->minimum_stock)
                         <span class="badges badge-warning">{{ __('ui.stock_low') }}</span>
                     @else

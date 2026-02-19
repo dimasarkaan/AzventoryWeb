@@ -1,8 +1,22 @@
 <div class="block md:hidden space-y-4">
+    @if(request('trash') && $spareparts->count() > 0)
+        <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-secondary-200 shadow-sm">
+            <input type="checkbox" id="mobile-select-all" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5 transition-colors duration-200">
+            <label for="mobile-select-all" class="text-sm font-semibold text-secondary-700 select-none cursor-pointer">{{ __('ui.select_all') }}</label>
+        </div>
+    @endif
     @forelse ($spareparts as $sparepart)
         <div class="card p-4">
             <!-- Header: Image, Name, Status -->
-            <div class="flex items-start gap-4 mb-4">
+            <div class="flex items-start gap-3 mb-4">
+                 @if(request('trash'))
+                    <div class="flex items-center self-center">
+                        <input type="checkbox" value="{{ $sparepart->id }}" class="bulk-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5">
+                    </div>
+                @endif
+                <!-- Type Indicator -->
+                <div class="w-1 self-stretch rounded-full shrink-0 {{ $sparepart->type === 'sale' ? 'bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.3)]' : 'bg-blue-500 shadow-[0_0_6px_rgba(59,130,246,0.3)]' }}" title="{{ $sparepart->type === 'sale' ? 'Barang Dijual' : 'Aset Kantor' }}"></div>
+                
                 <!-- Image -->
                 <div class="h-16 w-16 rounded-lg bg-secondary-100 flex items-center justify-center flex-shrink-0 text-secondary-400 overflow-hidden border border-secondary-200">
                     @if($sparepart->image)
@@ -60,7 +74,7 @@
 
                 <!-- Stock & Location -->
                 <div class="flex flex-col items-end text-right">
-                    <span class="text-xs text-secondary-500 mb-1">{{ __('ui.stock') }} @ {{ $sparepart->location }}</span>
+                    <span class="text-xs text-secondary-500 mb-1">{{ __('ui.stock') }} di {{ $sparepart->location }}</span>
                     <div class="flex items-center gap-1.5">
                         @php
                             $isLowStock = $sparepart->stock <= $sparepart->minimum_stock && !in_array(strtolower($sparepart->condition), ['rusak', 'hilang']);

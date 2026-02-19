@@ -20,18 +20,14 @@ class ExportActivityLogJob implements ShouldQueue
     protected $user;
     protected $params;
 
-    /**
-     * Create a new job instance.
-     */
+    // Buat instance job baru.
     public function __construct(User $user, array $params)
     {
         $this->user = $user;
         $this->params = $params;
     }
 
-    /**
-     * Execute the job.
-     */
+    // Eksekusi job.
     public function handle(): void
     {
         $query = ActivityLog::with('user');

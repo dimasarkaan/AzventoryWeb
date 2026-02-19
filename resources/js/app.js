@@ -1,5 +1,6 @@
 import './bootstrap';
 import './custom.js';
+import './realtime-inventory.js'; // Real-time inventory updates
 
 import Alpine from 'alpinejs';
 

@@ -12,20 +12,16 @@ class ImageOptimizationService
 {
     protected $manager;
 
+    // Inisialisasi ImageManager dengan driver GD.
     public function __construct()
     {
-        // Initialize ImageManager with GD driver
         $this->manager = new ImageManager(new Driver());
     }
 
     /**
-     * Optimize, resize, and save an image.
-     *
-     * @param UploadedFile $file The uploaded file
-     * @param string $folder The folder to store the image in (e.g., 'spareparts', 'avatars')
-     * @param int $maxWidth Maximum width for the image
-     * @param int $quality WebP quality (0-100)
-     * @return string The relative path to the stored image
+     * Optimasi, resize, dan simpan gambar.
+     * 
+     * @return string Path relatif gambar yang disimpan
      */
     public function optimizeAndSave(UploadedFile $file, string $folder, int $maxWidth = 2000, int $quality = 95): string
     {

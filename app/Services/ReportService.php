@@ -10,10 +10,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ReportService
 {
-    /**
-     * Get report data based on type and filters.
-     * Returns array with 'data', 'title', 'view'.
-     */
+    // Dapatkan data laporan berdasarkan tipe dan filter.
+    // Mengembalikan array dengan ['data', 'title', 'view'].
     public function getReportData($type, $location, $startDate, $endDate)
     {
         $data = collect();
@@ -63,9 +61,7 @@ class ReportService
         return compact('data', 'title', 'view');
     }
 
-    /**
-     * Resolve date range from period string.
-     */
+    // Urai rentang tanggal dari string periode.
     public function resolveDateRange($period, $customStart = null, $customEnd = null)
     {
         $startDate = null;

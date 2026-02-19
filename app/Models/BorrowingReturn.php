@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model BorrowingReturn untuk mencatat pengembalian barang secara parsial atau penuh.
+ */
 class BorrowingReturn extends Model
 {
     protected $table = 'borrowing_returns';
@@ -22,6 +25,7 @@ class BorrowingReturn extends Model
         'photos' => 'array',
     ];
 
+    // Relasi ke transaksi peminjaman induk.
     public function borrowing()
     {
         return $this->belongsTo(Borrowing::class);

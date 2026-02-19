@@ -16,7 +16,7 @@ class StockRequestEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * Create a new event instance.
+     * Buat instance event baru.
      */
     public function __construct(
         public User $user,
@@ -28,7 +28,7 @@ class StockRequestEvent implements ShouldBroadcast
     }
 
     /**
-     * Get the channels the event should broadcast on.
+     * Dapatkan channel tempat event harus disiarkan.
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */

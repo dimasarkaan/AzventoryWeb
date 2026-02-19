@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsurePasswordIsChanged
 {
     /**
-     * Handle an incoming request.
+     * Tangani permintaan yang masuk.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */

@@ -9,27 +9,27 @@ use Illuminate\Auth\Access\Response;
 class SparepartPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Tentukan apakah user bisa melihat daftar inventaris.
      */
     public function viewAny(User $user): bool
     {
-        return true; // All authenticated users can view inventory
+        return true; // Semua user terautentikasi bisa melihat inventory
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Tentukan apakah user bisa melihat detail barang.
      */
     public function view(User $user, Sparepart $sparepart): bool
     {
-        return true; // All authenticated users can view details
+        return true; // Semua user user terautentikasi bisa melihat detail
     }
 
     /**
-     * Determine whether the user can create models.
+     * Tentukan apakah user bisa menambahkan barang baru.
      */
     public function create(User $user): bool
     {
-        // Only Superadmin and Admin can create. Operator CANNOT.
+        // Hanya Superadmin dan Admin yang bisa membuat. Operator TIDAK BISA.
         return in_array($user->role, [
             \App\Enums\UserRole::SUPERADMIN,
             \App\Enums\UserRole::ADMIN,
@@ -37,11 +37,11 @@ class SparepartPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Tentukan apakah user bisa mengubah data barang.
      */
     public function update(User $user, Sparepart $sparepart): bool
     {
-        // Only Superadmin and Admin can update. Operator CANNOT.
+        // Hanya Superadmin dan Admin yang bisa update. Operator TIDAK BISA.
         return in_array($user->role, [
             \App\Enums\UserRole::SUPERADMIN,
             \App\Enums\UserRole::ADMIN,
@@ -49,11 +49,11 @@ class SparepartPolicy
     }
 
     /**
-     * Determine whether the user can delete the model (Soft Delete).
+     * Tentukan apakah user bisa menghapus barang (Soft Delete).
      */
     public function delete(User $user, Sparepart $sparepart): bool
     {
-        // Only Superadmin and Admin can delete. Operator CANNOT.
+        // Hanya Superadmin dan Admin yang bisa delete. Operator TIDAK BISA.
         return in_array($user->role, [
             \App\Enums\UserRole::SUPERADMIN,
             \App\Enums\UserRole::ADMIN,
@@ -61,20 +61,27 @@ class SparepartPolicy
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Tentukan apakah user bisa memulihkan barang (Restore).
      */
     public function restore(User $user, Sparepart $sparepart): bool
     {
-        // Only Superadmin
+        // Hanya Superadmin
         return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Tentukan apakah user bisa menghapus permanen barang.
      */
     public function forceDelete(User $user, Sparepart $sparepart): bool
     {
-        // Only Superadmin
+        // Hanya Superadmin
+        return $user->role === \App\Enums\UserRole::SUPERADMIN;
+    }
+    /**
+     * Tentukan apakah user bisa mengubah harga barang.
+     */
+    public function updatePrice(User $user, Sparepart $sparepart): bool
+    {
         return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
 }

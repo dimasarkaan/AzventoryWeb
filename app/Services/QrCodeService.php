@@ -10,9 +10,7 @@ use Illuminate\Support\Str;
 
 class QrCodeService
 {
-    /**
-     * Generate and save a standard QR Code for a sparepart.
-     */
+    // Generate dan simpan QR Code standar.
     public function generate(Sparepart $sparepart)
     {
         $options = new QROptions(['outputBase64' => false]);
@@ -27,9 +25,7 @@ class QrCodeService
         return $qrCodePath;
     }
 
-    /**
-     * Generate the custom printable label SVG with QR code and text.
-     */
+    // Generate SVG label siap cetak dengan QR code.
     public function generateLabelSvg(Sparepart $inventory)
     {
         if (!$inventory->qr_code_path || !Storage::disk('public')->exists($inventory->qr_code_path)) {

@@ -8,17 +8,17 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi.
      */
     public function up(): void
     {
-        // Check if column exists to avoid duplication errors
+        // Cek jika kolom sudah ada untuk menghindari error duplikasi
         if (!Schema::hasColumn('spareparts', 'age')) {
             Schema::table('spareparts', function (Blueprint $table) {
                 $table->string('age', 50)->default('Bekas')->after('condition'); 
             });
 
-            // Populate initial data
+            // Isi data awal
             DB::statement("
                 UPDATE spareparts 
                 SET age = CASE 
@@ -30,7 +30,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Kembalikan migrasi.
      */
     public function down(): void
     {

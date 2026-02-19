@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class ReturnBorrowingRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Tentukan apakah user diizinkan untuk membuat request ini.
      */
     public function authorize(): bool
     {
@@ -15,7 +15,7 @@ class ReturnBorrowingRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Dapatkan aturan validasi yang berlaku untuk request ini.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -29,16 +29,12 @@ class ReturnBorrowingRequest extends FormRequest
             'return_condition' => 'required|in:good,bad,lost',
             'return_notes' => 'nullable|string',
             'return_photos' => [
-                function ($attribute, $value, $fail) {
-                    if ($this->input('return_condition') !== 'lost' && empty($value)) {
-                        $fail('Bukti foto wajib diunggah untuk kondisi Barang Baik atau Rusak.');
-                    }
-                },
+                'required_if:return_condition,good,bad',
                 'array',
                 'min:1',
                 'max:5'
             ],
-            'return_photos.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // Max 5MB
+            'return_photos.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120', // Max 5MB
         ];
     }
 
@@ -55,7 +51,7 @@ class ReturnBorrowingRequest extends FormRequest
             'return_photos.min' => 'Minimal unggah :min foto.',
             'return_photos.max' => 'Maksimal unggah :max foto.',
             'return_photos.*.image' => 'File harus berupa gambar.',
-            'return_photos.*.mimes' => 'Format file harus jpeg, png, jpg, atau gif.',
+            'return_photos.*.mimes' => 'Format file harus jpeg, png, jpg, gif, atau webp.',
             'return_photos.*.max' => 'Ukuran file maksimal 5MB.',
         ];
     }

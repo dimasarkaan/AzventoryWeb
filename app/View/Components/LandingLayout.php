@@ -8,17 +8,13 @@ use Illuminate\View\Component;
 
 class LandingLayout extends Component
 {
-    /**
-     * Create a new component instance.
-     */
+    // Inisialisasi komponen.
     public function __construct()
     {
         //
     }
 
-    /**
-     * Get the view / contents that represent the component.
-     */
+    // Render view komponen landing-layout.
     public function render(): View|Closure|string
     {
         return view('components.landing-layout');

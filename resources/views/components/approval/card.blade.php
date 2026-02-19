@@ -39,7 +39,7 @@
     </div>
 
     <div class="grid grid-cols-2 gap-3 pt-1 mt-auto">
-        <form action="{{ route('stock-approvals.update', $approval) }}" method="POST" class="w-full">
+        <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="w-full">
             @csrf
             @method('PATCH')
             <input type="hidden" name="status" value="rejected">
@@ -47,7 +47,7 @@
                 {{ __('ui.btn_reject') }}
             </button>
         </form>
-        <form action="{{ route('stock-approvals.update', $approval) }}" method="POST" class="w-full">
+        <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="w-full">
             @csrf
             @method('PATCH')
             <input type="hidden" name="status" value="approved">

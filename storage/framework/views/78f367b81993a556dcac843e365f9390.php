@@ -1,0 +1,432 @@
+<nav x-data="{ mobileMenuOpen: false }" class="glass-nav border-b border-secondary-200">
+    <!-- Menu Navigasi Utama -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div class="flex justify-between h-16">
+            <div class="flex">
+                <div class="shrink-0 flex items-center">
+                    <?php
+                        $dashboardRoute = match(Auth::user()->role) {
+                            \App\Enums\UserRole::SUPERADMIN => route('dashboard.superadmin'),
+                            \App\Enums\UserRole::ADMIN => route('dashboard.admin'),
+                            \App\Enums\UserRole::OPERATOR => route('dashboard.operator'),
+                            default => route('dashboard'),
+                        };
+                    ?>
+                    <a href="<?php echo e($dashboardRoute); ?>" class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary-500/30">
+                            A
+                        </div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
+                            Azventory
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Link Navigasi -->
+                <div class="hidden space-x-1 lg:-my-px lg:ms-10 lg:flex items-center">
+                    <?php
+                        $navClass = "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md transition duration-150 ease-in-out gap-2";
+                        $activeClass = "bg-primary-50 text-primary-700";
+                        $inactiveClass = "text-secondary-600 hover:text-secondary-900 hover:bg-secondary-50";
+                    ?>
+
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
+                        <a href="<?php echo e(route('dashboard.superadmin')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('dashboard.superadmin') ? $activeClass : $inactiveClass); ?>">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <?php echo e(__('ui.dashboard')); ?>
+
+                        </a>
+                    <?php endif; ?>
+
+                    
+                    <a href="<?php echo e(route('inventory.index')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('inventory.*') ? $activeClass : $inactiveClass); ?>">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <?php echo e(__('ui.inventory_list')); ?>
+
+                    </a>
+
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
+                        <a href="<?php echo e(route('users.index')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('users.*') ? $activeClass : $inactiveClass); ?>">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <?php echo e(__('ui.user_management')); ?>
+
+                        </a>
+                    <?php endif; ?>
+
+                    <a href="<?php echo e(route('inventory.scan-qr')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('inventory.scan-qr') ? $activeClass : $inactiveClass); ?>">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                        <?php echo e(__('ui.scan_qr')); ?>
+
+                    </a>
+
+                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
+                        <a href="<?php echo e(route('reports.index')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('reports.*') ? $activeClass : $inactiveClass); ?>">
+                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <?php echo e(__('ui.reports')); ?>
+
+                        </a>
+                    <?php endif; ?>
+                    
+                     <?php if(Auth::user()->role === \App\Enums\UserRole::ADMIN): ?>
+                        <a href="<?php echo e(route('dashboard.admin')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('dashboard.admin') ? $activeClass : $inactiveClass); ?>">
+                            <?php echo e(__('ui.dashboard')); ?>
+
+                        </a>
+                     <?php endif; ?>
+                     
+                     <?php if(Auth::user()->role === \App\Enums\UserRole::OPERATOR): ?>
+                        <a href="<?php echo e(route('dashboard.operator')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('dashboard.operator') ? $activeClass : $inactiveClass); ?>">
+                            <?php echo e(__('ui.dashboard')); ?>
+
+                        </a>
+                     <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="flex items-center ms-auto gap-2 sm:gap-4 lg:ms-6">
+
+                <!-- Notifications Dropdown -->
+                <div x-data="notificationComponent()" class="relative">
+                    <button @click="notificationOpen = !notificationOpen" class="relative p-2 text-secondary-500 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none transition-all duration-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span x-show="unreadCount > 0" x-text="unreadCount" style="display: none;" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]">
+                        </span>
+                    </button>
+
+                    <div x-show="notificationOpen" @click.away="notificationOpen = false"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="transform opacity-0 scale-95"
+                         x-transition:enter-end="transform opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="transform opacity-100 scale-100"
+                         x-transition:leave-end="transform opacity-0 scale-95"
+                         class="absolute right-0 z-50 mt-2 w-72 sm:w-80 max-w-[calc(100vw-2rem)] rounded-xl shadow-floating bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden" style="display: none;">
+                        <div class="py-2">
+                            <div class="px-4 py-3 border-b border-secondary-100 flex justify-between items-center bg-white">
+                                <span class="font-bold text-secondary-800 text-sm"><?php echo e(__('ui.notifications')); ?></span>
+                                <div class="flex items-center gap-3">
+                                    <a href="<?php echo e(route('notifications.index')); ?>" class="text-xs text-secondary-400 hover:text-secondary-600 font-medium transition-colors"><?php echo e(__('ui.view_all')); ?></a>
+                                </div>
+                            </div>
+                            <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                <template x-if="notifications.length > 0">
+                                    <template x-for="notification in notifications" :key="notification.id">
+                                        <div class="block px-4 py-3 hover:bg-secondary-50 border-b border-secondary-50 last:border-0 transition duration-150 group relative">
+                                            <div @click="markAsRead(notification.id, notification.data.url, notification.type)" class="cursor-pointer flex gap-3">
+                                                <div class="flex-shrink-0 mt-1">
+                                                     <div class="w-2 h-2 rounded-full" :class="notification.read_at ? 'bg-transparent' : 'bg-primary-500'"></div>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors" x-text="notification.data.title || '<?php echo e(__('ui.new_notification')); ?>'"></p>
+                                                    <p class="text-xs text-secondary-500 line-clamp-2 mt-0.5" x-text="notification.data.message"></p>
+                                                    <p class="text-[10px] text-secondary-400 mt-1" x-text="timeAgo(notification.created_at) + ' • ' + new Date(notification.created_at).toLocaleString('id-ID')"></p>
+                                                </div>
+                                            </div>
+                                            <!-- Tombol Tandai Dibaca Manual -->
+                                            <button @click.stop="markAsRead(notification.id, null, null)" x-show="!notification.read_at" class="absolute top-3 right-3 text-secondary-300 hover:text-primary-600 bg-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-secondary-100" title="<?php echo e(__('ui.mark_as_read')); ?>">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </template>
+                                <template x-if="notifications.length === 0">
+                                    <div class="px-4 py-8 text-center text-sm text-secondary-500 flex flex-col items-center">
+                                        <svg class="w-8 h-8 text-secondary-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                        <?php echo e(__('ui.no_new_notifications')); ?>
+
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dropdown Pengaturan -->
+            <div x-data="{ profileOpen: false }" class="relative hidden lg:block">
+                <button @click="profileOpen = !profileOpen" class="inline-flex items-center gap-3 px-1 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-secondary-500 hover:text-secondary-700 focus:outline-none transition ease-in-out duration-150 group">
+                    <!-- Info Profil: 2 Baris (Nama di Atas, Peran di Bawah) -->
+                    <div class="hidden md:flex flex-col items-end text-right mr-3">
+                        <span class="font-bold text-secondary-800 text-sm group-hover:text-primary-600 transition-colors whitespace-nowrap"><?php echo e(Auth::user()->name); ?></span>
+                        <span class="text-xs text-secondary-500 font-normal"><?php echo e(Auth::user()->role->label()); ?></span>
+                    </div>
+                    <div class="h-9 w-9 rounded-full overflow-hidden border-2 border-secondary-200 group-hover:border-primary-200 transition-colors shadow-sm relative">
+                         <?php if(Auth::user()->avatar): ?>
+                            <img class="h-full w-full object-cover" src="<?php echo e(asset('storage/' . Auth::user()->avatar)); ?>" alt="<?php echo e(Auth::user()->name); ?>" />
+                         <?php else: ?>
+                            <div class="h-full w-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
+                                <?php echo e(substr(Auth::user()->name, 0, 1)); ?>
+
+                            </div>
+                         <?php endif; ?>
+                    </div>
+                </button>
+                
+                <!-- Script ditambahkan atas permintaan refactoring -->
+                <script>
+                    function notificationComponent() {
+                        return {
+                            notificationOpen: false, 
+                            unreadCount: <?php echo e(auth()->user()->unreadNotifications()->count()); ?>,
+                            notifications: [],
+                            init() { 
+                                this.fetchNotifications(); 
+                                
+                                // Listener Real-time
+                                if (window.Echo) {
+                                    window.Echo.private('App.Models.User.<?php echo e(auth()->id()); ?>')
+                                        .notification((notification) => {
+                                            // Perbarui Jumlah
+                                            this.unreadCount++;
+
+                                            // Tambahkan ke Daftar
+                                            this.notifications.unshift({
+                                                id: notification.id,
+                                                type: notification.type,
+                                                read_at: null,
+                                                created_at: new Date().toISOString(),
+                                                data: {
+                                                    title: notification.title,
+                                                    message: notification.message,
+                                                    url: notification.url
+                                                }
+                                            });
+
+                                            // Tampilkan Toast
+                                            const Toast = Swal.mixin({
+                                                toast: true,
+                                                position: 'top-end',
+                                                showConfirmButton: false,
+                                                timer: 4000,
+                                                timerProgressBar: true,
+                                                customClass: { popup: 'solid-toast-popup' }
+                                            });
+
+                                            Toast.fire({
+                                                icon: 'info',
+                                                // String HTML aman tanpa konflik kutipan
+                                                iconHtml: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>`,
+                                                title: notification.title || '<?php echo e(__('ui.new_notification')); ?>',
+                                                text: notification.message
+                                            });
+                                        });
+                                }
+                            },
+                            timeAgo(dateString) {
+                                const date = new Date(dateString);
+                                const now = new Date();
+                                const seconds = Math.floor((now - date) / 1000);
+
+                                let interval = seconds / 31536000;
+                                if (interval > 1) return Math.floor(interval) + " tahun yang lalu";
+                                
+                                interval = seconds / 2592000;
+                                if (interval > 1) return Math.floor(interval) + " bulan yang lalu";
+                                
+                                interval = seconds / 86400;
+                                if (interval > 1) return Math.floor(interval) + " hari yang lalu";
+                                
+                                interval = seconds / 3600;
+                                if (interval > 1) return Math.floor(interval) + " jam yang lalu";
+                                
+                                interval = seconds / 60;
+                                if (interval > 1) return Math.floor(interval) + " menit yang lalu";
+                                
+                                return "Baru saja";
+                            },
+                            fetchNotifications() {
+                                axios.get('/notifications?_=' + new Date().getTime())
+                                    .then(response => {
+                                        this.notifications = response.data;
+                                        this.unreadCount = this.notifications.filter(n => !n.read_at).length;
+                                    })
+                                    .catch(error => console.error(error));
+                            },
+                            markAsRead(id, url, type) {
+                                 axios.patch('/notifications/' + id + '/read')
+                                    .then(response => {
+                                        this.unreadCount = Math.max(0, this.unreadCount - 1);
+                                        this.notifications = this.notifications.map(n => 
+                                            n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+                                        );
+                                        
+                                        const targetUrl = response.data.url || url;
+                                        if (targetUrl) {
+                                            if (type === 'App\\Notifications\\ReportReadyNotification') {
+                                                window.open(targetUrl, '_blank');
+                                            } else {
+                                                window.location.href = targetUrl;
+                                            }
+                                        }
+                                    })
+                                    .catch(error => console.error(error));
+                            }
+                        }
+                    }
+                </script>
+
+                <div x-show="profileOpen" @click.away="profileOpen = false"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl shadow-floating bg-white ring-1 ring-black ring-opacity-5 focus:outline-none overflow-hidden" 
+                     style="display: none;">
+                    
+                    <div class="px-4 py-3 border-b border-secondary-100 bg-secondary-50/50">
+                        <p class="text-sm font-semibold text-secondary-900"><?php echo e(__('ui.my_account')); ?></p>
+                        <p class="text-xs text-secondary-500 truncate" title="<?php echo e(Auth::user()->email); ?>"><?php echo e(Auth::user()->email); ?></p>
+                    </div>
+                    
+                    <div class="py-1">
+                        <?php if (isset($component)) { $__componentOriginal68cb1971a2b92c9735f83359058f7108 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal68cb1971a2b92c9735f83359058f7108 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.dropdown-link','data' => ['href' => route('profile.edit'),'class' => 'flex items-center gap-2 group']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('dropdown-link'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('profile.edit')),'class' => 'flex items-center gap-2 group']); ?>
+                             <svg class="w-4 h-4 text-secondary-400 group-hover:text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <?php echo e(__('ui.my_profile')); ?>
+
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal68cb1971a2b92c9735f83359058f7108)): ?>
+<?php $attributes = $__attributesOriginal68cb1971a2b92c9735f83359058f7108; ?>
+<?php unset($__attributesOriginal68cb1971a2b92c9735f83359058f7108); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal68cb1971a2b92c9735f83359058f7108)): ?>
+<?php $component = $__componentOriginal68cb1971a2b92c9735f83359058f7108; ?>
+<?php unset($__componentOriginal68cb1971a2b92c9735f83359058f7108); ?>
+<?php endif; ?>
+                    </div>
+
+                    <div class="border-t border-secondary-100 my-1"></div>
+
+                    <form method="POST" action="<?php echo e(route('logout')); ?>" onsubmit="clearDashboardPeriod()">
+                        <?php echo csrf_field(); ?>
+                        <?php if (isset($component)) { $__componentOriginal68cb1971a2b92c9735f83359058f7108 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal68cb1971a2b92c9735f83359058f7108 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.dropdown-link','data' => ['href' => route('logout'),'onclick' => 'event.preventDefault(); clearDashboardPeriod(); this.closest(\'form\').submit();','class' => 'text-danger-600 hover:bg-danger-50 hover:text-danger-700 flex items-center gap-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('dropdown-link'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['href' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(route('logout')),'onclick' => 'event.preventDefault(); clearDashboardPeriod(); this.closest(\'form\').submit();','class' => 'text-danger-600 hover:bg-danger-50 hover:text-danger-700 flex items-center gap-2']); ?>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <?php echo e(__('ui.logout')); ?>
+
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal68cb1971a2b92c9735f83359058f7108)): ?>
+<?php $attributes = $__attributesOriginal68cb1971a2b92c9735f83359058f7108; ?>
+<?php unset($__attributesOriginal68cb1971a2b92c9735f83359058f7108); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal68cb1971a2b92c9735f83359058f7108)): ?>
+<?php $component = $__componentOriginal68cb1971a2b92c9735f83359058f7108; ?>
+<?php unset($__componentOriginal68cb1971a2b92c9735f83359058f7108); ?>
+<?php endif; ?>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Hamburger (lg:hidden, statis di dalam flex) -->
+            <div class="-me-2 flex items-center lg:hidden">
+                <button @click="mobileMenuOpen = ! mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-secondary-500 hover:text-secondary-900 hover:bg-secondary-100 focus:outline-none focus:bg-secondary-100 focus:text-secondary-900 transition duration-150 ease-in-out">
+                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                        <path :class="{'hidden': mobileMenuOpen, 'inline-flex': ! mobileMenuOpen }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path :class="{'hidden': ! mobileMenuOpen, 'inline-flex': mobileMenuOpen }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Navigasi Responsif -->
+    <div x-show="mobileMenuOpen" style="display: none;" class="lg:hidden bg-white border-t border-secondary-100">
+        <div class="pt-2 pb-3 space-y-1">
+             <?php
+                $resNavClass = "block w-full ps-3 pe-4 py-2 border-l-4 text-start text-base font-medium transition duration-150 ease-in-out";
+                $resActiveClass = "border-primary-400 text-primary-700 bg-primary-50 focus:outline-none focus:text-primary-800 focus:bg-primary-100 focus:border-primary-700";
+                $resInactiveClass = "border-transparent text-secondary-600 hover:text-secondary-800 hover:bg-secondary-50 hover:border-secondary-300 focus:outline-none focus:text-secondary-800 focus:bg-secondary-50 focus:border-secondary-300";
+            ?>
+
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
+                <a href="<?php echo e(route('dashboard.superadmin')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('dashboard.superadmin') ? $resActiveClass : $resInactiveClass); ?>">
+                    <?php echo e(__('ui.dashboard')); ?>
+
+                </a>
+            <?php endif; ?>
+            
+            
+            <a href="<?php echo e(route('inventory.index')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('inventory.*') ? $resActiveClass : $resInactiveClass); ?>">
+                <?php echo e(__('ui.inventory_list')); ?>
+
+            </a>
+
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
+                <a href="<?php echo e(route('users.index')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('users.*') ? $resActiveClass : $resInactiveClass); ?>">
+                    <?php echo e(__('ui.user_management')); ?>
+
+                </a>
+            <?php endif; ?>
+            
+            <a href="<?php echo e(route('inventory.scan-qr')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('inventory.scan-qr') ? $resActiveClass : $resInactiveClass); ?>">
+                <?php echo e(__('ui.scan_qr')); ?>
+
+            </a>
+
+            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
+                <a href="<?php echo e(route('reports.index')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('reports.*') ? $resActiveClass : $resInactiveClass); ?>">
+                    <?php echo e(__('ui.reports')); ?>
+
+                </a>
+            <?php endif; ?>
+
+            <a href="<?php echo e(route('notifications.index')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('notifications.index') ? $resActiveClass : $resInactiveClass); ?> flex justify-between items-center">
+                <?php echo e(__('ui.notifications')); ?>
+
+                <?php if(auth()->user()->unreadNotifications()->count() > 0): ?>
+                    <span class="bg-danger-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                        <?php echo e(auth()->user()->unreadNotifications()->count()); ?>
+
+                    </span>
+                <?php endif; ?>
+            </a>
+        </div>
+
+        <!-- Opsi Pengaturan Responsif -->
+        <div class="pt-4 pb-4 border-t border-secondary-100 bg-secondary-50/50">
+            <div class="px-4 flex items-center gap-3">
+                 <div class="h-10 w-10 rounded-full overflow-hidden border border-secondary-300">
+                    <img class="h-full w-full object-cover" src="<?php echo e(asset('storage/' . Auth::user()->avatar)); ?>" alt="<?php echo e(Auth::user()->name); ?>" />
+                </div>
+                <div>
+                    <div class="font-medium text-base text-secondary-800"><?php echo e(Auth::user()->name); ?></div>
+                    <div class="font-medium text-sm text-secondary-500"><?php echo e(Auth::user()->email); ?></div>
+                </div>
+            </div>
+
+            <div class="mt-3 space-y-1">
+                <a href="<?php echo e(route('profile.edit')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e($resInactiveClass); ?>">
+                    <?php echo e(__('ui.profile')); ?>
+
+                </a>
+                <form method="POST" action="<?php echo e(route('logout')); ?>" onsubmit="clearDashboardPeriod()">
+                    <?php echo csrf_field(); ?>
+                    <a href="<?php echo e(route('logout')); ?>" onclick="event.preventDefault(); clearDashboardPeriod(); this.closest('form').submit();" class="<?php echo e($resNavClass); ?> <?php echo e($resInactiveClass); ?> text-danger-600">
+                        <?php echo e(__('ui.logout')); ?>
+
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+<?php /**PATH E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\resources\views/layouts/navigation.blade.php ENDPATH**/ ?>

@@ -16,14 +16,16 @@ class BorrowingController extends Controller
 {
     use ActivityLogger;
     protected $imageOptimizer;
+    protected $inventoryService;
 
-    public function __construct(\App\Services\ImageOptimizationService $imageOptimizer)
+    public function __construct(\App\Services\ImageOptimizationService $imageOptimizer, \App\Services\InventoryService $inventoryService)
     {
         $this->imageOptimizer = $imageOptimizer;
+        $this->inventoryService = $inventoryService;
     }
 
     /**
-     * Display borrowing detail with returns history.
+     * Menampilkan detail peminjaman dan riwayat pengembalian.
      */
     public function show(Borrowing $borrowing)
     {
@@ -39,7 +41,7 @@ class BorrowingController extends Controller
     }
 
     /**
-     * Store a new borrowing record (Pinjam Barang).
+     * Menyimpan data peminjaman baru (Pinjam Barang).
      */
     public function store(StoreBorrowingRequest $request, Sparepart $sparepart)
     {
@@ -61,6 +63,10 @@ class BorrowingController extends Controller
 
             // Log Activity
             $this->logActivity('Peminjaman Barang', "Meminjam {$request->quantity} {$sparepart->unit} '{$sparepart->name}'. Catatan: " . ($request->notes ?? '-'));
+
+            // Clear Dashboard Cache & Broadcast Update
+            $this->inventoryService->clearCache();
+            $this->inventoryService->broadcastUpdate($sparepart, 'updated');
         });
 
         return redirect()->route('inventory.show', $sparepart->id)
@@ -68,7 +74,7 @@ class BorrowingController extends Controller
     }
 
     /**
-     * Update borrowing status (Kembalikan Barang).
+     * Memperbarui status peminjaman (Kembalikan Barang).
      */
     public function returnItem(ReturnBorrowingRequest $request, Borrowing $borrowing)
     {
@@ -157,6 +163,10 @@ class BorrowingController extends Controller
                  }
                  $this->logActivity('Barang Hilang', "Melaporkan pengembalian {$qty} unit '{$originalSparepart->name}' dalam kondisi Hilang.");
             }
+
+            // Clear Dashboard Cache & Broadcast Update
+            $this->inventoryService->clearCache();
+            $this->inventoryService->broadcastUpdate($originalSparepart, 'updated');
         });
 
         // 5. Final Log

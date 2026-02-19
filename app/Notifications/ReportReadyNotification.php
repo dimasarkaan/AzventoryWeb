@@ -15,29 +15,21 @@ class ReportReadyNotification extends Notification implements ShouldQueue
     protected $title;
     protected $downloadUrl;
 
-    /**
-     * Create a new notification instance.
-     */
+    // Buat instance notifikasi baru.
     public function __construct($title, $downloadUrl)
     {
         $this->title = $title;
         $this->downloadUrl = $downloadUrl;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
-     */
+    // Tentukan channel pengiriman notifikasi.
     public function via(object $notifiable): array
     {
-        // Support database (in-app) and broadcast (real-time wrapper)
+        // Mendukung database (in-app) dan broadcast (real-time wrapper)
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     */
+    // Representasi email dari notifikasi.
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
@@ -47,11 +39,7 @@ class ReportReadyNotification extends Notification implements ShouldQueue
                     ->line('Tautan ini akan valid selama file masih tersimpan di server.');
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
-     */
+    // Representasi array dari notifikasi.
     public function toArray(object $notifiable): array
     {
         return [
@@ -63,9 +51,7 @@ class ReportReadyNotification extends Notification implements ShouldQueue
         ];
     }
 
-    /**
-     * Get the broadcastable representation of the notification.
-     */
+    // Representasi broadcast dari notifikasi.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 
+/**
+ * Model ActivityLog untuk mencatat riwayat aktivitas pengguna.
+ * 
+ * Menggunakan fitur Prunable untuk otomatis menghapus log lama.
+ */
 class ActivityLog extends Model
 {
     use HasFactory, Prunable;
@@ -22,7 +27,9 @@ class ActivityLog extends Model
     ];
 
     /**
-     * Get the prunable model query.
+     * Query untuk pruning (pembersihan otomatis) model.
+     * 
+     * Menghapus log yang lebih tua dari 1 tahun.
      */
     public function prunable()
     {
@@ -30,6 +37,7 @@ class ActivityLog extends Model
         return static::where('created_at', '<=', now()->subDays(365));
     }
 
+    // Relasi ke user yang melakukan aktivitas.
     public function user()
     {
         return $this->belongsTo(User::class);

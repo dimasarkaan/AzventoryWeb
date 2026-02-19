@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi.
      */
     public function up(): void
     {
@@ -28,11 +28,11 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Kembalikan migrasi.
      */
     public function down(): void
     {
-        // Revert changes if necessary
+        // Kembalikan perubahan jika diperlukan
         DB::table('activity_logs')
             ->where('description', 'like', '%(Kondisi: Baik)%')
             ->update(['description' => DB::raw("REPLACE(description, '(Kondisi: Baik)', '(good)')")]);

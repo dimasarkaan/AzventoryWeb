@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Model Borrowing untuk mencatat transaksi peminjaman barang.
+ */
 class Borrowing extends Model
 {
     use HasFactory;
@@ -31,21 +34,27 @@ class Borrowing extends Model
         'return_photos' => 'array',
     ];
 
+    // Relasi ke barang (sparepart) yang dipinjam.
     public function sparepart()
     {
         return $this->belongsTo(Sparepart::class);
     }
 
+    // Relasi ke user yang memproses peminjaman (bukan peminjam jika orang luar).
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // Relasi ke riwayat pengembalian (parsial).
     public function returns()
     {
         return $this->hasMany(BorrowingReturn::class);
     }
 
+    /**
+     * Aksesori untuk menghitung sisa barang yang belum dikembalikan.
+     */
     public function getRemainingQuantityAttribute()
     {
         return $this->quantity - $this->returns()->sum('quantity');
