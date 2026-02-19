@@ -9,13 +9,7 @@ use App\Events\ActivityLogged;
 
 trait ActivityLogger
 {
-    /**
-     * Log an activity.
-     *
-     * @param string $action
-     * @param string $description
-     * @return void
-     */
+    // Catat aktivitas sistem ke database + broadcast.
     protected function logActivity(string $action, string $description, array $properties = null): void
     {
         $log = ActivityLog::create([

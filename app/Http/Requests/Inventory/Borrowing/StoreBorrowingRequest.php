@@ -8,7 +8,7 @@ use App\Models\Sparepart;
 class StoreBorrowingRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Tentukan apakah user diizinkan untuk membuat request ini.
      */
     public function authorize(): bool
     {
@@ -16,7 +16,7 @@ class StoreBorrowingRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Dapatkan aturan validasi yang berlaku untuk request ini.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */

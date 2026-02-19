@@ -22,10 +22,10 @@ class BorrowingTest extends TestCase
         
         $this->superAdmin = User::factory()->create(['role' => 'superadmin']);
         
-        // Mock Storage for photos
+        // Mock Storage untuk foto
         Storage::fake('public');
 
-        // MOCK ImageOptimizationService
+        // MOCK Service Optimasi Gambar
         $this->mock(\App\Services\ImageOptimizationService::class, function ($mock) {
             $mock->shouldReceive('optimizeAndSave')->andReturn('dummy/path.webp');
         });
@@ -49,13 +49,13 @@ class BorrowingTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        // Check Inventory Reduced
+        // Periksa Inventaris Berkurang
         $this->assertDatabaseHas('spareparts', [
             'id' => $item->id,
             'stock' => 8,
         ]);
 
-        // Check Borrowing Record
+        // Periksa Catatan Peminjaman
         $this->assertDatabaseHas('borrowings', [
             'sparepart_id' => $item->id,
             'user_id' => $this->superAdmin->id,
@@ -104,13 +104,13 @@ class BorrowingTest extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
-        // Check Borrowing Status Updated
+        // Periksa Status Peminjaman Diperbarui
         $this->assertDatabaseHas('borrowings', [
             'id' => $borrowing->id,
             'status' => 'returned',
         ]);
 
-        // Check Inventory Restored
+        // Periksa Inventaris Dikembalikan
         $this->assertDatabaseHas('spareparts', [
             'id' => $item->id,
             'stock' => 10, // 8 + 2

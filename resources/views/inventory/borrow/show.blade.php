@@ -39,7 +39,7 @@
                         <div class="flex items-center gap-4 mb-4">
                             <div class="w-16 h-16 rounded-full bg-secondary-200 overflow-hidden flex-shrink-0">
                                 @if($borrowing->user && $borrowing->user->avatar)
-                                    <img src="{{ asset('storage/' . $borrowing->user->avatar) }}" class="w-full h-full object-cover" alt="{{ $borrowing->user->name }}">
+                                    <img src="{{ asset('storage/' . $borrowing->user->avatar) }}" class="w-full h-full object-cover" loading="lazy" alt="{{ $borrowing->user->name }}">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-secondary-500 text-xl font-bold">
                                         {{ substr($borrowing->user->name ?? 'U', 0, 1) }}
@@ -265,7 +265,7 @@
                         <div class="flex-1 overflow-y-auto px-4 pt-2 pb-4 sm:px-6 space-y-4 custom-scrollbar">
                             
                             <!-- Error Display -->
-                            <div x-show="Object.keys(errors).length > 0" class="mb-4 bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded relative">
+                            <div x-ref="errorContainer" x-show="Object.keys(errors).length > 0" class="mb-4 bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded relative">
                                 <strong class="font-bold">{{ __('ui.save_failed') }}</strong>
                                 <ul class="list-disc list-inside text-sm mt-1">
                                     <template x-for="(fieldErrors, field) in errors" :key="field">

@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sparepart;
-use App\Models\Category;
-use App\Models\Location;
 use App\Services\InventoryService;
 use App\Http\Requests\Inventory\StoreSparepartRequest;
 use App\Http\Requests\Inventory\UpdateSparepartRequest;
@@ -31,7 +29,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar barang inventaris.
      */
     public function index(Request $request)
     {
@@ -44,7 +42,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Menampilkan form untuk membuat barang baru.
      */
     public function create()
     {
@@ -54,7 +52,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Menyimpan barang baru ke database.
      */
     public function store(\App\Http\Requests\Inventory\StoreSparepartRequest $request)
     {
@@ -73,17 +71,17 @@ class InventoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan detail barang spesifik.
      */
     public function show(Sparepart $inventory)
     {
-        // Fetch borrowings with pagination (5 per page)
+        // Ambil data peminjaman dengan paginasi (5 per halaman)
         $borrowings = $inventory->borrowings()
             ->with(['user', 'returns'])
             ->latest()
             ->paginate(5, ['*'], 'history_page');
 
-        // Fetch similar items with pagination (3 per page) 
+        // Ambil item serupa dengan paginasi (3 per halaman) 
         $similarItems = Sparepart::where('part_number', $inventory->part_number)
             ->where('id', '!=', $inventory->id)
             ->paginate(3, ['*'], 'similar_page');
@@ -96,7 +94,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Menampilkan form untuk mengedit barang.
      */
     public function edit(Sparepart $inventory)
     {
@@ -106,25 +104,82 @@ class InventoryController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Memperbarui data barang di database.
      */
     public function update(\App\Http\Requests\Inventory\UpdateSparepartRequest $request, Sparepart $inventory)
     {
         $this->authorize('update', $inventory);
 
-        $result = $this->inventoryService->updateSparepart($inventory, $request->validated());
+        $validated = $request->validated();
+
+        // Cek apakah ada request untuk merge atau keep separate
+        $mergeConfirmed = $request->input('merge_confirmed') === 'true';
+        $keepSeparate = $request->input('keep_separate') === 'true';
+
+        // Jika belum ada konfirmasi, cek duplikat
+        if (!$mergeConfirmed && !$keepSeparate) {
+            $duplicateItem = $this->inventoryService->checkUpdateDuplicate($inventory, $validated);
+
+            if ($duplicateItem) {
+                // Duplikat ditemukan, redirect kembali dengan modal konfirmasi
+                return redirect()->back()
+                    ->withInput()
+                    ->with('duplicate_detected', true)
+                    ->with('duplicate_item', [
+                        'id' => $duplicateItem->id,
+                        'name' => $duplicateItem->name,
+                        'part_number' => $duplicateItem->part_number,
+                        'brand' => $duplicateItem->brand,
+                        'category' => $duplicateItem->category,
+                        'condition' => $duplicateItem->condition,
+                        'location' => $duplicateItem->location,
+                        'stock' => $duplicateItem->stock,
+                        'unit' => $duplicateItem->unit,
+                    ])
+                    ->with('current_item', [
+                        'id' => $inventory->id,
+                        'name' => $inventory->name,
+                        'part_number' => $inventory->part_number,
+                        'stock' => $inventory->stock,
+                    ]);
+            }
+        }
+
+        // Jika user pilih merge
+        if ($mergeConfirmed) {
+            $duplicateId = $request->input('duplicate_id');
+            $duplicateItem = Sparepart::findOrFail($duplicateId);
+
+            $result = $this->inventoryService->mergeSpareparts($inventory, $duplicateItem);
+
+            if ($result['status'] === 'error') {
+                return redirect()->route('inventory.edit', $inventory)
+                    ->with('error', $result['message']);
+            }
+
+            return redirect()->route('inventory.index')
+                ->with('success', $result['message']);
+        }
+
+        // Normal update (no duplicate atau user pilih keep separate)
+        $result = $this->inventoryService->updateSparepart($inventory, $validated);
 
         return redirect()->route('inventory.index')
             ->with('success', $result['message']);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Menghapus barang dari database (Soft Delete).
      */
     public function destroy($id)
     {
         $inventory = Sparepart::findOrFail($id);
         $this->authorize('delete', $inventory);
+
+        // Check for active borrowings
+        if ($inventory->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
+            return redirect()->back()->with('error', __('ui.error_cannot_delete_borrowed'));
+        }
 
         $result = $this->inventoryService->deleteSparepart($inventory);
 
@@ -183,7 +238,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Restore a soft-deleted sparepart.
+     * Memulihkan barang yang dihapus (Restore).
      */
     public function restore($id)
     {
@@ -197,7 +252,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Permanently delete a sparepart.
+     * Menghapus permanen barang.
      */
     public function forceDelete($id)
     {
@@ -215,7 +270,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Permanently delete all spareparts in the trash.
+     * Menghapus permanen semua barang di sampah.
      */
     public function forceDeleteAll()
     {
@@ -227,7 +282,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Bulk restore soft-deleted spareparts.
+     * Memulihkan banyak barang sekaligus.
      */
     public function bulkRestore(Request $request)
     {
@@ -247,7 +302,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Bulk permanently delete spareparts.
+     * Menghapus permanen banyak barang sekaligus.
      */
     public function bulkForceDelete(Request $request)
     {

@@ -12,11 +12,17 @@ use App\Traits\ActivityLogger;
 class ChangePasswordController extends Controller
 {
     use ActivityLogger;
+    /**
+     * Menampilkan halaman ganti password.
+     */
     public function create()
     {
         return view('auth.change-password');
     }
 
+    /**
+     * Memproses penggantian password pengguna.
+     */
     public function store(Request $request)
     {
         $user = $request->user();

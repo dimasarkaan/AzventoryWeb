@@ -9,11 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class SparepartFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    // Definisikan state default model.
     public function definition(): array
     {
         return [

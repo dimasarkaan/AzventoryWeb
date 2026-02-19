@@ -17,7 +17,7 @@ class ActivityLogged implements ShouldBroadcastNow
     public $log;
 
     /**
-     * Create a new event instance.
+     * Buat instance event baru.
      */
     public function __construct($log)
     {
@@ -25,7 +25,7 @@ class ActivityLogged implements ShouldBroadcastNow
     }
 
     /**
-     * Get the channels the event should broadcast on.
+     * Dapatkan channel tempat event harus disiarkan.
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */

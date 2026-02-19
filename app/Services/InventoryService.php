@@ -29,9 +29,7 @@ class InventoryService
         $this->qrCodeService = $qrCodeService;
     }
 
-    /**
-     * Get filtered spareparts with pagination.
-     */
+    // Dapatkan data sparepart dengan filter & pagination.
     public function getFilteredSpareparts(array $filters, int $perPage = 10)
     {
         $query = Sparepart::query();
@@ -58,6 +56,11 @@ class InventoryService
         // Special Filter
         if (($filters['filter'] ?? '') === 'low_stock') {
             $query->whereColumn('stock', '<=', 'minimum_stock');
+        } elseif (($filters['filter'] ?? '') === 'overdue') {
+            $query->whereHas('borrowings', function ($q) {
+                $q->where('status', 'borrowed')
+                  ->where('expected_return_at', '<', now());
+            });
         }
 
         // Sorting
@@ -66,9 +69,7 @@ class InventoryService
         return $query->paginate($perPage)->appends($filters);
     }
 
-    /**
-     * Create a new sparepart or merge stock if duplicate.
-     */
+    // Buat sparepart baru atau gabungkan stok jika duplikat.
     public function createSparepart(array $data)
     {
 
@@ -98,6 +99,13 @@ class InventoryService
 
                     $this->logActivity('Stok Diupdate', $message);
                     $this->clearCache();
+
+                    // Broadcast update ke semua user.
+                    broadcast(new \App\Events\InventoryUpdatedEvent(
+                        $existingItem->fresh(),
+                        'updated',
+                        auth()->user()->name
+                    ))->toOthers();
 
                     return ['status' => 'merged', 'message' => $message, 'data' => $existingItem];
                 } else {
@@ -144,13 +152,18 @@ class InventoryService
             $this->logActivity('Sparepart Dibuat', $message);
             $this->clearCache();
 
+            // Broadcast event barang baru ke semua user.
+            broadcast(new \App\Events\InventoryUpdatedEvent(
+                $sparepart,
+                'created',
+                auth()->user()->name
+            ))->toOthers();
+
             return ['status' => 'created', 'message' => $message, 'data' => $sparepart];
         });
     }
 
-    /**
-     * Update an existing sparepart.
-     */
+    // Update data sparepart.
     public function updateSparepart(Sparepart $sparepart, array $data)
     {
         return DB::transaction(function () use ($sparepart, $data) {
@@ -191,13 +204,24 @@ class InventoryService
             $this->logActivity('Sparepart Diperbarui', __('messages.log_item_updated', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]), $changes);
             $this->clearCache();
 
+            // Broadcast update ke semua user.
+            broadcast(new \App\Events\InventoryUpdatedEvent(
+                $sparepart->fresh(),
+                'updated',
+                auth()->user()->name
+            ))->toOthers();
+
+            // Broadcast critical stock alert jika < 50% minimum.
+            if ($sparepart->minimum_stock > 0 && $sparepart->stock < ($sparepart->minimum_stock * 0.5)) {
+                $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
+                broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+            }
+
             return ['status' => 'updated', 'message' => __('messages.item_updated'), 'data' => $sparepart];
         });
     }
 
-    /**
-     * Soft delete a sparepart.
-     */
+    // Soft delete sparepart.
     public function deleteSparepart(Sparepart $sparepart)
     {
         return DB::transaction(function () use ($sparepart) {
@@ -210,13 +234,18 @@ class InventoryService
             $sparepart->delete();
             $this->clearCache();
 
+            // Broadcast delete event ke semua user.
+            broadcast(new \App\Events\InventoryUpdatedEvent(
+                $sparepart,
+                'deleted',
+                auth()->user()->name
+            ))->toOthers();
+
             return ['status' => 'deleted', 'message' => __('messages.item_deleted')];
         });
     }
 
-    /**
-     * Restore a soft-deleted sparepart.
-     */
+    // Pulihkan sparepart yang dihapus.
     public function restoreSparepart($id)
     {
         return DB::transaction(function () use ($id) {
@@ -230,9 +259,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Permanently delete a sparepart.
-     */
+    // Hapus permanen sparepart.
     public function forceDeleteSparepart($id)
     {
         return DB::transaction(function () use ($id) {
@@ -260,9 +287,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Permanently delete all spareparts in trash.
-     */
+    // Hapus permanen semua sparepart di tong sampah.
     public function forceDeleteAllSpareparts()
     {
         return DB::transaction(function () {
@@ -289,9 +314,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Bulk restore spareparts.
-     */
+    // Pulihkan banyak sparepart sekaligus.
     public function bulkRestore(array $ids)
     {
         return DB::transaction(function () use ($ids) {
@@ -307,9 +330,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Bulk force delete spareparts.
-     */
+    // Hapus permanen banyak sparepart sekaligus.
     public function bulkForceDelete(array $ids)
     {
         return DB::transaction(function () use ($ids) {
@@ -335,9 +356,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Get unique values for dropdowns (Cached).
-     */
+    // Dapatkan opsi dropdown (Cached).
     public function getDropdownOptions()
     {
         return [
@@ -351,9 +370,7 @@ class InventoryService
         ];
     }
 
-    /**
-     * Clear inventory caches.
-     */
+    // Bersihkan cache inventaris.
     public function clearCache()
     {
         Cache::forget('inventory_categories');
@@ -363,6 +380,9 @@ class InventoryService
         Cache::forget('inventory_units');
         Cache::forget('inventory_names');
         Cache::forget('inventory_part_numbers');
+
+        // Update timestamp global untuk invalidasi cache dashboard
+        Cache::forever('inventory_last_updated', now()->timestamp);
     }
 
     private function applyExactFilter(Builder $query, string $column, ?string $value, string $ignoreValue)
@@ -391,9 +411,96 @@ class InventoryService
         }
     }
 
-    /**
-     * Find exact duplicate item in database.
-     */
+    // Cek apakah update akan membuat duplikat dengan item lain (exclude current item).
+    public function checkUpdateDuplicate(Sparepart $currentItem, array $data)
+    {
+        $query = Sparepart::where('id', '!=', $currentItem->id)
+            ->where('part_number', $data['part_number'])
+            ->where('name', $data['name'])
+            ->where('brand', $data['brand'])
+            ->where('category', $data['category'])
+            ->where('location', $data['location'])
+            ->where('condition', $data['condition'])
+            ->where('type', $data['type']);
+
+        foreach (['color', 'price', 'unit'] as $field) {
+            if (isset($data[$field])) {
+                $query->where($field, $data[$field]);
+            } else {
+                $query->whereNull($field);
+            }
+        }
+
+        return $query->first();
+    }
+
+    // Gabungkan stock dari source ke target dan hapus source.
+    public function mergeSpareparts(Sparepart $source, Sparepart $target)
+    {
+        return DB::transaction(function () use ($source, $target) {
+            // Validasi: tidak bisa merge jika source sedang dipinjam
+            if ($source->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
+                return [
+                    'status' => 'error',
+                    'message' => __('messages.cannot_merge_borrowed_item')
+                ];
+            }
+
+            // Gabungkan stock
+            $stockToAdd = $source->stock;
+            $target->stock += $stockToAdd;
+            $target->save();
+
+            // Transfer borrowing history
+            $source->borrowings()->update(['sparepart_id' => $target->id]);
+
+            // Transfer stock logs
+            $source->stockLogs()->update(['sparepart_id' => $target->id]);
+
+            // Log stock addition ke target
+            if ($stockToAdd > 0) {
+                StockLog::create([
+                    'sparepart_id' => $target->id,
+                    'user_id' => auth()->id(),
+                    'type' => 'masuk',
+                    'quantity' => $stockToAdd,
+                    'reason' => __('messages.log_stock_merged_from', ['source_pn' => $source->part_number]),
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                    'approved_at' => now(),
+                ]);
+            }
+
+            // Soft delete source item
+            $source->delete();
+
+            $message = __('messages.items_merged', [
+                'source_name' => $source->name,
+                'source_pn' => $source->part_number,
+                'target_name' => $target->name,
+                'target_pn' => $target->part_number,
+                'stock' => $stockToAdd
+            ]);
+
+            $this->logActivity('Items Merged', $message);
+            $this->clearCache();
+
+            // Broadcast update
+            broadcast(new \App\Events\InventoryUpdatedEvent(
+                $target->fresh(),
+                'updated',
+                auth()->user()->name
+            ))->toOthers();
+
+            return [
+                'status' => 'merged',
+                'message' => $message,
+                'data' => $target
+            ];
+        });
+    }
+
+    // Cari duplikat persis di database.
     private function findExactDuplicate(array $data)
     {
         $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
@@ -413,5 +520,14 @@ class InventoryService
         }
 
         return $existingItemQuery->lockForUpdate()->first();
+    }
+    // Helper untuk broadcast update ke semua user.
+    public function broadcastUpdate(Sparepart $sparepart, string $action = 'updated')
+    {
+        broadcast(new \App\Events\InventoryUpdatedEvent(
+            $sparepart->fresh(),
+            $action,
+            auth()->user()->name
+        ))->toOthers();
     }
 }

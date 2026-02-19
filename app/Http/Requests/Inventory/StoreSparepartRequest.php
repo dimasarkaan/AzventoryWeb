@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreSparepartRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Tentukan apakah user diizinkan untuk membuat request ini.
      */
     public function authorize(): bool
     {
@@ -15,7 +15,7 @@ class StoreSparepartRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Dapatkan aturan validasi yang berlaku untuk request ini.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
@@ -36,13 +36,13 @@ class StoreSparepartRequest extends FormRequest
             'minimum_stock' => 'nullable|integer|min:0',
             'unit' => 'nullable|string|max:50',
             'status' => 'required|in:aktif,nonaktif',
-            'image' => 'nullable|image|max:10240',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // Max 5MB untuk foto HP
             'existing_image' => 'nullable|string',
         ];
     }
 
     /**
-     * Get custom attributes for validator errors.
+     * Dapatkan atribut kustom untuk pesan error validator.
      */
     public function attributes(): array
     {
@@ -66,7 +66,7 @@ class StoreSparepartRequest extends FormRequest
     }
 
     /**
-     * Get custom validation messages.
+     * Dapatkan pesan validasi kustom.
      */
     public function messages(): array
     {

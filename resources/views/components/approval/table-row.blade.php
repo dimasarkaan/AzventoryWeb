@@ -37,7 +37,7 @@
     </td>
     <td class="px-4 py-3 text-right">
         <div class="flex items-center justify-end gap-2">
-            <form action="{{ route('stock-approvals.update', $approval) }}" method="POST">
+            <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="status" value="approved">
@@ -46,7 +46,7 @@
                     <span class="hidden sm:inline">{{ __('ui.btn_approve') }}</span>
                 </button>
             </form>
-            <form action="{{ route('stock-approvals.update', $approval) }}" method="POST">
+            <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="status" value="rejected">

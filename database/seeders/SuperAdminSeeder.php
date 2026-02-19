@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 class SuperAdminSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
+     * Menjalankan database seeds.
      */
     public function run(): void
     {

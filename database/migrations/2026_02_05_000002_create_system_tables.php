@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Jalankan migrasi.
      */
     public function up(): void
     {
-        // 1. Activity Logs
+        // 1. Log Aktivitas
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null')->index();
@@ -21,8 +21,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Notifications (Default Laravel but with UUID if needed, here just keeping it standard + verifying UUID support if strictly 10)
-        // Laravel 10/11 default usually:
+        // 2. Notifikasi (Bawaan Laravel tapi dengan UUID jika diperlukan)
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('type');
@@ -34,7 +33,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.
+     * Kembalikan migrasi.
      */
     public function down(): void
     {

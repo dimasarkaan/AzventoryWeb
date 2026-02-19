@@ -22,22 +22,24 @@ class DashboardServiceTest extends TestCase
         $this->service = new DashboardService();
     }
 
+    // Menguji perhitungan rentang tanggal dengan benar.
     /** @test */
     public function it_calculates_date_range_correctly()
     {
-        // Test Today
+        // Test Hari Ini
         [$start, $end, $period] = $this->service->getDateRange('today', null, null);
         $this->assertEquals(Carbon::today(), $start);
         $this->assertEquals(Carbon::tomorrow(), $end);
         $this->assertEquals('today', $period);
 
-        // Test Specific Month
+        // Test Bulan Spesifik
         [$start, $end, $period] = $this->service->getDateRange(null, '2025', '5');
         $this->assertEquals(Carbon::create(2025, 5, 1)->startOfMonth(), $start);
         $this->assertEquals(Carbon::create(2025, 5, 1)->endOfMonth(), $end);
         $this->assertEquals('custom', $period);
     }
 
+    // Menguji pengambilan snapshot stok.
     /** @test */
     public function it_returns_stock_snapshots()
     {
@@ -49,6 +51,7 @@ class DashboardServiceTest extends TestCase
         $this->assertEquals(30, $snapshots['totalStock']);
     }
 
+    // Menguji pengambilan data pergerakan stok.
     /** @test */
     public function it_returns_stock_movements()
     {
@@ -86,6 +89,7 @@ class DashboardServiceTest extends TestCase
         $this->assertEquals([5], $data['keluar']);
     }
 
+     // Menguji pengambilan item terlaris.
      /** @test */
     public function it_returns_top_items()
     {

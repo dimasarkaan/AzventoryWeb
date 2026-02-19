@@ -8,7 +8,7 @@
         <form method="POST" action="{{ route('login') }}" class="space-y-5">
             @csrf
 
-            <!-- Login Field -->
+            <!-- Field Login -->
             <div>
                 <label for="login" class="input-label">{{ __('ui.auth_label_login') }}</label>
                 <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autofocus tabindex="1">
@@ -40,7 +40,7 @@
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
-            <!-- Remember Me -->
+            <!-- Ingat Saya -->
             <div class="block">
                 <label for="remember_me" class="inline-flex items-center group cursor-pointer">
                     <input id="remember_me" type="checkbox" name="remember" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition duration-150 ease-in-out cursor-pointer" tabindex="3">

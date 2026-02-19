@@ -9,13 +9,18 @@ use Illuminate\Notifications\Notifiable;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Model User sebagai representasi pengguna dalam sistem.
+ * 
+ * Mengatur autentikasi, otorisasi role, dan relasi ke data lain.
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
 
     /**
-     * The attributes that are mass assignable.
+     * Atribut yang dapat diisi secara massal.
      *
      * @var list<string>
      */
@@ -35,7 +40,9 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the user's avatar URL.
+     * Mendapatkan URL avatar pengguna.
+     * 
+     * Jika tidak ada avatar, akan menggunakan layanan UI Avatars.
      */
     protected function avatarUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
@@ -47,7 +54,7 @@ class User extends Authenticatable
     }
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Atribut yang harus disembunyikan saat serialisasi.
      *
      * @var list<string>
      */
@@ -57,7 +64,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Definisi casting tipe data atribut.
      *
      * @return array<string, string>
      */
@@ -70,6 +77,8 @@ class User extends Authenticatable
             'role' => \App\Enums\UserRole::class,
         ];
     }
+    
+    // Relasi ke data peminjaman.
     public function borrowings()
     {
         return $this->hasMany(Borrowing::class);

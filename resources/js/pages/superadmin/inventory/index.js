@@ -116,11 +116,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 attachPaginationListeners();
 
                 // 9. Re-initialize Bulk Actions (if needed)
-                const newSelectAll = doc.getElementById('select-all');
-                if (document.getElementById('select-all') && newSelectAll) {
-                    document.getElementById('select-all').checked = false; // Reset select all
+                if (window.resetBulkActions) {
+                    window.resetBulkActions();
+                } else {
+                    // Fallback if function not ready yet
+                    const newSelectAll = doc.getElementById('select-all');
+                    if (document.getElementById('select-all') && newSelectAll) {
+                        document.getElementById('select-all').checked = false;
+                    }
                 }
-                initBulkActions();
 
             })
             .catch(error => {
@@ -156,73 +160,88 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial attachment
     attachPaginationListeners();
 
-    // --- Bulk Action Logic (Encapsulated) ---
-    function initBulkActions() {
-        const selectAllCheckbox = document.getElementById('select-all');
-        const bulkCheckboxes = document.querySelectorAll('.bulk-checkbox'); // Re-query these
+    // --- Bulk Action Logic (Event Delegation) ---
+    function updateBulkActionBar() {
         const bulkActionBar = document.getElementById('bulk-action-bar');
         const selectedCountSpan = document.getElementById('selected-count');
         const bulkRestoreInputs = document.getElementById('bulk-restore-inputs');
         const bulkDeleteInputs = document.getElementById('bulk-delete-inputs');
 
-        function updateBulkActionBar() {
-            const selectedCheckboxes = document.querySelectorAll('.bulk-checkbox:checked');
-            const count = selectedCheckboxes.length;
+        const selectedCheckboxes = document.querySelectorAll('.bulk-checkbox:checked');
+        const count = selectedCheckboxes.length;
 
-            if (selectedCountSpan) selectedCountSpan.textContent = count;
+        if (selectedCountSpan) selectedCountSpan.textContent = count;
 
-            if (bulkRestoreInputs) bulkRestoreInputs.innerHTML = '';
-            if (bulkDeleteInputs) bulkDeleteInputs.innerHTML = '';
+        if (bulkRestoreInputs) bulkRestoreInputs.innerHTML = '';
+        if (bulkDeleteInputs) bulkDeleteInputs.innerHTML = '';
 
-            selectedCheckboxes.forEach(cb => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'ids[]';
-                input.value = cb.value;
-                if (bulkRestoreInputs) bulkRestoreInputs.appendChild(input.cloneNode());
-                if (bulkDeleteInputs) bulkDeleteInputs.appendChild(input.cloneNode());
-            });
+        selectedCheckboxes.forEach(cb => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ids[]';
+            input.value = cb.value;
+            if (bulkRestoreInputs) bulkRestoreInputs.appendChild(input.cloneNode());
+            if (bulkDeleteInputs) bulkDeleteInputs.appendChild(input.cloneNode());
+        });
 
-            if (bulkActionBar) {
-                if (count > 0) {
-                    bulkActionBar.classList.remove('hidden');
-                    bulkActionBar.classList.add('flex');
-                } else {
-                    bulkActionBar.classList.add('hidden');
-                    bulkActionBar.classList.remove('flex');
-                }
+        if (bulkActionBar) {
+            if (count > 0) {
+                bulkActionBar.classList.remove('translate-y-24', 'opacity-0');
+                bulkActionBar.classList.add('translate-y-0', 'opacity-100');
+            } else {
+                bulkActionBar.classList.add('translate-y-24', 'opacity-0');
+                bulkActionBar.classList.remove('translate-y-0', 'opacity-100');
             }
-        }
-
-        if (selectAllCheckbox) {
-            const newSelectAll = selectAllCheckbox.cloneNode(true);
-            selectAllCheckbox.parentNode.replaceChild(newSelectAll, selectAllCheckbox);
-
-            newSelectAll.addEventListener('change', function () {
-                const isChecked = this.checked;
-                const currentBulkCheckboxes = document.querySelectorAll('.bulk-checkbox');
-                currentBulkCheckboxes.forEach(cb => {
-                    cb.checked = isChecked;
-                });
-                updateBulkActionBar();
-            });
-        }
-
-        const currentBulkCheckboxes = document.querySelectorAll('.bulk-checkbox');
-        if (currentBulkCheckboxes.length > 0) {
-            currentBulkCheckboxes.forEach(cb => {
-                cb.addEventListener('change', function () {
-                    const allChecked = Array.from(document.querySelectorAll('.bulk-checkbox')).every(c => c.checked);
-                    const sa = document.getElementById('select-all');
-                    if (sa) sa.checked = allChecked;
-                    updateBulkActionBar();
-                });
-            });
         }
     }
 
-    // Initial call
-    initBulkActions();
+    // Event Delegation for Checkboxes
+    document.addEventListener('change', function (e) {
+        // Desktop Select All
+        if (e.target.id === 'select-all') {
+            const isChecked = e.target.checked;
+            document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = isChecked);
+            const mobileSelect = document.getElementById('mobile-select-all');
+            if (mobileSelect) mobileSelect.checked = isChecked;
+            updateBulkActionBar();
+        }
+
+        // Mobile Select All
+        if (e.target.id === 'mobile-select-all') {
+            const isChecked = e.target.checked;
+            document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = isChecked);
+            const desktopSelect = document.getElementById('select-all');
+            if (desktopSelect) desktopSelect.checked = isChecked;
+            updateBulkActionBar();
+        }
+
+        // Individual Checkbox
+        if (e.target.classList.contains('bulk-checkbox')) {
+            updateBulkActionBar();
+
+            // Sync Select All Checkboxes
+            const allCheckboxes = document.querySelectorAll('.bulk-checkbox');
+            const allChecked = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(c => c.checked);
+
+            const desktopSelect = document.getElementById('select-all');
+            const mobileSelect = document.getElementById('mobile-select-all');
+
+            if (desktopSelect) desktopSelect.checked = allChecked;
+            if (mobileSelect) mobileSelect.checked = allChecked;
+        }
+    });
+
+    // Helper to reset bulk actions after fetch
+    window.resetBulkActions = function () {
+        const desktopSelect = document.getElementById('select-all');
+        const mobileSelect = document.getElementById('mobile-select-all');
+        if (desktopSelect) desktopSelect.checked = false;
+        if (mobileSelect) mobileSelect.checked = false;
+        updateBulkActionBar();
+    };
+
+    // Initial check on load (in case browser preserved state)
+    updateBulkActionBar();
 });
 
 // Global Bulk Action Handlers (Inventory)

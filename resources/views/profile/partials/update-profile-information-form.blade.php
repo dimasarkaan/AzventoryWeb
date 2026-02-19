@@ -81,10 +81,10 @@
             <!-- Email -->
             <div class="sm:col-span-3">
                  <label for="email" class="input-label">{{ __('ui.profile_label_email') }}</label>
-                 @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
+                @can('update', $user)
                     <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('email', $user->email) }}" :disabled="!isEditing" required>
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
-                 @else
+                @else
                      <div class="relative">
                         <input type="email" id="email" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->email }}" readonly>
                          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -92,7 +92,7 @@
                         </div>
                      </div>
                      <p class="mt-1 text-xs text-secondary-400">Hubungi admin untuk ganti email.</p>
-                 @endif
+                @endcan
             </div>
 
              <!-- Name -->

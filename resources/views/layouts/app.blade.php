@@ -13,7 +13,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
 
-        <!-- Scripts -->
+        <!-- Skrip -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     </head>
@@ -23,7 +23,7 @@
              x-init="$el.classList.remove('opacity-0')">
             @include('layouts.navigation')
 
-            <!-- Page Heading -->
+            <!-- Judul Halaman -->
             @isset($header)
                 <header class="bg-white shadow">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -32,7 +32,7 @@
                 </header>
             @endisset
 
-            <!-- Page Content -->
+            <!-- Konten Halaman -->
             <main>
                 {{ $slot }}
             </main>
@@ -42,7 +42,7 @@
 
         @stack('scripts')
         <script>
-            // Pass Flash Messages to Custom JS
+            // Teruskan Pesan Flash ke JS Kustom
             window.flashMessages = {
                 @if(session('success'))
                     success: "{{ session('success') }}",

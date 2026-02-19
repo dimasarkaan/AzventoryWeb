@@ -1,5 +1,5 @@
 <nav x-data="{ mobileMenuOpen: false }" class="glass-nav border-b border-secondary-200">
-    <!-- Primary Navigation Menu -->
+    <!-- Menu Navigasi Utama -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -7,8 +7,8 @@
                     @php
                         $dashboardRoute = match(Auth::user()->role) {
                             \App\Enums\UserRole::SUPERADMIN => route('dashboard.superadmin'),
-                            \App\Enums\UserRole::ADMIN => route('admin.dashboard'),
-                            \App\Enums\UserRole::OPERATOR => route('operator.dashboard'),
+                            \App\Enums\UserRole::ADMIN => route('dashboard.admin'),
+                            \App\Enums\UserRole::OPERATOR => route('dashboard.operator'),
                             default => route('dashboard'),
                         };
                     @endphp
@@ -22,7 +22,7 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
+                <!-- Link Navigasi -->
                 <div class="hidden space-x-1 lg:-my-px lg:ms-10 lg:flex items-center">
                     @php
                         $navClass = "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md transition duration-150 ease-in-out gap-2";
@@ -30,46 +30,46 @@
                         $inactiveClass = "text-secondary-600 hover:text-secondary-900 hover:bg-secondary-50";
                     @endphp
 
-                    @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
+                    @can('viewAny', \App\Models\User::class)
                         <a href="{{ route('dashboard.superadmin') }}" class="{{ $navClass }} {{ request()->routeIs('dashboard.superadmin') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                             {{ __('ui.dashboard') }}
                         </a>
-                    @endif
+                    @endcan
 
-                    {{-- Shared Menu --}}
+                    {{-- Menu Bersama --}}
                     <a href="{{ route('inventory.index') }}" class="{{ $navClass }} {{ request()->routeIs('inventory.*') ? $activeClass : $inactiveClass }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                         {{ __('ui.inventory_list') }}
                     </a>
 
-                    @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
+                    @can('viewAny', \App\Models\User::class)
                         <a href="{{ route('users.index') }}" class="{{ $navClass }} {{ request()->routeIs('users.*') ? $activeClass : $inactiveClass }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
                             {{ __('ui.user_management') }}
                         </a>
-                    @endif
+                    @endcan
 
                     <a href="{{ route('inventory.scan-qr') }}" class="{{ $navClass }} {{ request()->routeIs('inventory.scan-qr') ? $activeClass : $inactiveClass }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
                         {{ __('ui.scan_qr') }}
                     </a>
 
-                    @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
+                    @can('viewAny', \App\Models\User::class)
                         <a href="{{ route('reports.index') }}" class="{{ $navClass }} {{ request()->routeIs('reports.*') ? $activeClass : $inactiveClass }}">
                              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                             {{ __('ui.reports') }}
                         </a>
-                    @endif
+                    @endcan
                     
                      @if (Auth::user()->role === \App\Enums\UserRole::ADMIN)
-                        <a href="{{ route('admin.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('admin.dashboard') ? $activeClass : $inactiveClass }}">
+                        <a href="{{ route('dashboard.admin') }}" class="{{ $navClass }} {{ request()->routeIs('dashboard.admin') ? $activeClass : $inactiveClass }}">
                             {{ __('ui.dashboard') }}
                         </a>
                      @endif
                      
                      @if (Auth::user()->role === \App\Enums\UserRole::OPERATOR)
-                        <a href="{{ route('operator.dashboard') }}" class="{{ $navClass }} {{ request()->routeIs('operator.dashboard') ? $activeClass : $inactiveClass }}">
+                        <a href="{{ route('dashboard.operator') }}" class="{{ $navClass }} {{ request()->routeIs('dashboard.operator') ? $activeClass : $inactiveClass }}">
                             {{ __('ui.dashboard') }}
                         </a>
                      @endif
@@ -78,7 +78,6 @@
 
             <div class="flex items-center ms-auto gap-2 sm:gap-4 lg:ms-6">
 
-                <!-- Notifications Dropdown -->
                 <!-- Notifications Dropdown -->
                 <div x-data="notificationComponent()" class="relative">
                     <button @click="notificationOpen = !notificationOpen" class="relative p-2 text-secondary-500 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none transition-all duration-200">
@@ -116,7 +115,7 @@
                                                     <p class="text-[10px] text-secondary-400 mt-1" x-text="timeAgo(notification.created_at) + ' • ' + new Date(notification.created_at).toLocaleString('id-ID')"></p>
                                                 </div>
                                             </div>
-                                            <!-- Manual Mark Read Button -->
+                                            <!-- Tombol Tandai Dibaca Manual -->
                                             <button @click.stop="markAsRead(notification.id, null, null)" x-show="!notification.read_at" class="absolute top-3 right-3 text-secondary-300 hover:text-primary-600 bg-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm border border-secondary-100" title="{{ __('ui.mark_as_read') }}">
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                                             </button>
@@ -134,10 +133,10 @@
                     </div>
                 </div>
 
-                <!-- Settings Dropdown -->
+                <!-- Dropdown Pengaturan -->
             <div x-data="{ profileOpen: false }" class="relative hidden lg:block">
                 <button @click="profileOpen = !profileOpen" class="inline-flex items-center gap-3 px-1 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-secondary-500 hover:text-secondary-700 focus:outline-none transition ease-in-out duration-150 group">
-                    <!-- Profile Info: 2 Lines (Name Top, Role Bottom) -->
+                    <!-- Info Profil: 2 Baris (Nama di Atas, Peran di Bawah) -->
                     <div class="hidden md:flex flex-col items-end text-right mr-3">
                         <span class="font-bold text-secondary-800 text-sm group-hover:text-primary-600 transition-colors whitespace-nowrap">{{ Auth::user()->name }}</span>
                         <span class="text-xs text-secondary-500 font-normal">{{ Auth::user()->role->label() }}</span>
@@ -153,7 +152,7 @@
                     </div>
                 </button>
                 
-                <!-- Added Script at the request of refactoring -->
+                <!-- Script ditambahkan atas permintaan refactoring -->
                 <script>
                     function notificationComponent() {
                         return {
@@ -163,14 +162,14 @@
                             init() { 
                                 this.fetchNotifications(); 
                                 
-                                // Real-time Listener
+                                // Listener Real-time
                                 if (window.Echo) {
                                     window.Echo.private('App.Models.User.{{ auth()->id() }}')
                                         .notification((notification) => {
-                                            // Update Count
+                                            // Perbarui Jumlah
                                             this.unreadCount++;
 
-                                            // Add to List
+                                            // Tambahkan ke Daftar
                                             this.notifications.unshift({
                                                 id: notification.id,
                                                 type: notification.type,
@@ -183,7 +182,7 @@
                                                 }
                                             });
 
-                                            // Show Toast
+                                            // Tampilkan Toast
                                             const Toast = Swal.mixin({
                                                 toast: true,
                                                 position: 'top-end',
@@ -195,7 +194,7 @@
 
                                             Toast.fire({
                                                 icon: 'info',
-                                                // Safe HTML string without conflicting quotes
+                                                // String HTML aman tanpa konflik kutipan
                                                 iconHtml: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>`,
                                                 title: notification.title || '{{ __('ui.new_notification') }}',
                                                 text: notification.message
@@ -280,10 +279,10 @@
 
                     <div class="border-t border-secondary-100 my-1"></div>
 
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}" onsubmit="clearDashboardPeriod()">
                         @csrf
                         <x-dropdown-link :href="route('logout')"
-                                onclick="event.preventDefault(); this.closest('form').submit();" 
+                                onclick="event.preventDefault(); clearDashboardPeriod(); this.closest('form').submit();" 
                                 class="text-danger-600 hover:bg-danger-50 hover:text-danger-700 flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                             {{ __('ui.logout') }}
@@ -292,7 +291,7 @@
                 </div>
             </div>
             
-            <!-- Hamburger (lg:hidden, static inside flex) -->
+            <!-- Hamburger (lg:hidden, statis di dalam flex) -->
             <div class="-me-2 flex items-center lg:hidden">
                 <button @click="mobileMenuOpen = ! mobileMenuOpen" class="inline-flex items-center justify-center p-2 rounded-md text-secondary-500 hover:text-secondary-900 hover:bg-secondary-100 focus:outline-none focus:bg-secondary-100 focus:text-secondary-900 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -302,12 +301,9 @@
                 </button>
             </div>
         </div>
-
-
-    </div>
     </div>
 
-    <!-- Responsive Navigation Menu -->
+    <!-- Menu Navigasi Responsif -->
     <div x-show="mobileMenuOpen" style="display: none;" class="lg:hidden bg-white border-t border-secondary-100">
         <div class="pt-2 pb-3 space-y-1">
              @php
@@ -316,32 +312,32 @@
                 $resInactiveClass = "border-transparent text-secondary-600 hover:text-secondary-800 hover:bg-secondary-50 hover:border-secondary-300 focus:outline-none focus:text-secondary-800 focus:bg-secondary-50 focus:border-secondary-300";
             @endphp
 
-            @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
+            @can('viewAny', \App\Models\User::class)
                 <a href="{{ route('dashboard.superadmin') }}" class="{{ $resNavClass }} {{ request()->routeIs('dashboard.superadmin') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.dashboard') }}
                 </a>
-            @endif
+            @endcan
             
-            {{-- Shared Menu for All Roles --}}
+            {{-- Menu Bersama untuk Semua Peran --}}
             <a href="{{ route('inventory.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('inventory.*') ? $resActiveClass : $resInactiveClass }}">
                 {{ __('ui.inventory_list') }}
             </a>
 
-            @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
+            @can('viewAny', \App\Models\User::class)
                 <a href="{{ route('users.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('users.*') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.user_management') }}
                 </a>
-            @endif
+            @endcan
             
             <a href="{{ route('inventory.scan-qr') }}" class="{{ $resNavClass }} {{ request()->routeIs('inventory.scan-qr') ? $resActiveClass : $resInactiveClass }}">
                 {{ __('ui.scan_qr') }}
             </a>
 
-            @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
+            @can('viewAny', \App\Models\User::class)
                 <a href="{{ route('reports.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('reports.*') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.reports') }}
                 </a>
-            @endif
+            @endcan
 
             <a href="{{ route('notifications.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('notifications.index') ? $resActiveClass : $resInactiveClass }} flex justify-between items-center">
                 {{ __('ui.notifications') }}
@@ -353,7 +349,7 @@
             </a>
         </div>
 
-        <!-- Responsive Settings Options -->
+        <!-- Opsi Pengaturan Responsif -->
         <div class="pt-4 pb-4 border-t border-secondary-100 bg-secondary-50/50">
             <div class="px-4 flex items-center gap-3">
                  <div class="h-10 w-10 rounded-full overflow-hidden border border-secondary-300">
@@ -369,9 +365,9 @@
                 <a href="{{ route('profile.edit') }}" class="{{ $resNavClass }} {{ $resInactiveClass }}">
                     {{ __('ui.profile') }}
                 </a>
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" onsubmit="clearDashboardPeriod()">
                     @csrf
-                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); this.closest('form').submit();" class="{{ $resNavClass }} {{ $resInactiveClass }} text-danger-600">
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); clearDashboardPeriod(); this.closest('form').submit();" class="{{ $resNavClass }} {{ $resInactiveClass }} text-danger-600">
                         {{ __('ui.logout') }}
                     </a>
                 </form>

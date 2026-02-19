@@ -7,7 +7,7 @@
     placeholder: '{{ $placeholder }}',
     options: {{ json_encode($options) }},
     init() {
-        // Find label for initial value
+        // Cari label untuk nilai awal
         if (this.selected && this.options.hasOwnProperty(this.selected)) {
             this.selectedLabel = this.options[this.selected];
         } else {
@@ -16,7 +16,7 @@
         
         $watch('selected', value => {
              if ({{ $submitOnChange ? 'true' : 'false' }}) {
-                 // Use a small timeout to let the input value update before submitting
+                 // Gunakan timeout kecil agar nilai input terupdate sebelum submit
                  setTimeout(() => {
                     const form = $el.closest('form');
                     if (form) {
@@ -56,16 +56,16 @@ class="relative {{ $width }}">
          class="absolute z-50 mt-1 w-full min-w-[100%] bg-white rounded-xl shadow-xl border border-secondary-100 overflow-hidden" 
          style="display: none;">
         <div class="max-h-60 overflow-y-auto p-1 space-y-0.5">
-             <!-- Reset Option -->
+             <!-- Opsi Reset -->
              <div @click="select('', placeholder)"
                   class="px-3 py-2 rounded-lg cursor-pointer hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"
                   :class="{'bg-primary-50 text-primary-700 font-medium': !selected}">
                  <span x-text="placeholder"></span>
              </div>
              
-             <!-- Options -->
-             <!-- Note: iterating objects in Alpine x-for uses (value, key) syntax for arrays, but (val, key) for objects. -->
-             <!-- We treat options as an object/associative array from PHP json_encode -->
+             <!-- Opsi -->
+             <!-- Catatan: iterasi objek di Alpine x-for menggunakan sintaks (value, key) untuk array, tapi (val, key) untuk objek. -->
+             <!-- Kita memperlakukan opsi sebagai objek/array asosiatif dari PHP json_encode -->
              <template x-for="(label, value) in options" :key="value">
                 <div @click="select(value, label)"
                      class="px-3 py-2 rounded-lg cursor-pointer text-secondary-700 hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"

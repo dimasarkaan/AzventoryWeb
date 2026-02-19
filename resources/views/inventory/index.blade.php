@@ -108,27 +108,30 @@
                         </div>
 
                         <!-- Floating Bulk Action Bar -->
-                            <div id="bulk-action-bar" style="display: none;" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-2xl border border-secondary-200 p-3 z-50 flex items-center gap-4 animate-in slide-in-from-bottom-5 fade-in duration-300 ring-1 ring-black/5">
-                            <span class="text-sm font-medium text-secondary-700 whitespace-nowrap pl-2">
-                                <span id="selected-count" class="font-bold text-primary-600">0</span> {{ __('ui.selected') }}
-                            </span>
-                            <div class="h-6 w-px bg-secondary-200"></div>
-                            <div class="flex gap-2">
+                        <!-- Floating Bulk Action Bar (Styled like Users) -->
+                        <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl border border-secondary-200 px-6 py-3 flex items-center gap-6 z-50 transition-all duration-300 translate-y-24 opacity-0">
+                            <div class="flex items-center gap-2 border-r border-secondary-200 pr-6">
+                                <span class="font-bold text-lg text-primary-600" id="selected-count">0</span>
+                                <span class="text-sm text-secondary-500 font-medium">{{ __('ui.selected') }}</span>
+                            </div>
+                            
+                            <div class="flex items-center gap-3">
                                 <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST">
                                     @csrf
                                     <div id="bulk-restore-inputs"></div>
-                                    <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-sm btn-success flex items-center gap-2">
-                                        <x-icon.restore class="w-4 h-4" />
-                                        {{ __('ui.restore') }}
+                                    <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
+                                        <x-icon.restore class="w-5 h-5" />
+                                        <span class="font-medium">{{ __('ui.restore') }}</span>
                                     </button>
                                 </form>
+
                                 <form id="bulk-delete-form" action="{{ route('inventory.bulk-force-delete') }}" method="POST">
                                     @csrf
                                     @method('DELETE')
                                     <div id="bulk-delete-inputs"></div>
-                                    <button type="button" onclick="submitInventoryBulkDelete()" class="btn btn-sm btn-danger flex items-center gap-2">
+                                    <button type="button" onclick="submitInventoryBulkDelete()" class="btn btn-danger flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all">
                                         <x-icon.trash class="w-4 h-4" />
-                                        {{ __('ui.force_delete') }}
+                                        <span>{{ __('ui.force_delete') }}</span>
                                     </button>
                                 </form>
                             </div>

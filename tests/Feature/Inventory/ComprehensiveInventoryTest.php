@@ -20,10 +20,10 @@ class ComprehensiveInventoryTest extends TestCase
         ]);
     }
 
-    // 1. Test Duplicate Logic: Merging Stock (Success)
+    // 1. Tes Logika Duplikat: Penggabungan Stok (Sukses)
     public function test_duplicate_item_merges_stock_when_input_stock_is_positive()
     {
-        // Create initial item with ALL fields explicit to match POST data
+        // Buat item awal dengan SEMUA field eksplisit agar cocok dengan data POST
         $existing = Sparepart::factory()->create([
             'part_number' => 'DUPLICATE-PN-123',
             'name' => 'Existing Item',
@@ -39,7 +39,7 @@ class ComprehensiveInventoryTest extends TestCase
             'color' => 'Black', // Explicitly set
         ]);
 
-        // Post exact duplicate data
+        // Post data duplikat persis
         $response = $this->actingAs($this->user)->post(route('inventory.store'), [
             'part_number' => 'DUPLICATE-PN-123',
             'name' => 'Existing Item',
@@ -60,20 +60,20 @@ class ComprehensiveInventoryTest extends TestCase
         $response->assertRedirect(route('inventory.index'));
         $response->assertSessionHas('success');
         
-        // Assert NO new item created (Count should be 1)
+        // Pastikan TIDAK ada item baru dibuat (Jumlah harus 1)
         $this->assertDatabaseCount('spareparts', 1);
 
-        // Assert stock merged (10 + 5 = 15)
+        // Pastikan stok digabungkan (10 + 5 = 15)
         $this->assertDatabaseHas('spareparts', [
             'id' => $existing->id,
             'stock' => 15,
         ]);
     }
 
-    // 2. Test Duplicate Logic: Warning on 0 Stock
+    // 2. Tes Logika Duplikat: Peringatan pada Stok 0
     public function test_duplicate_item_shows_warning_when_input_stock_is_zero()
     {
-        // Create initial item
+        // Buat item awal
         $existing = Sparepart::factory()->create([
             'part_number' => 'DUPLICATE-PN-123',
             'name' => 'Existing Item',
@@ -89,7 +89,7 @@ class ComprehensiveInventoryTest extends TestCase
             'color' => 'Black', // Explicitly set
         ]);
 
-        // Post exact duplicate data with 0 stock
+        // Post data duplikat persis dengan stok 0
         $response = $this->actingAs($this->user)->from(route('inventory.create'))
             ->post(route('inventory.store'), [
             'part_number' => 'DUPLICATE-PN-123',
@@ -108,20 +108,20 @@ class ComprehensiveInventoryTest extends TestCase
             'color' => 'Black', // Explicitly set
         ]);
 
-        // Should NOT redirect to index, but back to create
+        // Seharusnya TIDAK redirect ke index, tapi kembali ke create
         $response->assertRedirect(route('inventory.create'));
         
-        // Assert stock UNCHANGED
+        // Pastikan stok TIDAK BERUBAH
         $this->assertDatabaseHas('spareparts', [
             'id' => $existing->id,
             'stock' => 10,
         ]);
         
-        // Assert NO new item created
+        // Pastikan TIDAK ada item baru dibuat
         $this->assertDatabaseCount('spareparts', 1);
     }
 
-    // 3. Test Create New Item (Partial Validation Check)
+    // 3. Tes Buat Item Baru (Cek Validasi Parsial)
     public function test_create_new_item_validates_required_fields()
     {
         $response = $this->actingAs($this->user)->post(route('inventory.store'), [

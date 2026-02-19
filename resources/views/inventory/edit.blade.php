@@ -780,16 +780,16 @@
                                     <input type="hidden" name="price" x-model="rawPrice">
                                     <input 
                                         id="price" 
-                                        class="input-field pl-10 {{ auth()->user()->role === \App\Enums\UserRole::ADMIN ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : '' }}" 
+                                        class="input-field pl-10 @cannot('updatePrice', $sparepart) bg-gray-100 text-gray-500 cursor-not-allowed @endcannot" 
                                         type="text" 
                                         x-model="displayPrice"
-                                        @if(auth()->user()->role !== \App\Enums\UserRole::ADMIN)
+                                        @can('updatePrice', $sparepart)
                                             @input="formatPrice()"
                                             @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()"
-                                        @endif
+                                        @endcan
                                         placeholder="0" 
                                         autocomplete="off"
-                                        {{ auth()->user()->role === \App\Enums\UserRole::ADMIN ? 'readonly' : '' }}
+                                        @cannot('updatePrice', $sparepart) readonly @endcannot
                                     />
                                 </div>
                                 <x-input-error :messages="$errors->get('price')" class="mt-2" />
@@ -1081,4 +1081,152 @@
         })
     </script>
     @endpush
+
+    {{-- Merge Confirmation Modal --}}
+    @if(session('duplicate_detected'))
+    <div x-data="{ showMergeModal: true }" x-show="showMergeModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            {{-- Background Overlay --}}
+            <div x-show="showMergeModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 transition-opacity bg-secondary-500 bg-opacity-75"
+                 @click="showMergeModal = false"></div>
+
+            {{-- Center trick --}}
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+
+            {{-- Modal Content --}}
+            <div x-show="showMergeModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                
+                {{-- Header --}}
+                <div class="bg-warning-50 px-6 py-4 border-b border-warning-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-shrink-0 w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-secondary-900">Barang Duplikat Terdeteksi!</h3>
+                            <p class="text-sm text-secondary-600 mt-0.5">Perubahan Anda akan membuat item ini identik dengan barang yang sudah ada.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Body --}}
+                <div class="px-6 py-5">
+                    <div class="space-y-4">
+                        {{-- Comparison Cards --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {{-- Current Item --}}
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="text-sm font-bold text-blue-900 mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    Item yang Sedang Diedit
+                                </h4>
+                                <dl class="space-y-1.5 text-sm">
+                                    <div class="flex justify-between">
+                                        <dt class="text-blue-700 font-medium">Part Number:</dt>
+                                        <dd class="text-blue-900 font-mono">{{ session('current_item')['part_number'] }}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-blue-700 font-medium">Nama:</dt>
+                                        <dd class="text-blue-900 truncate ml-2">{{ session('current_item')['name'] }}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-blue-700 font-medium">Stock:</dt>
+                                        <dd class="text-blue-900 font-bold">{{ session('current_item')['stock'] }} Pcs</dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            {{-- Duplicate Item --}}
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <h4 class="text-sm font-bold text-green-900 mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    Item yang Sudah Ada
+                                </h4>
+                                <dl class="space-y-1.5 text-sm">
+                                    <div class="flex justify-between">
+                                        <dt class="text-green-700 font-medium">Part Number:</dt>
+                                        <dd class="text-green-900 font-mono">{{ session('duplicate_item')['part_number'] }}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-green-700 font-medium">Nama:</dt>
+                                        <dd class="text-green-900 truncate ml-2">{{ session('duplicate_item')['name'] }}</dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-green-700 font-medium">Stock:</dt>
+                                        <dd class="text-green-900 font-bold">{{ session('duplicate_item')['stock'] }} {{ session('duplicate_item')['unit'] ?? 'Pcs' }}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+
+                        {{-- Info Box --}}
+                        <div class="bg-secondary-50 border border-secondary-200 rounded-lg p-4">
+                            <h5 class="text-sm font-bold text-secondary-900 mb-2">Detail Barang Duplikat:</h5>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                                <div><span class="text-secondary-600">Merk:</span> <span class="font-medium text-secondary-900">{{ session('duplicate_item')['brand'] }}</span></div>
+                                <div><span class="text-secondary-600">Kategori:</span> <span class="font-medium text-secondary-900">{{ session('duplicate_item')['category'] }}</span></div>
+                                <div><span class="text-secondary-600">Kondisi:</span> <span class="font-medium text-secondary-900">{{ session('duplicate_item')['condition'] }}</span></div>
+                                <div><span class="text-secondary-600">Lokasi:</span> <span class="font-medium text-secondary-900">{{ session('duplicate_item')['location'] }}</span></div>
+                            </div>
+                        </div>
+
+                        {{-- Question --}}
+                        <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded">
+                            <p class="text-sm text-primary-900 font-medium">Apa yang ingin Anda lakukan?</p>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Footer Actions --}}
+                <div class="bg-secondary-50 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:gap-3 border-t border-secondary-200">
+                    {{-- Keep Separate Form --}}
+                    <form action="{{ route('inventory.update', $sparepart) }}" method="POST" class="flex-1">
+                        @csrf
+                        @method('PUT')
+                        @foreach(old() as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+                        <input type="hidden" name="keep_separate" value="true">
+                        <button type="submit" class="btn btn-secondary w-full justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Simpan Terpisah
+                        </button>
+                    </form>
+
+                    {{-- Merge Form --}}
+                    <form action="{{ route('inventory.update', $sparepart) }}" method="POST" class="flex-1">
+                        @csrf
+                        @method('PUT')
+                        @foreach(old() as $key => $value)
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endforeach
+                        <input type="hidden" name="merge_confirmed" value="true">
+                        <input type="hidden" name="duplicate_id" value="{{ session('duplicate_item')['id'] }}">
+                        <button type="submit" class="btn btn-primary w-full justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            Gabungkan Stock (Merge)
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
 </x-app-layout>

@@ -738,7 +738,7 @@
                                     </template>
 
                                     <!-- Create New Option (Superadmin Only) -->
-                                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
+                                    @can('create', \App\Models\Location::class)
                                         <div x-show="search.length > 0 && !filteredOptions.includes(search)" 
                                              @click="select(search); open = false"
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
@@ -750,7 +750,7 @@
                                          <div x-show="filteredOptions.length === 0" class="cursor-default select-none relative py-2 pl-3 pr-9 text-secondary-500 italic">
                                             {{ __('ui.location_not_found') }}
                                         </div>
-                                    @endif
+                                    @endcan
                                 </div>
                                 <x-input-error :messages="$errors->get('location')" class="mt-2" />
                             </div>
@@ -766,7 +766,7 @@
                             <!-- Stok Saat Ini -->
                             <div>
                                 <label for="stock" class="input-label">{{ __('ui.current_stock') }} <span class="text-danger-500">*</span></label>
-                                <input id="stock" class="input-field" type="number" name="stock" value="{{ old('stock', 0) }}" min="0" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" />
+                                <input id="stock" class="input-field" type="number" name="stock" value="{{ old('stock') }}" min="0" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" />
                                 <x-input-error :messages="$errors->get('stock')" class="mt-2" />
                             </div>
                             

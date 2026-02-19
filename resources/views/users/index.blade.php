@@ -96,6 +96,11 @@
                         <!-- Header: Avatar, Name, Role -->
                         <div class="flex items-start gap-4 mb-4">
                             <!-- Avatar -->
+                            @if(request('trash'))
+                                <div class="flex items-center self-center mr-2">
+                                    <input type="checkbox" name="ids[]" value="{{ $user->id }}" class="user-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5">
+                                </div>
+                            @endif
                             <div class="h-14 w-14 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0 border border-secondary-200 overflow-hidden">
                                 @if($user->avatar)
                                     <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" loading="lazy" class="h-full w-full object-cover">
@@ -152,6 +157,7 @@
                         <!-- Actions -->
                         <div class="flex items-center justify-end gap-2">
                             @if(request('trash'))
+                                @can('restore', $user)
                                 <form action="{{ route('users.restore', $user->id) }}" method="POST" class="w-full">
                                     @csrf
                                     @method('PATCH')
@@ -160,12 +166,15 @@
                                         {{ __('ui.restore') }}
                                     </button>
                                 </form>
+                                @endcan
                             @else
-                                <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-secondary flex-1 justify-center flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                    {{ __('ui.edit') }}
-                                </a>
-                                @if(auth()->id() !== $user->id)
+                                @can('update', $user)
+                                    <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-secondary flex-1 justify-center flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        {{ __('ui.edit') }}
+                                    </a>
+                                @endcan
+                                @can('delete', $user)
                                     <form action="{{ route('users.destroy', $user) }}" method="POST" class="flex-1">
                                         @csrf
                                         @method('DELETE')
@@ -174,7 +183,7 @@
                                             {{ __('ui.delete') }}
                                         </button>
                                     </form>
-                                @endif
+                                @endcan
                             @endif
                         </div>
                     </div>

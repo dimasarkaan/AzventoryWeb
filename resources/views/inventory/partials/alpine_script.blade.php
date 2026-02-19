@@ -19,7 +19,7 @@
             successMessage: '',
             
             maxReturnQty: 0,
-            returnQty: 0,
+            returnQty: '',
             returnCondition: '',
             isSubmitting: false,
             
@@ -43,7 +43,7 @@
             },
 
             get isValid() {
-                return this.returnQty > 0 && 
+                return this.returnQty !== '' && this.returnQty > 0 && 
                        this.returnQty <= this.maxReturnQty && 
                        this.returnCondition !== ''; 
             },
@@ -51,7 +51,7 @@
             initReturn(detail) {
                 console.log('Init Return Open:', detail);
                 this.maxReturnQty = detail.maxQty;
-                this.returnQty = 0;
+                this.returnQty = '';
                 this.selectedBorrowing = detail.borrowingId;
                 this.returnCondition = '';
                 this.conditionLabel = 'Pilih Kondisi';
@@ -99,6 +99,11 @@
                     } else {
                         if (response.status === 422) {
                             this.errors = data.errors;
+                            this.$nextTick(() => {
+                                if (this.$refs.errorContainer) {
+                                    this.$refs.errorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            });
                         } else {
                             alert(data.message || 'Terjadi kesalahan sistem.');
                         }

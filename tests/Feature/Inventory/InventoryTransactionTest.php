@@ -25,18 +25,18 @@ class InventoryTransactionTest extends TestCase
         \Illuminate\Support\Facades\Storage::fake('public');
         \Illuminate\Support\Facades\Notification::fake();
 
-        // MOCK ImageOptimizationService to avoid GD requirement
+        // MOCK ImageOptimizationService untuk menghindari kebutuhan GD
         $this->mock(\App\Services\ImageOptimizationService::class, function ($mock) {
             $mock->shouldReceive('optimizeAndSave')->andReturn('dummy/path.webp');
         });
 
-        // MOCK QrCodeService to avoid file generation
+        // MOCK QrCodeService untuk menghindari pembuatan file
         $this->mock(\App\Services\QrCodeService::class, function ($mock) {
             $mock->shouldReceive('generate')->andReturn('dummy/qrcode.svg');
             $mock->shouldReceive('generateLabelSvg')->andReturn('<svg>...</svg>');
         });
 
-        // Create SuperAdmin user
+        // Buat user SuperAdmin
         $this->user = User::factory()->create([
             'role' => 'superadmin',
             'password_changed_at' => now(),
@@ -68,7 +68,7 @@ class InventoryTransactionTest extends TestCase
         $response->assertRedirect(route('inventory.index'));
         $response->assertSessionHas('success');
 
-        // 1. Check Sparepart Created
+        // 1. Periksa Sparepart Dibuat
         $this->assertDatabaseHas('spareparts', [
             'part_number' => 'PN-TRANS-001',
             'stock' => 10,
@@ -76,7 +76,7 @@ class InventoryTransactionTest extends TestCase
 
         $sparepart = Sparepart::where('part_number', 'PN-TRANS-001')->first();
 
-        // 2. Check Stock Log Created (Critical for Data Integrity)
+        // 2. Periksa Log Stok Dibuat (Penting untuk Integritas Data)
         $this->assertDatabaseHas('stock_logs', [
             'sparepart_id' => $sparepart->id,
             'type' => 'masuk',
@@ -85,7 +85,7 @@ class InventoryTransactionTest extends TestCase
             'user_id' => $this->user->id,
         ]);
 
-        // 3. Check Activity Log Created
+        // 3. Periksa Log Aktivitas Dibuat
         $this->assertDatabaseHas('activity_logs', [
             'user_id' => $this->user->id,
             'action' => 'Sparepart Dibuat',
@@ -122,13 +122,13 @@ class InventoryTransactionTest extends TestCase
         $response->assertRedirect(route('inventory.index'));
         $response->assertSessionHas('success');
 
-        // Check Update
+        // Periksa Pembaruan
         $this->assertDatabaseHas('spareparts', [
             'id' => $sparepart->id,
             'name' => 'Updated Name',
         ]);
 
-        // Check Activity Log
+        // Periksa Log Aktivitas
         $this->assertDatabaseHas('activity_logs', [
             'user_id' => $this->user->id,
             'action' => 'Sparepart Diperbarui',
@@ -146,12 +146,12 @@ class InventoryTransactionTest extends TestCase
         $response->assertRedirect(route('inventory.index'));
         $response->assertSessionHas('success');
 
-        // Check Soft Delete
+        // Periksa Soft Delete
         $this->assertSoftDeleted('spareparts', [
             'id' => $sparepart->id,
         ]);
 
-        // Check Activity Log
+        // Periksa Log Aktivitas
         $this->assertDatabaseHas('activity_logs', [
             'user_id' => $this->user->id,
             'action' => 'Sparepart Dihapus',
@@ -170,12 +170,12 @@ class InventoryTransactionTest extends TestCase
         $response->assertRedirect(route('inventory.index') . '?trash=true');
         $response->assertSessionHas('success');
 
-        // Check Restore
+        // Periksa Pemulihan
         $this->assertNotSoftDeleted('spareparts', [
             'id' => $sparepart->id,
         ]);
 
-        // Check Activity Log
+        // Periksa Log Aktivitas
         $this->assertDatabaseHas('activity_logs', [
             'user_id' => $this->user->id,
             'action' => 'Sparepart Dipulihkan',
@@ -194,12 +194,12 @@ class InventoryTransactionTest extends TestCase
         $response->assertRedirect(route('inventory.index') . '?trash=true');
         $response->assertSessionHas('success');
 
-        // Check Force Delete
+        // Periksa Hapus Permanen
         $this->assertDatabaseMissing('spareparts', [
             'id' => $sparepart->id,
         ]);
 
-        // Check Activity Log
+        // Periksa Log Aktivitas
         $this->assertDatabaseHas('activity_logs', [
             'user_id' => $this->user->id,
             'action' => 'Sparepart Dihapus Permanen',
@@ -209,7 +209,7 @@ class InventoryTransactionTest extends TestCase
     /** @test */
     public function it_handles_duplicate_entry_merging_correctly()
     {
-        // 1. Create Initial Item
+        // 1. Buat Item Awal
         $sparepart = Sparepart::factory()->create([
             'part_number' => 'PN-DUP-001',
             'name' => 'Duplicate Candidate',
@@ -224,7 +224,7 @@ class InventoryTransactionTest extends TestCase
             'unit' => 'Pcs',
         ]);
 
-        // 2. Submit Duplicate Data
+        // 2. Kirim Data Duplikat
         $data = [
             'part_number' => 'PN-DUP-001',
             'name' => 'Duplicate Candidate',
@@ -245,15 +245,15 @@ class InventoryTransactionTest extends TestCase
         $response = $this->actingAs($this->user)
             ->post(route('inventory.store'), $data);
             
-        $response->assertSessionHas('success'); // Should be success (merged)
+        $response->assertSessionHas('success'); // Seharusnya sukses (digabungkan)
 
-        // 3. Verify Stock Merged
+        // 3. Verifikasi Stok Digabung
         $this->assertDatabaseHas('spareparts', [
             'id' => $sparepart->id,
             'stock' => 15, // 10 + 5
         ]);
 
-        // 4. Verify Stock Log for merging
+        // 4. Verifikasi Log Stok untuk penggabungan
         $this->assertDatabaseHas('stock_logs', [
             'sparepart_id' => $sparepart->id,
             'type' => 'masuk',
@@ -261,7 +261,7 @@ class InventoryTransactionTest extends TestCase
             'reason' => 'Penambahan stok (Duplicate Entry)',
         ]);
 
-        // 5. Verify NO new item
+        // 5. Verifikasi TIDAK ada item baru
         $this->assertDatabaseCount('spareparts', 1);
     }
 }

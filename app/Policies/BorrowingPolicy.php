@@ -9,7 +9,7 @@ use App\Enums\UserRole;
 class BorrowingPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Tentukan apakah user bisa melihat daftar peminjaman.
      */
     public function viewAny(User $user): bool
     {
@@ -17,7 +17,7 @@ class BorrowingPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Tentukan apakah user bisa melihat detail peminjaman.
      */
     public function view(User $user, Borrowing $borrowing): bool
     {
@@ -27,7 +27,7 @@ class BorrowingPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Tentukan apakah user bisa mengajukan peminjaman.
      */
     public function create(User $user): bool
     {
@@ -36,7 +36,7 @@ class BorrowingPolicy
     }
 
     /**
-     * Determine whether the user can update the model (e.g., return item).
+     * Tentukan apakah user bisa mengubah data peminjaman (misal: pengembalian).
      */
     public function update(User $user, Borrowing $borrowing): bool
     {
@@ -46,7 +46,7 @@ class BorrowingPolicy
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Tentukan apakah user bisa menghapus data peminjaman.
      */
     public function delete(User $user, Borrowing $borrowing): bool
     {
@@ -55,7 +55,7 @@ class BorrowingPolicy
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Tentukan apakah user bisa memulihkan data peminjaman yang dihapus.
      */
     public function restore(User $user, Borrowing $borrowing): bool
     {
@@ -63,7 +63,7 @@ class BorrowingPolicy
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Tentukan apakah user bisa menghapus permanen data peminjaman.
      */
     public function forceDelete(User $user, Borrowing $borrowing): bool
     {

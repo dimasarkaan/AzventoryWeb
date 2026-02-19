@@ -14,7 +14,7 @@
             <form method="POST" action="{{ route('password.change.store') }}">
                 @csrf
 
-                <!-- Username (Only on First Login / Activation) -->
+                <!-- Username (Hanya saat Login Pertama / Aktivasi) -->
                 @if(is_null(auth()->user()->password_changed_at))
                     <div class="mb-4">
                         <x-input-label for="username" :value="__('ui.auth_label_username_optional')" />
@@ -26,7 +26,7 @@
                     </div>
                 @endif
 
-                <!-- Current Password -->
+                <!-- Password Saat Ini -->
                 @if(!is_null(auth()->user()->password_changed_at))
                     <div>
                         <x-input-label for="current_password" :value="__('ui.auth_label_current_password')" />
@@ -35,14 +35,14 @@
                     </div>
                 @endif
 
-                <!-- New Password -->
+                <!-- Password Baru -->
                 <div class="mt-4">
                     <x-input-label for="password" :value="__('ui.auth_label_new_password')" />
                     <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required />
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
 
-                <!-- Confirm New Password -->
+                <!-- Konfirmasi Password Baru -->
                 <div class="mt-4">
                     <x-input-label for="password_confirmation" :value="__('ui.auth_label_new_password_confirmation')" />
                     <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required />

@@ -70,7 +70,7 @@
     x-show="open"
     x-cloak
 >
-    <!-- Backdrop -->
+    <!-- Latar Belakang -->
     <div x-show="open" 
          x-transition:enter="ease-out duration-300"
          x-transition:enter-start="opacity-0"
@@ -81,7 +81,7 @@
          class="fixed inset-0 bg-gray-500/75 backdrop-blur-sm transition-opacity" 
          @click="open = false"></div>
 
-    <!-- Modal Panel -->
+    <!-- Panel Modal -->
     <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
         <div x-show="open" 
              x-transition:enter="ease-out duration-300"
@@ -92,7 +92,7 @@
              x-transition:leave-end="opacity-0 scale-95"
              class="mx-auto max-w-2xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
 
-            <!-- Search Input -->
+            <!-- Input Pencarian -->
             <div class="relative">
                 <svg class="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                     <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1114 0 7 7 0 01-14 0z" clip-rule="evenodd" />
@@ -113,11 +113,11 @@
                 </div>
             </div>
 
-            <!-- Results -->
+            <!-- Hasil -->
             <ul x-show="query.length >= 2 && totalItems > 0" class="max-h-96 scroll-py-3 overflow-y-auto p-3" id="options" role="listbox">
                 @php $globalIndex = 0; @endphp
                 
-                <!-- Menus -->
+                <!-- Menu -->
                 <template x-if="results.menus.length > 0">
                     <li class="mb-2">
                         <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">{{ __('ui.search_menu') }}</h2>
@@ -130,7 +130,7 @@
                                     role="option" 
                                     tabindex="-1">
                                     <div class="flex h-8 w-8 flex-none items-center justify-center rounded-lg bg-white border border-gray-200 group-hover:border-primary-200 shadow-sm">
-                                        <!-- Simple Icon Fallback -->
+                                        <!-- Fallback Ikon Sederhana -->
                                         <svg class="h-5 w-5 text-gray-400 group-hover:text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                         </svg>
@@ -143,7 +143,7 @@
                     </li>
                 </template>
 
-                <!-- Inventory -->
+                <!-- Inventaris -->
                 <template x-if="results.spareparts.length > 0">
                     <li class="mb-2">
                          <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">{{ __('ui.search_inventory') }}</h2>
@@ -169,7 +169,7 @@
                     </li>
                 </template>
 
-                 <!-- Users -->
+                 <!-- Pengguna -->
                  <template x-if="results.users.length > 0">
                     <li class="mb-2">
                          <h2 class="px-2.5 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 rounded-md mb-1">{{ __('ui.search_users') }}</h2>
@@ -195,7 +195,7 @@
                 </template>
             </ul>
 
-            <!-- Empty State -->
+            <!-- State Kosong -->
             <div x-show="query.length >= 2 && totalItems === 0 && !isLoading" class="px-6 py-14 text-center text-sm sm:px-14">
                 <svg class="mx-auto h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -204,10 +204,10 @@
                 <p class="mt-2 text-gray-500">{{ __('ui.search_no_results_desc') }}</p>
             </div>
             
-             <!-- Loading State -->
+             <!-- State Loading -->
              <!-- Skeleton Loading State -->
             <div x-show="isLoading" class="max-h-96 scroll-py-3 overflow-y-auto p-3 space-y-4">
-                <!-- Skeleton Group 1 (Menus) -->
+                <!-- Grup Skeleton 1 (Menu) -->
                 <div>
                      <div class="h-4 w-16 bg-gray-100 rounded mb-2 animate-pulse"></div>
                      <div class="space-y-1">
@@ -224,7 +224,7 @@
                      </div>
                 </div>
 
-                <!-- Skeleton Group 2 (Inventory) -->
+                <!-- Grup Skeleton 2 (Inventaris) -->
                  <div>
                      <div class="h-4 w-20 bg-gray-100 rounded mb-2 animate-pulse"></div>
                      <div class="space-y-1">

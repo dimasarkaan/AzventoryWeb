@@ -7,13 +7,13 @@ use Illuminate\Console\Command;
 class CleanupActivityLogs extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature console command.
      *
      * @var string
      */
-    protected $signature = 'activitylog:clean {--days=180 : Number of days to keep logs}';
+    protected $signature = 'activitylog:clean {--days=180 : Jumlah hari untuk menyimpan log}';
 
-    protected $description = 'Clean up activity logs older than specified days (default 180 days / 6 months)';
+    protected $description = 'Bersihkan log aktivitas yang lebih lama dari jumlah hari yang ditentukan (default 180 hari / 6 bulan)';
 
     public function handle()
     {
@@ -22,6 +22,6 @@ class CleanupActivityLogs extends Command
 
         $count = \App\Models\ActivityLog::where('created_at', '<', $date)->delete();
 
-        $this->info("Deleted {$count} activity logs older than {$days} days.");
+        $this->info("Berhasil menghapus {$count} log aktivitas yang lebih lama dari {$days} hari.");
     }
 }

@@ -15,7 +15,7 @@ class AuthenticatedSessionController extends Controller
     use ActivityLogger;
 
     /**
-     * Display the login view.
+     * Menampilkan halaman login.
      */
     public function create(): View
     {
@@ -23,7 +23,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Handle an incoming authentication request.
+     * Menangani permintaan autentikasi (Login).
      */
     public function store(LoginRequest $request): RedirectResponse
     {
@@ -45,7 +45,7 @@ class AuthenticatedSessionController extends Controller
     }
 
     /**
-     * Destroy an authenticated session.
+     * Menghapus sesi autentikasi (Logout).
      */
     public function destroy(Request $request): RedirectResponse
     {

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+})->purpose('Tampilkan kutipan inspiratif');
 
 Schedule::command('app:send-overdue-notifications')->dailyAt('08:00');
 Schedule::command('model:prune', [

@@ -9,21 +9,21 @@ use Illuminate\Support\Facades\Hash;
 class CreateApiToken extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature console command.
      *
      * @var string
      */
-    protected $signature = 'api:create-token {name : The name of the token (e.g., "Web HR")} {email? : Optional email to attach to a new user}';
+    protected $signature = 'api:create-token {name : Nama token (misal: "Web HR")} {email? : Email opsional untuk user baru}';
 
     /**
-     * The console command description.
+     * Deskripsi console command.
      *
      * @var string
      */
-    protected $description = 'Create an API token for a user (or create a new service user)';
+    protected $description = 'Buat API token untuk user (atau buat service user baru)';
 
     /**
-     * Execute the console command.
+     * Eksekusi console command.
      */
     public function handle()
     {
@@ -42,11 +42,11 @@ class CreateApiToken extends Command
         // Create Token
         $token = $user->createToken($name);
 
-        $this->info("Token Created Successfully!");
+        $this->info("Token Berhasil Dibuat!");
         $this->line("User: " . $user->email);
-        $this->line("Token Name: " . $name);
+        $this->line("Nama Token: " . $name);
         $this->newLine();
-        $this->warn("Access Token (SAVE THIS, it won't be shown again):");
+        $this->warn("Akses Token (SIMPAN INI, token tidak akan ditampilkan lagi):");
         $this->info($token->plainTextToken);
         $this->newLine();
 

@@ -9,25 +9,25 @@ use App\Notifications\OverdueBorrowingNotification;
 class SendOverdueNotifications extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature console command.
      *
      * @var string
      */
     protected $signature = 'app:send-overdue-notifications';
 
     /**
-     * The console command description.
+     * Deskripsi console command.
      *
      * @var string
      */
-    protected $description = 'Send notifications to users with overdue borrowings';
+    protected $description = 'Kirim notifikasi ke user yang meminjam barang melewati batas waktu';
 
     /**
-     * Execute the console command.
+     * Eksekusi console command.
      */
     public function handle()
     {
-        $this->info('Checking for overdue borrowings...');
+        $this->info('Memeriksa peminjaman yang terlambat...');
 
         $overdueBorrowings = Borrowing::where('status', 'borrowed')
             ->where('expected_return_at', '<', now())
@@ -35,7 +35,7 @@ class SendOverdueNotifications extends Command
             ->get();
 
         if ($overdueBorrowings->isEmpty()) {
-            $this->info('No overdue borrowings found.');
+            $this->info('Tidak ditemukan peminjaman yang terlambat.');
             return;
         }
 
@@ -43,10 +43,10 @@ class SendOverdueNotifications extends Command
             if ($borrowing->user) {
                 // Send notification
                 $borrowing->user->notify(new OverdueBorrowingNotification($borrowing));
-                $this->info("Notification sent to {$borrowing->user->name} for {$borrowing->sparepart->name}");
+                $this->info("Notifikasi dikirim ke {$borrowing->user->name} untuk barang {$borrowing->sparepart->name}");
             }
         }
 
-        $this->info("Sent notifications for {$overdueBorrowings->count()} items.");
+        $this->info("Mengirim notifikasi untuk {$overdueBorrowings->count()} item.");
     }
 }

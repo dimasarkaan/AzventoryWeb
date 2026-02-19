@@ -10,32 +10,32 @@ use Illuminate\Support\Facades\Storage;
 class GenerateQrCodes extends Command
 {
     /**
-     * The name and signature of the console command.
+     * Nama dan signature console command.
      *
      * @var string
      */
     protected $signature = 'app:generate-qr-codes';
 
     /**
-     * The console command description.
+     * Deskripsi console command.
      *
      * @var string
      */
-    protected $description = 'Generate QR Codes for spareparts that do not have one';
+    protected $description = 'Generate kode QR untuk sparepart yang belum memilikinya';
 
     /**
-     * Execute the console command.
+     * Eksekusi console command.
      */
     public function handle()
     {
         $spareparts = Sparepart::all();
 
         if ($spareparts->isEmpty()) {
-            $this->info('All spareparts already have QR codes.');
+            $this->info('Semua sparepart sudah memiliki kode QR.');
             return;
         }
 
-        $this->info('Generating QR Codes for ' . $spareparts->count() . ' spareparts...');
+        $this->info('Membuat Kode QR untuk ' . $spareparts->count() . ' sparepart...');
 
         $bar = $this->output->createProgressBar($spareparts->count());
         $bar->start();
@@ -56,6 +56,6 @@ class GenerateQrCodes extends Command
 
         $bar->finish();
         $this->newLine();
-        $this->info('QR Codes generated successfully.');
+        $this->info('Kode QR berhasil dibuat.');
     }
 }

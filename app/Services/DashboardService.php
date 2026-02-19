@@ -13,9 +13,7 @@ use Illuminate\Support\Collection;
 
 class DashboardService
 {
-    /**
-     * Get date range based on request input
-     */
+    // Dapatkan rentang tanggal berdasarkan input request.
     public function getDateRange(?string $period, ?string $year, ?string $month): array
     {
         $period = $period ?? 'today';
@@ -49,9 +47,7 @@ class DashboardService
         return [$start, $end, $period];
     }
 
-    /**
-     * Get basic stock counts (Snapshots)
-     */
+    // Dapatkan ringkasan stok (Snapshot).
     public function getStockSnapshots(): array
     {
         return [
@@ -64,9 +60,7 @@ class DashboardService
         ];
     }
 
-    /**
-     * Get Stock Movement Chart Data
-     */
+    // Dapatkan data grafik pergerakan stok.
     public function getStockMovements(Carbon $start, Carbon $end): array
     {
         $movementStats = StockLog::where('status', 'approved')
@@ -88,9 +82,7 @@ class DashboardService
         return compact('labels', 'masuk', 'keluar');
     }
 
-    /**
-     * Get Top Moving Items (Entered/Exited)
-     */
+    // Dapatkan barang paling sering masuk/keluar.
     public function getTopItems(Carbon $start, Carbon $end, string $type): Collection
     {
         return StockLog::join('spareparts', 'stock_logs.sparepart_id', '=', 'spareparts.id')
@@ -104,9 +96,7 @@ class DashboardService
             ->get();
     }
 
-    /**
-     * Get Dead Stock Items
-     */
+    // Dapatkan barang 'Dead Stock' (tidak bergerak lama).
     public function getDeadStock(Carbon $start, Carbon $end, string $period): Collection
     {
         $deadStockStart = $start;
@@ -126,9 +116,7 @@ class DashboardService
             ->get();
     }
 
-    /**
-     * Get User Activity Leaderboard
-     */
+    // Dapatkan leaderboard aktivitas user.
     public function getUserLeaderboard(Carbon $start, Carbon $end): Collection
     {
         return StockLog::select('user_id', DB::raw('count(*) as total_actions'))
@@ -140,9 +128,7 @@ class DashboardService
             ->get();
     }
 
-    /**
-     * Get Forecasts (Optimized)
-     */
+    // Dapatkan prediksi kebutuhan stok (Forecast).
     public function getForecasts(Collection $topExitedItems): array
     {
         $forecasts = [];
@@ -181,9 +167,7 @@ class DashboardService
         return $forecasts;
     }
 
-    /**
-     * Get Active and Overdue Borrowings based on User Role
-     */
+    // Dapatkan statistik peminjaman aktif & terlambat berdasarkan Role.
     public function getBorrowingStats(User $user): array
     {
         $borrowQuery = Borrowing::query();
@@ -206,7 +190,9 @@ class DashboardService
         
         $totalOverdueCount = $overdueBaseQuery->count();
         
-        $overdueBorrowings = $overdueBaseQuery->with(['user', 'sparepart'])
+        $overdueBorrowings = $overdueBaseQuery->with(['user', 'sparepart' => function($q) {
+                $q->withTrashed();
+            }])
             ->orderBy('expected_return_at', 'asc')
             ->take(5)
             ->get();

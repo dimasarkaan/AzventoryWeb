@@ -11,7 +11,7 @@ use App\Policies\SparepartPolicy;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Registrasi service aplikasi.
      */
     public function register(): void
     {
@@ -19,11 +19,12 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap service aplikasi.
      */
     public function boot(): void
     {
         Gate::policy(Sparepart::class, SparepartPolicy::class);
+        Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
 
         config(['app.locale' => 'id']);
         \Carbon\Carbon::setLocale('id');
@@ -31,5 +32,27 @@ class AppServiceProvider extends ServiceProvider
         $this->app['translator']->addJsonPath(lang_path());
 
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
+        
+        // Environment validation untuk production
+        if (app()->environment('production')) {
+            $this->validateCriticalEnvVariables();
+        }
+    }
+    
+    /**
+     * Validasi environment variables kritis untuk production.
+     */
+    private function validateCriticalEnvVariables(): void
+    {
+        $required = [
+            'APP_KEY' => 'Application encryption key',
+            'DB_CONNECTION' => 'Database connection',
+        ];
+        
+        foreach ($required as $env => $description) {
+            if (empty(env($env))) {
+                throw new \RuntimeException("Missing critical environment variable: {$env} ({$description})");
+            }
+        }
     }
 }

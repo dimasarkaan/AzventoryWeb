@@ -55,9 +55,11 @@ return [
     'trash_empty' => 'Tempat sampah sudah kosong.',
     'trash_cleared' => 'Semua item di sampah berhasil dihapus permanen.',
     'cannot_delete_borrowed_item' => 'Barang tidak dapat dihapus karena sedang dipinjam.',
+    'cannot_merge_borrowed_item' => 'Barang tidak dapat digabungkan karena sedang dipinjam.',
     'no_item_selected' => 'Tidak ada item yang dipilih.',
     'bulk_restored' => ':count item berhasil dipulihkan.',
     'bulk_force_deleted' => ':count item berhasil dihapus permanen.',
+    'items_merged' => "Berhasil menggabungkan ':source_name' (PN: :source_pn) dengan stock :stock ke ':target_name' (PN: :target_pn).",
     
     // Users
     'user_created' => "User berhasil dibuat. Username Sementara: :username, Password Default: :password",
@@ -75,6 +77,7 @@ return [
     // Activity Logs
     'log_stock_added_duplicate' => 'Penambahan stok (Duplicate Entry)',
     'log_stock_initial' => 'Stok awal (Item baru)',
+    'log_stock_merged_from' => 'Penggabungan stok dari PN: :source_pn',
     'log_item_updated' => "Data sparepart ':name' (PN: :part_number) telah diperbarui.",
     'log_item_deleted_soft' => "Sparepart ':name' (PN: :part_number) telah dipindahkan ke tong sampah.",
     'log_item_restored' => "Sparepart ':name' (PN: :part_number) telah dipulihkan dari tong sampah.",

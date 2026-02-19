@@ -14,11 +14,25 @@ use App\Traits\ActivityLogger;
 class StockRequestController extends Controller
 {
     use ActivityLogger;
+
+    protected $inventoryService;
+
+    public function __construct(\App\Services\InventoryService $inventoryService)
+    {
+        $this->inventoryService = $inventoryService;
+    }
+
+    /**
+     * Menampilkan form pengajuan perubahan stok.
+     */
     public function create(Sparepart $inventory)
     {
         return view('inventory.stock_request', ['sparepart' => $inventory]);
     }
 
+    /**
+     * Menyimpan pengajuan perubahan stok.
+     */
     public function store(Request $request, Sparepart $sparepart)
     {
         $request->validate([
@@ -46,6 +60,10 @@ class StockRequestController extends Controller
                     $sparepart->stock -= $request->quantity;
                 }
                 $sparepart->save();
+                
+                // Clear Dashboard Cache & Broadcast Update
+                $this->inventoryService->clearCache();
+                $this->inventoryService->broadcastUpdate($sparepart, 'updated');
             }
 
             // Create Log
