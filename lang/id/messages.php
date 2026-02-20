@@ -17,6 +17,7 @@ return [
     'all_locations' => 'Semua Lokasi',
     'all_colors' => 'Semua Warna',
     'all_types' => 'Semua Tipe',
+    'all_conditions' => 'Semua Kondisi',
 
     // Inventory
     'inventory_create_title' => 'Tambah Sparepart Baru',

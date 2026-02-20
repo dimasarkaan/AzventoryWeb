@@ -113,15 +113,19 @@ Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
         Route::resource('/', InventoryController::class)->parameters(['' => 'inventory']);
     });
 
-    // --- Laporan & Analitik (Superadmin) ---
-    Route::prefix('reports')->name('reports.')->middleware('role:superadmin')->group(function () {
-        // Laporan Umum
-        Route::get('/', [ReportController::class, 'index'])->name('index');
-        Route::get('/download', [ReportController::class, 'download'])->name('download');
+    // --- Laporan & Analitik ---
+    Route::prefix('reports')->name('reports.')->group(function () {
+        // Laporan Umum (Superadmin & Admin)
+        Route::middleware('role:superadmin,admin')->group(function () {
+            Route::get('/', [ReportController::class, 'index'])->name('index');
+            Route::get('/download', [ReportController::class, 'download'])->name('download');
+        });
 
-        // Log Aktivitas
-        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
-        Route::get('/activity-logs/export', [ActivityLogController::class, 'export'])->name('activity-logs.export');
+        // Log Aktivitas (Hanya Superadmin)
+        Route::middleware('role:superadmin')->group(function () {
+            Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+            Route::get('/activity-logs/export', [ActivityLogController::class, 'export'])->name('activity-logs.export');
+        });
     });
 
     // --- Manajemen Pengguna (Superadmin) ---

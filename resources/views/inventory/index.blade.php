@@ -163,6 +163,7 @@
                             $brandOptions = $brands->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             $locationOptions = $locations->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             $colorOptions = $colors->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $conditionOptions = $conditions->mapWithKeys(fn($item) => [$item => $item])->toArray();
                         @endphp
 
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
@@ -186,25 +187,30 @@
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
                             <x-select name="color" :options="$colorOptions" :selected="request('color')" placeholder="{{ __('ui.all_colors') }}" :submitOnChange="true" width="w-full" />
                         </div>
-                        @php
-                            $sortOptions = [
-                                'newest' => __('ui.sort_newest'),
-                                'oldest' => __('ui.sort_oldest'),
-                                'name_asc' => __('ui.sort_name_asc'),
-                                'name_desc' => __('ui.sort_name_desc'),
-                                'stock_asc' => __('ui.sort_stock_asc'),
-                                'stock_desc' => __('ui.sort_stock_desc'),
-                                'price_asc' => __('ui.sort_price_asc'),
-                                'price_desc' => __('ui.sort_price_desc'),
-                            ];
-                        @endphp
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <x-select name="condition" :options="$conditionOptions" :selected="request('condition')" placeholder="{{ __('ui.all_conditions') }}" :submitOnChange="true" width="w-full" />
+                        </div>
+                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            @php
+                                $sortOptions = [
+                                    'newest' => __('ui.sort_newest'),
+                                    'oldest' => __('ui.sort_oldest'),
+                                    'name_asc' => __('ui.sort_name_asc'),
+                                    'name_desc' => __('ui.sort_name_desc'),
+                                    'stock_asc' => __('ui.sort_stock_asc'),
+                                    'stock_desc' => __('ui.sort_stock_desc'),
+                                    'price_asc' => __('ui.sort_price_asc'),
+                                    'price_desc' => __('ui.sort_price_desc'),
+                                ];
+                            @endphp
                             <x-select name="sort" :options="$sortOptions" :selected="request('sort', 'newest')" placeholder="{{ __('ui.sort') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         
-                        <a href="{{ route('inventory.index') }}" id="reset-filters" class="btn btn-secondary flex items-center justify-center gap-2" title="{{ __('ui.reset_filter') }}">
-                            <x-icon.restore class="h-5 w-5" />
-                        </a>
+                        <div class="flex items-end flex-shrink-0">
+                            <a href="{{ route('inventory.index') }}" id="reset-filters" class="btn btn-secondary flex items-center justify-center p-2.5 h-[42px] w-[42px]" title="{{ __('ui.reset_filter') }}">
+                                <x-icon.restore class="h-5 w-5" />
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>

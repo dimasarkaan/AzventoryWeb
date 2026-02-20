@@ -56,7 +56,9 @@ class DashboardService
             'totalCategories' => Sparepart::distinct('category')->count('category'),
             'totalLocations' => Sparepart::distinct('location')->count('location'),
             'pendingApprovalsCount' => StockLog::where('status', 'pending')->count(),
-            'lowStockItems' => Sparepart::whereColumn('stock', '<=', 'minimum_stock')->take(5)->get(),
+            'lowStockItems' => Sparepart::whereColumn('stock', '<=', 'minimum_stock')
+                ->where('condition', 'Baik')
+                ->take(5)->get(),
         ];
     }
 

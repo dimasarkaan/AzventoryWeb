@@ -365,6 +365,7 @@
                             $brandOptions = $brands->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             $locationOptions = $locations->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             $colorOptions = $colors->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $conditionOptions = $conditions->mapWithKeys(fn($item) => [$item => $item])->toArray();
                         ?>
 
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
@@ -483,19 +484,41 @@
 <?php unset($__componentOriginaled2cde6083938c436304f332ba96bb7c); ?>
 <?php endif; ?>
                         </div>
-                        <?php
-                            $sortOptions = [
-                                'newest' => __('ui.sort_newest'),
-                                'oldest' => __('ui.sort_oldest'),
-                                'name_asc' => __('ui.sort_name_asc'),
-                                'name_desc' => __('ui.sort_name_desc'),
-                                'stock_asc' => __('ui.sort_stock_asc'),
-                                'stock_desc' => __('ui.sort_stock_desc'),
-                                'price_asc' => __('ui.sort_price_asc'),
-                                'price_desc' => __('ui.sort_price_desc'),
-                            ];
-                        ?>
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <?php if (isset($component)) { $__componentOriginaled2cde6083938c436304f332ba96bb7c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaled2cde6083938c436304f332ba96bb7c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.select','data' => ['name' => 'condition','options' => $conditionOptions,'selected' => request('condition'),'placeholder' => ''.e(__('ui.all_conditions')).'','submitOnChange' => true,'width' => 'w-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['name' => 'condition','options' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($conditionOptions),'selected' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request('condition')),'placeholder' => ''.e(__('ui.all_conditions')).'','submitOnChange' => true,'width' => 'w-full']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaled2cde6083938c436304f332ba96bb7c)): ?>
+<?php $attributes = $__attributesOriginaled2cde6083938c436304f332ba96bb7c; ?>
+<?php unset($__attributesOriginaled2cde6083938c436304f332ba96bb7c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaled2cde6083938c436304f332ba96bb7c)): ?>
+<?php $component = $__componentOriginaled2cde6083938c436304f332ba96bb7c; ?>
+<?php unset($__componentOriginaled2cde6083938c436304f332ba96bb7c); ?>
+<?php endif; ?>
+                        </div>
+                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                            <?php
+                                $sortOptions = [
+                                    'newest' => __('ui.sort_newest'),
+                                    'oldest' => __('ui.sort_oldest'),
+                                    'name_asc' => __('ui.sort_name_asc'),
+                                    'name_desc' => __('ui.sort_name_desc'),
+                                    'stock_asc' => __('ui.sort_stock_asc'),
+                                    'stock_desc' => __('ui.sort_stock_desc'),
+                                    'price_asc' => __('ui.sort_price_asc'),
+                                    'price_desc' => __('ui.sort_price_desc'),
+                                ];
+                            ?>
                             <?php if (isset($component)) { $__componentOriginaled2cde6083938c436304f332ba96bb7c = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginaled2cde6083938c436304f332ba96bb7c = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.select','data' => ['name' => 'sort','options' => $sortOptions,'selected' => request('sort', 'newest'),'placeholder' => ''.e(__('ui.sort')).'','submitOnChange' => true,'width' => 'w-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -518,8 +541,9 @@
 <?php endif; ?>
                         </div>
                         
-                        <a href="<?php echo e(route('inventory.index')); ?>" id="reset-filters" class="btn btn-secondary flex items-center justify-center gap-2" title="<?php echo e(__('ui.reset_filter')); ?>">
-                            <?php if (isset($component)) { $__componentOriginald4bd00a03a971114f20525c4c2f7903f = $component; } ?>
+                        <div class="flex items-end flex-shrink-0">
+                            <a href="<?php echo e(route('inventory.index')); ?>" id="reset-filters" class="btn btn-secondary flex items-center justify-center p-2.5 h-[42px] w-[42px]" title="<?php echo e(__('ui.reset_filter')); ?>">
+                                <?php if (isset($component)) { $__componentOriginald4bd00a03a971114f20525c4c2f7903f = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginald4bd00a03a971114f20525c4c2f7903f = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.restore','data' => ['class' => 'h-5 w-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('icon.restore'); ?>
@@ -539,7 +563,8 @@
 <?php $component = $__componentOriginald4bd00a03a971114f20525c4c2f7903f; ?>
 <?php unset($__componentOriginald4bd00a03a971114f20525c4c2f7903f); ?>
 <?php endif; ?>
-                        </a>
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
