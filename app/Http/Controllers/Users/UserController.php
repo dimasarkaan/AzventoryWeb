@@ -120,6 +120,7 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
         $user->update([
+            'email' => $request->email,
             'role' => $request->role,
             'jabatan' => $request->jabatan,
             'status' => $request->status,

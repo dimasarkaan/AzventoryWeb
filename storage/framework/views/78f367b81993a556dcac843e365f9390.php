@@ -161,7 +161,7 @@
                 <button @click="profileOpen = !profileOpen" class="inline-flex items-center gap-3 px-1 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-secondary-500 hover:text-secondary-700 focus:outline-none transition ease-in-out duration-150 group">
                     <!-- Info Profil: 2 Baris (Nama di Atas, Peran di Bawah) -->
                     <div class="hidden md:flex flex-col items-end text-right mr-3">
-                        <span class="font-bold text-secondary-800 text-sm group-hover:text-primary-600 transition-colors whitespace-nowrap"><?php echo e(Auth::user()->name); ?></span>
+                        <span class="font-bold text-secondary-800 text-sm group-hover:text-primary-600 transition-colors whitespace-nowrap"><?php echo e(Auth::user()->username); ?></span>
                         <span class="text-xs text-secondary-500 font-normal"><?php echo e(Auth::user()->role->label()); ?></span>
                     </div>
                     <div class="h-9 w-9 rounded-full overflow-hidden border-2 border-secondary-200 group-hover:border-primary-200 transition-colors shadow-sm relative">
@@ -169,7 +169,7 @@
                             <img class="h-full w-full object-cover" src="<?php echo e(asset('storage/' . Auth::user()->avatar)); ?>" alt="<?php echo e(Auth::user()->name); ?>" />
                          <?php else: ?>
                             <div class="h-full w-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold">
-                                <?php echo e(substr(Auth::user()->name, 0, 1)); ?>
+                                <?php echo e(substr(Auth::user()->username, 0, 1)); ?>
 
                             </div>
                          <?php endif; ?>
@@ -290,7 +290,7 @@
                      style="display: none;">
                     
                     <div class="px-4 py-3 border-b border-secondary-100 bg-secondary-50/50">
-                        <p class="text-sm font-semibold text-secondary-900"><?php echo e(__('ui.my_account')); ?></p>
+                        <p class="text-sm font-semibold text-secondary-900"><?php echo e(Auth::user()->username); ?></p>
                         <p class="text-xs text-secondary-500 truncate" title="<?php echo e(Auth::user()->email); ?>"><?php echo e(Auth::user()->email); ?></p>
                     </div>
                     
@@ -419,11 +419,18 @@
         <!-- Opsi Pengaturan Responsif -->
         <div class="pt-4 pb-4 border-t border-secondary-100 bg-secondary-50/50">
             <div class="px-4 flex items-center gap-3">
-                 <div class="h-10 w-10 rounded-full overflow-hidden border border-secondary-300">
-                    <img class="h-full w-full object-cover" src="<?php echo e(asset('storage/' . Auth::user()->avatar)); ?>" alt="<?php echo e(Auth::user()->name); ?>" />
+                 <div class="h-10 w-10 rounded-full overflow-hidden border border-secondary-300 flex-shrink-0">
+                    <?php if(Auth::user()->avatar): ?>
+                        <img class="h-full w-full object-cover" src="<?php echo e(asset('storage/' . Auth::user()->avatar)); ?>" alt="<?php echo e(Auth::user()->name); ?>" />
+                    <?php else: ?>
+                        <div class="h-full w-full bg-primary-100 flex items-center justify-center text-primary-600 font-bold text-lg">
+                            <?php echo e(mb_substr(Auth::user()->username, 0, 1)); ?>
+
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div>
-                    <div class="font-medium text-base text-secondary-800"><?php echo e(Auth::user()->name); ?></div>
+                    <div class="font-medium text-base text-secondary-800"><?php echo e(Auth::user()->username); ?></div>
                     <div class="font-medium text-sm text-secondary-500"><?php echo e(Auth::user()->email); ?></div>
                 </div>
             </div>

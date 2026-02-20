@@ -40,11 +40,9 @@
                                     </div>
             
                                     <div>
-                                        <label class="input-label">{{ __('ui.email_address') }}</label>
-                                        <div class="input-field bg-secondary-50 text-secondary-500 cursor-not-allowed">
-                                            {{ $user->email }}
-                                        </div>
-                                        <p class="text-xs text-secondary-400 mt-1">{{ __('ui.email_immutable') }}</p>
+                                        <label for="email" class="input-label">{{ __('ui.email_address') }} <span class="text-danger-500">*</span></label>
+                                        <input type="email" name="email" id="email" class="input-field w-full" value="{{ old('email', $user->email) }}" required>
+                                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                     </div>
                                 </div>
 

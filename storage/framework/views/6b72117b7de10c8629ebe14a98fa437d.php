@@ -398,33 +398,32 @@
             </div>
 
 
-            <!-- Widget Item Terlambat (Baris Baru) -->
-            <!-- Skeleton Terlambat -->
-            <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && isLoading" class="mb-6 animate-pulse">
-                <div class="card border-l-4 border-danger-200">
-                    <div class="card-header p-4 border-b border-gray-100 flex justify-between">
-                         <div class="h-6 bg-gray-200 rounded w-64"></div>
-                    </div>
-                    <div class="p-4 space-y-3">
-                        <?php for($i=0; $i<3; $i++): ?>
-                            <div class="flex justify-between">
-                                <div class="h-4 bg-gray-200 rounded w-1/3"></div>
-                                <div class="h-4 bg-gray-200 rounded w-20"></div>
-                            </div>
-                        <?php endfor; ?>
-                    </div>
-                </div>
-            </div>
-
             
             <div class="mb-6"
-                 x-show="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading) || (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>)"
+                 x-show="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0) || (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>)"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
 
                 <div class="grid gap-4 items-stretch"
-                     :class="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading) && (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>) ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'">
+                     :class="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0) && (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>) ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'">
+
+                    
+                    <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && isLoading" class="h-full animate-pulse">
+                        <div class="card border-l-4 border-danger-200 h-full">
+                            <div class="card-header p-4 border-b border-gray-100 flex justify-between">
+                                 <div class="h-6 bg-gray-200 rounded w-64"></div>
+                            </div>
+                            <div class="p-4 space-y-3">
+                                <?php for($i=0; $i<3; $i++): ?>
+                                    <div class="flex justify-between">
+                                        <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+                                        <div class="h-4 bg-gray-200 rounded w-20"></div>
+                                    </div>
+                                <?php endfor; ?>
+                            </div>
+                        </div>
+                    </div>
 
                     
                     <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading" class="h-full">
