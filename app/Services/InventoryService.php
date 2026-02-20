@@ -52,10 +52,12 @@ class InventoryService
         $this->applyExactFilter($query, 'location', $filters['location'] ?? null, __('messages.all_locations'));
         $this->applyExactFilter($query, 'color', $filters['color'] ?? null, __('messages.all_colors'));
         $this->applyExactFilter($query, 'type', $filters['type'] ?? null, __('messages.all_types'));
+        $this->applyExactFilter($query, 'condition', $filters['condition'] ?? null, __('messages.all_conditions'));
 
         // Special Filter
         if (($filters['filter'] ?? '') === 'low_stock') {
-            $query->whereColumn('stock', '<=', 'minimum_stock');
+            $query->whereColumn('stock', '<=', 'minimum_stock')
+                  ->where('condition', 'Baik');
         } elseif (($filters['filter'] ?? '') === 'overdue') {
             $query->whereHas('borrowings', function ($q) {
                 $q->where('status', 'borrowed')
@@ -371,6 +373,7 @@ class InventoryService
             'units' => Cache::remember('inventory_units', 3600, fn() => Sparepart::whereNotNull('unit')->select('unit')->distinct()->pluck('unit')),
             'names' => Cache::remember('inventory_names', 3600, fn() => Sparepart::select('name')->distinct()->pluck('name')),
             'partNumbers' => Cache::remember('inventory_part_numbers', 3600, fn() => Sparepart::select('part_number')->distinct()->pluck('part_number')),
+            'conditions' => Cache::remember('inventory_conditions', 3600, fn() => Sparepart::whereNotNull('condition')->select('condition')->distinct()->pluck('condition')),
         ];
     }
 
@@ -384,6 +387,7 @@ class InventoryService
         Cache::forget('inventory_units');
         Cache::forget('inventory_names');
         Cache::forget('inventory_part_numbers');
+        Cache::forget('inventory_conditions');
 
         // Update timestamp global untuk invalidasi cache dashboard
         Cache::forever('inventory_last_updated', now()->timestamp);

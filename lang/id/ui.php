@@ -79,6 +79,7 @@ return [
     'all_brands' => 'Semua Merk',
     'all_locations' => 'Semua Lokasi',
     'all_colors' => 'Semua Warna',
+    'all_conditions' => 'Semua Kondisi',
     'reset_filter' => 'Reset Filter',
     'sort' => 'Urutkan',
 
@@ -166,6 +167,8 @@ return [
     
     // Return Modal
     'return_item_title' => 'Kembalikan Barang',
+    'return_evidence' => 'Bukti Pengembalian',
+    'evidence' => 'Bukti',
     'save_failed' => 'Gagal Menyimpan!',
     'return_quantity' => 'Jumlah Dikembalikan',
 
@@ -687,6 +690,7 @@ return [
     'notification_action_detail' => 'Detail',
     'notification_empty_title' => 'Belum ada notifikasi',
     'notification_empty_desc' => 'Semua aman terkendali.',
+    'new_notification' => 'Notifikasi Baru',
     'notification_low_stock' => 'Stok untuk :name menipis!',
     'notification_stock_request' => 'Permintaan Stok Baru',
     'notification_stock_request_body' => 'Pengajuan stok :type Anda untuk :name telah :status.',
