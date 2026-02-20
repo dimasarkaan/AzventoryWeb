@@ -22,6 +22,7 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'email' => 'required|string|email|max:255|unique:users,email,' . $this->route('user')->id,
             'role' => 'required|in:superadmin,admin,operator',
             'jabatan' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
