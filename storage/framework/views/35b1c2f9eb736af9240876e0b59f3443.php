@@ -1,4 +1,5 @@
-﻿<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
 <?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
 <?php $component->withName('app-layout'); ?>
@@ -10,37 +11,31 @@
 <?php $component->withAttributes([]); ?>
 <script>
     (function () {
-        const STORAGE_KEY = 'dashboard_period';
+        const STORAGE_KEY = 'admin_dashboard_period';
         const params = new URLSearchParams(window.location.search);
 
-        // Jika URL tidak punya ?period=, coba restore dari sessionStorage
         if (!params.has('period')) {
             const saved = sessionStorage.getItem(STORAGE_KEY);
             if (saved && saved !== 'today') {
-                // Redirect ke URL yang sama + ?period=saved
                 params.set('period', saved);
                 window.location.replace(window.location.pathname + '?' + params.toString());
             }
         } else {
-            // Simpan periode saat ini ke sessionStorage
             sessionStorage.setItem(STORAGE_KEY, params.get('period'));
         }
 
-        // Fungsi global untuk dipanggil saat klik tab
-        window.savePeriod = function (key) {
+        window.saveAdminPeriod = function (key) {
             sessionStorage.setItem(STORAGE_KEY, key);
         };
-
-        // Fungsi global untuk dipakai tombol logout
-        window.clearDashboardPeriod = function () {
+        window.clearAdminDashboardPeriod = function () {
             sessionStorage.removeItem(STORAGE_KEY);
         };
     })();
 </script>
     <div class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" 
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
              x-data="dashboardData()">
-             
+
             
             <div class="mb-6">
                 
@@ -81,10 +76,6 @@
                                     <input type="checkbox" :checked="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700"><?php echo e(__('ui.widget_overdue')); ?></span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showNoPriceItems" @change="toggle('showNoPriceItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700"><?php echo e(__('ui.widget_missing_price')); ?></span>
-                                </label>
                                 <div class="border-t border-secondary-100 my-1"></div>
                                 <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider"><?php echo e(__('ui.widget_analytics')); ?></div>
                                 <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
@@ -95,7 +86,6 @@
                                     <input type="checkbox" :checked="showTopItems" @change="toggle('showTopItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700"><?php echo e(__('ui.widget_popular_items')); ?></span>
                                 </label>
-
                                 <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
                                     <input type="checkbox" :checked="showDeadStock" @change="toggle('showDeadStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700"><?php echo e(__('ui.widget_dead_stock')); ?></span>
@@ -157,14 +147,11 @@
                         'this_year'  => 'Tahun Ini',
                     ];
                 ?>
-                
-                
                 <div x-data="globalPeriodFilter()" class="flex flex-col gap-2">
-                    
                     <div class="flex flex-wrap items-center gap-1 bg-secondary-100/60 rounded-xl p-1.5">
                         <?php $__currentLoopData = $tabDefs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <a href="<?php echo e(route('dashboard.superadmin', ['period' => $key])); ?>"
-                               onclick="savePeriod('<?php echo e($key); ?>')"
+                            <a href="<?php echo e(route('dashboard.admin', ['period' => $key])); ?>"
+                               onclick="saveAdminPeriod('<?php echo e($key); ?>')"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap
                                       <?php echo e($activePeriod === $key
                                           ? 'bg-white text-primary-700 shadow-sm font-semibold ring-1 ring-secondary-200'
@@ -174,7 +161,6 @@
                             </a>
                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
 
-                        
                         <button @click="showCustom = !showCustom"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap
                                        <?php echo e(in_array($activePeriod, ['custom','custom_year'])
@@ -192,7 +178,6 @@
                             <?php endif; ?>
                         </button>
 
-                        
                         <span class="ml-auto text-xs text-secondary-400 hidden sm:block">
                             Data: <?php echo e(\Carbon\Carbon::parse($start)->format('d M Y')); ?> — <?php echo e(\Carbon\Carbon::parse($end)->format('d M Y')); ?>
 
@@ -205,7 +190,17 @@
                          x-transition:enter-start="opacity-0 -translate-y-2"
                          x-transition:enter-end="opacity-100 translate-y-0"
                          x-cloak>
-                        <form method="GET" action="<?php echo e(route('dashboard.superadmin')); ?>"
+                        <?php
+                            $bulanList = [
+                                '' => 'Semua Bulan',
+                                '1' => 'Januari', '2' => 'Februari', '3' => 'Maret',
+                                '4' => 'April', '5' => 'Mei', '6' => 'Juni',
+                                '7' => 'Juli', '8' => 'Agustus', '9' => 'September',
+                                '10' => 'Oktober', '11' => 'November', '12' => 'Desember',
+                            ];
+                            $activeMonthLabel = $bulanList[$month ?? ''] ?? 'Semua Bulan';
+                        ?>
+                        <form method="GET" action="<?php echo e(route('dashboard.admin')); ?>"
                               class="bg-white border border-secondary-200 rounded-xl p-4 flex flex-wrap items-end gap-3 shadow-sm">
                             <input type="hidden" name="period" value="custom">
 
@@ -238,16 +233,6 @@
                             </div>
 
                             
-                            <?php
-                                $bulanList = [
-                                    '' => 'Semua Bulan',
-                                    '1' => 'Januari', '2' => 'Februari', '3' => 'Maret',
-                                    '4' => 'April', '5' => 'Mei', '6' => 'Juni',
-                                    '7' => 'Juli', '8' => 'Agustus', '9' => 'September',
-                                    '10' => 'Oktober', '11' => 'November', '12' => 'Desember',
-                                ];
-                                $activeMonthLabel = $bulanList[$month ?? ''] ?? 'Semua Bulan';
-                            ?>
                             <div x-data="{
                                     open: false,
                                     selectedVal: '<?php echo e($month ?? ''); ?>',
@@ -285,17 +270,13 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary text-sm">Terapkan</button>
-                            <a href="<?php echo e(route('dashboard.superadmin')); ?>" class="btn btn-secondary text-sm">Reset</a>
+                            <a href="<?php echo e(route('dashboard.admin')); ?>" class="btn btn-secondary text-sm">Reset</a>
                         </form>
                     </div>
                 </div>
             </div>
 
             
-            
-
-            <!-- Bagian Ikhtisar Statistik -->
-            <!-- Loading Skeleton -->
             <div x-show="showStats && isLoading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6 animate-pulse">
                 <?php for($i = 0; $i < 5; $i++): ?>
                     <div class="card p-6 flex flex-col justify-between h-40">
@@ -312,8 +293,8 @@
                 <?php endfor; ?>
             </div>
 
-            <!-- Konten Asli -->
-            <div x-show="showStats && !isLoading" 
+            
+            <div x-show="showStats && !isLoading"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100"
@@ -321,7 +302,8 @@
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-95"
                  class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6">
-                <!-- Total Sparepart -->
+
+                
                 <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-primary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary-200"></div>
                     <div>
@@ -336,7 +318,7 @@
                     </div>
                 </div>
 
-                <!-- Total Stok -->
+                
                 <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-success-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-success-200"></div>
                     <div>
@@ -351,10 +333,10 @@
                     </div>
                 </div>
 
-                <!-- Total Kategori -->
+                
                 <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-warning-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-warning-200"></div>
-                     <div>
+                    <div>
                         <p class="text-sm font-medium text-secondary-500 z-10 relative"><?php echo e(__('ui.categories')); ?></p>
                         <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative"><?php echo e($totalCategories); ?></h3>
                     </div>
@@ -366,7 +348,7 @@
                     </div>
                 </div>
 
-                <!-- Widget Peminjaman Aktif -->
+                
                 <div x-show="showBorrowings" class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-indigo-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-indigo-200"></div>
                     <div>
@@ -381,29 +363,27 @@
                     </div>
                 </div>
 
-                <!-- Total Lokasi -->
+                
                 <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-secondary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-secondary-200"></div>
-                     <div>
+                    <div>
                         <p class="text-sm font-medium text-secondary-500 z-10 relative"><?php echo e(__('ui.storage_locations')); ?></p>
                         <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative"><?php echo e($totalLocations); ?></h3>
                     </div>
                     <div class="mt-4 flex items-center text-secondary-600 z-10 relative">
                         <div class="p-2 bg-secondary-200 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         </div>
                         <span class="ml-2 text-xs font-semibold bg-secondary-100 text-secondary-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.warehouse_racks')); ?></span>
                     </div>
                 </div>
             </div>
-
-
-            <!-- Widget Item Terlambat (Baris Baru) -->
+            
             <!-- Skeleton Terlambat -->
             <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && isLoading" class="mb-6 animate-pulse">
                 <div class="card border-l-4 border-danger-200">
                     <div class="card-header p-4 border-b border-gray-100 flex justify-between">
-                         <div class="h-6 bg-gray-200 rounded w-64"></div>
+                        <div class="h-6 bg-gray-200 rounded w-64"></div>
                     </div>
                     <div class="p-4 space-y-3">
                         <?php for($i=0; $i<3; $i++): ?>
@@ -416,91 +396,67 @@
                 </div>
             </div>
 
-            
-            <div class="mb-6"
-                 x-show="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading) || (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>)"
+            <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
-                 x-transition:enter-end="opacity-100 translate-y-0">
-
-                <div class="grid gap-4 items-stretch"
-                     :class="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading) && (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>) ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'">
-
-                    
-                    <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading" class="h-full">
-                        <div class="card bg-white shadow-lg border-none overflow-hidden h-full">
-                            
-                            <div class="p-4 bg-gradient-to-r from-red-500 to-orange-600 flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    <h3 class="font-bold text-white text-sm"><?php echo e(__('ui.attention_overdue')); ?> (<?php echo e($totalOverdueCount); ?>)</h3>
-                                </div>
-                                <?php if($totalOverdueCount > 0): ?>
-                                    <a href="<?php echo e(route('inventory.index', ['filter' => 'overdue'])); ?>" class="text-xs text-white hover:text-red-100 font-bold underline decoration-white/50"><?php echo e(__('ui.view_all')); ?></a>
-                                <?php endif; ?>
-                            </div>
-                            
-                            <div class="divide-y divide-secondary-100">
-                                <template x-for="(borrow, index) in overdueBorrowingsList.slice(0, 5)" :key="borrow.id">
-                                    <div class="px-4 py-3 hover:bg-red-50 transition-colors cursor-pointer flex justify-between items-center gap-3"
-                                         @click="window.location.href = '/inventory/borrow/' + borrow.id">
-                                        <div class="min-w-0">
-                                            <p class="font-semibold text-secondary-900 text-sm truncate" x-text="borrow.user_name || borrow.borrower_name"></p>
-                                            <p class="text-xs text-secondary-500 truncate" x-text="borrow.sparepart_name + ' (' + borrow.quantity + 'x)'"></p>
-                                        </div>
-                                        <div class="text-right flex-shrink-0">
-                                            <p class="text-xs font-bold text-danger-600" x-text="borrow.due_date_formatted"></p>
-                                            <p class="text-xs text-danger-400" x-text="borrow.due_date_rel"></p>
-                                        </div>
-                                    </div>
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-4"
+                 class="mb-6">
+                <div class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden">
+                    <div class="card-header p-4 bg-gradient-to-r from-red-500 to-orange-600 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h3 class="font-bold text-white"><?php echo e(__('ui.attention_overdue')); ?> (<?php echo e($totalOverdueCount); ?>)</h3>
+                        </div>
+                        <?php if($totalOverdueCount > 0): ?>
+                            <a href="<?php echo e(route('inventory.index', ['filter' => 'overdue'])); ?>" class="text-xs text-white hover:text-red-100 font-bold underline decoration-white/50"><?php echo e(__('ui.view_all')); ?></a>
+                        <?php endif; ?>
+                    </div>
+                    <!-- Desktop table -->
+                    <div class="overflow-x-auto md:block hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-secondary-500 uppercase bg-secondary-50 border-b border-secondary-200">
+                                <tr>
+                                    <th class="px-6 py-3"><?php echo e(__('ui.borrower')); ?></th>
+                                    <th class="px-6 py-3"><?php echo e(__('ui.item')); ?></th>
+                                    <th class="px-6 py-3 text-center"><?php echo e(__('ui.due_date_short')); ?></th>
+                                    <th class="px-6 py-3 text-center"><?php echo e(__('ui.late')); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-secondary-100">
+                                <template x-for="borrow in overdueBorrowingsList" :key="borrow.id">
+                                    <tr class="hover:bg-secondary-50 cursor-pointer" @click="window.location.href = '/inventory/borrow/' + borrow.id">
+                                        <td class="px-6 py-3 font-medium text-secondary-900" x-text="borrow.user_name || borrow.borrower_name"></td>
+                                        <td class="px-6 py-3"><span x-text="borrow.sparepart_name"></span> (<span x-text="borrow.quantity"></span>)</td>
+                                        <td class="px-6 py-3 text-center font-bold text-danger-600" x-text="borrow.due_date_formatted"></td>
+                                        <td class="px-6 py-3 text-center text-danger-500" x-text="borrow.due_date_rel"></td>
+                                    </tr>
                                 </template>
-                            </div>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
-
-                    
-                    <?php if(isset($noPriceItems) && $noPriceItems->count() > 0): ?>
-                    <div x-show="showNoPriceItems" class="h-full">
-                        <div class="card bg-white shadow-lg border-none overflow-hidden h-full">
-                            
-                            <div class="p-4 bg-gradient-to-r from-amber-500 to-orange-500 flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                    </svg>
-                                    <h3 class="font-bold text-white text-sm"><?php echo e(__('ui.widget_missing_price')); ?> (<?php echo e($noPriceItems->count()); ?>)</h3>
+                    <!-- Mobile stacked -->
+                    <div class="md:hidden divide-y divide-secondary-100">
+                        <template x-for="borrow in overdueBorrowingsList" :key="borrow.id">
+                            <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href = '/inventory/borrow/' + borrow.id">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="font-bold text-secondary-900" x-text="borrow.user_name || borrow.borrower_name"></div>
+                                    <span class="text-xs font-bold text-danger-600 bg-danger-50 px-2 py-1 rounded-full" x-text="borrow.due_date_rel"></span>
                                 </div>
-                                <a href="<?php echo e(route('inventory.index', ['type' => 'sale', 'filter' => 'no_price'])); ?>" class="text-xs text-white hover:text-amber-100 font-bold underline decoration-white/50"><?php echo e(__('ui.view_all')); ?></a>
-                            </div>
-                            
-                            <div class="divide-y divide-secondary-100">
-                                <?php $__currentLoopData = $noPriceItems->take(5); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <div class="px-4 py-3 hover:bg-amber-50 transition-colors group flex justify-between items-center gap-3">
-                                    <div class="min-w-0">
-                                        <p class="font-semibold text-secondary-900 text-sm truncate"><?php echo e($item->name); ?></p>
-                                        <p class="text-xs text-secondary-500 truncate"><?php echo e($item->part_number); ?></p>
-                                    </div>
-                                    <div class="flex items-center gap-2 flex-shrink-0">
-                                        <span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">Rp 0</span>
-                                        <a href="<?php echo e(route('inventory.edit', $item->id)); ?>"
-                                           class="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 px-2 py-1 rounded-lg transition-all">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                            Isi
-                                        </a>
-                                    </div>
+                                <div class="text-sm text-secondary-600 mb-1"><span x-text="borrow.sparepart_name"></span> (<span x-text="borrow.quantity"></span> unit)</div>
+                                <div class="text-xs text-secondary-500 flex items-center gap-1">
+                                    <span><?php echo e(__('ui.due_date_short')); ?>:</span>
+                                    <span class="font-semibold text-danger-600" x-text="borrow.due_date_formatted"></span>
                                 </div>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                             </div>
-                        </div>
+                        </template>
                     </div>
-                    <?php endif; ?>
-
                 </div>
             </div>
 
-            <!-- Baru: Grafik Pergerakan Stok -->
+            
             <div x-show="showMovement && isLoading" class="card mb-4 animate-pulse">
                 <div class="card-header border-b border-gray-100 p-5">
                     <div class="h-5 bg-gray-200 rounded w-48 mb-2"></div>
@@ -508,14 +464,14 @@
                 </div>
                 <div class="card-body p-6">
                     <div class="h-[250px] w-full bg-gray-100 rounded flex items-end justify-between px-4 pb-4 gap-2">
-                         <?php for($i=0; $i<12; $i++): ?>
+                        <?php for($i=0; $i<12; $i++): ?>
                             <div class="w-full bg-gray-200 rounded-t" style="height: <?php echo e(rand(20, 80)); ?>%"></div>
-                         <?php endfor; ?>
+                        <?php endfor; ?>
                     </div>
                 </div>
             </div>
 
-            <div x-show="showMovement && !isLoading" 
+            <div x-show="showMovement && !isLoading"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0"
@@ -529,7 +485,7 @@
                             <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.stock_movement')); ?></h3>
                             <p class="text-xs text-secondary-500"><?php echo e(__('ui.stock_movement_desc')); ?></p>
                         </div>
-                    
+                        
                         <div class="flex flex-wrap gap-2" id="movement-kpi-badges">
                             <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
@@ -562,39 +518,33 @@
                 </div>
             </div>
 
-            <!-- Baru: Bagian Item Teratas -->
+            
             <div x-show="showTopItems && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-pulse">
-                 <!-- Skeleton Teratas Keluar -->
-                 <div class="card">
-                     <div class="card-header border-b border-gray-100 p-4">
-                         <div class="h-4 bg-gray-200 rounded w-32"></div>
-                     </div>
-                     <div class="p-4 space-y-3">
+                <div class="card">
+                    <div class="card-header border-b border-gray-100 p-4"><div class="h-4 bg-gray-200 rounded w-32"></div></div>
+                    <div class="p-4 space-y-3">
                         <?php for($i=0; $i<5; $i++): ?>
                             <div class="flex justify-between">
                                 <div class="h-4 bg-gray-200 rounded w-2/3"></div>
                                 <div class="h-4 bg-gray-200 rounded w-8"></div>
                             </div>
                         <?php endfor; ?>
-                     </div>
-                 </div>
-                 <!-- Skeleton Teratas Masuk -->
-                 <div class="card">
-                    <div class="card-header border-b border-gray-100 p-4">
-                        <div class="h-4 bg-gray-200 rounded w-32"></div>
                     </div>
+                </div>
+                <div class="card">
+                    <div class="card-header border-b border-gray-100 p-4"><div class="h-4 bg-gray-200 rounded w-32"></div></div>
                     <div class="p-4 space-y-3">
-                       <?php for($i=0; $i<5; $i++): ?>
-                           <div class="flex justify-between">
-                               <div class="h-4 bg-gray-200 rounded w-2/3"></div>
-                               <div class="h-4 bg-gray-200 rounded w-8"></div>
-                           </div>
-                       <?php endfor; ?>
+                        <?php for($i=0; $i<5; $i++): ?>
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-2/3"></div>
+                                <div class="h-4 bg-gray-200 rounded w-8"></div>
+                            </div>
+                        <?php endfor; ?>
                     </div>
                 </div>
             </div>
 
-            <div x-show="showTopItems && !isLoading" 
+            <div x-show="showTopItems && !isLoading"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0"
@@ -602,102 +552,96 @@
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-4"
                  class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                 
-                 <div class="card flex flex-col overflow-hidden">
-                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
-                         <div class="w-8 h-8 rounded-lg bg-danger-50 flex items-center justify-center flex-shrink-0">
-                             <svg class="w-4 h-4 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                         </div>
-                         <div>
-                             <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.top_exiting_items')); ?></h3>
-                             <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
-                         </div>
-                     </div>
-                     <div class="flex-grow divide-y divide-secondary-100">
-                         <template x-for="(item, index) in topExited" :key="item.sparepart_id">
-                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-danger-50/40 transition-all duration-150 cursor-pointer"
-                                  @click="window.location.href = '/inventory/' + item.sparepart_id">
-                                 <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110"
-                                      :class="{
-                                         'bg-amber-100 text-amber-700 shadow shadow-amber-200':  index === 0,
-                                         'bg-slate-100  text-slate-600  shadow shadow-slate-200': index === 1,
-                                         'bg-orange-100 text-orange-700 shadow shadow-orange-200': index === 2,
-                                         'bg-secondary-100 text-secondary-500': index > 2
-                                      }"
-                                      x-text="index + 1"></div>
-                                 <span class="flex-grow font-semibold text-secondary-800 text-sm group-hover:text-primary-700 transition-colors truncate" x-text="item.sparepart_name || 'Unknown'"></span>
-                                 <span class="flex-shrink-0 font-bold text-sm text-danger-600 tabular-nums" x-text="'− ' + parseInt(item.total_qty).toLocaleString('id-ID')"></span>
-                             </div>
-                         </template>
-                         <div x-show="topExited.length === 0" class="px-6 py-10 text-center text-secondary-400">
-                             <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                             <p class="text-sm italic"><?php echo e(__('ui.no_data')); ?></p>
-                         </div>
-                     </div>
-                 </div>
 
-                 
-                 <div class="card flex flex-col overflow-hidden border-l-4 border-emerald-400">
-                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
-                         <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                             <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
-                         </div>
-                         <div>
-                             <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.top_entering_items')); ?></h3>
-                             <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
-                         </div>
-                     </div>
-                     <div class="flex-grow divide-y divide-secondary-100">
-                         <?php $__empty_1 = true; $__currentLoopData = $topEntered; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                             <?php
-                                  $rank = $loop->iteration;
-                                  $badgeClass = match(true) {
-                                      $rank === 1 => 'bg-amber-100 text-amber-700 shadow shadow-amber-200',
-                                      $rank === 2 => 'bg-slate-100  text-slate-600 shadow shadow-slate-200',
-                                      $rank === 3 => 'bg-orange-100 text-orange-700 shadow shadow-orange-200',
-                                      default     => 'bg-secondary-100 text-secondary-500',
-                                  };
-                             ?>
-                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-emerald-50/50 transition-all duration-150 cursor-pointer"
-                                  onclick="window.location.href='<?php echo e(route('inventory.show', $item->sparepart_id)); ?>'">
-                                 <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110 <?php echo e($badgeClass); ?>">
-                                     <?php echo e($rank); ?>
-
-                                 </div>
-                                 <span class="flex-grow font-semibold text-secondary-800 text-sm group-hover:text-primary-700 transition-colors truncate"><?php echo e($item->sparepart_name ?? 'Unknown'); ?></span>
-                                 <span class="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs tabular-nums">
-                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                                     <?php echo e(number_format($item->total_qty, 0, ',', '.')); ?>
-
-                                 </span>
-                             </div>
-                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                              <div class="px-6 py-10 text-center text-secondary-400">
-                                  <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                                  <p class="text-sm italic"><?php echo e(__('ui.no_data')); ?></p>
-                              </div>
-                         <?php endif; ?>
-                     </div>
-                 </div>
-
-             </div>
-
-            <!-- Bagian Grafik -->
-            <div x-show="showCharts && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-pulse">
-                <!-- Skeleton Donut -->
-                <div class="card flex flex-col h-[400px]">
-                    <div class="card-header border-b border-gray-100 p-5">
-                        <div class="h-5 bg-gray-200 rounded w-48"></div>
+                
+                <div class="card flex flex-col overflow-hidden">
+                    <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-danger-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.top_exiting_items')); ?></h3>
+                            <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
+                        </div>
                     </div>
+                    <div class="flex-grow divide-y divide-secondary-100">
+                        <template x-for="(item, index) in topExited" :key="item.sparepart_id">
+                            <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-danger-50/40 transition-all duration-150 cursor-pointer"
+                                 @click="window.location.href = '/inventory/' + item.sparepart_id">
+                                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110"
+                                     :class="{
+                                        'bg-amber-100 text-amber-700 shadow shadow-amber-200':  index === 0,
+                                        'bg-slate-100  text-slate-600  shadow shadow-slate-200': index === 1,
+                                        'bg-orange-100 text-orange-700 shadow shadow-orange-200': index === 2,
+                                        'bg-secondary-100 text-secondary-500': index > 2
+                                     }"
+                                     x-text="index + 1"></div>
+                                <span class="flex-grow font-semibold text-secondary-800 text-sm group-hover:text-primary-700 transition-colors truncate" x-text="item.sparepart_name || 'Unknown'"></span>
+                                <span class="flex-shrink-0 font-bold text-sm text-danger-600 tabular-nums" x-text="'- ' + parseInt(item.total_qty).toLocaleString('id-ID')"></span>
+                            </div>
+                        </template>
+                        <div x-show="topExited.length === 0" class="px-6 py-10 text-center text-secondary-400">
+                            <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                            <p class="text-sm italic"><?php echo e(__('ui.no_data')); ?></p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="card flex flex-col overflow-hidden border-l-4 border-emerald-400">
+                    <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.top_entering_items')); ?></h3>
+                            <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
+                        </div>
+                    </div>
+                    <div class="flex-grow divide-y divide-secondary-100">
+                        <?php $__empty_1 = true; $__currentLoopData = $topEntered; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                            <?php
+                                $rank = $loop->iteration;
+                                $badgeClass = match(true) {
+                                    $rank === 1 => 'bg-amber-100 text-amber-700 shadow shadow-amber-200',
+                                    $rank === 2 => 'bg-slate-100  text-slate-600 shadow shadow-slate-200',
+                                    $rank === 3 => 'bg-orange-100 text-orange-700 shadow shadow-orange-200',
+                                    default     => 'bg-secondary-100 text-secondary-500',
+                                };
+                            ?>
+                            <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-emerald-50/50 transition-all duration-150 cursor-pointer"
+                                 onclick="window.location.href='<?php echo e(route('inventory.show', $item->sparepart_id)); ?>'">
+                                <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110 <?php echo e($badgeClass); ?>">
+                                    <?php echo e($rank); ?>
+
+                                </div>
+                                <span class="flex-grow font-semibold text-secondary-800 text-sm group-hover:text-primary-700 transition-colors truncate"><?php echo e($item->sparepart_name ?? 'Unknown'); ?></span>
+                                <span class="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs tabular-nums">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                                    <?php echo e(number_format($item->total_qty, 0, ',', '.')); ?>
+
+                                </span>
+                            </div>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                            <div class="px-6 py-10 text-center text-secondary-400">
+                                <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                <p class="text-sm italic"><?php echo e(__('ui.no_data')); ?></p>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            
+            <div x-show="showCharts && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-pulse">
+                <div class="card flex flex-col h-[400px]">
+                    <div class="card-header border-b border-gray-100 p-5"><div class="h-5 bg-gray-200 rounded w-48"></div></div>
                     <div class="card-body p-6 flex-grow flex items-center justify-center">
                         <div class="w-48 h-48 rounded-full border-8 border-gray-200"></div>
                     </div>
                 </div>
-                <!-- Skeleton Bar -->
                 <div class="card flex flex-col h-[400px]">
-                    <div class="card-header border-b border-gray-100 p-5">
-                        <div class="h-5 bg-gray-200 rounded w-32"></div>
-                    </div>
+                    <div class="card-header border-b border-gray-100 p-5"><div class="h-5 bg-gray-200 rounded w-32"></div></div>
                     <div class="card-body p-6 flex-grow flex items-end justify-around gap-2 px-10">
                         <?php for($i=0; $i<6; $i++): ?>
                             <div class="w-12 bg-gray-200 rounded-t" style="height: <?php echo e(rand(30, 90)); ?>%"></div>
@@ -706,7 +650,7 @@
                 </div>
             </div>
 
-            <div x-show="showCharts && !isLoading" 
+            <div x-show="showCharts && !isLoading"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0"
@@ -714,11 +658,10 @@
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-4"
                  class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                <!-- Grafik Donut -->
+                <!-- Grafik Donut: Kategori -->
                 <div class="card flex flex-col">
                     <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
                         <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.stock_distribution_category')); ?></h3>
- 
                     </div>
                     <div class="card-body p-6 flex-grow flex items-center justify-center bg-white min-h-[300px]">
                         <div class="w-full h-full max-h-[300px]">
@@ -726,12 +669,10 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Grafik Batang -->
+                <!-- Grafik Batang: Lokasi -->
                 <div class="card flex flex-col">
-                     <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
+                    <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
                         <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.stock_location')); ?></h3>
-
                     </div>
                     <div class="card-body p-6 flex-grow flex items-center justify-center bg-white min-h-[300px]">
                         <div class="w-full h-full max-h-[300px]">
@@ -741,43 +682,44 @@
                 </div>
             </div>
 
-            <!-- Bagian Bawah: Stok Rendah & Aktivitas -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                <!-- Skeleton Stok Rendah -->
-                <div x-show="showLowStock && isLoading" 
-                     class="card animate-pulse h-[400px]"
-                     :class="{ 'lg:col-span-3': !showRecent, 'lg:col-span-2': showRecent }">
-                    <div class="card-header p-5 border-b border-gray-100 flex justify-between">
-                        <div class="h-5 bg-gray-200 rounded w-48"></div>
-                        <div class="h-4 bg-gray-200 rounded w-20"></div>
-                    </div>
-                    <div class="p-6 space-y-4">
-                         <div class="flex gap-4 mb-4">
-                             <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-                             <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-                             <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-                             <div class="h-4 bg-gray-200 rounded w-1/4"></div>
-                         </div>
-                         <?php for($i=0; $i<5; $i++): ?>
-                             <div class="h-10 bg-gray-100 rounded w-full"></div>
-                         <?php endfor; ?>
-                    </div>
+            
+            <!-- Skeleton Low Stock -->
+            <div x-show="showLowStock && isLoading"
+                 class="card animate-pulse h-[400px]"
+                 :class="{ 'lg:col-span-3': !showRecent, 'lg:col-span-2': showRecent }">
+                <div class="card-header p-5 border-b border-gray-100 flex justify-between">
+                    <div class="h-5 bg-gray-200 rounded w-48"></div>
+                    <div class="h-4 bg-gray-200 rounded w-20"></div>
                 </div>
+                <div class="p-6 space-y-4">
+                    <div class="flex gap-4 mb-4">
+                        <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+                        <div class="h-4 bg-gray-200 rounded w-1/4"></div>
+                    </div>
+                    <?php for($i=0; $i<5; $i++): ?>
+                        <div class="h-10 bg-gray-100 rounded w-full"></div>
+                    <?php endfor; ?>
+                </div>
+            </div>
 
-                <!-- Item Stok Rendah (2 kolom) -->
-                <div x-show="showLowStock && !isLoading" 
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Item Stok Rendah -->
+                <div x-show="showLowStock && !isLoading"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-4"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-200"
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 translate-y-4"
-                     class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden" :class="{ 'lg:col-span-3': !showRecent, 'lg:col-span-2': showRecent }">
+                     class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden"
+                     :class="{ 'lg:col-span-3': !showRecent, 'lg:col-span-2': showRecent }">
                     <div class="card-header p-5 bg-gradient-to-r from-amber-500 to-orange-500 flex justify-between items-center">
                         <div class="flex items-center gap-2">
-                             <div class="p-1.5 bg-white/20 text-white rounded-lg backdrop-blur-sm">
+                            <div class="p-1.5 bg-white/20 text-white rounded-lg backdrop-blur-sm">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                             </div>
+                            </div>
                             <h3 class="font-bold text-white"><?php echo e(__('ui.warning_low_stock')); ?></h3>
                         </div>
                         <a href="<?php echo e(route('inventory.index', ['filter' => 'low_stock'])); ?>" class="text-sm text-white hover:text-amber-100 font-medium underline decoration-white/50"><?php echo e(__('ui.view_all')); ?></a>
@@ -794,9 +736,9 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-secondary-100">
-                            <tbody class="divide-y divide-secondary-100">
                                 <template x-for="item in lowStockItems" :key="item.id">
-                                    <tr class="bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href = '/inventory/' + item.id">
+                                    <tr class="bg-white hover:bg-secondary-50 transition-colors cursor-pointer"
+                                        @click="window.location.href = '/inventory/' + item.id">
                                         <td class="px-4 py-3 font-medium text-secondary-800" x-text="item.name || 'Unknown'"></td>
                                         <td class="px-6 py-4 hidden md:table-cell" x-text="item.category || '-'"></td>
                                         <td class="px-6 py-4 text-center font-bold text-danger-600" x-text="item.stock"></td>
@@ -820,7 +762,7 @@
                     </div>
                 </div>
 
-                <!-- Skeleton Terkini -->
+                <!-- Skeleton Aktivitas Terkini -->
                 <div x-show="showRecent && isLoading" class="card lg:col-span-1 animate-pulse h-[400px]">
                     <div class="card-header p-5 border-b border-gray-100 flex justify-between">
                         <div class="h-5 bg-gray-200 rounded w-32"></div>
@@ -838,23 +780,23 @@
                     </div>
                 </div>
 
-                <!-- Aktivitas Terkini (1 kolom di web, penuh di cetak jika diperlukan) -->
-
-                <div x-show="showRecent && !isLoading" 
+                <!-- Aktivitas Terkini -->
+                <div x-show="showRecent && !isLoading"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 translate-y-4"
                      x-transition:enter-end="opacity-100 translate-y-0"
                      x-transition:leave="transition ease-in duration-200"
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 translate-y-4"
-                     class="card p-0 flex flex-col h-full print-safe" :class="{ 'lg:col-span-3': !showLowStock, 'lg:col-span-1': showLowStock }">
-                     <div class="card-header p-5 border-b border-secondary-100 flex justify-between items-center">
+                     class="card p-0 flex flex-col h-full print-safe"
+                     :class="{ 'lg:col-span-3': !showLowStock, 'lg:col-span-1': showLowStock }">
+                    <div class="card-header p-5 border-b border-secondary-100 flex justify-between items-center">
                         <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.recent_activities')); ?></h3>
-                        <a href="<?php echo e(route('reports.activity-logs.index')); ?>" class="text-sm text-primary-600 hover:text-primary-700 font-medium"><?php echo e(__('ui.view_all')); ?></a>
-                     </div>
+                        
+                        <span class="text-xs text-secondary-400"><?php echo e(count($recentActivities ?? [])); ?> terbaru</span>
+                    </div>
                     <div class="card-body p-0 overflow-y-auto max-h-[500px] custom-scrollbar">
                         <div class="flex flex-col">
-                            <!-- Alpine Loop -->
                             <template x-for="log in recentActivities" :key="log.id">
                                 <div class="px-5 py-4 hover:bg-secondary-50 transition-colors group">
                                     <div class="flex gap-4">
@@ -874,8 +816,6 @@
                                     </div>
                                 </div>
                             </template>
-                            
-                            <!-- Empty State -->
                             <div x-show="recentActivities.length === 0" class="px-5 py-12 text-center">
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="w-16 h-16 rounded-full bg-secondary-100 flex items-center justify-center">
@@ -892,14 +832,11 @@
                 </div>
             </div>
 
-            <!-- Bagian Baru: Analitik & Perkiraan -->
-            <!-- Skeleton Analitik -->
-            <div x-show="showStats && isLoading" class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4 animate-pulse">
-                 <!-- Skeleton Stok Mati -->
+            
+            <!-- Skeleton Analytics -->
+            <div x-show="showStats && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 animate-pulse">
                 <div class="card h-[300px]">
-                    <div class="card-header p-4 border-b border-gray-100">
-                        <div class="h-4 bg-gray-200 rounded w-32"></div>
-                    </div>
+                    <div class="card-header p-4 border-b border-gray-100"><div class="h-4 bg-gray-200 rounded w-32"></div></div>
                     <div class="p-4 space-y-3">
                         <?php for($i=0; $i<5; $i++): ?>
                             <div class="flex justify-between">
@@ -909,11 +846,8 @@
                         <?php endfor; ?>
                     </div>
                 </div>
-                <!-- Skeleton Papan Peringkat -->
                 <div class="card h-[300px]">
-                    <div class="card-header p-4 border-b border-gray-100">
-                        <div class="h-4 bg-gray-200 rounded w-40"></div>
-                    </div>
+                    <div class="card-header p-4 border-b border-gray-100"><div class="h-4 bg-gray-200 rounded w-40"></div></div>
                     <div class="p-4 space-y-3">
                         <?php for($i=0; $i<5; $i++): ?>
                             <div class="flex justify-between items-center">
@@ -985,7 +919,6 @@
                     <div class="flex-grow divide-y divide-secondary-100">
                         <template x-for="(userLog, index) in activeUsers" :key="userLog.user_id || Math.random()">
                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-success-50/40 transition-all duration-150">
-                                
                                 <div class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-transform duration-200 group-hover:scale-110"
                                      :class="{
                                         'bg-amber-100 text-amber-700 ring-2 ring-amber-300':  index === 0,
@@ -1002,7 +935,6 @@
                                 </span>
                             </div>
                         </template>
-                        
                         <div x-show="activeUsers.length === 0" class="px-6 py-10 text-center">
                             <div class="flex flex-col items-center gap-2">
                                 <svg class="w-10 h-10 text-secondary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -1017,7 +949,7 @@
             <!-- Footer Cetak -->
             <div class="hidden print:block mt-8 text-center text-xs text-secondary-400">
                 <p><?php echo e(__('ui.printed_at')); ?> <?php echo e(now()->format('d M Y H:i')); ?> <?php echo e(__('ui.by')); ?> <?php echo e(auth()->user()->name); ?></p>
-                <p>Azventory Management System - <?php echo e(__('ui.stock_inventory_report')); ?></p>
+                <p>Azventory Management System &mdash; <?php echo e(__('ui.stock_inventory_report')); ?></p>
             </div>
 
             <style>
@@ -1026,28 +958,15 @@
                     body { visibility: hidden; background: white; }
                     .print-safe, .print-safe * { visibility: visible; }
                     .max-w-7xl { max-width: none !important; margin: 0 !important; padding: 0 !important; }
-                    
-                    /* Sembunyikan Sidebar, Header, Tombol */
                     nav, header, form, button, .btn, .no-print { display: none !important; }
-                    
-                    /* Pastikan Tata Letak Grid berfungsi saat dicetak */
                     .grid { display: grid !important; }
-                    .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
-                    .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
-                    .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
+                    .lg\\:grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+                    .lg\\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
+                    .lg\\:grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
                     .print-grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
-
-                    /* Buat konten terlihat absolut ke atas */
-                    .py-6 > div {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        visibility: visible;
-                    }
-                    
+                    .py-6 > div { position: absolute; top: 0; left: 0; width: 100%; visibility: visible; }
                     .card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
-                    .text-3xl { font-size: 1.5rem; } /* Perkecil judul */
+                    .text-3xl { font-size: 1.5rem; }
                 }
             </style>
         </div>
@@ -1056,7 +975,7 @@
     <?php $__env->startPush('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Default Chart untuk konsistensi
+        // Default Chart
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#64748b';
         Chart.defaults.scale.grid.color = '#f1f5f9';
@@ -1081,7 +1000,6 @@
             if (elNet && elNetDot && elNetLabel && elNetBadge) {
                 const prefix = net >= 0 ? '+' : '';
                 elNet.textContent = prefix + net.toLocaleString('id-ID');
-                // Warna dinamis: hijau positif, merah negatif, abu netral
                 if (net > 0) {
                     elNetBadge.className = 'flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5';
                     elNetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0';
@@ -1098,15 +1016,8 @@
             }
         }
 
-        // =====================================================================
-        // Grafik Pergerakan Stok — Grouped Bar Chart
-        // =====================================================================
-
-        // =====================================================================
-        // Export Dashboard — PDF (Print) and PNG (html2canvas)
-        // =====================================================================
         function exportDashboardPDF() {
-            document.title = 'Dashboard Azventory - ' + new Date().toLocaleDateString('id-ID');
+            document.title = 'Dashboard Admin Azventory - ' + new Date().toLocaleDateString('id-ID');
             window.print();
         }
 
@@ -1115,8 +1026,6 @@
             toast.className = 'fixed bottom-6 right-6 z-[9999] bg-secondary-900 text-white text-sm px-4 py-3 rounded-xl shadow-xl flex items-center gap-2';
             toast.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Menyiapkan gambar...';
             document.body.appendChild(toast);
-
-            // Load html2canvas jika belum ada
             if (typeof html2canvas === 'undefined') {
                 const s = document.createElement('script');
                 s.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
@@ -1129,31 +1038,22 @@
 
         function doCapture(toastEl) {
             const target = document.querySelector('[x-data]') || document.body;
-            html2canvas(target, {
-                scale: 1.5,
-                useCORS: true,
-                backgroundColor: '#f8fafc',
-                logging: false,
-            }).then(canvas => {
-                const link = document.createElement('a');
-                const d = new Date();
-                const dateStr = d.toISOString().slice(0, 10);
-                link.download = `dashboard-azventory-${dateStr}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                if (toastEl) toastEl.remove();
-            }).catch(() => {
-                if (toastEl) toastEl.remove();
-                alert('Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.');
-            });
+            html2canvas(target, { scale: 1.5, useCORS: true, backgroundColor: '#f8fafc', logging: false })
+                .then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `dashboard-admin-azventory-${new Date().toISOString().slice(0,10)}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    if (toastEl) toastEl.remove();
+                }).catch(() => {
+                    if (toastEl) toastEl.remove();
+                    alert('Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.');
+                });
         }
 
         const movementDataKey = <?php echo json_encode($movementData, 15, 512) ?>;
-
-        // Inisialisasi KPI Badge saat load
         updateMovementKPI(movementDataKey);
 
-        // Fungsi pembuatan gradient (dipakai ulang)
         function makeGradient(ctx, color1, color2) {
             const gradient = ctx.createLinearGradient(0, 0, 0, 300);
             gradient.addColorStop(0, color1);
@@ -1161,13 +1061,15 @@
             return gradient;
         }
 
+        // =====================================================================
+        // Chart Pergerakan Stok (Line Chart)
+        // =====================================================================
         const movCtx = document.getElementById('stockMovementChart').getContext('2d');
         const gradMasuk = makeGradient(movCtx, 'rgba(16,185,129,0.85)', 'rgba(16,185,129,0.15)');
         const gradKeluar = makeGradient(movCtx, 'rgba(239,68,68,0.85)', 'rgba(239,68,68,0.15)');
 
-        // Jika tidak ada label (periode kosong), tampilkan placeholder
         const movLabels = movementDataKey.labels.length > 0 ? movementDataKey.labels : ['Tidak ada data'];
-        const movMasuk  = movementDataKey.masuk.length > 0  ? movementDataKey.masuk  : [0];
+        const movMasuk  = movementDataKey.masuk.length  > 0 ? movementDataKey.masuk  : [0];
         const movKeluar = movementDataKey.keluar.length > 0 ? movementDataKey.keluar : [0];
 
         let movementChart = new Chart(movCtx, {
@@ -1208,19 +1110,11 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
                     legend: {
                         position: 'top',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'rectRounded',
-                            padding: 16,
-                            font: { size: 12, weight: '500' }
-                        }
+                        labels: { usePointStyle: true, pointStyle: 'rectRounded', padding: 16, font: { size: 12, weight: '500' } }
                     },
                     tooltip: {
                         backgroundColor: 'rgba(15,23,42,0.92)',
@@ -1231,20 +1125,14 @@
                         padding: 12,
                         cornerRadius: 8,
                         callbacks: {
-                            title(ctx) {
-                                return '🗓 ' + ctx[0].label;
-                            },
-                            label(ctx) {
-                                const val = ctx.parsed.y.toLocaleString('id-ID');
-                                return `  ${ctx.dataset.label}: ${val} unit`;
-                            },
+                            title(ctx) { return '🗓 ' + ctx[0].label; },
+                            label(ctx) { return `  ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('id-ID')} unit`; },
                             afterBody(ctx) {
                                 if (ctx.length < 2) return '';
                                 const masuk  = ctx.find(c => c.datasetIndex === 0)?.parsed.y ?? 0;
                                 const keluar = ctx.find(c => c.datasetIndex === 1)?.parsed.y ?? 0;
                                 const net = masuk - keluar;
-                                const prefix = net >= 0 ? '+' : '';
-                                return [`  ─────────────────`, `  🔄 Net Stok: ${prefix}${net.toLocaleString('id-ID')} unit`];
+                                return [`  ─────────────────`, `  🔄 Net Stok: ${net >= 0 ? '+' : ''}${net.toLocaleString('id-ID')} unit`];
                             }
                         }
                     }
@@ -1252,73 +1140,44 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: 'rgba(148,163,184,0.15)',
-                            borderDash: [4, 4]
-                        },
-                        ticks: {
-                            callback: val => val.toLocaleString('id-ID')
-                        }
+                        grid: { color: 'rgba(148,163,184,0.15)', borderDash: [4,4] },
+                        ticks: { callback: val => val.toLocaleString('id-ID') }
                     },
-                    x: {
-                        grid: { display: false },
-                        ticks: {
-                            maxRotation: 45,
-                            autoSkipPadding: 8
-                        }
-                    }
+                    x: { grid: { display: false }, ticks: { maxRotation: 45, autoSkipPadding: 8 } }
                 }
             }
         });
 
         // =====================================================================
-        // Grafik Donut: Stok berdasarkan Kategori
+        // Chart Donut: Stok berdasarkan Kategori
         // =====================================================================
         const stockByCategoryData = <?php echo json_encode($stockByCategory, 15, 512) ?>;
         const catCtx = document.getElementById('stockByCategoryChart').getContext('2d');
-        // Cool-tone Gradient Colors (Blue -> Violet -> Pink -> Cyan)
-        const baseColors = [
-            '#3b82f6', // Blue
-            '#8b5cf6', // Violet
-            '#ec4899', // Pink
-            '#06b6d4', // Cyan
-            '#6366f1', // Indigo
-            '#14b8a6', // Teal
-        ];
+        const baseColors = ['#3b82f6','#8b5cf6','#ec4899','#06b6d4','#6366f1','#14b8a6'];
         const chartColors = baseColors.map(c => {
             const grd = catCtx.createLinearGradient(0, 0, 0, 300);
             grd.addColorStop(0, c);
-            grd.addColorStop(1, c + '90'); // Less transparency for richer color
+            grd.addColorStop(1, c + '90');
             return grd;
         });
-        const chartColorsBorder = baseColors;
-
-        // Total untuk persentase tooltip
         const catTotal = Object.values(stockByCategoryData).reduce((a, b) => a + b, 0);
-
-        // Responsive legend position
         const isSmallScreen = window.innerWidth < 640;
 
-        // Custom Plugin untuk menggambar dashed ring yang presisi di tengah chart
         const outerDashedRing = {
             id: 'outerDashedRing',
             beforeDraw(chart) {
-                const {ctx, chartArea: {top, bottom, left, right, width, height}} = chart;
+                const {ctx, chartArea: {top, bottom, left, right}} = chart;
                 const centerX = (left + right) / 2;
                 const centerY = (top + bottom) / 2;
-                
-                // Pastikan radius ring dihitung dari radius chart sebenarnya
                 const meta = chart.getDatasetMeta(0);
                 if (meta.data.length > 0) {
-                    const outerRadius = meta.data[0].outerRadius;
-                    const ringRadius = outerRadius + 15; // Jarak ring dari chart
-
+                    const ringRadius = meta.data[0].outerRadius + 15;
                     ctx.save();
                     ctx.beginPath();
                     ctx.arc(centerX, centerY, ringRadius, 0, 2 * Math.PI);
                     ctx.lineWidth = 2;
-                    ctx.strokeStyle = '#e0e7ff'; // Indigo-100
-                    ctx.setLineDash([6, 6]); // Garis putus-putus
+                    ctx.strokeStyle = '#e0e7ff';
+                    ctx.setLineDash([6, 6]);
                     ctx.stroke();
                     ctx.restore();
                 }
@@ -1329,41 +1188,19 @@
             type: 'doughnut',
             data: {
                 labels: Object.keys(stockByCategoryData),
-                datasets: [{
-                    label: '<?php echo e(__('ui.total_stock')); ?>',
-                    data: Object.values(stockByCategoryData),
-                    backgroundColor: chartColors,
-                    borderColor: '#ffffff',
-                    borderWidth: 0,
-                    hoverOffset: 8
-                }]
+                datasets: [{ label: 'Total Stok', data: Object.values(stockByCategoryData), backgroundColor: chartColors, borderColor: '#ffffff', borderWidth: 0, hoverOffset: 8 }]
             },
-            plugins: [outerDashedRing], // Register plugin
+            plugins: [outerDashedRing],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '70%', // Balanced & Modern
-                layout: {
-                    padding: 20 // Extra padding for ring
-                },
-                elements: {
-                    arc: {
-                        borderWidth: 0,
-                        borderColor: '#ffffff',
-                        borderRadius: 5,
-                        hoverOffset: 10
-                    }
-                },
+                cutout: '70%',
+                layout: { padding: 20 },
+                elements: { arc: { borderWidth: 0, borderColor: '#ffffff', borderRadius: 5, hoverOffset: 10 } },
                 plugins: {
                     legend: {
                         position: isSmallScreen ? 'bottom' : 'right',
-                        labels: {
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            padding: 20,
-                            font: { size: 12 },
-                            boxWidth: 8
-                        }
+                        labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 12 }, boxWidth: 8 }
                     },
                     tooltip: {
                         backgroundColor: 'rgba(15,23,42,0.92)',
@@ -1384,7 +1221,7 @@
         });
 
         // =====================================================================
-        // Grafik Batang: Stok berdasarkan Lokasi
+        // Chart Bar: Stok berdasarkan Lokasi
         // =====================================================================
         const stockByLocationData = <?php echo json_encode($stockByLocation, 15, 512) ?>;
         const locCtx = document.getElementById('stockByLocationChart').getContext('2d');
@@ -1396,16 +1233,7 @@
             type: 'bar',
             data: {
                 labels: Object.keys(stockByLocationData),
-                datasets: [{
-                    label: '<?php echo e(__('ui.total_stock')); ?>',
-                    data: Object.values(stockByLocationData),
-                    backgroundColor: gradLoc,
-                    borderColor: '#3b82f6',
-                    borderWidth: 1.5,
-                    borderRadius: 6,
-                    borderSkipped: false,
-                    barPercentage: 0.65,
-                }]
+                datasets: [{ label: 'Total Stok', data: Object.values(stockByLocationData), backgroundColor: gradLoc, borderColor: '#3b82f6', borderWidth: 1.5, borderRadius: 6, borderSkipped: false, barPercentage: 0.65 }]
             },
             options: {
                 responsive: true,
@@ -1421,61 +1249,32 @@
                         borderWidth: 1,
                         padding: 12,
                         cornerRadius: 8,
-                        callbacks: {
-                            label(ctx) {
-                                return `  📦 Stok: ${ctx.parsed.y.toLocaleString('id-ID')} unit`;
-                            }
-                        }
+                        callbacks: { label(ctx) { return `  📦 Stok: ${ctx.parsed.y.toLocaleString('id-ID')} unit`; } }
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: 'rgba(148,163,184,0.15)',
-                            borderDash: [4, 4]
-                        },
-                        ticks: {
-                            callback: val => val.toLocaleString('id-ID')
-                        }
-                    },
-                    x: {
-                        grid: { display: false },
-                        ticks: {
-                            maxRotation: 35,
-                            autoSkipPadding: 6
-                        }
-                    }
+                    y: { beginAtZero: true, grid: { color: 'rgba(148,163,184,0.15)', borderDash: [4,4] }, ticks: { callback: val => val.toLocaleString('id-ID') } },
+                    x: { grid: { display: false }, ticks: { maxRotation: 35, autoSkipPadding: 6 } }
                 }
             }
         });
 
         // =====================================================================
         // Global Function untuk Update Chart (Real-time Safe)
-        // Dipanggil oleh real-time listener Alpine.js saat ada event baru
         // =====================================================================
         window.updateDashboardCharts = function(movementData, stockByCategory, stockByLocation) {
-            // Update Movement Chart + KPI Badges
             if (movementData && movementChart) {
-                const newLabels  = movementData.labels.length > 0 ? movementData.labels : ['Tidak ada data'];
-                const newMasuk   = movementData.masuk.length  > 0 ? movementData.masuk  : [0];
-                const newKeluar  = movementData.keluar.length > 0 ? movementData.keluar : [0];
-                movementChart.data.labels = newLabels;
-                movementChart.data.datasets[0].data = newMasuk;
-                movementChart.data.datasets[1].data = newKeluar;
+                movementChart.data.labels = movementData.labels.length > 0 ? movementData.labels : ['Tidak ada data'];
+                movementChart.data.datasets[0].data = movementData.masuk.length  > 0 ? movementData.masuk  : [0];
+                movementChart.data.datasets[1].data = movementData.keluar.length > 0 ? movementData.keluar : [0];
                 movementChart.update();
-                // Sinkronkan KPI badges dengan data terbaru
                 updateMovementKPI(movementData);
             }
-
-            // Update Category Chart
             if (stockByCategory && stockCategoryChart) {
                 stockCategoryChart.data.labels = Object.keys(stockByCategory);
                 stockCategoryChart.data.datasets[0].data = Object.values(stockByCategory);
                 stockCategoryChart.update();
             }
-
-            // Update Location Chart
             if (stockByLocation && stockLocationChart) {
                 stockLocationChart.data.labels = Object.keys(stockByLocation);
                 stockLocationChart.data.datasets[0].data = Object.values(stockByLocation);
@@ -1483,135 +1282,119 @@
             }
         };
 
+        // =====================================================================
+        // Alpine Component: dashboardData()
+        // =====================================================================
         function dashboardData() {
             return {
-                showStats: localStorage.getItem('dashboard_showStats') !== 'false',
-                showCharts: localStorage.getItem('dashboard_showCharts') !== 'false',
-                showMovement: localStorage.getItem('dashboard_showMovement') !== 'false',
-                showTopItems: localStorage.getItem('dashboard_showTopItems') !== 'false',
-                showLowStock: localStorage.getItem('dashboard_showLowStock') !== 'false',
-                showRecent: localStorage.getItem('dashboard_showRecent') !== 'false',
-                showDeadStock: localStorage.getItem('dashboard_showDeadStock') !== 'false',
-                showLeaderboard: localStorage.getItem('dashboard_showLeaderboard') !== 'false',
-                showBorrowings: localStorage.getItem('dashboard_showBorrowings') !== 'false',
-                showOverdue: localStorage.getItem('dashboard_showOverdue') !== 'false',
-                showNoPriceItems: localStorage.getItem('dashboard_showNoPriceItems') !== 'false',
-                
+                // Widget visibility — persisted di localStorage
+                showStats:       (localStorage.getItem('admin_dashboard_showStats')       ?? 'true')  !== 'false',
+                showCharts:      (localStorage.getItem('admin_dashboard_showCharts')      ?? 'true')  !== 'false',
+                showMovement:    (localStorage.getItem('admin_dashboard_showMovement')    ?? 'true')  !== 'false',
+                showTopItems:    (localStorage.getItem('admin_dashboard_showTopItems')    ?? 'false') === 'true',
+                showLowStock:    (localStorage.getItem('admin_dashboard_showLowStock')    ?? 'true')  !== 'false',
+                showRecent:      (localStorage.getItem('admin_dashboard_showRecent')      ?? 'true')  !== 'false',
+                showDeadStock:   (localStorage.getItem('admin_dashboard_showDeadStock')   ?? 'false') === 'true',
+                showLeaderboard: (localStorage.getItem('admin_dashboard_showLeaderboard') ?? 'false') === 'true',
+                showBorrowings:  (localStorage.getItem('admin_dashboard_showBorrowings')  ?? 'true')  !== 'false',
+                showOverdue:     (localStorage.getItem('admin_dashboard_showOverdue')     ?? 'true')  !== 'false',
+
                 isLoading: true,
-                
-                // Data Statis & List
-                totalSpareparts: <?php echo e($totalSpareparts); ?>,
-                totalStock: <?php echo e($totalStock); ?>,
-                totalCategories: <?php echo e($totalCategories); ?>,
-                totalLocations: <?php echo e($totalLocations); ?>,
-                pendingApprovalsCount: <?php echo e($pendingApprovalsCount); ?>,
-                activeBorrowingsCount: <?php echo e($activeBorrowingsCount); ?>,
 
-                // Arrays (untuk x-for)
-                recentActivities: <?php echo json_encode($recentActivities, 15, 512) ?>,
-                topExited: <?php echo json_encode($topExited, 15, 512) ?>,
-                topEntered: <?php echo json_encode($topEntered, 15, 512) ?>,
-                deadStockItems: <?php echo json_encode($deadStockItems, 15, 512) ?>,
-                activeUsers: <?php echo json_encode($activeUsers, 15, 512) ?>,
-                activeBorrowingsList: <?php echo json_encode($activeBorrowingsList, 15, 512) ?>,
+                // Data Statis
+                totalSpareparts: <?php echo json_encode($totalSpareparts, 15, 512) ?>,
+                totalStock:      <?php echo json_encode($totalStock, 15, 512) ?>,
+                totalCategories: <?php echo json_encode($totalCategories, 15, 512) ?>,
+                totalLocations:  <?php echo json_encode($totalLocations, 15, 512) ?>,
+                pendingApprovalsCount: <?php echo json_encode($pendingApprovalsCount, 15, 512) ?>,
+                activeBorrowingsCount: <?php echo json_encode($activeBorrowingsCount, 15, 512) ?>,
+
+                // Arrays untuk x-for
+                recentActivities:      <?php echo json_encode($recentActivities, 15, 512) ?>,
+                topExited:             <?php echo json_encode($topExited, 15, 512) ?>,
+                topEntered:            <?php echo json_encode($topEntered, 15, 512) ?>,
+                deadStockItems:        <?php echo json_encode($deadStockItems, 15, 512) ?>,
+                activeUsers:           <?php echo json_encode($activeUsers, 15, 512) ?>,
+                activeBorrowingsList:  <?php echo json_encode($activeBorrowingsList, 15, 512) ?>,
                 overdueBorrowingsList: <?php echo json_encode($overdueBorrowingsList, 15, 512) ?>,
-                lowStockItems: <?php echo json_encode($lowStockItems, 15, 512) ?>,
+                lowStockItems:         <?php echo json_encode($lowStockItems, 15, 512) ?>,
 
-                // Charts Data (Disimpan sementara untuk update chart)
-                movementData: <?php echo json_encode($movementData, 15, 512) ?>,
+                // Charts Data
+                movementData:    <?php echo json_encode($movementData, 15, 512) ?>,
                 stockByCategory: <?php echo json_encode($stockByCategory, 15, 512) ?>,
                 stockByLocation: <?php echo json_encode($stockByLocation, 15, 512) ?>,
-                
-                init() {
-                    // Simulasikan delay loading
-                    setTimeout(() => {
-                        this.isLoading = false;
-                    }, 800);
 
-                    // Real-time listener
+                init() {
+                    setTimeout(() => { this.isLoading = false; }, 800);
+
+                    // Real-time listener (jika Echo tersedia)
                     if (window.Echo) {
                         window.Echo.channel('inventory-updates')
                             .listen('.InventoryUpdated', (e) => {
-                                console.log('Realtime Update:', e);
                                 this.refreshData();
-                                
-                                // Tampilkan notifikasi toast
-                                if (window.showToast) {
-                                    window.showToast('info', e.message);
-                                }
+                                if (window.showToast) window.showToast('info', e.message);
                             });
                     }
                 },
 
                 async refreshData() {
-                   try {
-                       const response = await fetch('<?php echo e(route("dashboard.superadmin")); ?>', {
-                           headers: {
-                               'X-Requested-With': 'XMLHttpRequest',
-                               'Accept': 'application/json'
-                           }
-                       });
-                       
-                       if (!response.ok) throw new Error('Network response was not ok');
-                       
-                       const data = await response.json();
-                       
-                       // Update Single Values
-                       this.totalSpareparts = data.totalSpareparts;
-                       this.totalStock = data.totalStock;
-                       this.totalCategories = data.totalCategories;
-                       this.totalLocations = data.totalLocations;
-                       this.pendingApprovalsCount = data.pendingApprovalsCount;
-                       this.activeBorrowingsCount = data.activeBorrowingsCount;
+                    try {
+                        const response = await fetch('<?php echo e(route("dashboard.admin")); ?>', {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                        });
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        const data = await response.json();
 
-                       // Update Lists
-                       this.recentActivities = data.recentActivities;
-                       this.topExited = data.topExited;
-                       this.topEntered = data.topEntered;
-                       this.forecasts = data.forecasts;
-                       this.deadStockItems = data.deadStockItems;
-                       this.activeUsers = data.activeUsers;
-                       this.activeBorrowingsList = data.activeBorrowingsList;
-                       this.overdueBorrowingsList = data.overdueBorrowingsList;
-                       this.lowStockItems = data.lowStockItems;
+                        // Update single values
+                        this.totalSpareparts       = data.totalSpareparts;
+                        this.totalStock            = data.totalStock;
+                        this.totalCategories       = data.totalCategories;
+                        this.totalLocations        = data.totalLocations;
+                        this.pendingApprovalsCount = data.pendingApprovalsCount;
+                        this.activeBorrowingsCount = data.activeBorrowingsCount;
 
-                       // Update Charts (Function defined globally or attached to window)
-                       if (window.updateDashboardCharts) {
-                           window.updateDashboardCharts(data.movementData, data.stockByCategory, data.stockByLocation);
-                       }
+                        // Update lists
+                        this.recentActivities      = data.recentActivities;
+                        this.topExited             = data.topExited;
+                        this.topEntered            = data.topEntered;
+                        this.deadStockItems        = data.deadStockItems;
+                        this.activeUsers           = data.activeUsers;
+                        this.activeBorrowingsList  = data.activeBorrowingsList;
+                        this.overdueBorrowingsList = data.overdueBorrowingsList;
+                        this.lowStockItems         = data.lowStockItems;
 
-                   } catch (error) {
-                       console.error('Failed to refresh dashboard data:', error);
-                   }
+                        if (window.updateDashboardCharts) {
+                            window.updateDashboardCharts(data.movementData, data.stockByCategory, data.stockByLocation);
+                        }
+                    } catch (error) {
+                        console.error('Failed to refresh admin dashboard data:', error);
+                    }
                 },
 
                 toggle(key) {
                     this[key] = !this[key];
-                    localStorage.setItem('dashboard_' + key, this[key]);
+                    localStorage.setItem('admin_dashboard_' + key, this[key]);
                 }
             };
         }
+
         // =====================================================================
         // Alpine Component: Tab Period Global
-        // Mengelola state panel "Custom" (Opsi F)
         // =====================================================================
         function globalPeriodFilter() {
             return {
-                // Buka panel custom secara otomatis jika periode aktif = custom
                 showCustom: <?php echo e(in_array($period ?? 'today', ['custom','custom_year']) ? 'true' : 'false'); ?>,
             };
         }
 
         // =====================================================================
-        // Opsi C: Quick-filter per-widget Pergerakan Stok
-        // Fetch data movement dari endpoint ringan tanpa reload halaman
+        // Quick-filter per-widget Pergerakan Stok
         // =====================================================================
-        let movementActiveRange = 7; // default aktif
+        let movementActiveRange = 7;
 
         async function fetchMovementData(range) {
             movementActiveRange = range;
 
-            // Update tampilan state tombol aktif
             document.querySelectorAll('.mov-range-btn').forEach(btn => {
                 btn.classList.remove('bg-white', 'shadow-sm', 'text-primary-700');
                 btn.classList.add('text-secondary-600');
@@ -1622,47 +1405,36 @@
                 activeBtn.classList.remove('text-secondary-600');
             }
 
-            // Tampilkan loading state pada canvas
             const canvas = document.getElementById('stockMovementChart');
             if (canvas) canvas.style.opacity = '0.5';
 
             try {
-                const response = await fetch('<?php echo e(route("dashboard.movement-data")); ?>?range=' + range, {
+                const response = await fetch('<?php echo e(route("dashboard.admin.movement-data")); ?>?range=' + range, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
                     }
                 });
-
                 if (!response.ok) throw new Error('Gagal memuat data movement');
-
                 const data = await response.json();
 
-                // Update chart dengan data baru
                 if (movementChart) {
-                    const newLabels  = (data.labels  || []).length > 0 ? data.labels  : ['Tidak ada data'];
-                    const newMasuk   = (data.masuk   || []).length > 0 ? data.masuk   : [0];
-                    const newKeluar  = (data.keluar  || []).length > 0 ? data.keluar  : [0];
-
-                    movementChart.data.labels = newLabels;
-                    movementChart.data.datasets[0].data = newMasuk;
-                    movementChart.data.datasets[1].data = newKeluar;
+                    movementChart.data.labels = (data.labels  || []).length > 0 ? data.labels  : ['Tidak ada data'];
+                    movementChart.data.datasets[0].data = (data.masuk   || []).length > 0 ? data.masuk   : [0];
+                    movementChart.data.datasets[1].data = (data.keluar  || []).length > 0 ? data.keluar  : [0];
                     movementChart.update('active');
                 }
-
-                // Update KPI badges
                 updateMovementKPI(data);
-
             } catch (err) {
                 console.error('fetchMovementData error:', err);
             } finally {
-                // Hapus loading state
                 if (canvas) canvas.style.opacity = '1';
             }
         }
     </script>
     <?php $__env->stopPush(); ?>
+
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
@@ -1673,4 +1445,4 @@
 <?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
 <?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
 <?php endif; ?>
-<?php /**PATH E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\resources\views/dashboard/superadmin.blade.php ENDPATH**/ ?>
+<?php /**PATH E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\resources\views/dashboard/admin.blade.php ENDPATH**/ ?>

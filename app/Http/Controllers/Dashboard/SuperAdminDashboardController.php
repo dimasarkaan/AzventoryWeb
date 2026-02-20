@@ -131,12 +131,22 @@ class SuperAdminDashboardController extends Controller
             return response()->json($data);
         }
 
+        // Barang bertipe 'sale' yang belum memiliki harga — selalu fresh (tidak di-cache)
+        $noPriceItems = \App\Models\Sparepart::where('type', 'sale')
+            ->where(function ($q) {
+                $q->whereNull('price')->orWhere('price', '<=', 0);
+            })
+            ->latest()
+            ->take(10)
+            ->get();
+
         return view('dashboard.superadmin', array_merge($data, [
-            'period' => $period,
-            'start' => $start,
-            'end' => $end,
-            'year' => $year,
-            'month' => $month,
+            'period'       => $period,
+            'start'        => $start,
+            'end'          => $end,
+            'year'         => $year,
+            'month'        => $month,
+            'noPriceItems' => $noPriceItems,
         ]));
     }
 

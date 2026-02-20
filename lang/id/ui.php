@@ -747,4 +747,11 @@ return [
     'hide_filter' => 'Sembunyikan Filter',
     'error_cannot_delete_borrowed' => 'Tidak dapat menghapus item ini karena sedang dipinjam atau belum dikembalikan. Selesaikan peminjaman terlebih dahulu.',
     'select_all' => 'Pilih Semua',
+
+    // Notifikasi Harga Belum Diisi
+    'missing_price_alert'        => 'Harga Barang Belum Diisi',
+    'notification_missing_price' => 'Barang ":name" yang diinput oleh :admin belum memiliki harga. Segera lengkapi.',
+    'widget_missing_price'       => 'Harga Belum Diisi',
+    'no_missing_price'           => 'Semua barang sudah memiliki harga. ✓',
+    'fill_price_now'             => 'Isi Harga Sekarang',
 ];

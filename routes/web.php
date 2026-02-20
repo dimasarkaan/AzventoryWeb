@@ -62,6 +62,12 @@ Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
             ->middleware('role:admin')
             ->name('admin');
 
+        // Endpoint AJAX: data pergerakan stok per-widget untuk Admin
+        Route::get('/admin/movement-data', [AdminDashboardController::class, 'movementData'])
+            ->middleware('role:admin')
+            ->name('admin.movement-data');
+
+
         // Operator
         Route::get('/operator', [OperatorDashboardController::class, 'index'])
             ->middleware('role:operator')

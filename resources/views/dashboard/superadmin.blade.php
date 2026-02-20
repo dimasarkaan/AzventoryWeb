@@ -76,6 +76,10 @@
                                     <input type="checkbox" :checked="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_overdue') }}</span>
                                 </label>
+                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" :checked="showNoPriceItems" @change="toggle('showNoPriceItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_missing_price') }}</span>
+                                </label>
                                 <div class="border-t border-secondary-100 my-1"></div>
                                 <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">{{ __('ui.widget_analytics') }}</div>
                                 <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
@@ -411,71 +415,93 @@
                 </div>
             </div>
 
-            <div x-show="showOverdue && {{ $totalOverdueCount }} > 0 && !isLoading" 
+            {{-- ============================================================
+                 GRID 2 KOLOM: Overdue Terlambat + Harga Belum Diisi
+                 Side-by-side di desktop, stacked di mobile.
+                 Overdue otomatis full-width jika kolom harga disembunyikan.
+                 ============================================================ --}}
+            <div class="mb-6"
+                 x-show="(showOverdue && {{ $totalOverdueCount }} > 0 && !isLoading) || (showNoPriceItems && {{ isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false' }})"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100 translate-y-0"
-                 x-transition:leave-end="opacity-0 translate-y-4"
-                 class="mb-6">
-                <div class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden">
-                        <div class="card-header p-4 bg-gradient-to-r from-red-500 to-orange-600 flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <h3 class="font-bold text-white">{{ __('ui.attention_overdue') }} ({{ $totalOverdueCount }})</h3>
-                        </div>
-                        <!-- Link ke inventaris jika > 5 -->
-                        @if($totalOverdueCount > 0)
-                            <a href="{{ route('inventory.index', ['filter' => 'overdue']) }}" class="text-xs text-white hover:text-red-100 font-bold underline decoration-white/50">{{ __('ui.view_all') }}</a>
-                        @endif
-                    </div>
-                    <div class="overflow-x-auto md:block hidden">
-                        <table class="w-full text-sm text-left">
-                            <thead class="text-xs text-secondary-500 uppercase bg-secondary-50 border-b border-secondary-200">
-                                <tr>
-                                    <th class="px-6 py-3">{{ __('ui.borrower') }}</th>
-                                    <th class="px-6 py-3">{{ __('ui.item') }}</th>
-                                    <th class="px-6 py-3 text-center">{{ __('ui.due_date_short') }}</th>
-                                    <th class="px-6 py-3 text-center">{{ __('ui.late') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-secondary-100">
-                                <template x-for="borrow in overdueBorrowingsList" :key="borrow.id">
-                                    <tr class="hover:bg-secondary-50 cursor-pointer" @click="window.location.href = '/inventory/borrow/' + borrow.id">
-                                        <td class="px-6 py-3 font-medium text-secondary-900" x-text="borrow.user_name || borrow.borrower_name"></td>
-                                        <td class="px-6 py-3">
-                                            <span x-text="borrow.sparepart_name"></span> (<span x-text="borrow.quantity"></span>)
-                                        </td>
-                                        <td class="px-6 py-3 text-center font-bold text-danger-600" x-text="borrow.due_date_formatted"></td>
-                                        <td class="px-6 py-3 text-center text-danger-500" x-text="borrow.due_date_rel"></td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
+                 x-transition:enter-end="opacity-100 translate-y-0">
 
-                    <!-- Tampilan Bertumpuk Mobile -->
-                    <div class="md:hidden divide-y divide-secondary-100">
-                        <template x-for="borrow in overdueBorrowingsList" :key="borrow.id">
-                            <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href = '/inventory/borrow/' + borrow.id">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div class="font-bold text-secondary-900" x-text="borrow.user_name || borrow.borrower_name"></div>
-                                    <span class="text-xs font-bold text-danger-600 bg-danger-50 px-2 py-1 rounded-full" x-text="borrow.due_date_rel"></span>
+                <div class="grid gap-4 items-stretch"
+                     :class="(showOverdue && {{ $totalOverdueCount }} > 0 && !isLoading) && (showNoPriceItems && {{ isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false' }}) ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'">
+
+                    {{-- Kolom Kiri: Barang Terlambat Kembali --}}
+                    <div x-show="showOverdue && {{ $totalOverdueCount }} > 0 && !isLoading" class="h-full">
+                        <div class="card bg-white shadow-lg border-none overflow-hidden h-full">
+                            {{-- Header merah --}}
+                            <div class="p-4 bg-gradient-to-r from-red-500 to-orange-600 flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <h3 class="font-bold text-white text-sm">{{ __('ui.attention_overdue') }} ({{ $totalOverdueCount }})</h3>
                                 </div>
-                                <div class="text-sm text-secondary-600 mb-1">
-                                    <span x-text="borrow.sparepart_name"></span> (<span x-text="borrow.quantity"></span> unit)
-                                </div>
-                                <div class="text-xs text-secondary-500 flex items-center gap-1">
-                                    <span>{{ __('ui.due_date_short') }}:</span>
-                                    <span class="font-semibold text-danger-600" x-text="borrow.due_date_formatted"></span>
-                                </div>
+                                @if($totalOverdueCount > 0)
+                                    <a href="{{ route('inventory.index', ['filter' => 'overdue']) }}" class="text-xs text-white hover:text-red-100 font-bold underline decoration-white/50">{{ __('ui.view_all') }}</a>
+                                @endif
                             </div>
-                        </template>
+                            {{-- List tanpa scroll --}}
+                            <div class="divide-y divide-secondary-100">
+                                <template x-for="(borrow, index) in overdueBorrowingsList.slice(0, 5)" :key="borrow.id">
+                                    <div class="px-4 py-3 hover:bg-red-50 transition-colors cursor-pointer flex justify-between items-center gap-3"
+                                         @click="window.location.href = '/inventory/borrow/' + borrow.id">
+                                        <div class="min-w-0">
+                                            <p class="font-semibold text-secondary-900 text-sm truncate" x-text="borrow.user_name || borrow.borrower_name"></p>
+                                            <p class="text-xs text-secondary-500 truncate" x-text="borrow.sparepart_name + ' (' + borrow.quantity + 'x)'"></p>
+                                        </div>
+                                        <div class="text-right flex-shrink-0">
+                                            <p class="text-xs font-bold text-danger-600" x-text="borrow.due_date_formatted"></p>
+                                            <p class="text-xs text-danger-400" x-text="borrow.due_date_rel"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
 
+                    {{-- Kolom Kanan: Harga Belum Diisi --}}
+                    @if(isset($noPriceItems) && $noPriceItems->count() > 0)
+                    <div x-show="showNoPriceItems" class="h-full">
+                        <div class="card bg-white shadow-lg border-none overflow-hidden h-full">
+                            {{-- Header amber — konsisten dengan overdue --}}
+                            <div class="p-4 bg-gradient-to-r from-amber-500 to-orange-500 flex justify-between items-center">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <h3 class="font-bold text-white text-sm">{{ __('ui.widget_missing_price') }} ({{ $noPriceItems->count() }})</h3>
+                                </div>
+                                <a href="{{ route('inventory.index', ['type' => 'sale', 'filter' => 'no_price']) }}" class="text-xs text-white hover:text-amber-100 font-bold underline decoration-white/50">{{ __('ui.view_all') }}</a>
+                            </div>
+                            {{-- List tanpa scroll --}}
+                            <div class="divide-y divide-secondary-100">
+                                @foreach($noPriceItems->take(5) as $item)
+                                <div class="px-4 py-3 hover:bg-amber-50 transition-colors group flex justify-between items-center gap-3">
+                                    <div class="min-w-0">
+                                        <p class="font-semibold text-secondary-900 text-sm truncate">{{ $item->name }}</p>
+                                        <p class="text-xs text-secondary-500 truncate">{{ $item->part_number }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-2 flex-shrink-0">
+                                        <span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">Rp 0</span>
+                                        <a href="{{ route('inventory.edit', $item->id) }}"
+                                           class="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 px-2 py-1 rounded-lg transition-all">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                            </svg>
+                                            Isi
+                                        </a>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                </div>{{-- end inner grid --}}
+            </div>{{-- end outer wrapper --}}
 
             <!-- Baru: Grafik Pergerakan Stok -->
             <div x-show="showMovement && isLoading" class="card mb-4 animate-pulse">
@@ -1468,6 +1494,7 @@
                 showLeaderboard: localStorage.getItem('dashboard_showLeaderboard') !== 'false',
                 showBorrowings: localStorage.getItem('dashboard_showBorrowings') !== 'false',
                 showOverdue: localStorage.getItem('dashboard_showOverdue') !== 'false',
+                showNoPriceItems: localStorage.getItem('dashboard_showNoPriceItems') !== 'false',
                 
                 isLoading: true,
                 
