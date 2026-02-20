@@ -61,6 +61,10 @@ class InventoryService
                 $q->where('status', 'borrowed')
                   ->where('expected_return_at', '<', now());
             });
+        } elseif (($filters['filter'] ?? '') === 'no_price') {
+            $query->where(function ($q) {
+                $q->whereNull('price')->orWhere('price', '<=', 0);
+            });
         }
 
         // Sorting

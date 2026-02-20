@@ -879,9 +879,10 @@
                                 init() {
                                     // Watch for external updates (from PN lookup)
                                     this.$watch('itemPrice', (value) => {
-                                        if (value && value !== this.rawPrice) {
-                                            this.rawPrice = value.toString();
-                                            this.displayPrice = parseInt(value).toLocaleString('id-ID');
+                                        if (value != null && value.toString() !== this.rawPrice) {
+                                            const numVal = parseInt(value) || 0;
+                                            this.rawPrice = numVal.toString();
+                                            this.displayPrice = numVal > 0 ? numVal.toLocaleString('id-ID') : '';
                                         }
                                     });
                                     
@@ -1027,10 +1028,10 @@
                             this.isLocked = true;
                             console.log('Produk ditemukan, data diisi otomatis.');
                         } else {
-                            // Only reset isLocked status, do not clear form if it was manually filled or if OCR was just used
-                            // But if we want to be strict that "New PN = Fresh Form", we might want to clear.
-                            // For now, let's keep it user-friendly: only unlock fields so they can type.
-                            this.isLocked = false; 
+                            // PN baru (belum ada di database): unlock semua field
+                            // Reset harga ke 0 agar tidak menggunakan sisa harga dari PN sebelumnya
+                            this.isLocked = false;
+                            this.itemPrice = 0;
                         }
                     } catch (error) {
                         console.error('Error checking PN:', error);

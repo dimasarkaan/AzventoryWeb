@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sparepart;
+use App\Models\User;
 use App\Services\InventoryService;
 use App\Http\Requests\Inventory\StoreSparepartRequest;
-use App\Http\Requests\Inventory\UpdateSparepartRequest;
+use App\Notifications\MissingPriceNotification;
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -65,6 +67,18 @@ class InventoryController extends Controller
 
         if ($result['status'] === 'error_zero_stock') {
             return redirect()->back()->withInput()->with('warning', $result['message']);
+        }
+
+        // Jika barang bertipe 'sale' dan harga belum diisi (0 atau null),
+        // kirim notifikasi ke semua Superadmin agar segera melengkapi harga.
+        if (isset($result['data'])) {
+            $sparepart = $result['data'];
+            if ($sparepart->type === 'sale' && ($sparepart->price === null || $sparepart->price == 0)) {
+                $superadmins = User::where('role', UserRole::SUPERADMIN)->get();
+                foreach ($superadmins as $superadmin) {
+                    $superadmin->notify(new MissingPriceNotification($sparepart, auth()->user()));
+                }
+            }
         }
 
         return redirect()->route('inventory.index')->with('success', $result['message']);

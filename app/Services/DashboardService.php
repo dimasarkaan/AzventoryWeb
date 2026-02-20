@@ -200,13 +200,28 @@ class DashboardService
         return compact('activeBorrowingsCount', 'totalOverdueCount', 'overdueBorrowings');
     }
 
-    public function getRecentActivities(Carbon $start, Carbon $end): Collection
+    /**
+     * Dapatkan aktivitas terbaru berdasarkan periode.
+     *
+     * Jika user adalah Admin, filter hanya log dari user dengan role admin/operator
+     * (bukan superadmin) untuk menjaga privasi hierarki.
+     */
+    public function getRecentActivities(Carbon $start, Carbon $end, ?User $user = null): Collection
     {
-        return ActivityLog::with('user')
-            ->whereBetween('created_at', [$start, $end])
-            ->latest()
-            ->take(4) 
-            ->get();
+        $query = ActivityLog::with('user')
+            ->whereBetween('created_at', [$start, $end]);
+
+        // Jika Admin, batasi hanya aktivitas dari Admin & Operator (bukan Superadmin)
+        if ($user && $user->role === \App\Enums\UserRole::ADMIN) {
+            $allowedUserIds = User::whereIn('role', [
+                \App\Enums\UserRole::ADMIN,
+                \App\Enums\UserRole::OPERATOR,
+            ])->pluck('id');
+
+            $query->whereIn('user_id', $allowedUserIds);
+        }
+
+        return $query->latest()->take(4)->get();
     }
     
     public function getStockByAttribute(string $attribute): Collection
