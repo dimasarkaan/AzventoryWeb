@@ -45,46 +45,46 @@
 
                     @can('viewAny', \App\Models\User::class)
                         <a href="{{ route('dashboard.superadmin') }}" class="{{ $navClass }} {{ request()->routeIs('dashboard.superadmin') ? $activeClass : $inactiveClass }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <x-icon.dashboard class="w-4 h-4" />
                             {{ __('ui.dashboard') }}
                         </a>
                     @endcan
 
                      @if (Auth::user()->role === \App\Enums\UserRole::ADMIN)
                         <a href="{{ route('dashboard.admin') }}" class="{{ $navClass }} {{ request()->routeIs('dashboard.admin') ? $activeClass : $inactiveClass }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <x-icon.dashboard class="w-4 h-4" />
                             {{ __('ui.dashboard') }}
                         </a>
                      @endif
                      
                      @if (Auth::user()->role === \App\Enums\UserRole::OPERATOR)
                         <a href="{{ route('dashboard.operator') }}" class="{{ $navClass }} {{ request()->routeIs('dashboard.operator') ? $activeClass : $inactiveClass }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <x-icon.dashboard class="w-4 h-4" />
                             {{ __('ui.dashboard') }}
                         </a>
                      @endif
 
                     {{-- Menu Bersama --}}
                     <a href="{{ route('inventory.index') }}" class="{{ $navClass }} {{ request()->routeIs('inventory.*') ? $activeClass : $inactiveClass }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <x-icon.inventory class="w-4 h-4" />
                         {{ __('ui.inventory_list') }}
                     </a>
 
                     @can('viewAny', \App\Models\User::class)
                         <a href="{{ route('users.index') }}" class="{{ $navClass }} {{ request()->routeIs('users.*') ? $activeClass : $inactiveClass }}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <x-icon.users class="w-4 h-4" />
                             {{ __('ui.user_management') }}
                         </a>
                     @endcan
 
                     <a href="{{ route('inventory.scan-qr') }}" class="{{ $navClass }} {{ request()->routeIs('inventory.scan-qr') ? $activeClass : $inactiveClass }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                        <x-icon.scan-qr class="w-4 h-4" />
                         {{ __('ui.scan_qr') }}
                     </a>
 
                     @if(in_array(Auth::user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
                         <a href="{{ route('reports.index') }}" class="{{ $navClass }} {{ request()->routeIs('reports.*') ? $activeClass : $inactiveClass }}">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                             <x-icon.reports class="w-4 h-4" />
                             {{ __('ui.reports') }}
                         </a>
                     @endif

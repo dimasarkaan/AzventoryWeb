@@ -33,7 +33,7 @@ use App\Http\Controllers\ApiTokenController;
 */
 
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return view('welcome');
 });
 
 // Rute Autentikasi

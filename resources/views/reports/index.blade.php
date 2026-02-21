@@ -23,7 +23,7 @@
                                 <input type="radio" name="report_type" value="inventory_list" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mb-3 group-hover:bg-primary-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                        <x-icon.inventory class="w-6 h-6" />
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.inventory_data') }}</span>
                                     <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.inventory_data_desc') }}</span>
@@ -36,7 +36,7 @@
                                 <input type="radio" name="report_type" value="stock_mutation" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-warning-100 text-warning-600 flex items-center justify-center mb-3 group-hover:bg-warning-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                                        <x-icon.mutation class="w-6 h-6" />
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.stock_mutation_history') }}</span>
                                     <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.stock_mutation_desc') }}</span>
@@ -49,7 +49,7 @@
                                 <input type="radio" name="report_type" value="borrowing_history" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-sky-400 peer-checked:border-sky-600 peer-checked:bg-sky-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mb-3 group-hover:bg-sky-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <x-icon.borrow-user class="w-6 h-6" />
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.borrowing_history_report') }}</span>
                                     <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.borrowing_history_desc') }}</span>
@@ -62,7 +62,7 @@
                                 <input type="radio" name="report_type" value="low_stock" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-danger-100 text-danger-600 flex items-center justify-center mb-3 group-hover:bg-danger-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        <x-icon.low-stock class="w-6 h-6" />
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.low_stock_report') }}</span>
                                     <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.low_stock_desc') }}</span>

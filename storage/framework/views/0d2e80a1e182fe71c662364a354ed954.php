@@ -26,7 +26,26 @@
                         <h3 class="text-4xl font-extrabold"><?php echo e($activeBorrowingsCount ?? 0); ?></h3>
                     </div>
                     <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
+                        <?php if (isset($component)) { $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.borrow-user','data' => ['class' => 'w-8 h-8','strokeWidth' => '2.5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.borrow-user'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-8 h-8','stroke-width' => '2.5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $attributes = $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $component = $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
                     </div>
                 </div>
 
@@ -37,7 +56,26 @@
                         <h3 class="text-4xl font-extrabold"><?php echo e($pendingRequestsCount ?? 0); ?></h3>
                     </div>
                     <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center text-white">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <?php if (isset($component)) { $__componentOriginal92c3cdd7c141dc9b9aa91714437e728e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.low-stock','data' => ['class' => 'w-8 h-8','strokeWidth' => '2.5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.low-stock'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-8 h-8','stroke-width' => '2.5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e)): ?>
+<?php $attributes = $__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e; ?>
+<?php unset($__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal92c3cdd7c141dc9b9aa91714437e728e)): ?>
+<?php $component = $__componentOriginal92c3cdd7c141dc9b9aa91714437e728e; ?>
+<?php unset($__componentOriginal92c3cdd7c141dc9b9aa91714437e728e); ?>
+<?php endif; ?>
                     </div>
                 </div>
             </div>

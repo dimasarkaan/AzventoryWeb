@@ -312,7 +312,26 @@
                     </div>
                     <div class="mt-4 flex items-center text-primary-600 z-10 relative">
                         <div class="p-2 bg-primary-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginalc867a7d0834788820c9284b3decea570 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc867a7d0834788820c9284b3decea570 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.inventory','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.inventory'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-5 h-5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc867a7d0834788820c9284b3decea570)): ?>
+<?php $attributes = $__attributesOriginalc867a7d0834788820c9284b3decea570; ?>
+<?php unset($__attributesOriginalc867a7d0834788820c9284b3decea570); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc867a7d0834788820c9284b3decea570)): ?>
+<?php $component = $__componentOriginalc867a7d0834788820c9284b3decea570; ?>
+<?php unset($__componentOriginalc867a7d0834788820c9284b3decea570); ?>
+<?php endif; ?>
                         </div>
                         <span class="ml-2 text-xs font-semibold bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.sku_items')); ?></span>
                     </div>
@@ -327,7 +346,26 @@
                     </div>
                     <div class="mt-4 flex items-center text-success-600 z-10 relative">
                         <div class="p-2 bg-success-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginal9021a7c39fc1f9da1eab8489680add27 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9021a7c39fc1f9da1eab8489680add27 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.package','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.package'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-5 h-5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9021a7c39fc1f9da1eab8489680add27)): ?>
+<?php $attributes = $__attributesOriginal9021a7c39fc1f9da1eab8489680add27; ?>
+<?php unset($__attributesOriginal9021a7c39fc1f9da1eab8489680add27); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9021a7c39fc1f9da1eab8489680add27)): ?>
+<?php $component = $__componentOriginal9021a7c39fc1f9da1eab8489680add27; ?>
+<?php unset($__componentOriginal9021a7c39fc1f9da1eab8489680add27); ?>
+<?php endif; ?>
                         </div>
                         <span class="ml-2 text-xs font-semibold bg-success-50 text-success-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.units')); ?></span>
                     </div>
@@ -342,7 +380,26 @@
                     </div>
                     <div class="mt-4 flex items-center text-warning-600 z-10 relative">
                         <div class="p-2 bg-warning-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginal71d34cd6b5098862348da0456bab239d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal71d34cd6b5098862348da0456bab239d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.category','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.category'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-5 h-5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal71d34cd6b5098862348da0456bab239d)): ?>
+<?php $attributes = $__attributesOriginal71d34cd6b5098862348da0456bab239d; ?>
+<?php unset($__attributesOriginal71d34cd6b5098862348da0456bab239d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal71d34cd6b5098862348da0456bab239d)): ?>
+<?php $component = $__componentOriginal71d34cd6b5098862348da0456bab239d; ?>
+<?php unset($__componentOriginal71d34cd6b5098862348da0456bab239d); ?>
+<?php endif; ?>
                         </div>
                         <span class="ml-2 text-xs font-semibold bg-warning-50 text-warning-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.item_types')); ?></span>
                     </div>
@@ -357,7 +414,26 @@
                     </div>
                     <div class="mt-4 flex items-center text-indigo-600 z-10 relative">
                         <div class="p-2 bg-indigo-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.borrow-user','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.borrow-user'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-5 h-5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $attributes = $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $component = $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
                         </div>
                         <span class="ml-2 text-xs font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.units_out')); ?></span>
                     </div>
@@ -372,7 +448,26 @@
                     </div>
                     <div class="mt-4 flex items-center text-secondary-600 z-10 relative">
                         <div class="p-2 bg-secondary-200 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginalb6952584d5242e7a54c1423e310b3baa = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb6952584d5242e7a54c1423e310b3baa = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.location','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.location'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-5 h-5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb6952584d5242e7a54c1423e310b3baa)): ?>
+<?php $attributes = $__attributesOriginalb6952584d5242e7a54c1423e310b3baa; ?>
+<?php unset($__attributesOriginalb6952584d5242e7a54c1423e310b3baa); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb6952584d5242e7a54c1423e310b3baa)): ?>
+<?php $component = $__componentOriginalb6952584d5242e7a54c1423e310b3baa; ?>
+<?php unset($__componentOriginalb6952584d5242e7a54c1423e310b3baa); ?>
+<?php endif; ?>
                         </div>
                         <span class="ml-2 text-xs font-semibold bg-secondary-100 text-secondary-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.warehouse_racks')); ?></span>
                     </div>
