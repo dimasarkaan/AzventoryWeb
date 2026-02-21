@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Inventory\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sparepart;
+use App\Http\Resources\SparepartResource;
+use App\Http\Resources\SparepartCollection;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
@@ -26,11 +28,8 @@ class InventoryController extends Controller
         $filters = $request->all();
         $spareparts = $this->inventoryService->getFilteredSpareparts($filters, $request->input('per_page', 20));
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Data inventory retrieved successfully',
-            'data' => $spareparts
-        ]);
+        // Mengembalikan dalam format standar Koleksi Resource JSON
+        return new SparepartCollection($spareparts);
     }
 
     /**
@@ -60,8 +59,8 @@ class InventoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Sparepart created successfully',
-            'data' => $sparepart
+            'message' => 'Barang baru berhasil ditambahkan',
+            'data' => new SparepartResource($sparepart)
         ], 201);
     }
 
@@ -78,13 +77,14 @@ class InventoryController extends Controller
         if (!$sparepart) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Sparepart not found'
+                'message' => 'Data Barang tidak ditemukan di katalog.'
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $sparepart
+            'message' => 'Detail data barang berhasil diambil',
+            'data' => new SparepartResource($sparepart)
         ]);
     }
 
@@ -122,8 +122,8 @@ class InventoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Sparepart updated successfully',
-            'data' => $sparepart
+            'message' => 'Data Barang berhasil diperbarui',
+            'data' => new SparepartResource($sparepart)
         ]);
     }
 
@@ -145,7 +145,7 @@ class InventoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Sparepart deleted successfully'
+            'message' => 'Data Barang berhasil dihapus secara soft-delete'
         ]);
     }
 
@@ -197,9 +197,12 @@ class InventoryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Stock adjusted successfully',
+            'message' => 'Stok berhasil disesuaikan',
             'data' => [
-                'current_stock' => $sparepart->stock
+                'current_stock' => $sparepart->stock,
+                'minimum_stock' => $sparepart->minimum_stock,
+                'is_low_stock' => $sparepart->stock <= $sparepart->minimum_stock,
+                'part_number' => $sparepart->part_number
             ]
         ]);
     }

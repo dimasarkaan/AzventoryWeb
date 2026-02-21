@@ -88,6 +88,21 @@
                     </div>
                 </div>
 
+                <!-- API Tokens (Hanya Superadmin) -->
+                @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
+                <div class="card">
+                    <div class="card-header px-4 py-2 flex flex-col items-start gap-0.5">
+                        <h3 class="text-lg font-bold text-secondary-900">{{ __('Kunci Akses API (Token)') }}</h3>
+                        <p class="text-sm text-secondary-500">
+                            {{ __('Kelola token API yang mengizinkan layanan eksternal untuk mengakses data inventaris.') }}
+                        </p>
+                    </div>
+                    <div class="card-body p-4 pt-4 border-t border-secondary-100">
+                        @include('profile.partials.api-tokens-form')
+                    </div>
+                </div>
+                @endif
+
                 <!-- Delete Account -->
                 <div class="card border-danger-200">
                     <div class="card-header px-4 py-2 bg-danger-50 border-danger-100 flex flex-col items-start gap-1">

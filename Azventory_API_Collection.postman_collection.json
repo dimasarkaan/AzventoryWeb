@@ -1,0 +1,282 @@
+{
+    "info": {
+        "_postman_id": "azventory-api-v1-collection",
+        "name": "Azventory API Integrasi v1",
+        "description": "Koleksi API untuk integrasi web E-commerce dan Aplikasi Third-Party dengan sistem Azventory. Semua endpoint wajib menyertakan Authorization Bearer Token.",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "1. Inventory Dasar (Katalog)",
+            "item": [
+                {
+                    "name": "Mendapatkan Semua Daftar Barang",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/inventory?per_page=20",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "inventory"
+                            ],
+                            "query": [
+                                {
+                                    "key": "per_page",
+                                    "value": "20",
+                                    "description": "Jumlah limit per halaman"
+                                },
+                                {
+                                    "key": "search",
+                                    "value": "Laptop",
+                                    "description": "Cari nama barang atau kode part (opsional)",
+                                    "disabled": true
+                                }
+                            ]
+                        },
+                        "description": "Digunakan untuk menampilkan katalog barang di toko/ecommerce. Mengembalikan list (array) dari SparepartCollection."
+                    }
+                },
+                {
+                    "name": "Mendapatkan Detail 1 Barang",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/inventory/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "inventory",
+                                "1"
+                            ]
+                        },
+                        "description": "Digunakan saat pembeli meng-klik produk untuk melihat detail dan sisa stok."
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Manipulasi Stok (Sinkronisasi)",
+            "item": [
+                {
+                    "name": "Update Stok (Pengurangan Transaksi)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"type\": \"decrement\",\r\n    \"quantity\": 1,\r\n    \"description\": \"Terjual dari Web Ecommerce via Order #INV-12345\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/inventory/1/adjust-stock",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "inventory",
+                                "1",
+                                "adjust-stock"
+                            ]
+                        },
+                        "description": "KRUSIAL: Panggil API ini segera setelah transaksi e-commerce (pembayaran) Tuntas. Ini berguna memotong stok di Gudang berdasarkan barang apa yang baru saja terjual."
+                    }
+                },
+                {
+                    "name": "Update Stok (Penambahan / Restock)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"type\": \"increment\",\r\n    \"quantity\": 50,\r\n    \"description\": \"Retur Pembeli dari Order #INV-12344 / Pasokan Barang Baru\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/inventory/1/adjust-stock",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "inventory",
+                                "1",
+                                "adjust-stock"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Manajemen Barang Eksternal (Opsional)",
+            "item": [
+                {
+                    "name": "Tambah Barang Baru dari Sistem Lain",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"part_number\": \"SKU-MYS-001\",\r\n    \"name\": \"Mouse Wireless Logitech M190\",\r\n    \"brand\": \"Logitech\",\r\n    \"category\": \"Peripheral\",\r\n    \"location\": \"Rak A1\",\r\n    \"type\": \"sale\",\r\n    \"condition\": \"Baik\",\r\n    \"status\": \"aktif\",\r\n    \"stock\": 15,\r\n    \"price\": 140000,\r\n    \"minimum_stock\": 2,\r\n    \"unit\": \"Pcs\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/inventory",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "inventory"
+                            ]
+                        },
+                        "description": "Jika aplikasi e-commerce Anda memiliki fitur tambah Katalog produk sendiri dan ingin mensinkronisasikannya ke Azventory."
+                    }
+                },
+                {
+                    "name": "Memperbarui Data Barang",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\r\n    \"price\": 145000,\r\n    \"name\": \"Mouse Wireless Logitech M190 (V2)\"\r\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/v1/inventory/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "v1",
+                                "inventory",
+                                "1"
+                            ]
+                        },
+                        "description": "Digunakan misalnya fitur 'Ubah Harga Massal' dari toko online ingin diterapkan ke gudang Azventory."
+                    }
+                }
+            ]
+        }
+    ],
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{api_token}}",
+                "type": "string"
+            }
+        ]
+    },
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    ""
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000",
+            "type": "string"
+        },
+        {
+            "key": "api_token",
+            "value": "MASUKKAN_TOKEN_SANCTUM_DISINI",
+            "type": "string",
+            "description": "Token Sanctum yang digenerate di halaman Profil Superadmin."
+        }
+    ]
+}
