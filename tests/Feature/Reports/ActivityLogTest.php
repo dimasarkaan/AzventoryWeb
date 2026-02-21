@@ -67,7 +67,7 @@ class ActivityLogTest extends TestCase
         ]));
 
         $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'application/vnd.ms-excel');
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
 
     /** @test */

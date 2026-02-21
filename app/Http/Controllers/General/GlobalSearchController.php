@@ -104,10 +104,17 @@ class GlobalSearchController extends Controller
                 ['title' => 'Persetujuan Stok', 'url' => route('inventory.stock-approvals.index'), 'icon' => 'check-circle'],
             ],
             \App\Enums\UserRole::ADMIN => [
-                 // Tambahkan rute khusus admin di sini jika ada
+                ['title' => 'Manajemen Inventaris', 'url' => route('inventory.index'), 'icon' => 'cube'],
+                ['title' => 'Scan QR', 'url' => route('inventory.scan-qr'), 'icon' => 'qrcode'],
+                ['title' => 'Laporan', 'url' => route('reports.index'), 'icon' => 'chart-bar'],
+                ['title' => 'Riwayat Aktivitas', 'url' => route('reports.activity-logs.index'), 'icon' => 'clock'],
+                ['title' => 'Persetujuan Stok', 'url' => route('inventory.stock-approvals.index'), 'icon' => 'check-circle'],
             ],
             \App\Enums\UserRole::OPERATOR => [
                 ['title' => 'Dashboard Operator', 'url' => route('dashboard.operator'), 'icon' => 'home'],
+                ['title' => 'Manajemen Inventaris', 'url' => route('inventory.index'), 'icon' => 'cube'],
+                ['title' => 'Scan QR', 'url' => route('inventory.scan-qr'), 'icon' => 'qrcode'],
+                ['title' => 'Riwayat Aktivitas', 'url' => route('reports.activity-logs.index'), 'icon' => 'clock'],
             ],
             default => []
         };

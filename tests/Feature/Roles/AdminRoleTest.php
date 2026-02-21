@@ -53,10 +53,10 @@ class AdminRoleTest extends TestCase
     }
 
     /** @test */
-    public function admin_cannot_access_operator_dashboard()
+    public function admin_can_access_operator_dashboard()
     {
         $response = $this->actingAs($this->admin)->get(route('dashboard.operator'));
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     /** @test */

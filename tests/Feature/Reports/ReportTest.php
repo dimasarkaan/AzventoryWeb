@@ -49,7 +49,7 @@ class ReportTest extends TestCase
             ]));
 
         $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'application/vnd.ms-excel');
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
     /** @test */
     public function superadmin_can_access_reports_page()

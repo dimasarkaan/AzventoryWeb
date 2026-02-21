@@ -71,8 +71,6 @@ class ReportController extends Controller
         $reportData = $this->reportService->getReportData($type, $location, $startDate, $endDate);
         
         $data = $reportData['data'];
-        $title = $reportData['title'];
-        $view = $reportData['view'];
 
         // Generate Filename (Standardized)
          $prefix = match($type) {
@@ -86,16 +84,22 @@ class ReportController extends Controller
         if ($startDate && $endDate) {
             $start = $startDate->format('d-m-Y');
             $end = $endDate->format('d-m-Y');
-            $filename = "{$prefix}_{$start}sd{$end}.xls";
+            $filename = "{$prefix}_{$start}sd{$end}";
         } else {
-             $filename = "{$prefix}SemuaRiwayat_" . now()->format('d-m-Y') . ".xls";
+             $filename = "{$prefix}SemuaRiwayat_" . now()->format('d-m-Y');
         }
         
         $this->logActivity('Laporan Diunduh', "Mengunduh laporan Excel tipe: {$type}");
 
-        // Return Excel View
-        return response(view($view, compact('data', 'startDate', 'endDate', 'title', 'location', 'type')))
-            ->header('Content-Type', 'application/vnd.ms-excel')
-            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        // Return Excel using Service
+        $excelService = new \App\Services\ExcelExportService();
+        
+        return match($type) {
+            'inventory_list' => $excelService->exportInventoryList($data, $filename),
+            'stock_mutation' => $excelService->exportStockMutation($data, $filename),
+            'borrowing_history' => $excelService->exportBorrowingHistory($data, $filename),
+            'low_stock' => $excelService->exportLowStock($data, $filename),
+            default => back()->with('error', 'Tipe laporan tidak didukung untuk export Excel.'),
+        };
     }
 }

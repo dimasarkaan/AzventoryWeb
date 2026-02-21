@@ -34,7 +34,7 @@ class AuditTest extends TestCase
     public function inventory_index_uses_cache_for_dropdowns()
     {
         Cache::shouldReceive('remember')
-            ->times(7) // kategori, merek, lokasi, warna, satuan, nama, partNumbers
+            ->times(8) // kategori, merek, lokasi, warna, satuan, nama, partNumbers, conditions
             ->andReturn(collect(['Test']));
 
         $response = $this->actingAs($this->superAdmin)
@@ -75,7 +75,7 @@ class AuditTest extends TestCase
 
         // Seharusnya berupa stream download file (200 OK)
         $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'application/vnd.ms-excel');
+        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
         // Pastikan Job TIDAK didorong
         Queue::assertNotPushed(GenerateReportJob::class);
