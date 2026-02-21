@@ -55,9 +55,53 @@ class SecurityTest extends TestCase
     }
 
     /** @test */
-    public function operator_cannot_view_audit_logs()
+    public function operator_can_access_own_activity_logs()
     {
         $response = $this->actingAs($this->operator)->get(route('reports.activity-logs.index'));
+        $response->assertStatus(200);
+    }
+
+    /** @test */
+    public function operator_cannot_access_user_management()
+    {
+        $response = $this->actingAs($this->operator)->get(route('users.index'));
+        $response->assertStatus(403);
+    }
+
+    /** @test */
+    public function admin_can_access_admin_dashboard_but_not_superadmin()
+    {
+        $response = $this->actingAs($this->admin)->get(route('dashboard.admin'));
+        $response->assertStatus(200);
+
+        $response2 = $this->actingAs($this->admin)->get(route('dashboard.superadmin'));
+        $response2->assertStatus(403);
+    }
+
+    /** @test */
+    public function superadmin_can_access_all_dashboards()
+    {
+        $response = $this->actingAs($this->superAdmin)->get(route('dashboard.superadmin'));
+        $response->assertStatus(200);
+
+        $response2 = $this->actingAs($this->superAdmin)->get(route('dashboard.admin'));
+        $response2->assertStatus(200);
+
+        $response3 = $this->actingAs($this->superAdmin)->get(route('dashboard.operator'));
+        $response3->assertStatus(200);
+    }
+
+    /** @test */
+    public function operator_cannot_access_admin_dashboard()
+    {
+        $response = $this->actingAs($this->operator)->get(route('dashboard.admin'));
+        $response->assertStatus(403);
+    }
+
+    /** @test */
+    public function admin_cannot_access_user_management()
+    {
+        $response = $this->actingAs($this->admin)->get(route('users.index'));
         $response->assertStatus(403);
     }
 }

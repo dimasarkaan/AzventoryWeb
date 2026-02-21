@@ -18,6 +18,7 @@ use App\Http\Controllers\Profile\ProfileController;
 use App\Http\Controllers\Notifications\NotificationController;
 use App\Http\Controllers\General\GlobalSearchController;
 use App\Http\Controllers\Auth\ChangePasswordController;
+use App\Http\Controllers\ApiTokenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -146,6 +147,10 @@ Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::get('/my-inventory', [ProfileController::class, 'myInventory'])->name('profile.inventory');
+        
+        // API Tokens
+        Route::post('/profile/api-tokens', [ApiTokenController::class, 'store'])->name('profile.api-tokens.store');
+        Route::delete('/profile/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])->name('profile.api-tokens.destroy');
         
         // Kembalikan item sendiri
         Route::post('/my-inventory/return/{borrowing}', [BorrowingController::class, 'returnItem'])->name('profile.inventory.return');
