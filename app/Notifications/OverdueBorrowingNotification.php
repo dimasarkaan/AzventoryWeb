@@ -31,7 +31,7 @@ class OverdueBorrowingNotification extends Notification implements ShouldBroadca
         return [
             'title' => 'Peminjaman Terlambat',
             'message' => "Barang {$this->borrowing->sparepart->name} seharusnya dikembalikan pada {$this->borrowing->expected_return_at->format('d M Y')}.",
-            'url' => route('borrowings.index'), // Follows general route
+            'url' => route('inventory.borrow.show', $this->borrowing->id), // Follows general route
             'type' => 'warning',
         ];
     }
@@ -41,7 +41,7 @@ class OverdueBorrowingNotification extends Notification implements ShouldBroadca
         return new BroadcastMessage([
             'title' => 'Peminjaman Terlambat',
             'message' => "Barang {$this->borrowing->sparepart->name} seharusnya dikembalikan pada {$this->borrowing->expected_return_at->format('d M Y')}.",
-            'url' => route('borrowings.index'),
+            'url' => route('inventory.borrow.show', $this->borrowing->id),
             'type' => 'warning',
         ]);
     }

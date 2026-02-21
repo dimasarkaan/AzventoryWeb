@@ -23,7 +23,7 @@
                 <!-- Main Edit Form -->
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-xl border border-secondary-200 shadow-card p-6 overflow-visible">
-                        <form action="{{ route('users.update', $user) }}" method="POST">
+                        <form action="{{ route('users.update', $user) }}" method="POST" novalidate>
                             @csrf
                             @method('PUT')
         

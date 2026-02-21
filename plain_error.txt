@@ -1,0 +1,29 @@
+PHPUnit 11.5.46 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.2.12
+Configuration: E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\phpunit.xml
+
+....F.F.......................                                    30 / 30 (100%)
+
+Time: 00:01.615, Memory: 66.00 MB
+
+There were 2 failures:
+
+1) Tests\Feature\Roles\AdminRoleTest::admin_cannot_access_stock_approvals
+Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:45
+E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:174
+E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\tests\Feature\Roles\AdminRoleTest.php:73
+
+2) Tests\Feature\Roles\AdminRoleTest::admin_cannot_access_activity_logs
+Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\vendor\laravel\framework\src\Illuminate\Testing\TestResponseAssert.php:45
+E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:174
+E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\tests\Feature\Roles\AdminRoleTest.php:87
+
+FAILURES!
+Tests: 30, Assertions: 41, Failures: 2, PHPUnit Deprecations: 30.

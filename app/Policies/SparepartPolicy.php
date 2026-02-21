@@ -65,11 +65,8 @@ class SparepartPolicy
      */
     public function restore(User $user, Sparepart $sparepart): bool
     {
-        // Superadmin dan Admin
-        return in_array($user->role, [
-            \App\Enums\UserRole::SUPERADMIN,
-            \App\Enums\UserRole::ADMIN,
-        ]);
+        // Hanya Superadmin
+        return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
 
     /**

@@ -59,4 +59,16 @@ class Borrowing extends Model
     {
         return $this->quantity - $this->returns()->sum('quantity');
     }
+
+    /**
+     * Memeriksa apakah peminjaman sudah melewati batas waktu (terlambat).
+     */
+    public function isOverdue()
+    {
+        if ($this->status === 'returned' || $this->remaining_quantity <= 0) {
+            return false;
+        }
+
+        return $this->expected_return_at && $this->expected_return_at->startOfDay()->isPast();
+    }
 }

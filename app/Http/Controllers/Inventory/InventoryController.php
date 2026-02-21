@@ -90,10 +90,15 @@ class InventoryController extends Controller
     public function show(Sparepart $inventory)
     {
         // Ambil data peminjaman dengan paginasi (5 per halaman)
-        $borrowings = $inventory->borrowings()
+        $borrowingQuery = $inventory->borrowings()
             ->with(['user', 'returns'])
-            ->latest()
-            ->paginate(5, ['*'], 'history_page');
+            ->latest();
+
+        if (auth()->user()->role === \App\Enums\UserRole::OPERATOR) {
+            $borrowingQuery->where('user_id', auth()->id());
+        }
+
+        $borrowings = $borrowingQuery->paginate(5, ['*'], 'history_page');
 
         // Ambil item serupa dengan paginasi (3 per halaman) 
         $similarItems = Sparepart::where('part_number', $inventory->part_number)

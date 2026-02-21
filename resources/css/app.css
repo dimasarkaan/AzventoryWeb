@@ -29,6 +29,10 @@
         @apply bg-danger-600 text-white hover:bg-danger-800 focus:ring-danger-500 shadow-sm hover:shadow-lg;
     }
 
+    .btn-success {
+        @apply bg-success-600 text-white hover:bg-success-800 focus:ring-success-500 shadow-sm hover:shadow-lg;
+    }
+
     .btn-ghost {
         @apply text-secondary-600 hover:bg-secondary-100 hover:text-secondary-900 border-transparent shadow-none;
     }

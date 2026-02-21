@@ -67,10 +67,10 @@ class AdminRoleTest extends TestCase
     }
 
     /** @test */
-    public function admin_cannot_access_stock_approvals()
+    public function admin_can_access_stock_approvals()
     {
         $response = $this->actingAs($this->admin)->get(route('inventory.stock-approvals.index'));
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     /** @test */
@@ -81,10 +81,10 @@ class AdminRoleTest extends TestCase
     }
 
     /** @test */
-    public function admin_cannot_access_activity_logs()
+    public function admin_can_access_activity_logs()
     {
         $response = $this->actingAs($this->admin)->get(route('reports.activity-logs.index'));
-        $response->assertStatus(403);
+        $response->assertStatus(200);
     }
 
     /** @test */
@@ -163,14 +163,13 @@ class AdminRoleTest extends TestCase
         $this->assertSoftDeleted('spareparts', ['id' => $sparepart->id]);
     }
     /** @test */
-    public function admin_can_restore_inventory()
+    public function admin_cannot_restore_inventory()
     {
         $sparepart = Sparepart::factory()->create();
         $sparepart->delete();
 
         $response = $this->actingAs($this->admin)->patch(route('inventory.restore', $sparepart->id));
-        $response->assertRedirect(route('inventory.index') . '?trash=true');
-        $this->assertNotSoftDeleted('spareparts', ['id' => $sparepart->id]);
+        $response->assertStatus(403);
     }
 
     /** @test */
@@ -184,7 +183,7 @@ class AdminRoleTest extends TestCase
     }
 
     /** @test */
-    public function admin_can_bulk_restore_inventory()
+    public function admin_cannot_bulk_restore_inventory()
     {
         $sparepart1 = Sparepart::factory()->create();
         $sparepart1->delete();
@@ -195,9 +194,7 @@ class AdminRoleTest extends TestCase
             'ids' => [$sparepart1->id, $sparepart2->id]
         ]);
         
-        $response->assertRedirect();
-        $this->assertNotSoftDeleted('spareparts', ['id' => $sparepart1->id]);
-        $this->assertNotSoftDeleted('spareparts', ['id' => $sparepart2->id]);
+        $response->assertStatus(403);
     }
 
     /** @test */

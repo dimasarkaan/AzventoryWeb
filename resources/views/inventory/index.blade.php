@@ -66,6 +66,7 @@
                             </div>
                         </div>
                     </div>
+                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                      <!-- Trash Toggle Button -->
                      <a href="{{ request('trash') ? route('inventory.index') : route('inventory.index', ['trash' => 'true']) }}" 
                         class="btn flex items-center justify-center p-2.5 {{ request('trash') ? 'btn-danger' : 'btn-secondary' }}" 
@@ -78,6 +79,7 @@
                             <x-icon.trash class="w-5 h-5 text-secondary-600" />
                         @endif
                     </a>
+                    @endif
                     
                     @if(!request('trash'))
                     @can('create', App\Models\Sparepart::class)
