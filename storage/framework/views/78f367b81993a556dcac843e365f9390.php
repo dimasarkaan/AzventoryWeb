@@ -45,7 +45,26 @@
 
                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
                         <a href="<?php echo e(route('dashboard.superadmin')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('dashboard.superadmin') ? $activeClass : $inactiveClass); ?>">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginalab5df9c45a342a42b2016b40c5da2137 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalab5df9c45a342a42b2016b40c5da2137 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.dashboard','data' => ['class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.dashboard'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalab5df9c45a342a42b2016b40c5da2137)): ?>
+<?php $attributes = $__attributesOriginalab5df9c45a342a42b2016b40c5da2137; ?>
+<?php unset($__attributesOriginalab5df9c45a342a42b2016b40c5da2137); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalab5df9c45a342a42b2016b40c5da2137)): ?>
+<?php $component = $__componentOriginalab5df9c45a342a42b2016b40c5da2137; ?>
+<?php unset($__componentOriginalab5df9c45a342a42b2016b40c5da2137); ?>
+<?php endif; ?>
                             <?php echo e(__('ui.dashboard')); ?>
 
                         </a>
@@ -53,7 +72,26 @@
 
                      <?php if(Auth::user()->role === \App\Enums\UserRole::ADMIN): ?>
                         <a href="<?php echo e(route('dashboard.admin')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('dashboard.admin') ? $activeClass : $inactiveClass); ?>">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginalab5df9c45a342a42b2016b40c5da2137 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalab5df9c45a342a42b2016b40c5da2137 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.dashboard','data' => ['class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.dashboard'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalab5df9c45a342a42b2016b40c5da2137)): ?>
+<?php $attributes = $__attributesOriginalab5df9c45a342a42b2016b40c5da2137; ?>
+<?php unset($__attributesOriginalab5df9c45a342a42b2016b40c5da2137); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalab5df9c45a342a42b2016b40c5da2137)): ?>
+<?php $component = $__componentOriginalab5df9c45a342a42b2016b40c5da2137; ?>
+<?php unset($__componentOriginalab5df9c45a342a42b2016b40c5da2137); ?>
+<?php endif; ?>
                             <?php echo e(__('ui.dashboard')); ?>
 
                         </a>
@@ -61,7 +99,26 @@
                      
                      <?php if(Auth::user()->role === \App\Enums\UserRole::OPERATOR): ?>
                         <a href="<?php echo e(route('dashboard.operator')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('dashboard.operator') ? $activeClass : $inactiveClass); ?>">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginalab5df9c45a342a42b2016b40c5da2137 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalab5df9c45a342a42b2016b40c5da2137 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.dashboard','data' => ['class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.dashboard'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalab5df9c45a342a42b2016b40c5da2137)): ?>
+<?php $attributes = $__attributesOriginalab5df9c45a342a42b2016b40c5da2137; ?>
+<?php unset($__attributesOriginalab5df9c45a342a42b2016b40c5da2137); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalab5df9c45a342a42b2016b40c5da2137)): ?>
+<?php $component = $__componentOriginalab5df9c45a342a42b2016b40c5da2137; ?>
+<?php unset($__componentOriginalab5df9c45a342a42b2016b40c5da2137); ?>
+<?php endif; ?>
                             <?php echo e(__('ui.dashboard')); ?>
 
                         </a>
@@ -69,28 +126,104 @@
 
                     
                     <a href="<?php echo e(route('inventory.index')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('inventory.*') ? $activeClass : $inactiveClass); ?>">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                        <?php if (isset($component)) { $__componentOriginalc867a7d0834788820c9284b3decea570 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc867a7d0834788820c9284b3decea570 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.inventory','data' => ['class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.inventory'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc867a7d0834788820c9284b3decea570)): ?>
+<?php $attributes = $__attributesOriginalc867a7d0834788820c9284b3decea570; ?>
+<?php unset($__attributesOriginalc867a7d0834788820c9284b3decea570); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc867a7d0834788820c9284b3decea570)): ?>
+<?php $component = $__componentOriginalc867a7d0834788820c9284b3decea570; ?>
+<?php unset($__componentOriginalc867a7d0834788820c9284b3decea570); ?>
+<?php endif; ?>
                         <?php echo e(__('ui.inventory_list')); ?>
 
                     </a>
 
                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
                         <a href="<?php echo e(route('users.index')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('users.*') ? $activeClass : $inactiveClass); ?>">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                            <?php if (isset($component)) { $__componentOriginal07c29f1ca6ba0f6658925eab04869708 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal07c29f1ca6ba0f6658925eab04869708 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.users','data' => ['class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.users'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal07c29f1ca6ba0f6658925eab04869708)): ?>
+<?php $attributes = $__attributesOriginal07c29f1ca6ba0f6658925eab04869708; ?>
+<?php unset($__attributesOriginal07c29f1ca6ba0f6658925eab04869708); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal07c29f1ca6ba0f6658925eab04869708)): ?>
+<?php $component = $__componentOriginal07c29f1ca6ba0f6658925eab04869708; ?>
+<?php unset($__componentOriginal07c29f1ca6ba0f6658925eab04869708); ?>
+<?php endif; ?>
                             <?php echo e(__('ui.user_management')); ?>
 
                         </a>
                     <?php endif; ?>
 
                     <a href="<?php echo e(route('inventory.scan-qr')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('inventory.scan-qr') ? $activeClass : $inactiveClass); ?>">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                        <?php if (isset($component)) { $__componentOriginal4a23095320439a806c351cc06b90a972 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal4a23095320439a806c351cc06b90a972 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.scan-qr','data' => ['class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.scan-qr'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal4a23095320439a806c351cc06b90a972)): ?>
+<?php $attributes = $__attributesOriginal4a23095320439a806c351cc06b90a972; ?>
+<?php unset($__attributesOriginal4a23095320439a806c351cc06b90a972); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal4a23095320439a806c351cc06b90a972)): ?>
+<?php $component = $__componentOriginal4a23095320439a806c351cc06b90a972; ?>
+<?php unset($__componentOriginal4a23095320439a806c351cc06b90a972); ?>
+<?php endif; ?>
                         <?php echo e(__('ui.scan_qr')); ?>
 
                     </a>
 
                     <?php if(in_array(Auth::user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])): ?>
                         <a href="<?php echo e(route('reports.index')); ?>" class="<?php echo e($navClass); ?> <?php echo e(request()->routeIs('reports.*') ? $activeClass : $inactiveClass); ?>">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                             <?php if (isset($component)) { $__componentOriginal24390ae3d90e240bd263a82260274af4 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal24390ae3d90e240bd263a82260274af4 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.reports','data' => ['class' => 'w-4 h-4']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.reports'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-4 h-4']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal24390ae3d90e240bd263a82260274af4)): ?>
+<?php $attributes = $__attributesOriginal24390ae3d90e240bd263a82260274af4; ?>
+<?php unset($__attributesOriginal24390ae3d90e240bd263a82260274af4); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal24390ae3d90e240bd263a82260274af4)): ?>
+<?php $component = $__componentOriginal24390ae3d90e240bd263a82260274af4; ?>
+<?php unset($__componentOriginal24390ae3d90e240bd263a82260274af4); ?>
+<?php endif; ?>
                             <?php echo e(__('ui.reports')); ?>
 
                         </a>

@@ -24,9 +24,9 @@ class RouteAccessTest extends TestCase
         $response = $this->get('/forgot-password');
         $response->assertStatus(200);
 
-        // Halaman Utama (biasanya redirect ke login atau dashboard)
+        // Halaman Utama (Sekarang menampilkan Landing Page)
         $response = $this->get('/');
-        $response->assertStatus(302); // Redirect
+        $response->assertStatus(200);
     }
 
     /**

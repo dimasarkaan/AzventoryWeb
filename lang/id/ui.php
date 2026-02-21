@@ -367,7 +367,7 @@ return [
     'currently_borrowed' => 'Sedang Dipinjam',
     'units_out' => 'Unit Keluar',
     'storage_locations' => 'Lokasi Penyimpanan',
-    'warehouse_racks' => 'Gudang & Rak',
+    'warehouse_racks' => 'Lokasi',
     'attention_overdue' => 'Perhatian: Barang Terlambat Kembali',
     'showing_top_5_overdue' => 'Menampilkan 5 teratas. Cek detail per item di Inventaris.',
     'borrower' => 'Peminjam',

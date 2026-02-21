@@ -33,7 +33,26 @@
                                 <input type="radio" name="report_type" value="inventory_list" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mb-3 group-hover:bg-primary-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                        <?php if (isset($component)) { $__componentOriginalc867a7d0834788820c9284b3decea570 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc867a7d0834788820c9284b3decea570 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.inventory','data' => ['class' => 'w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.inventory'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-6 h-6']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc867a7d0834788820c9284b3decea570)): ?>
+<?php $attributes = $__attributesOriginalc867a7d0834788820c9284b3decea570; ?>
+<?php unset($__attributesOriginalc867a7d0834788820c9284b3decea570); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc867a7d0834788820c9284b3decea570)): ?>
+<?php $component = $__componentOriginalc867a7d0834788820c9284b3decea570; ?>
+<?php unset($__componentOriginalc867a7d0834788820c9284b3decea570); ?>
+<?php endif; ?>
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1"><?php echo e(__('ui.inventory_data')); ?></span>
                                     <span class="text-xs text-secondary-500 leading-tight"><?php echo e(__('ui.inventory_data_desc')); ?></span>
@@ -46,7 +65,26 @@
                                 <input type="radio" name="report_type" value="stock_mutation" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-warning-100 text-warning-600 flex items-center justify-center mb-3 group-hover:bg-warning-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
+                                        <?php if (isset($component)) { $__componentOriginal96e77c68d2ad4a54f82a559330ef4d20 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal96e77c68d2ad4a54f82a559330ef4d20 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.mutation','data' => ['class' => 'w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.mutation'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-6 h-6']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal96e77c68d2ad4a54f82a559330ef4d20)): ?>
+<?php $attributes = $__attributesOriginal96e77c68d2ad4a54f82a559330ef4d20; ?>
+<?php unset($__attributesOriginal96e77c68d2ad4a54f82a559330ef4d20); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal96e77c68d2ad4a54f82a559330ef4d20)): ?>
+<?php $component = $__componentOriginal96e77c68d2ad4a54f82a559330ef4d20; ?>
+<?php unset($__componentOriginal96e77c68d2ad4a54f82a559330ef4d20); ?>
+<?php endif; ?>
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1"><?php echo e(__('ui.stock_mutation_history')); ?></span>
                                     <span class="text-xs text-secondary-500 leading-tight"><?php echo e(__('ui.stock_mutation_desc')); ?></span>
@@ -59,7 +97,26 @@
                                 <input type="radio" name="report_type" value="borrowing_history" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-sky-400 peer-checked:border-sky-600 peer-checked:bg-sky-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mb-3 group-hover:bg-sky-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <?php if (isset($component)) { $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.borrow-user','data' => ['class' => 'w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.borrow-user'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-6 h-6']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $attributes = $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $component = $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1"><?php echo e(__('ui.borrowing_history_report')); ?></span>
                                     <span class="text-xs text-secondary-500 leading-tight"><?php echo e(__('ui.borrowing_history_desc')); ?></span>
@@ -72,7 +129,26 @@
                                 <input type="radio" name="report_type" value="low_stock" x-model="reportType" class="peer sr-only">
                                 <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
                                     <div class="w-12 h-12 rounded-full bg-danger-100 text-danger-600 flex items-center justify-center mb-3 group-hover:bg-danger-200 transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        <?php if (isset($component)) { $__componentOriginal92c3cdd7c141dc9b9aa91714437e728e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.low-stock','data' => ['class' => 'w-6 h-6']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.low-stock'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-6 h-6']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e)): ?>
+<?php $attributes = $__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e; ?>
+<?php unset($__attributesOriginal92c3cdd7c141dc9b9aa91714437e728e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal92c3cdd7c141dc9b9aa91714437e728e)): ?>
+<?php $component = $__componentOriginal92c3cdd7c141dc9b9aa91714437e728e; ?>
+<?php unset($__componentOriginal92c3cdd7c141dc9b9aa91714437e728e); ?>
+<?php endif; ?>
                                     </div>
                                     <span class="font-bold text-secondary-900 block mb-1"><?php echo e(__('ui.low_stock_report')); ?></span>
                                     <span class="text-xs text-secondary-500 leading-tight"><?php echo e(__('ui.low_stock_desc')); ?></span>
