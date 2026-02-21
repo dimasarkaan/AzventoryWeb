@@ -1,0 +1,536 @@
+
+   WARN  Metadata found in doc-comment for method Tests\Unit\DashboardServiceTest::it_calculates_date_range_correctly(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Unit\DashboardServiceTest::it_returns_stock_snapshots(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Unit\DashboardServiceTest::it_returns_stock_movements(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Unit\DashboardServiceTest::it_returns_top_items(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Dashboard\DashboardAccessTest::superadmin_can_access_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Dashboard\DashboardAnalyticsTest::dashboard_shows_correct_basic_stats(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Dashboard\DashboardAnalyticsTest::dashboard_identifies_dead_stock_correctly(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Dashboard\DashboardAnalyticsTest::dashboard_forecast_calculation_logic(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Dashboard\DashboardAnalyticsTest::dashboard_date_filter_affects_analytics(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\FrontendUITest::operator_cannot_see_edit_delete_buttons_on_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\FrontendUITest::admin_can_see_edit_but_cannot_see_force_delete_button(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\FrontendUITest::operator_sees_different_dashboard_widgets_than_admin(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\FrontendUITest::inventory_index_view_is_responsive(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\LocalizationTest::guest_views_are_localized(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\LocalizationTest::superadmin_views_are_localized(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::operator_cannot_access_superadmin_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::admin_cannot_access_superadmin_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::unauthenticated_user_redirected_to_login(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::operator_cannot_perform_dangerous_actions(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::operator_can_access_own_activity_logs(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::operator_cannot_access_user_management(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::admin_can_access_admin_dashboard_but_not_superadmin(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::superadmin_can_access_all_dashboards(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::operator_cannot_access_admin_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\General\SecurityTest::admin_cannot_access_user_management(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\BorrowingTest::superadmin_can_borrow_item(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\BorrowingTest::superadmin_cannot_borrow_more_than_stock(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\BorrowingTest::superadmin_can_return_borrowed_item_good_condition(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\DuplicateItemTest::it_merges_stock_when_exact_duplicate_is_added(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\DuplicateItemTest::it_creates_new_item_if_one_attribute_differs(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::system_prevents_negative_stock_input_on_create(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::system_prevents_negative_stock_through_borrowing(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::cannot_delete_item_with_active_borrowing(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::merges_stock_if_duplicate_part_number_exists(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::system_prevents_bypassing_status_validation(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::system_prevents_condition_exceeding_max_validation(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::system_prevents_incorrect_datatype_on_stock(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::user_cannot_borrow_out_of_stock_item(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\EdgeCaseTest::operator_can_only_view_own_borrowings(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\InventoryTransactionTest::it_creates_sparepart_creates_stock_log_and_activity_log_atomically(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\InventoryTransactionTest::it_updates_sparepart_and_logs_activity(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\InventoryTransactionTest::it_soft_deletes_sparepart_and_logs_activity(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\InventoryTransactionTest::it_restores_sparepart_and_logs_activity(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\InventoryTransactionTest::it_force_deletes_sparepart_and_logs_activity(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\InventoryTransactionTest::it_handles_duplicate_entry_merging_correctly(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\PolicyTest::superadmin_can_access_all_inventory_actions(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\PolicyTest::admin_can_access_most_actions_except_restore_and_force_delete(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\PolicyTest::operator_can_only_view(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\StockApprovalTest::superadmin_can_view_pending_approvals(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\StockApprovalTest::superadmin_can_approve_stock_request(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Inventory\StockApprovalTest::superadmin_can_reject_stock_request(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Notifications\NotificationTest::superadmin_can_view_notifications(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Notifications\NotificationTest::superadmin_can_mark_notification_as_read(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Notifications\NotificationTest::test_low_stock_notification_can_be_triggered(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\ActivityLogTest::can_filter_logs_by_action_and_user(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\ActivityLogTest::can_export_logs_to_excel_directly(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\ActivityLogTest::export_pdf_dispatches_job(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\AuditTest::inventory_index_uses_cache_for_dropdowns(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\AuditTest::pdf_report_generation_is_queued(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\AuditTest::excel_report_generation_is_synchronous(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\ReportTest::superadmin_can_download_pdf_report_via_queue(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\ReportTest::superadmin_can_download_excel_report_directly(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\ReportTest::superadmin_can_access_reports_page(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Reports\ReportTest::superadmin_can_access_qr_scan_page(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_admin_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_cannot_access_superadmin_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_cannot_access_operator_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_inventory_index(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_stock_approvals(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_reports(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_activity_logs(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_cannot_access_user_management(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_create_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_update_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_soft_delete_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_cannot_restore_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_cannot_force_delete_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_cannot_bulk_restore_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_cannot_bulk_force_delete_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_request_stock(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_borrow_item(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_profile_and_notifications(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_inventory_create(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_inventory_show(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_inventory_edit(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_scan_qr(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_check_part_number(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_download_qr_code(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_print_qr_code(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_borrow_history(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_borrow_show(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_return_borrowed_item(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_download_reports(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\AdminRoleTest::admin_can_access_movement_data(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_operator_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_access_superadmin_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_access_admin_dashboard(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_inventory_index(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_access_stock_approvals(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_access_reports_index(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_activity_logs(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_access_user_management(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_create_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_update_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_soft_delete_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_restore_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_force_delete_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_bulk_restore_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_bulk_force_delete_inventory(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_request_stock(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_borrow_item(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_profile_and_notifications(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_access_inventory_create(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_inventory_show(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_access_inventory_edit(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_scan_qr(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_check_part_number(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_download_qr_code(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_print_qr_code(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_borrow_history(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_access_borrow_show(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_can_return_borrowed_item(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Roles\OperatorRoleTest::operator_cannot_download_reports(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   PASS  Tests\Unit\DashboardServiceTest
+  ✓ it calculates date range cor… 0.33s  
+  ✓ it returns stock snapshots    0.05s  
+  ✓ it returns stock movements    0.03s  
+  ✓ it returns top items          0.02s  
+
+   PASS  Tests\Unit\Inventory\StockLogicTest
+  ✓ check if stock is low         0.01s  
+  ✓ check if stock is safe
+  ✓ stock cannot be negative logic
+
+   PASS  Tests\Feature\Auth\AuthenticationTest
+  ✓ login screen can be rendered  0.07s  
+  ✓ users can authenticate using… 0.05s  
+  ✓ users can not authenticate w… 0.22s  
+
+   PASS  Tests\Feature\Auth\EmailVerificationTest
+  ✓ email verification screen ca… 0.03s  
+  ✓ email can be verified         0.03s  
+  ✓ email is not verified with i… 0.03s  
+
+   PASS  Tests\Feature\Auth\ForcePasswordChangeTest
+  ✓ new user is redirected to ch… 0.03s  
+  ✓ user can access change passw… 0.03s  
+  ✓ user with changed password c… 0.04s  
+
+   PASS  Tests\Feature\Auth\PasswordConfirmationTest
+  ✓ confirm password screen can…  0.03s  
+  ✓ password can be confirmed     0.02s  
+  ✓ password is not confirmed wi… 0.22s  
+
+   PASS  Tests\Feature\Auth\PasswordResetTest
+  ✓ reset password link screen c… 0.02s  
+  ✓ reset password link can be r… 0.24s  
+  ✓ reset password screen can be… 0.23s  
+  ✓ password can be reset with v… 0.23s  
+
+   PASS  Tests\Feature\Auth\PasswordUpdateTest
+  ✓ password can be updated       0.03s  
+  ✓ correct password must be pro… 0.03s  
+
+   WARN  Tests\Feature\Auth\RegistrationTest
+  - registration screen can be r… 0.03s  
+  - new users can register → Reg… 0.02s  
+
+   PASS  Tests\Feature\Dashboard\DashboardAccessTest
+  ✓ superadmin can access dashbo… 0.04s  
+
+   PASS  Tests\Feature\Dashboard\DashboardAnalyticsTest
+  ✓ dashboard shows correct basi… 0.04s  
+  ✓ dashboard identifies dead st… 0.04s  
+  ✓ dashboard forecast calculati… 0.05s  
+  ✓ dashboard date filter affect… 0.04s  
+
+   PASS  Tests\Feature\General\FrontendUITest
+  ✓ operator cannot see edit del… 0.06s  
+  ✓ admin can see edit but canno… 0.04s  
+  ✓ operator sees different dash… 0.07s  
+  ✓ inventory index view is resp… 0.04s  
+
+   PASS  Tests\Feature\General\LocalizationTest
+  ✓ guest views are localized     0.02s  
+  ✓ superadmin views are localiz… 0.06s  
+
+   PASS  Tests\Feature\General\RouteAccessTest
+  ✓ public pages accessible by g… 0.03s  
+  ✓ protected routes redirect un… 0.02s  
+  ✓ superadmin can access all cr… 0.10s  
+  ✓ operator has limited access   0.06s  
+  ✓ dashboard redirects based on… 0.03s  
+
+   PASS  Tests\Feature\General\SecurityTest
+  ✓ operator cannot access super… 0.03s  
+  ✓ admin cannot access superadm… 0.03s  
+  ✓ unauthenticated user redirec… 0.03s  
+  ✓ operator cannot perform dang… 0.03s  
+  ✓ operator can access own acti… 0.03s  
+  ✓ operator cannot access user…  0.03s  
+  ✓ admin can access admin dashb… 0.04s  
+  ✓ superadmin can access all da… 0.07s  
+  ✓ operator cannot access admin… 0.03s  
+  ✓ admin cannot access user man… 0.03s  
+
+   PASS  Tests\Feature\Inventory\BorrowingTest
+  ✓ superadmin can borrow item    0.09s  
+  ✓ superadmin cannot borrow mor… 0.02s  
+  ✓ superadmin can return borrow… 0.05s  
+
+   PASS  Tests\Feature\Inventory\ComprehensiveInventoryTest
+  ✓ duplicate item merges stock…  0.05s  
+  ✓ duplicate item shows warning… 0.03s  
+  ✓ create new item validates re… 0.03s  
+
+   PASS  Tests\Feature\Inventory\DuplicateItemTest
+  ✓ it merges stock when exact d… 0.07s  
+  ✓ it creates new item if one a… 0.07s  
+
+   PASS  Tests\Feature\Inventory\EdgeCaseTest
+  ✓ system prevents negative sto… 0.03s  
+  ✓ system prevents negative sto… 0.03s  
+  ✓ cannot delete item with acti… 0.03s  
+  ✓ merges stock if duplicate pa… 0.05s  
+  ✓ system prevents bypassing st… 0.03s  
+  ✓ system prevents condition ex… 0.02s  
+  ✓ system prevents incorrect da… 0.03s  
+  ✓ user cannot borrow out of st… 0.03s  
+  ✓ operator can only view own b… 0.05s  
+
+   PASS  Tests\Feature\Inventory\InventoryBulkActionTest
+  ✓ superadmin can bulk restore…  0.06s  
+  ✓ superadmin can bulk force de… 0.05s  
+  ✓ operator cannot bulk restore  0.03s  
+  ✓ operator cannot bulk force d… 0.03s  
+
+   PASS  Tests\Feature\Inventory\InventoryCrudTest
+  ✓ inventory list can be render… 0.04s  
+  ✓ can create new sparepart      0.05s  
+  ✓ can update sparepart stock    0.06s  
+  ✓ can delete sparepart          0.04s  
+  ✓ superadmin can check part nu… 0.03s  
+
+   PASS  Tests\Feature\Inventory\InventoryTransactionTest
+  ✓ it creates sparepart creates… 0.05s  
+  ✓ it updates sparepart and log… 0.05s  
+  ✓ it soft deletes sparepart an… 0.05s  
+  ✓ it restores sparepart and lo… 0.04s  
+  ✓ it force deletes sparepart a… 0.04s  
+  ✓ it handles duplicate entry m… 0.04s  
+
+   PASS  Tests\Feature\Inventory\MergeConfirmationTest
+  ✓ edit barang tanpa duplikat t… 0.06s  
+  ✓ edit barang yang menjadi dup… 0.03s  
+  ✓ user pilih merge stock berga… 0.05s  
+  ✓ user pilih keep separate tet… 0.05s  
+  ✓ merge transfer borrowing his… 0.05s  
+  ✓ cannot merge if item current… 0.03s  
+
+   PASS  Tests\Feature\Inventory\PolicyTest
+  ✓ superadmin can access all in… 0.14s  
+  ✓ admin can access most action… 0.11s  
+  ✓ operator can only view        0.09s  
+
+   PASS  Tests\Feature\Inventory\QuantityInputTest
+  ✓ create page stock input defa… 0.04s  
+  ✓ show page alpine initializes… 0.05s  
+
+   PASS  Tests\Feature\Inventory\ReturnBorrowingTest
+  ✓ return item validation good…  0.03s  
+  ✓ return item validation max q… 0.03s  
+  ✓ return item success with pho… 0.08s  
+  ✓ return item with damaged con… 0.05s  
+
+   PASS  Tests\Feature\Inventory\StockApprovalTest
+  ✓ superadmin can view pending…  0.04s  
+  ✓ superadmin can approve stock… 0.05s  
+  ✓ superadmin can reject stock…  0.05s  
+
+   PASS  Tests\Feature\Notifications\NotificationLogicTest
+  ✓ low stock notification trigg… 0.05s  
+  ✓ missing price notification t… 0.06s  
+
+   PASS  Tests\Feature\Notifications\NotificationTest
+  ✓ superadmin can view notifica… 0.05s  
+  ✓ superadmin can mark notifica… 0.02s  
+  ✓ low stock notification can b… 0.02s  
+
+   PASS  Tests\Feature\Profile\ProfileTest
+  ✓ profile page is displayed     0.04s  
+  ✓ profile information can be u… 0.05s  
+  ✓ email verification status is… 0.05s  
+  ✓ user can delete their accoun… 0.05s  
+  ✓ correct password must be pro… 0.02s  
+
+   PASS  Tests\Feature\Reports\ActivityLogTest
+  ✓ can filter logs by action an… 0.08s  
+  ✓ can export logs to excel dir… 0.16s  
+  ✓ export pdf dispatches job     0.06s  
+
+   FAIL  Tests\Feature\Reports\AuditTest
+  ⨯ inventory index uses cache f… 0.07s  
+  ✓ pdf report generation is que… 0.05s  
+  ✓ excel report generation is s… 0.08s  
+
+   PASS  Tests\Feature\Reports\ReportTest
+  ✓ superadmin can download pdf…  0.06s  
+  ✓ superadmin can download exce… 0.10s  
+  ✓ superadmin can access report… 0.04s  
+  ✓ superadmin can access qr sca… 0.04s  
+
+   FAIL  Tests\Feature\Roles\AdminRoleTest
+  ✓ admin can access admin dashb… 0.04s  
+  ✓ admin cannot access superadm… 0.03s  
+  ⨯ admin cannot access operator… 0.08s  
+  ✓ admin can access inventory i… 0.05s  
+  ✓ admin can access stock appro… 0.03s  
+  ✓ admin can access reports      0.03s  
+  ✓ admin can access activity lo… 0.03s  
+  ✓ admin cannot access user man… 0.03s  
+  ✓ admin can create inventory    0.06s  
+  ✓ admin can update inventory    0.06s  
+  ✓ admin can soft delete invent… 0.06s  
+  ✓ admin cannot restore invento… 0.03s  
+  ✓ admin cannot force delete in… 0.03s  
+  ✓ admin cannot bulk restore in… 0.03s  
+  ✓ admin cannot bulk force dele… 0.03s  
+  ✓ admin can request stock       0.06s  
+  ✓ admin can borrow item         0.06s  
+  ✓ admin can access profile and… 0.04s  
+  ✓ admin can access inventory c… 0.04s  
+  ✓ admin can access inventory s… 0.06s  
+  ✓ admin can access inventory e… 0.04s  
+  ✓ admin can access scan qr      0.03s  
+  ✓ admin can check part number   0.03s  
+  ✓ admin can download qr code    0.02s  
+  ✓ admin can print qr code       0.03s  
+  ✓ admin can access borrow hist… 0.06s  
+  ✓ admin can access borrow show  0.11s  
+  ✓ admin can return borrowed it… 0.16s  
+  ✓ admin can download reports    0.36s  
+  ✓ admin can access movement da… 0.05s  
+
+   PASS  Tests\Feature\Roles\OperatorRoleTest
+  ✓ operator can access operator… 0.18s  
+  ✓ operator cannot access super… 0.05s  
+  ✓ operator cannot access admin… 0.06s  
+  ✓ operator can access inventor… 0.08s  
+  ✓ operator cannot access stock… 0.05s  
+  ✓ operator cannot access repor… 0.06s  
+  ✓ operator can access activity… 0.08s  
+  ✓ operator cannot access user…  0.09s  
+  ✓ operator cannot create inven… 0.06s  
+  ✓ operator cannot update inven… 0.07s  
+  ✓ operator cannot soft delete…  0.07s  
+  ✓ operator cannot restore inve… 0.08s  
+  ✓ operator cannot force delete… 0.05s  
+  ✓ operator cannot bulk restore… 0.05s  
+  ✓ operator cannot bulk force d… 0.06s  
+  ✓ operator can request stock    0.15s  
+  ✓ operator can borrow item      0.13s  
+  ✓ operator can access profile…  0.08s  
+  ✓ operator cannot access inven… 0.06s  
+  ✓ operator can access inventor… 0.20s  
+  ✓ operator cannot access inven… 0.05s  
+  ✓ operator can access scan qr   0.10s  
+  ✓ operator can check part numb… 0.07s  
+  ✓ operator can download qr cod… 0.05s  
+  ✓ operator can print qr code    0.05s  
+  ✓ operator can access borrow h… 0.19s  
+  ✓ operator can access borrow s… 0.17s  
+  ✓ operator can return borrowed… 0.15s  
+  ✓ operator cannot download rep… 0.05s  
+
+   PASS  Tests\Feature\Users\UserAccessTest
+  ✓ operator cannot view user li… 0.14s  
+  ✓ admin cannot view user list   0.06s  
+  ✓ operator cannot create user   0.06s  
+  ✓ operator cannot delete user   0.05s  
+
+   PASS  Tests\Feature\Users\UserManagementTest
+  ✓ superadmin can view user lis… 0.07s  
+  ✓ superadmin can create new ad… 0.14s  
+  ✓ superadmin can create new op… 0.15s  
+  ✓ superadmin can delete user    0.20s  
+  ✓ superadmin can reset user pa… 0.16s  
+  ─────────────────────────────────────  
+   FAILED  Tes…  InvalidCountException   
+  Method remember(<Any Arguments>) from Mockery_4_Illuminate_Cache_CacheManager should be called
+ exactly 7 times but called 8 times.
+
+  ─────────────────────────────────────  
+   FAILED  Tests\Feature\Roles\AdminR…   
+  Expected response status code [403] but received 200.
+Failed asserting that 200 is identical to 403.
+
+  at tests\Feature\Roles\AdminRoleTest.php:59
+     55▕     /** @test */
+     56▕     public function admin_cannot_access_operator_dashboard()
+     57▕     {
+     58▕         $response = $this->actingAs($this->admin)->get(route('dashboard.operator'));
+  ➜  59▕         $response->assertStatus(403);
+     60▕     }
+     61▕ 
+     62▕     /** @test */
+     63▕     public function admin_can_access_inventory_index()
+
+
+  Tests:    2 failed, 2 skipped, 187 passed (474 assertions)
+  Duration: 12.52s
+

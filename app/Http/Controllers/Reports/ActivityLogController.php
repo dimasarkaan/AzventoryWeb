@@ -189,18 +189,17 @@ class ActivityLogController extends Controller
                 // Format: LogAktivitas_01-01-2026sd15-01-2026
                 $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
                 $end = \Carbon\Carbon::parse($request->end_date)->format('d-m-Y');
-                $filename = "LogAktivitas_{$start}sd{$end}.xls";
+                $filename = "LogAktivitas_{$start}sd{$end}";
             } elseif ($request->start_date) {
                 $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
-                $filename = "LogAktivitas_Sejak{$start}.xls";
+                $filename = "LogAktivitas_Sejak{$start}";
             } else {
                 // Format: LogAktivitasSemuaRiwayat_30-01-2026
-                $filename = 'LogAktivitasSemuaRiwayat_' . now()->format('d-m-Y') . '.xls';
+                $filename = 'LogAktivitasSemuaRiwayat_' . now()->format('d-m-Y');
             }
             
-            return response(view('reports.activity_logs.pdf', ['logs' => $logs, 'isPdf' => false]))
-                ->header('Content-Type', 'application/vnd.ms-excel')
-                ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+            $excelService = new \App\Services\ExcelExportService();
+            return $excelService->exportActivityLogs($logs, $filename);
         }
     }
 }
