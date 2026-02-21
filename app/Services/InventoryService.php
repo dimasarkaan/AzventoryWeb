@@ -422,18 +422,23 @@ class InventoryService
     // Cek apakah update akan membuat duplikat dengan item lain (exclude current item).
     public function checkUpdateDuplicate(Sparepart $currentItem, array $data)
     {
+        // Gabungkan data yang diupdate dengan data saat ini, 
+        // agar field yang tidak ada di $data (misal price karena filter role Admin) 
+        // tetap mengambil nilai aslinya.
+        $checkData = array_merge($currentItem->toArray(), $data);
+
         $query = Sparepart::where('id', '!=', $currentItem->id)
-            ->where('part_number', $data['part_number'])
-            ->where('name', $data['name'])
-            ->where('brand', $data['brand'])
-            ->where('category', $data['category'])
-            ->where('location', $data['location'])
-            ->where('condition', $data['condition'])
-            ->where('type', $data['type']);
+            ->where('part_number', $checkData['part_number'])
+            ->where('name', $checkData['name'])
+            ->where('brand', $checkData['brand'])
+            ->where('category', $checkData['category'])
+            ->where('location', $checkData['location'])
+            ->where('condition', $checkData['condition'])
+            ->where('type', $checkData['type']);
 
         foreach (['color', 'price', 'unit'] as $field) {
-            if (isset($data[$field])) {
-                $query->where($field, $data[$field]);
+            if (isset($checkData[$field])) {
+                $query->where($field, $checkData[$field]);
             } else {
                 $query->whereNull($field);
             }

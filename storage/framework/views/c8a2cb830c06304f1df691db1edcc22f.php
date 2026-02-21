@@ -1,0 +1,1565 @@
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-6">
+                <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                    <?php echo e(__('ui.edit_inventory_title')); ?>
+
+                </h2>
+                <p class="mt-1 text-sm text-secondary-500"><?php echo e(__('ui.edit_inventory_subtitle')); ?></p>
+            </div>
+
+            <form action="<?php echo e(route('inventory.update', $sparepart)); ?>" method="POST" enctype="multipart/form-data">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('PUT'); ?>
+                
+                <div class="space-y-4" x-data="inventoryForm()">
+                    <!-- Section 1: Informasi Dasar -->
+                    <div class="card p-6 overflow-visible">
+                        <div class="mb-4 border-b border-secondary-100 pb-2">
+                            <h3 class="text-lg font-semibold text-secondary-900"><?php echo e(__('ui.section_basic')); ?></h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Tipe Barang -->
+                            <div class="col-span-1 md:col-span-2">
+                                <label class="input-label mb-3 block"><?php echo e(__('ui.item_type')); ?> <span class="text-danger-500">*</span></label>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <label class="cursor-pointer border rounded-xl p-4 flex items-start gap-4 hover:bg-secondary-50 transition-all duration-200" :class="{ 'border-primary-500 bg-primary-50 ring-1 ring-primary-500': type === 'sale', 'border-secondary-200': type !== 'sale' }">
+                                        <div class="mt-1">
+                                            <input type="radio" name="type" value="sale" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5">
+                                        </div>
+                                        <div>
+                                            <span class="block font-semibold text-secondary-900 text-base"><?php echo e(__('ui.type_sale')); ?></span>
+                                            <span class="block text-sm text-secondary-500 mt-1"><?php echo e(__('ui.type_sale_desc')); ?></span>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer border rounded-xl p-4 flex items-start gap-4 hover:bg-secondary-50 transition-all duration-200" :class="{ 'border-primary-500 bg-primary-50 ring-1 ring-primary-500': type === 'asset', 'border-secondary-200': type !== 'asset' }">
+                                        <div class="mt-1">
+                                            <input type="radio" name="type" value="asset" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5">
+                                        </div>
+                                        <div>
+                                            <span class="block font-semibold text-secondary-900 text-base"><?php echo e(__('ui.type_asset')); ?></span>
+                                            <span class="block text-sm text-secondary-500 mt-1"><?php echo e(__('ui.type_asset_desc')); ?></span>
+                                        </div>
+                                    </label>
+                                </div>
+                                <input type="hidden" name="type" x-model="type">
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('type')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+
+                            <!-- Row 1: PN & Name -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-full">
+                                <!-- Part Number -->
+                                <div>
+                                    <label for="part_number" class="input-label"><?php echo e(__('ui.part_number')); ?> <span class="text-danger-500">*</span></label>
+                                    <div class="relative flex gap-2" x-data="{
+                                        open: false,
+                                        search: '',
+                                        selected: '<?php echo e(old('part_number', $sparepart->part_number)); ?>',
+                                        options: <?php echo e(json_encode($partNumbers)); ?> || [],
+                                        get filteredOptions() {
+                                            if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                            return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                        },
+                                        select(value) {
+                                            this.selected = value;
+                                            this.search = value;
+                                            this.open = false;
+                                        },
+                                        createNew() {
+                                            let term = this.search.toUpperCase();
+                                            this.select(term);
+                                        },
+                                        init() {
+                                            if (this.selected) {
+                                                this.search = this.selected;
+                                            }
+                                        }
+                                    }" @click.outside="open = false">
+                                        <div class="relative w-full">
+                                            <input type="hidden" name="part_number" x-model="selected">
+                                            <input id="part_number" class="input-field pr-10 w-full" type="text" 
+                                                   x-model="search" 
+                                                   @focus="open = true, $el.select()"
+                                                   @input="open = true, selected = search, partNumber = search.toUpperCase(), search = search.toUpperCase()"
+                                                   @keydown.enter.prevent="createNew()" 
+                                                   placeholder="<?php echo e(__('ui.placeholder_pn')); ?>" 
+                                                   autocomplete="off" />
+                                            
+                                            <!-- Chevron Button -->
+                                            <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+
+                                            <!-- Dropdown -->
+                                            <div x-show="open" 
+                                                 x-transition:leave="transition ease-in duration-100"
+                                                 x-transition:leave-start="opacity-100"
+                                                 x-transition:leave-end="opacity-0"
+                                                 class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                                
+                                                <template x-for="option in filteredOptions" :key="option">
+                                                    <div @click="select(option)" 
+                                                         class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                        <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                                    </div>
+                                                </template>
+
+                                                <!-- No Data State -->
+                                                <div x-show="filteredOptions.length === 0 && search.length === 0" class="px-3 py-2 text-sm text-secondary-500 italic">
+                                                    <?php echo e(__('ui.no_data')); ?>
+
+                                                </div>
+
+                                                <!-- Create New Option -->
+                                                <div x-show="search.length > 0 && !options.some(o => o === search)" 
+                                                     @click="createNew()"
+                                                     class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                                    <span class="block truncate">
+                                                        <?php echo __('ui.use_search', ['search' => '<span x-text="search" class="font-bold"></span>']); ?>
+
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" @click="window.triggerScanModal()" class="btn btn-secondary px-3" title="<?php echo e(__('ui.scan_pn')); ?>">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75zM16.5 19.5h.75v.75h-.75v-.75z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('part_number')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                                </div>
+
+                                <!-- Nama Barang (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '<?php echo e(old('name', $sparepart->name)); ?>',
+                                    options: <?php echo e(json_encode($names)); ?> || [],
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.itemName = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        if (this.selected) {
+                                            this.search = this.selected;
+                                            this.itemName = this.selected;
+                                        }
+                                        this.$watch('itemName', value => {
+                                             if (value !== this.selected) { this.selected = value; this.search = value; }
+                                        });
+                                    }
+                                }" @click.outside="open = false">
+                                    <label for="name" class="input-label"><?php echo e(__('ui.name')); ?> <span class="text-danger-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="hidden" name="name" x-model="selected">
+                                        <input type="text" 
+                                               id="name"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true, $el.select()" 
+                                               @input="open = true, selected = search, itemName = search" 
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="<?php echo e(__('ui.placeholder_name')); ?>" 
+                                               autocomplete="off">
+                                        
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            </div>
+                                        </template>
+
+                                        <!-- No Data State -->
+                                        <div x-show="filteredOptions.length === 0 && search.length === 0" class="px-3 py-2 text-sm text-secondary-500 italic">
+                                            <?php echo e(__('ui.no_data')); ?>
+
+                                        </div>
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate"><?php echo __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']); ?></span>
+                                        </div>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('name')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                                </div>
+                            </div>
+                        
+                            <!-- Continued in next steps due to size constraints... (Merk, Kategori, Warna, etc) -->
+                            <!-- TEMPORARY PLACEHOLDER FOR REMAINING BASIC INFO -->
+                            <!-- Row 2: Merk & Kategori -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-full">
+                                <!-- Merk (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '<?php echo e(old('brand', $sparepart->brand)); ?>',
+                                    options: <?php echo e(json_encode($brands)); ?>,
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        if (this.selected) {
+                                            this.search = this.selected;
+                                        }
+                                        this.$watch('itemBrand', value => {
+                                             if (value !== this.selected) { this.selected = value; this.search = value; }
+                                        });
+                                    }
+                                }" @click.outside="open = false">
+                                    <label for="brand" class="input-label"><?php echo e(__('ui.brand')); ?> <span class="text-danger-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="hidden" name="brand" x-model="selected">
+                                        <input type="text" 
+                                               id="brand"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true, $el.select()" 
+                                               @input="open = true, selected = search, itemBrand = search" 
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="<?php echo e(__('ui.placeholder_brand')); ?>" 
+                                               autocomplete="off">
+                                        
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            </div>
+                                        </template>
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate"><?php echo __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']); ?></span>
+                                        </div>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('brand')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                                </div>
+
+                                <!-- Kategori (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '<?php echo e(old('category', $sparepart->category)); ?>',
+                                    options: <?php echo e(json_encode($categories)); ?>,
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        if (this.selected) {
+                                            this.search = this.selected;
+                                        }
+                                        this.$watch('itemCategory', value => {
+                                             if (value !== this.selected) { this.selected = value; this.search = value; }
+                                        });
+                                    }
+                                }" @click.outside="open = false">
+                                    <label for="category" class="input-label"><?php echo e(__('ui.category')); ?> <span class="text-danger-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="hidden" name="category" x-model="selected">
+                                        <input type="text" 
+                                               id="category"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true, $el.select()" 
+                                               @input="open = true, selected = search, itemCategory = search" 
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="<?php echo e(__('ui.placeholder_category')); ?>" 
+                                               autocomplete="off">
+                                        
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            </div>
+                                        </template>
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate"><?php echo __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']); ?></span>
+                                        </div>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('category')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Row 3: Warna, Usia & Kondisi -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 col-span-full" x-data="{ 
+                                selectedAge: '<?php echo e(old('age', $sparepart->age ?? '')); ?>',
+                                selectedCondition: '<?php echo e(old('condition', $sparepart->condition ?? '')); ?>'
+                            }" x-effect="if(selectedAge === 'Baru' && !selectedCondition) { selectedCondition = 'Baik'; }">
+                                <!-- Warna (Creatable Select) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    search: '',
+                                    selected: '<?php echo e(old('color', $sparepart->color)); ?>',
+                                    options: <?php echo e(json_encode($colors)); ?>,
+                                    get filteredOptions() {
+                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    },
+                                    select(value) {
+                                        this.selected = value;
+                                        this.search = value;
+                                        this.itemColor = value;
+                                        this.open = false;
+                                    },
+                                    createNew() {
+                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        this.select(newValue);
+                                    },
+                                    init() {
+                                        if (this.selected) {
+                                            this.search = this.selected;
+                                        }
+                                        this.$watch('itemColor', value => {
+                                             if (value !== this.selected) { this.selected = value; this.search = value; }
+                                        });
+                                    }
+                                }" @click.outside="open = false">
+                                    <label for="color" class="input-label"><?php echo e(__('ui.color')); ?></label>
+                                    <div class="relative">
+                                        <input type="hidden" name="color" x-model="selected">
+                                        <input type="text" 
+                                               id="color"
+                                               class="input-field w-full pr-10 cursor-text" 
+                                               x-model="search" 
+                                               @focus="open = true; $el.select()" 
+                                               @input="open = true; selected = search; itemColor = search" 
+                                               @keydown.enter.prevent="createNew()"
+                                               placeholder="<?php echo e(__('ui.placeholder_color')); ?>" 
+                                               autocomplete="off">
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        <template x-for="option in filteredOptions" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option }"></span>
+                                            </div>
+                                        </template>
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate"><?php echo __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']); ?></span>
+                                        </div>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('color')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                                </div>
+
+                                <!-- Status Pemakaian (Age) -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    selected: selectedAge,
+                                    options: ['<?php echo e(__('ui.age_new')); ?>', '<?php echo e(__('ui.age_used')); ?>'],
+                                    placeholder: '<?php echo e(__('ui.select_age')); ?>',
+                                    select(value) {
+                                        this.selected = value;
+                                        selectedAge = value;
+                                        this.open = false;
+                                    }
+                                }" @click.outside="open = false">
+                                    <label for="age" class="input-label"><?php echo e(__('ui.age')); ?> <span class="text-danger-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="hidden" name="age" x-model="selected">
+                                        <button type="button" 
+                                                @click="open = !open"
+                                                class="input-field w-full text-left pr-10"
+                                                :class="{'text-secondary-400': !selected, 'text-secondary-900': selected}">
+                                            <span x-text="selected || placeholder"></span>
+                                            <svg class="h-5 w-5 text-secondary-400 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="margin: auto 0.5rem auto auto;">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        <template x-for="option in options" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900"
+                                                 :class="{'bg-primary-50': selected === option}">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option }"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('age')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                                </div>
+
+                                <!-- Kondisi Barang -->
+                                <div class="relative" x-data="{
+                                    open: false,
+                                    selected: selectedCondition,
+                                    options: ['<?php echo e(__('ui.condition_good')); ?>', '<?php echo e(__('ui.condition_bad')); ?>', '<?php echo e(__('ui.condition_lost')); ?>'],
+                                    placeholder: '<?php echo e(__('ui.select_condition')); ?>',
+                                    select(value) {
+                                        this.selected = value;
+                                        selectedCondition = value;
+                                        this.open = false;
+                                    }
+                                }" @click.outside="open = false" x-effect="selected = selectedCondition">
+                                    <label for="condition" class="input-label"><?php echo e(__('ui.condition')); ?> <span class="text-danger-500">*</span></label>
+                                    <div class="relative">
+                                        <input type="hidden" name="condition" x-model="selected">
+                                        <button type="button" 
+                                                @click="open = !open"
+                                                class="input-field w-full text-left pr-10"
+                                                :class="{'text-secondary-400': !selected, 'text-secondary-900': selected}">
+                                            <span x-text="selected || placeholder"></span>
+                                            <svg class="h-5 w-5 text-secondary-400 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="margin: auto 0.5rem auto auto;">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div x-show="open" 
+                                         x-transition:leave="transition ease-in duration-100"
+                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                        <template x-for="option in options" :key="option">
+                                            <div @click="select(option)" 
+                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900"
+                                                 :class="{'bg-primary-50': selected === option}">
+                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option }"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                    <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('condition')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                                </div>
+                            </div>
+
+                            <!-- Gambar (Optional) -->
+                            <div class="col-span-1 md:col-span-2">
+                                <label for="image" class="input-label"><?php echo e(__('ui.image')); ?></label>
+                                
+                                <input type="hidden" name="existing_image" x-model="existingImage">
+                                
+                                <div x-data="{ isDragging: false, fileName: null }" 
+                                     class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md transition-colors duration-200"
+                                     :class="{ 'border-primary-400 bg-primary-50': isDragging, 'border-gray-300 hover:border-primary-400': !isDragging }"
+                                     x-on:dragover.prevent="isDragging = true"
+                                     x-on:dragleave.prevent="isDragging = false"
+                                     x-on:drop.prevent="isDragging = false; fileName = $event.dataTransfer.files[0].name; $refs.fileInput.files = $event.dataTransfer.files; 
+                                                      const file = $event.dataTransfer.files[0];
+                                                      const reader = new FileReader();
+                                                      reader.onload = (e) => { imagePreview = e.target.result; };
+                                                      reader.readAsDataURL(file);
+                                     ">
+                                    
+                                    <!-- Preview Area -->
+                                    <template x-if="imagePreview">
+                                        <div class="mb-4 relative group">
+                                            <img :src="imagePreview" class="h-40 w-auto object-contain rounded-md shadow-sm border border-secondary-200">
+                                            <button type="button" @click="imagePreview = null; fileName = null; existingImage = ''; $refs.fileInput.value = ''" 
+                                                class="absolute -top-2 -right-2 bg-danger-500 text-white rounded-full p-1 shadow-md hover:bg-danger-600 focus:outline-none transition-colors"
+                                                title="<?php echo e(__('ui.delete')); ?>">
+                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+
+                                    <!-- Upload Placeholder -->
+                                    <div x-show="!imagePreview" class="space-y-1 text-center">
+                                        <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                        </svg>
+                                        <div class="flex text-sm text-gray-600 justify-center items-center gap-1">
+                                            <label for="image" class="relative cursor-pointer bg-transparent rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
+                                                <span><?php echo e(__('ui.choose_file')); ?></span>
+                                                <input id="image" name="image" type="file" accept="image/*" class="sr-only" x-ref="fileInput" 
+                                                       x-on:change="fileName = $event.target.files[0].name;
+                                                                    const file = $event.target.files[0];
+                                                                    const reader = new FileReader();
+                                                                    reader.onload = (e) => { imagePreview = e.target.result; };
+                                                                    reader.readAsDataURL(file);
+                                                       ">
+                                            </label>
+                                            <p><?php echo e(__('ui.drag_drop')); ?></p>
+                                        </div>
+                                        <p class="text-xs text-secondary-500">
+                                            <?php echo e(__('ui.image_help')); ?>
+
+                                        </p>
+                                    </div>
+                                </div>
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('image')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Section 2: Detail Lokasi & Stok -->
+                    <div class="card p-6 overflow-visible">
+                        <div class="mb-4 border-b border-secondary-100 pb-2">
+                             <h3 class="text-lg font-semibold text-secondary-900"><?php echo e(__('ui.section_location_stock')); ?></h3>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Lokasi Penyimpanan (Creatable Select) -->
+                            <div class="relative" x-data="{
+                                open: false,
+                                search: '',
+                                selected: '<?php echo e(old('location', $sparepart->location)); ?>',
+                                options: <?php echo e(json_encode($locations)); ?>,
+                                get filteredOptions() {
+                                    if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                    return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                },
+                                select(value) {
+                                    this.selected = value;
+                                    this.search = value;
+                                    this.open = false;
+                                },
+                                createNew() {
+                                    let term = this.search;
+                                    this.select(term);
+                                },
+                                init() {
+                                    if (this.selected) {
+                                        this.search = this.selected;
+                                    }
+                                }
+                            }" @click.outside="open = false">
+                                <label for="location" class="input-label"><?php echo e(__('ui.location')); ?> <span class="text-danger-500">*</span></label>
+                                <div class="relative">
+                                    <input type="hidden" name="location" x-model="selected">
+                                    <input type="text" 
+                                           id="location"
+                                           class="input-field w-full pr-10 cursor-text" 
+                                           x-model="search" 
+                                           @focus="open = true; $el.select()" 
+                                           @input="open = true; selected = search" 
+                                           placeholder="<?php echo e(__('ui.select_location')); ?>"  
+                                           autocomplete="off">
+                                    
+                                    <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Dropdown -->
+                                <div x-show="open" 
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100"
+                                     x-transition:leave-end="opacity-0"
+                                    class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                    
+                                    <template x-for="option in filteredOptions" :key="option">
+                                        <div @click="select(option)" 
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                            <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            
+                                            <span x-show="selected === option" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
+                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                                </svg>
+                                            </span>
+                                        </div>
+                                    </template>
+
+                                    <!-- Create New Option (Superadmin Only) -->
+                                    <?php if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN): ?>
+                                        <div x-show="search.length > 0 && !filteredOptions.includes(search)" 
+                                             @click="select(search); open = false"
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                            <span class="block truncate">
+                                                <?php echo __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']); ?>
+
+                                            </span>
+                                        </div>
+                                    <?php else: ?>
+                                         <div x-show="filteredOptions.length === 0" class="cursor-default select-none relative py-2 pl-3 pr-9 text-secondary-500 italic">
+                                            <?php echo e(__('ui.location_not_found')); ?>
+
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('location')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+
+                            <!-- Minimum Stok -->
+                            <div>
+                                <label for="minimum_stock" class="input-label"><?php echo e(__('ui.minimum_stock')); ?></label>
+                                <input id="minimum_stock" class="input-field" type="number" name="minimum_stock" value="<?php echo e(old('minimum_stock', $sparepart->minimum_stock)); ?>" min="0" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" />
+                                <p class="text-xs text-secondary-400 mt-1"><?php echo e(__('ui.minimum_stock_help')); ?></p>
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('minimum_stock')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+                            
+                            <!-- Stok Saat Ini -->
+                            <div>
+                                <label for="stock" class="input-label"><?php echo e(__('ui.current_stock')); ?> <span class="text-danger-500">*</span></label>
+                                <input id="stock" class="input-field" type="number" name="stock" value="<?php echo e(old('stock', $sparepart->stock)); ?>" min="0" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" />
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('stock')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+                            
+                            <!-- Satuan (Creatable Select) -->
+                            <div class="relative" x-data="{
+                                open: false,
+                                search: '',
+                                selected: '<?php echo e(old('unit', $sparepart->unit)); ?>',
+                                options: <?php echo e(json_encode($units)); ?>,
+                                get filteredOptions() {
+                                    if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
+                                    return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                },
+                                select(value) {
+                                    this.selected = value;
+                                    this.search = value;
+                                    this.itemUnit = value;
+                                    this.open = false;
+                                },
+                                createNew() {
+                                    let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                    this.select(newValue);
+                                },
+                                init() {
+                                    this.$watch('itemUnit', value => {
+                                        if (value !== this.selected) {
+                                            this.selected = value;
+                                            this.search = value;
+                                        }
+                                    });
+                                    if (this.itemUnit) {
+                                        this.selected = this.itemUnit;
+                                        this.search = this.itemUnit;
+                                    }
+                                }
+                            }" @click.outside="open = false">
+                                <label for="unit" class="input-label"><?php echo e(__('ui.unit')); ?></label>
+                                <div class="relative">
+                                    <input type="hidden" name="unit" x-model="selected">
+                                    <input type="text" 
+                                           id="unit"
+                                           class="input-field w-full pr-10 cursor-text" 
+                                           x-model="search" 
+                                           @focus="open = true; $el.select()" 
+                                           @input="open = true; selected = search; itemUnit = search" 
+                                           @keydown.enter.prevent="createNew()"
+                                           placeholder="<?php echo e(__('ui.placeholder_unit')); ?>"  
+                                           autocomplete="off">
+                                    
+                                    <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Dropdown -->
+                                <div x-show="open" 
+                                     x-transition:leave="transition ease-in duration-100"
+                                     x-transition:leave-start="opacity-100"
+                                     x-transition:leave-end="opacity-0"
+                                     class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                    
+                                    <template x-for="option in filteredOptions" :key="option">
+                                        <div @click="select(option)" 
+                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
+                                            <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                        </div>
+                                    </template>
+
+                                    <!-- Create New Option -->
+                                    <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                         @click="createNew()"
+                                         class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
+                                        <span class="block truncate">
+                                            <?php echo __('ui.add_new', ['search' => '<span x-text="search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase())" class="font-bold"></span>']); ?>
+
+                                        </span>
+                                    </div>
+                                </div>
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('unit')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Harga & Status -->
+                    <div class="card p-6 overflow-visible">
+                        <div class="mb-4 border-b border-secondary-100 pb-2">
+                            <h3 class="text-lg font-semibold text-secondary-900"><?php echo e(__('ui.section_price_status')); ?></h3>
+                        </div>
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             <!-- Harga -->
+                            <div x-show="type === 'sale'" x-data="{
+                                displayPrice: '',
+                                rawPrice: '',
+                                formatPrice() {
+                                    // Remove all non-digit characters
+                                    let value = this.displayPrice.replace(/[^0-9]/g, '');
+                                    this.rawPrice = value;
+                                    
+                                    // Format with thousand separator (dot)
+                                    if (value) {
+                                        this.displayPrice = parseInt(value).toLocaleString('id-ID');
+                                    } else {
+                                        this.displayPrice = '';
+                                    }
+                                    
+                                    // Update Alpine itemPrice for form submission if needed (though hidden input handles it)
+                                    this.itemPrice = value;
+                                },
+                                init() {
+                                    // Initial value from server (using bind in parent or just checking hidden input)
+                                    let initial = '<?php echo e(old('price', $sparepart->price)); ?>';
+                                    if (initial) {
+                                        this.rawPrice = initial.toString();
+                                        this.displayPrice = parseInt(initial).toLocaleString('id-ID');
+                                    }
+                                    
+                                    // Watch for external updates
+                                    this.$watch('itemPrice', (value) => {
+                                        if (value && value.toString() !== this.rawPrice) {
+                                            this.rawPrice = value.toString();
+                                            this.displayPrice = parseInt(value).toLocaleString('id-ID');
+                                        }
+                                    });
+                                }
+                            }">
+                                <label for="price" class="input-label"><?php echo e(__('ui.unit_price')); ?> <span class="text-danger-500">*</span></label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-secondary-500 font-medium">Rp</span>
+                                    </div>
+                                    <input type="hidden" name="price" x-model="rawPrice">
+                                    <input 
+                                        id="price" 
+                                        class="input-field pl-10 <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->denies('updatePrice', $sparepart)): ?> bg-gray-100 text-gray-500 cursor-not-allowed <?php endif; ?>" 
+                                        type="text" 
+                                        x-model="displayPrice"
+                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('updatePrice', $sparepart)): ?>
+                                            @input="formatPrice()"
+                                            @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()"
+                                        <?php endif; ?>
+                                        placeholder="0" 
+                                        autocomplete="off"
+                                        <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->denies('updatePrice', $sparepart)): ?> readonly <?php endif; ?>
+                                    />
+                                </div>
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('price')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+
+                            <!-- Status -->
+                            <div>
+                                <label for="status" class="input-label"><?php echo e(__('ui.status')); ?> <span class="text-danger-500">*</span></label>
+                                <?php
+                                    $statusOptions = [
+                                        'aktif' => 'Aktif',
+                                        'nonaktif' => 'Nonaktif',
+                                    ];
+                                ?>
+                                <?php if (isset($component)) { $__componentOriginaled2cde6083938c436304f332ba96bb7c = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaled2cde6083938c436304f332ba96bb7c = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.select','data' => ['name' => 'status','options' => $statusOptions,'selected' => old('status', $sparepart->status),'placeholder' => ''.e(__('ui.select_status')).'','width' => 'w-full']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('select'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['name' => 'status','options' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($statusOptions),'selected' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(old('status', $sparepart->status)),'placeholder' => ''.e(__('ui.select_status')).'','width' => 'w-full']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaled2cde6083938c436304f332ba96bb7c)): ?>
+<?php $attributes = $__attributesOriginaled2cde6083938c436304f332ba96bb7c; ?>
+<?php unset($__attributesOriginaled2cde6083938c436304f332ba96bb7c); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaled2cde6083938c436304f332ba96bb7c)): ?>
+<?php $component = $__componentOriginaled2cde6083938c436304f332ba96bb7c; ?>
+<?php unset($__componentOriginaled2cde6083938c436304f332ba96bb7c); ?>
+<?php endif; ?>
+                                <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
+<?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('input-error'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\App\View\Components\InputError::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['messages' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($errors->get('status')),'class' => 'mt-2']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $attributes = $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__attributesOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360)): ?>
+<?php $component = $__componentOriginal824404ceeb4a1e7de17bfcaedf377360; ?>
+<?php unset($__componentOriginal824404ceeb4a1e7de17bfcaedf377360); ?>
+<?php endif; ?>
+                            </div>
+                         </div>
+                    </div>
+                    <?php echo $__env->make('inventory.partials.scan-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+                </div>
+                <div class="flex items-center justify-end gap-3 mt-4">
+                    <a href="<?php echo e(route('inventory.index')); ?>" class="btn btn-secondary">
+                        <?php echo e(__('ui.cancel')); ?>
+
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <?php echo e(__('ui.save_changes')); ?>
+
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php $__env->startPush('scripts'); ?>
+    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('inventoryForm', () => ({
+                type: '<?php echo e(old('type', $sparepart->type)); ?>',
+                partNumber: '<?php echo e(old('part_number', $sparepart->part_number)); ?>',
+                isLocked: false,
+                itemName: '<?php echo e(old('name', $sparepart->name)); ?>',
+                itemBrand: '<?php echo e(old('brand', $sparepart->brand)); ?>',
+                itemCategory: '<?php echo e(old('category', $sparepart->category)); ?>',
+                itemColor: '<?php echo e(old('color', $sparepart->color)); ?>', 
+                itemUnit: '<?php echo e(old('unit', $sparepart->unit)); ?>',
+                itemPrice: '<?php echo e(old('price', $sparepart->price)); ?>',
+                imagePreview: null,
+                existingImage: '<?php echo e($sparepart->image ? asset('storage/' . $sparepart->image) : ''); ?>',
+                isLoading: false,
+
+                init() {
+                    // 1. Setup Global Trigger for Scan Modal
+                    window.triggerScanModal = () => {
+                        console.log('Trigger Scan Modal via Global Function');
+                        this.openScanModal();
+                    }
+
+                    // Pre-fill image preview if existing
+                    if (this.existingImage) {
+                        this.imagePreview = this.existingImage;
+                    }
+
+                    // Restore Image from LocalStorage if Validation Failed (same logic as create)
+                    const hasErrors = <?php echo e($errors->any() ? 'true' : 'false'); ?>;
+                    if (hasErrors) {
+                        const storedImage = localStorage.getItem('temp_inventory_image');
+                        if (storedImage) {
+                            this.imagePreview = storedImage;
+                            fetch(storedImage)
+                                .then(res => res.blob())
+                                .then(blob => {
+                                    const file = new File([blob], "restored-image.png", { type: blob.type });
+                                    const dataTransfer = new DataTransfer();
+                                    dataTransfer.items.add(file);
+                                    this.$nextTick(() => {
+                                        if (this.$refs.fileInput) {
+                                            this.$refs.fileInput.files = dataTransfer.files;
+                                            this.fileName = file.name;
+                                        }
+                                    });
+                                });
+                        }
+                    } else {
+                        localStorage.removeItem('temp_inventory_image');
+                    }
+                },
+
+                // OCR Functionality
+                scanModalOpen: false,
+                ocrLoading: false,
+                
+                scanErrorMsg: null,
+                stream: null,
+                debugMode: false,
+                debugImage: null,
+                videoDevices: [],
+                currentDeviceIndex: 0,
+                currentDeviceLabel: '',
+
+                openScanModal() {
+                    this.scanModalOpen = true;
+                    this.getVideoDevices().then(() => {
+                        this.startCamera();
+                    });
+                },
+
+                closeScanModal() {
+                    this.stopCamera();
+                    this.scanModalOpen = false;
+                    this.ocrLoading = false;
+                    this.ocrError = null;
+                },
+
+                async getVideoDevices() {
+                    try {
+                        const devices = await navigator.mediaDevices.enumerateDevices();
+                        this.videoDevices = devices.filter(device => device.kind === 'videoinput');
+                    } catch (err) {
+                        console.error("Error enumerating devices:", err);
+                    }
+                },
+
+                async switchCamera() {
+                    if (this.videoDevices.length < 2) return;
+                    this.currentDeviceIndex = (this.currentDeviceIndex + 1) % this.videoDevices.length;
+                    this.stopCamera();
+                    await this.startCamera();
+                },
+
+                async startCamera() {
+                    try {
+                        const constraints = { video: {} };
+                        if (this.videoDevices.length > 0) {
+                            const deviceId = this.videoDevices[this.currentDeviceIndex].deviceId;
+                            constraints.video.deviceId = { exact: deviceId };
+                            this.currentDeviceLabel = this.videoDevices[this.currentDeviceIndex].label;
+                        } else {
+                            constraints.video.facingMode = 'environment';
+                        }
+                        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                        this.$refs.video.srcObject = this.stream;
+                        if (!this.currentDeviceLabel && this.videoDevices.length > 0) {
+                            this.getVideoDevices().then(() => {
+                                if (this.videoDevices[this.currentDeviceIndex]) {
+                                    this.currentDeviceLabel = this.videoDevices[this.currentDeviceIndex].label;
+                                }
+                            });
+                        }
+                    } catch (err) {
+                        console.error("Error detecting camera:", err);
+                        this.scanErrorMsg = "<?php echo e(__('ui.camera_access_denied')); ?>";
+                    }
+                },
+
+                stopCamera() {
+                    if (this.stream) {
+                        this.stream.getTracks().forEach(track => track.stop());
+                        this.stream = null;
+                    }
+                },
+
+                async captureAndScan() {
+                    if (!this.stream) return;
+                    this.ocrLoading = true;
+                    this.ocrError = null;
+                    const video = this.$refs.video;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    canvas.getContext('2d').drawImage(video, 0, 0);
+                    const image = canvas.toDataURL('image/png');
+                    const processedImage = await this.preprocessImage(image);
+                    this.debugImage = processedImage; 
+                    await this.processFullAnalysis(processedImage);
+                },
+
+                async preprocessImage(imageSource) {
+                    return new Promise((resolve) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const ctx = canvas.getContext('2d');
+                            const scaleFactor = 2;
+                            canvas.width = img.width * scaleFactor;
+                            canvas.height = img.height * scaleFactor;
+                            ctx.imageSmoothingEnabled = false; 
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                            const data = imageData.data;
+                            let min = 255;
+                            let max = 0;
+                            for (let i = 0; i < data.length; i += 4) {
+                                const gray = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
+                                data[i] = data[i + 1] = data[i + 2] = gray;
+                                if (gray < min) min = gray;
+                                if (gray > max) max = gray;
+                            }
+                            if (max === min) max = min + 1;
+                            for (let i = 0; i < data.length; i += 4) {
+                                let gray = data[i];
+                                gray = ((gray - min) * 255) / (max - min);
+                                data[i] = data[i + 1] = data[i + 2] = gray;
+                            }
+                            ctx.putImageData(imageData, 0, 0);
+                            resolve(canvas.toDataURL('image/png'));
+                        };
+                        img.src = imageSource;
+                    });
+                },
+
+                handleFileUpload(e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    this.ocrLoading = true;
+                    this.ocrError = null;
+                    const reader = new FileReader();
+                    reader.onload = async (event) => {
+                        const processedImage = await this.preprocessImage(event.target.result);
+                        this.debugImage = processedImage; 
+                        await this.processFullAnalysis(processedImage);
+                    };
+                    reader.readAsDataURL(file);
+                },
+
+                async processFullAnalysis(imageSource) {
+                    let worker = null;
+                    try {
+                        this.ocrLoading = true;
+                        worker = await Tesseract.createWorker('eng', 1);
+                        await worker.setParameters({ tessedit_pageseg_mode: '11' });
+                        const { data: { text } } = await worker.recognize(imageSource);
+                        const rawText = text.toUpperCase();
+                        
+                        const knownBrands = ['LENOVO', 'DELL', 'HP', 'ASUS', 'ACER', 'APPLE', 'SAMSUNG', 'TOSHIBA', 'SONY', 'MSI', 'LOGITECH', 'CANON', 'EPSON'];
+                        let foundBrand = '';
+                        for (const brand of knownBrands) {
+                            if (rawText.includes(brand)) {
+                                foundBrand = brand.charAt(0) + brand.slice(1).toLowerCase(); 
+                                break; 
+                            }
+                        }
+
+                        let foundPN = '';
+                        const pnRegex = /(?:ORIG\.?|SHIP|MACHINE)?[\s\.]*(?:P\/N|PN|PART NO|PART NUMBER)[\s.:]*([A-Z0-9\-\/]{3,})/i;
+                        const pnMatch = rawText.match(pnRegex);
+                        if (pnMatch && pnMatch[1]) {
+                            foundPN = pnMatch[1];
+                        } else {
+                            const tokens = rawText.split(/[\s\n]+/);
+                            const potentialPNs = tokens.filter(t => {
+                                if (knownBrands.includes(t)) return false;
+                                if (['MODEL', 'REV', 'DATE', 'QTY', 'MADE', 'CHINA', 'WIN', 'MB', 'ORIG', 'SHIP'].includes(t)) return false;
+                                if (t.length < 5) return false;
+                                const hasDigit = /[0-9]/.test(t);
+                                const hasLetter = /[A-Z]/.test(t);
+                                return hasDigit && hasLetter;
+                            });
+                            if (potentialPNs.length > 0) {
+                                foundPN = potentialPNs.reduce((a, b) => a.length > b.length ? a : b);
+                            }
+                        }
+
+                        if (!foundPN && !foundBrand) {
+                            throw new Error("<?php echo e(__('ui.ocr_no_data')); ?>");
+                        }
+
+                        if (foundPN) {
+                            this.partNumber = foundPN.replace(/^[^A-Z0-9]+|[^A-Z0-9]+$/g, '');
+                        }
+                        if (foundBrand) this.itemBrand = foundBrand;
+
+                        if (!this.debugMode) {
+                            this.closeScanModal();
+                        } else {
+                            this.ocrLoading = false;
+                            const successMsg = <?php echo json_encode(__('ui.ocr_success', ['brand' => '__BRAND__', 'pn' => '__PN__'])) ?>;
+                            this.scanErrorMsg = successMsg.replace('__BRAND__', foundBrand || '-').replace('__PN__', foundPN || '-');
+                        }
+                        
+                    } catch (err) {
+                        console.error("Analysis Error:", err);
+                        this.scanErrorMsg = "<?php echo e(__('ui.ocr_error')); ?>: " + (err.message || "Kesalahan sistem.");
+                    } finally {
+                        if (worker) await worker.terminate();
+                        if (!this.scanErrorMsg) this.ocrLoading = false;
+                    }
+                }
+            }))
+        })
+    </script>
+    <?php $__env->stopPush(); ?>
+
+    
+    <?php if(session('duplicate_detected')): ?>
+    <div x-data="{ showMergeModal: true }" x-show="showMergeModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            
+            <div x-show="showMergeModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="fixed inset-0 transition-opacity bg-secondary-500 bg-opacity-75"
+                 @click="showMergeModal = false"></div>
+
+            
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+
+            
+            <div x-show="showMergeModal"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                 class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                
+                
+                <div class="bg-warning-50 px-6 py-4 border-b border-warning-100">
+                    <div class="flex items-center gap-3">
+                        <div class="flex-shrink-0 w-12 h-12 bg-warning-100 rounded-full flex items-center justify-center">
+                            <svg class="w-6 h-6 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-secondary-900">Barang Duplikat Terdeteksi!</h3>
+                            <p class="text-sm text-secondary-600 mt-0.5">Perubahan Anda akan membuat item ini identik dengan barang yang sudah ada.</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="px-6 py-5">
+                    <div class="space-y-4">
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h4 class="text-sm font-bold text-blue-900 mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    Item yang Sedang Diedit
+                                </h4>
+                                <dl class="space-y-1.5 text-sm">
+                                    <div class="flex justify-between">
+                                        <dt class="text-blue-700 font-medium">Part Number:</dt>
+                                        <dd class="text-blue-900 font-mono"><?php echo e(session('current_item')['part_number']); ?></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-blue-700 font-medium">Nama:</dt>
+                                        <dd class="text-blue-900 truncate ml-2"><?php echo e(session('current_item')['name']); ?></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-blue-700 font-medium">Stock:</dt>
+                                        <dd class="text-blue-900 font-bold"><?php echo e(session('current_item')['stock']); ?> Pcs</dd>
+                                    </div>
+                                </dl>
+                            </div>
+
+                            
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <h4 class="text-sm font-bold text-green-900 mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    Item yang Sudah Ada
+                                </h4>
+                                <dl class="space-y-1.5 text-sm">
+                                    <div class="flex justify-between">
+                                        <dt class="text-green-700 font-medium">Part Number:</dt>
+                                        <dd class="text-green-900 font-mono"><?php echo e(session('duplicate_item')['part_number']); ?></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-green-700 font-medium">Nama:</dt>
+                                        <dd class="text-green-900 truncate ml-2"><?php echo e(session('duplicate_item')['name']); ?></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-green-700 font-medium">Stock:</dt>
+                                        <dd class="text-green-900 font-bold"><?php echo e(session('duplicate_item')['stock']); ?> <?php echo e(session('duplicate_item')['unit'] ?? 'Pcs'); ?></dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+
+                        
+                        <div class="bg-secondary-50 border border-secondary-200 rounded-lg p-4">
+                            <h5 class="text-sm font-bold text-secondary-900 mb-2">Detail Barang Duplikat:</h5>
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                                <div><span class="text-secondary-600">Merk:</span> <span class="font-medium text-secondary-900"><?php echo e(session('duplicate_item')['brand']); ?></span></div>
+                                <div><span class="text-secondary-600">Kategori:</span> <span class="font-medium text-secondary-900"><?php echo e(session('duplicate_item')['category']); ?></span></div>
+                                <div><span class="text-secondary-600">Kondisi:</span> <span class="font-medium text-secondary-900"><?php echo e(session('duplicate_item')['condition']); ?></span></div>
+                                <div><span class="text-secondary-600">Lokasi:</span> <span class="font-medium text-secondary-900"><?php echo e(session('duplicate_item')['location']); ?></span></div>
+                            </div>
+                        </div>
+
+                        
+                        <div class="bg-primary-50 border-l-4 border-primary-500 p-4 rounded">
+                            <p class="text-sm text-primary-900 font-medium">Apa yang ingin Anda lakukan?</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-secondary-50 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:gap-3 border-t border-secondary-200">
+                    
+                    <form action="<?php echo e(route('inventory.update', $sparepart)); ?>" method="POST" class="flex-1">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PUT'); ?>
+                        <?php $__currentLoopData = old(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <input type="hidden" name="keep_separate" value="true">
+                        <button type="submit" class="btn btn-secondary w-full justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Simpan Terpisah
+                        </button>
+                    </form>
+
+                    
+                    <form action="<?php echo e(route('inventory.update', $sparepart)); ?>" method="POST" class="flex-1">
+                        <?php echo csrf_field(); ?>
+                        <?php echo method_field('PUT'); ?>
+                        <?php $__currentLoopData = old(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $value): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <input type="hidden" name="merge_confirmed" value="true">
+                        <input type="hidden" name="duplicate_id" value="<?php echo e(session('duplicate_item')['id']); ?>">
+                        <button type="submit" class="btn btn-primary w-full justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            Gabungkan Stock (Merge)
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php /**PATH E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\resources\views/inventory/edit.blade.php ENDPATH**/ ?>

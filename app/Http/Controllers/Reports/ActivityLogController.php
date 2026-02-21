@@ -16,8 +16,18 @@ class ActivityLogController extends Controller
      */
     public function index(Request $request)
     {
-        // ... (existing code, keeping logic same, just updating view) ...
         $query = ActivityLog::with('user');
+
+        $currentUser = $request->user();
+        if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
+            // Operator hanya bisa melihat aktivitas dirinya sendiri
+            $query->where('user_id', $currentUser->id);
+        } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
+            // Admin tidak bisa melihat aktivitas Superadmin
+            $query->whereHas('user', function ($q) {
+                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            });
+        }
 
         // Filter by Role
         if ($request->has('role') && $request->role && $request->role !== 'Semua Role') {
@@ -90,9 +100,21 @@ class ActivityLogController extends Controller
         }
 
         $activityLogs = $query->latest()->paginate(10);
-        $users = \App\Models\User::orderBy('name')->get();
+        
+        $usersQuery = \App\Models\User::orderBy('name');
+        if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
+            $usersQuery->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+        }
+        $users = $usersQuery->get();
+
         // Get unique actions for filter
-        $actions = ActivityLog::select('action')->distinct()->orderBy('action')->pluck('action');
+        $actionsQuery = ActivityLog::select('action')->distinct()->orderBy('action');
+        if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
+            $actionsQuery->whereHas('user', function ($q) {
+                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            });
+        }
+        $actions = $actionsQuery->pluck('action');
 
         return view('reports.activity_logs.index', compact('activityLogs', 'users', 'actions'));
     }
@@ -102,8 +124,18 @@ class ActivityLogController extends Controller
      */
     public function export(Request $request)
     {
-        // ... (existing export logic) ...
         $query = ActivityLog::with('user');
+
+        $currentUser = $request->user();
+        if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
+            // Operator hanya bisa melihat/export aktivitas dirinya sendiri
+            $query->where('user_id', $currentUser->id);
+        } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
+            // Admin tidak bisa melihat/export aktivitas Superadmin
+            $query->whereHas('user', function ($q) {
+                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            });
+        }
 
         // Filter by Role
         if ($request->has('role') && $request->role && $request->role !== 'Semua Role') {

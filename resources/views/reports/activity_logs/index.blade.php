@@ -56,7 +56,7 @@
                  style="display: none;">
                  
                 <form action="{{ route('reports.activity-logs.index') }}" method="GET" class="card p-6 border border-secondary-200 shadow-lg overflow-visible">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 {{ auth()->user()->role === \App\Enums\UserRole::OPERATOR ? 'lg:grid-cols-5' : 'lg:grid-cols-4' }} gap-4 items-end">
                         
                         <!-- Search -->
                         <div class="space-y-1">
@@ -66,22 +66,25 @@
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                 </span>
                                 <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Deskripsi..."
-                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm h-[42px]">
                             </div>
                         </div>
 
                         <!-- Role Filter -->
+                        @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                         <div class="space-y-1">
                             <label for="role" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.role_filter') }}</label>
                             @php
-                                $roleOptions = [
-                                    \App\Enums\UserRole::SUPERADMIN->value => \App\Enums\UserRole::SUPERADMIN->label(),
-                                    \App\Enums\UserRole::ADMIN->value => \App\Enums\UserRole::ADMIN->label(),
-                                    \App\Enums\UserRole::OPERATOR->value => \App\Enums\UserRole::OPERATOR->label(),
-                                ];
+                                $roleOptions = [];
+                                if (auth()->user()->role === \App\Enums\UserRole::SUPERADMIN) {
+                                    $roleOptions[\App\Enums\UserRole::SUPERADMIN->value] = \App\Enums\UserRole::SUPERADMIN->label();
+                                }
+                                $roleOptions[\App\Enums\UserRole::ADMIN->value] = \App\Enums\UserRole::ADMIN->label();
+                                $roleOptions[\App\Enums\UserRole::OPERATOR->value] = \App\Enums\UserRole::OPERATOR->label();
                             @endphp
                             <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="{{ __('ui.all_roles') }}" width="w-full" />
                         </div>
+                        @endif
 
                         <!-- Action Filter -->
                         <div class="space-y-1">
@@ -93,6 +96,7 @@
                         </div>
 
                         <!-- User Filter -->
+                        @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                         <div class="space-y-1">
                             <label for="user_id" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.user_filter') }}</label>
                             @php
@@ -100,6 +104,7 @@
                             @endphp
                             <x-select name="user_id" :options="$userOptions" :selected="request('user_id')" placeholder="{{ __('ui.all_users') }}" width="w-full" />
                         </div>
+                        @endif
 
                         <!-- Date Start -->
                         <div class="space-y-1">
@@ -109,7 +114,7 @@
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 </span>
                                 <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" 
-                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm h-[42px]">
                             </div>
                         </div>
 
@@ -121,11 +126,12 @@
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                 </span>
                                 <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}" 
-                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm h-[42px]">
                             </div>
                         </div>
 
                         <!-- NEW: Subject Type Filter -->
+                        @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                         <div class="space-y-1">
                             <label for="subject_type" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.subject_type') }}</label>
                             @php
@@ -138,6 +144,7 @@
                             @endphp
                             <x-select name="subject_type" :options="$subjectOptions" :selected="request('subject_type')" placeholder="{{ __('ui.all_types') }}" width="w-full" />
                         </div>
+                        @endif
 
                         <!-- Buttons -->
                         <div class="flex gap-2 w-full">

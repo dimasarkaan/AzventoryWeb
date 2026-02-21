@@ -51,7 +51,7 @@
             @csrf
             @method('PATCH')
             <input type="hidden" name="status" value="approved">
-            <button type="submit" class="btn btn-success w-full text-xs justify-center">
+            <button type="submit" class="btn btn-success w-full text-xs justify-center flex items-center py-2">
                 {{ __('ui.btn_approve') }}
             </button>
         </form>

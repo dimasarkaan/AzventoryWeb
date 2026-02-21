@@ -11,6 +11,10 @@ use App\Traits\ActivityLogger;
 use App\Http\Requests\Inventory\Borrowing\StoreBorrowingRequest;
 use App\Http\Requests\Inventory\Borrowing\ReturnBorrowingRequest;
 use App\Models\StockLog;
+use App\Models\User;
+use App\Enums\UserRole;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\LowStockNotification;
 
 class BorrowingController extends Controller
 {
@@ -60,6 +64,13 @@ class BorrowingController extends Controller
 
             // Reduce Stock
             $sparepart->decrement('stock', $request->quantity);
+
+            // Periksa jika stok mencapai atau di bawah minimum
+            $sparepart->refresh();
+            if ($sparepart->stock <= $sparepart->minimum_stock) {
+                $superadmins = User::where('role', UserRole::SUPERADMIN)->get();
+                Notification::send($superadmins, new LowStockNotification($sparepart));
+            }
 
             // Log Activity
             $this->logActivity('Peminjaman Barang', "Meminjam {$request->quantity} {$sparepart->unit} '{$sparepart->name}'. Catatan: " . ($request->notes ?? '-'));

@@ -21,9 +21,9 @@ class BorrowingPolicy
      */
     public function view(User $user, Borrowing $borrowing): bool
     {
-        // Owner OR Staff
+        // Owner OR Admin/Superadmin
         return $user->id === $borrowing->user_id || 
-               in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN, UserRole::OPERATOR]);
+               in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN]);
     }
 
     /**
@@ -40,9 +40,9 @@ class BorrowingPolicy
      */
     public function update(User $user, Borrowing $borrowing): bool
     {
-        // Owner (for returning) OR Staff
+        // Owner (for returning) OR Admin/Superadmin
         return $user->id === $borrowing->user_id || 
-               in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN, UserRole::OPERATOR]);
+               in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN]);
     }
 
     /**

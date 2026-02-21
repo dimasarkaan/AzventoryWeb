@@ -15,7 +15,7 @@
             </div>
 
             <div class="bg-white rounded-xl border border-secondary-200 shadow-card p-8 overflow-visible">
-                <form action="{{ route('users.store') }}" method="POST">
+                <form action="{{ route('users.store') }}" method="POST" novalidate>
                     @csrf
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">

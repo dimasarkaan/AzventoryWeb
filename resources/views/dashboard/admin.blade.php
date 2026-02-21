@@ -806,10 +806,9 @@
                      x-transition:leave-end="opacity-0 translate-y-4"
                      class="card p-0 flex flex-col h-full print-safe"
                      :class="{ 'lg:col-span-3': !showLowStock, 'lg:col-span-1': showLowStock }">
-                    <div class="card-header p-5 border-b border-secondary-100 flex justify-between items-center">
+                    <div class="card-header p-5 border-b border-secondary-100 flex justify-between items-center bg-white">
                         <h3 class="font-bold text-secondary-900">{{ __('ui.recent_activities') }}</h3>
-                        {{-- Admin tidak bisa akses route activity-logs (superadmin only) --}}
-                        <span class="text-xs text-secondary-400">{{ count($recentActivities ?? []) }} terbaru</span>
+                        <a href="{{ route('reports.activity-logs.index') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 transition-colors bg-primary-50 px-3 py-1.5 rounded-full border border-primary-100 shadow-sm hover:bg-primary-100">{{ __('ui.view_all') }}</a>
                     </div>
                     <div class="card-body p-0 overflow-y-auto max-h-[500px] custom-scrollbar">
                         <div class="flex flex-col">

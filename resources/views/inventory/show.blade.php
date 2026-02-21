@@ -104,7 +104,11 @@
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.unit_price') }}</span>
                                 <div class="mt-1 text-secondary-900 font-bold text-lg">
-                                    Rp {{ number_format($sparepart->price, 0, ',', '.') }}
+                                    @if(auth()->user()->role === \App\Enums\UserRole::OPERATOR)
+                                        -
+                                    @else
+                                        Rp {{ number_format($sparepart->price, 0, ',', '.') }}
+                                    @endif
                                 </div>
                             </div>
                             @endif
@@ -146,7 +150,10 @@
 
                         <!-- Actions Wrapper -->
                         <div>
-                             <div class="mt-4 pt-4 border-t border-secondary-100 grid grid-cols-1 gap-3">
+                            <div class="mt-4 pt-4 border-t border-secondary-100 grid grid-cols-1 gap-3">
+                                @php
+                                    $isOperator = auth()->user()->role === \App\Enums\UserRole::OPERATOR;
+                                @endphp
                                 @if($sparepart->type === 'asset')
                                     @if($sparepart->condition === 'Baik')
                                         <button @click="borrowModalOpen = true" type="button" class="btn btn-primary w-full justify-center">
@@ -164,12 +171,12 @@
                                     @endif
                                     <button @click="stockModalOpen = true" type="button" class="btn btn-secondary w-full justify-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                        {{ __('ui.update_stock') }}
+                                        {{ $isOperator ? __('ui.request_stock_change') : __('ui.update_stock') }}
                                     </button>
                                 @else
                                     <button @click="stockModalOpen = true" type="button" class="btn btn-primary w-full justify-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                        {{ __('ui.request_stock_change') }}
+                                        {{ $isOperator ? __('ui.request_stock_change') : __('ui.update_stock') }}
                                     </button>
                                 @endif
                             </div>

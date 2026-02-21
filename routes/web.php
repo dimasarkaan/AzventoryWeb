@@ -81,9 +81,9 @@ Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
         Route::view('/scan-qr', 'inventory.scan-qr')->name('scan-qr');
         Route::get('/check-part-number', [InventoryController::class, 'checkPartNumber'])->name('check-part-number');
         
-        // Persetujuan Stok (Khusus Superadmin) - Dipindah ke sini tapi dilindungi
+        // Persetujuan Stok (Superadmin & Admin) 
         Route::resource('stock-approvals', StockApprovalController::class)
-            ->middleware('role:superadmin')
+            ->middleware('role:superadmin,admin')
             ->only(['index', 'update', 'destroy'])
             ->parameters(['stock-approvals' => 'stock_log']);
 
@@ -121,8 +121,8 @@ Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
             Route::get('/download', [ReportController::class, 'download'])->name('download');
         });
 
-        // Log Aktivitas (Hanya Superadmin)
-        Route::middleware('role:superadmin')->group(function () {
+        // Log Aktivitas (Personal untuk Operator, Global untuk Superadmin/Admin)
+        Route::middleware('role:superadmin,admin,operator')->group(function () {
             Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
             Route::get('/activity-logs/export', [ActivityLogController::class, 'export'])->name('activity-logs.export');
         });

@@ -114,6 +114,7 @@
                             </div>
                         </div>
                     </div>
+                    <?php if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN): ?>
                      <!-- Trash Toggle Button -->
                      <a href="<?php echo e(request('trash') ? route('inventory.index') : route('inventory.index', ['trash' => 'true'])); ?>" 
                         class="btn flex items-center justify-center p-2.5 <?php echo e(request('trash') ? 'btn-danger' : 'btn-secondary'); ?>" 
@@ -164,6 +165,7 @@
 <?php endif; ?>
                         <?php endif; ?>
                     </a>
+                    <?php endif; ?>
                     
                     <?php if(!request('trash')): ?>
                     <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create', App\Models\Sparepart::class)): ?>
