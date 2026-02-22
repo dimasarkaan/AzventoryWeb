@@ -57,8 +57,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', function (User $user) {
-            // Allow all Superadmin users to access Telescope
-            return $user->role === \App\Enums\UserRole::SUPERADMIN;
+            // Allow all Superadmin users or specific emails to access Telescope
+            return $user->role === \App\Enums\UserRole::SUPERADMIN || in_array($user->email, [
+                'developer@azventory.com', // Ganti dengan email spesifik Anda
+            ]);
         });
     }
 }

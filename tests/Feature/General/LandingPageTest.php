@@ -39,7 +39,7 @@ class LandingPageTest extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertSee('Manajemen Stok Terpusat');
+        $response->assertSee('Manajemen Terpusat');
         $response->assertSee('QR Code Scanner');
         $response->assertSee('Monitoring Aktivitas');
     }

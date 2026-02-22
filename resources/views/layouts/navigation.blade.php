@@ -25,13 +25,8 @@
                             default => route('dashboard'),
                         };
                     @endphp
-                    <a href="{{ $dashboardRoute }}" class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-primary-500/30">
-                            A
-                        </div>
-                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
-                            Azventory
-                        </span>
+                    <a href="{{ $dashboardRoute }}" class="flex items-center">
+                        <x-application-logo class="h-5 lg:h-6 w-auto" />
                     </a>
                 </div>
 

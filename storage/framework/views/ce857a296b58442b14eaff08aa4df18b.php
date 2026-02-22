@@ -1,4 +1,4 @@
-<svg id="Layer_2" viewBox="0 0 1061.7 187.51" {{ $attributes }}>
+<svg id="Layer_2" viewBox="0 0 1061.7 187.51" <?php echo e($attributes); ?>>
   <defs>
     <linearGradient id="linear-gradient" x1="202.05" y1="93.69" x2="1050.7" y2="93.69" gradientTransform="translate(11 17)" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#3b82f6"/>
@@ -37,3 +37,4 @@
     </g>
   </g>
 </svg>
+<?php /**PATH E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\resources\views/components/application-logo.blade.php ENDPATH**/ ?>

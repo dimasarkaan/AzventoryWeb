@@ -11,7 +11,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="icon" href="<?php echo e(asset('favicon.png')); ?>" type="image/png">
+        <link rel="icon" href="<?php echo e(asset('logo.svg')); ?>?v=2" type="image/svg+xml">
 
         <!-- Scripts -->
         <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
@@ -27,7 +27,26 @@
                 <div class="relative z-10 text-white max-w-lg">
                     <div class="flex items-center gap-3 mb-8">
                         <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg">
-                            <span class="text-2xl font-bold">A</span>
+                            <?php if (isset($component)) { $__componentOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.logo','data' => ['variant' => 'white','class' => 'h-7 w-7']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.logo'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['variant' => 'white','class' => 'h-7 w-7']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9)): ?>
+<?php $attributes = $__attributesOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9; ?>
+<?php unset($__attributesOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9)): ?>
+<?php $component = $__componentOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9; ?>
+<?php unset($__componentOriginal2b6f9fe004ca6dd33a48f4f6eb431ad9); ?>
+<?php endif; ?>
                         </div>
                         <h1 class="text-4xl font-bold tracking-tight">Azventory</h1>
                     </div>
@@ -55,11 +74,27 @@
                 <div class="w-full max-w-md">
                      <!-- Mobile Logo (Visible only on small screens) -->
                     <div class="flex lg:hidden justify-center mb-8">
-                         <a href="/" class="flex items-center gap-2">
-                            <div class="w-10 h-10 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                                A
-                            </div>
-                            <span class="text-2xl font-bold text-gray-900">Azventory</span>
+                         <a href="/" class="flex items-center">
+                            <?php if (isset($component)) { $__componentOriginal8892e718f3d0d7a916180885c6f012e7 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8892e718f3d0d7a916180885c6f012e7 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.application-logo','data' => ['class' => 'h-6 sm:h-7 w-auto']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('application-logo'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'h-6 sm:h-7 w-auto']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8892e718f3d0d7a916180885c6f012e7)): ?>
+<?php $attributes = $__attributesOriginal8892e718f3d0d7a916180885c6f012e7; ?>
+<?php unset($__attributesOriginal8892e718f3d0d7a916180885c6f012e7); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8892e718f3d0d7a916180885c6f012e7)): ?>
+<?php $component = $__componentOriginal8892e718f3d0d7a916180885c6f012e7; ?>
+<?php unset($__componentOriginal8892e718f3d0d7a916180885c6f012e7); ?>
+<?php endif; ?>
                         </a>
                     </div>
                     
