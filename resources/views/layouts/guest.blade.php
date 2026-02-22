@@ -11,7 +11,7 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-        <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+        <link rel="icon" href="{{ asset('logo.svg') }}?v=2" type="image/svg+xml">
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -27,7 +27,7 @@
                 <div class="relative z-10 text-white max-w-lg">
                     <div class="flex items-center gap-3 mb-8">
                         <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 shadow-lg">
-                            <span class="text-2xl font-bold">A</span>
+                            <x-icon.logo variant="white" class="h-7 w-7" />
                         </div>
                         <h1 class="text-4xl font-bold tracking-tight">Azventory</h1>
                     </div>
@@ -54,11 +54,8 @@
                 <div class="w-full max-w-md">
                      <!-- Mobile Logo (Visible only on small screens) -->
                     <div class="flex lg:hidden justify-center mb-8">
-                         <a href="/" class="flex items-center gap-2">
-                            <div class="w-10 h-10 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                                A
-                            </div>
-                            <span class="text-2xl font-bold text-gray-900">Azventory</span>
+                         <a href="/" class="flex items-center">
+                            <x-application-logo class="h-6 sm:h-7 w-auto" />
                         </a>
                     </div>
                     
