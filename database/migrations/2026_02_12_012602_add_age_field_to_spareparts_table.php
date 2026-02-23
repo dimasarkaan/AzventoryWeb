@@ -22,7 +22,7 @@ return new class extends Migration
             DB::statement("
                 UPDATE spareparts 
                 SET age = CASE 
-                    WHEN condition = 'Baru' THEN 'Baru'
+                    WHEN `condition` = 'Baru' THEN 'Baru'
                     ELSE 'Bekas'
                 END
             ");
