@@ -149,7 +149,7 @@
         <!-- Overlapping Logo Card -->
         <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl px-4 sm:px-6 lg:px-8 z-30">
             <div class="bg-white rounded-[2rem] shadow-[0_15px_40px_rgb(0,0,0,0.06)] px-6 py-6 sm:px-10 sm:py-8 border border-gray-100 reveal-on-scroll delay-300">
-                <p class="text-center text-[10px] sm:text-xs font-bold text-secondary-400 mb-1 sm:mb-2 tracking-widest uppercase">Dikembangkan sebagai bagian dari Tugas Akhir untuk:</p>
+                <p class="text-center text-[10px] sm:text-xs font-bold text-secondary-400 mb-4 sm:mb-2 tracking-widest uppercase">Dikembangkan sebagai bagian dari Tugas Akhir untuk:</p>
                 <div class="flex flex-col md:flex-row justify-center items-center divide-y md:divide-y-0 md:divide-x divide-gray-100 min-h-[80px]">
                     <!-- Telkom -->
                     <div class="flex-1 py-4 md:py-0 px-4 md:px-8 flex justify-center items-center h-full w-full">
@@ -170,7 +170,7 @@
         <!-- Inner Pattern for Blue Section -->
         <div class="absolute inset-0 z-0 opacity-15" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 32px 32px;"></div>
 
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8 sm:mb-10 text-center">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8 sm:mb-10 text-center mt-32 sm:mt-0">
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.15] sm:leading-[1.1] text-secondary-900 mb-3 sm:mb-4 reveal-on-scroll">
                 Mengapa Memilih <br class="hidden sm:block" />
                 <span class="text-primary-600">Azventory?</span>
