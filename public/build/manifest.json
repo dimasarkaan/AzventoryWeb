@@ -1,0 +1,33 @@
+{
+  "_vendor-DleGK4oo.js": {
+    "file": "assets/vendor-DleGK4oo.js",
+    "name": "vendor"
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-B_8LIbvS.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "name": "app",
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BO0BaD2_.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-DleGK4oo.js"
+    ]
+  },
+  "resources/js/pages/superadmin/inventory/index.js": {
+    "file": "assets/index-CBGqW_-H.js",
+    "name": "index",
+    "src": "resources/js/pages/superadmin/inventory/index.js",
+    "isEntry": true,
+    "imports": [
+      "_vendor-DleGK4oo.js"
+    ]
+  }
+}
