@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Support\Facades\Schema::defaultStringLength(191);
         Gate::policy(Sparepart::class, SparepartPolicy::class);
         Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
 
