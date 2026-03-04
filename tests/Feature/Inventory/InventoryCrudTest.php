@@ -2,10 +2,9 @@
 
 namespace Tests\Feature\Inventory;
 
-use App\Models\User;
 use App\Models\Sparepart;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class InventoryCrudTest extends TestCase
@@ -23,20 +22,20 @@ class InventoryCrudTest extends TestCase
     }
 
     // Pastikan halaman daftar inventaris dapat dirender.
-    public function test_inventory_list_can_be_rendered()
+    public function test_daftar_inventaris_dapat_tampil()
     {
         $response = $this->actingAs($this->user)->get(route('inventory.index'));
         $response->assertStatus(200);
     }
 
     // Pastikan dapat membuat sparepart baru.
-    public function test_can_create_new_sparepart()
+    public function test_dapat_membuat_sparepart_baru()
     {
         $response = $this->actingAs($this->user)->post(route('inventory.store'), [
             'name' => 'Keyboard Mechanical',
             'part_number' => 'KB-MECH-001',
             'brand' => 'Logitech', // Ditambahkan
-            'category' => 'Peripheral', 
+            'category' => 'Peripheral',
             'location' => 'Rak A1',
             'age' => 'Baru', // Ditambahkan
             'condition' => 'Baik', // Diperbarui
@@ -50,8 +49,6 @@ class InventoryCrudTest extends TestCase
             'status' => 'aktif',
         ]);
 
-
-
         if (session('errors')) {
             dump(session('errors')->all());
         }
@@ -59,12 +56,12 @@ class InventoryCrudTest extends TestCase
         $response->assertRedirect(route('inventory.index'));
         $this->assertDatabaseHas('spareparts', [
             'name' => 'Keyboard Mechanical',
-            'stock' => 10
+            'stock' => 10,
         ]);
     }
 
     // Pastikan dapat memperbarui stok sparepart.
-    public function test_can_update_sparepart_stock()
+    public function test_dapat_memperbarui_stok_sparepart()
     {
         $sparepart = Sparepart::factory()->create();
 
@@ -88,29 +85,28 @@ class InventoryCrudTest extends TestCase
         $response->assertRedirect(route('inventory.index'));
         $this->assertDatabaseHas('spareparts', [
             'id' => $sparepart->id,
-            'stock' => 50
+            'stock' => 50,
         ]);
     }
 
     // Pastikan dapat menghapus sparepart (soft delete).
-    public function test_can_delete_sparepart()
+    public function test_dapat_menghapus_sparepart()
     {
         $this->withoutExceptionHandling();
         $sparepart = Sparepart::factory()->create();
-        
+
         $this->assertDatabaseCount('spareparts', 1); // Pastikan ada
 
         $response = $this->actingAs($this->user)->delete(route('inventory.destroy', $sparepart));
 
         $response->assertRedirect(route('inventory.index'));
-        
-
 
         // $this->assertDatabaseCount('spareparts', 0); // Seharusnya 0 jika hard delete
         $this->assertSoftDeleted('spareparts', ['id' => $sparepart->id]);
     }
+
     // Pastikan superadmin dapat memeriksa ketersediaan part number.
-    public function test_superadmin_can_check_part_number_availability()
+    public function test_superadmin_dapat_memeriksa_ketersediaan_part_number()
     {
         // Buat part yang sudah ada
         Sparepart::factory()->create(['part_number' => 'EXISTING-001']);

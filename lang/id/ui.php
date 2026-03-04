@@ -8,7 +8,7 @@ return [
     'save' => 'Simpan',
     'cancel' => 'Batal',
     'delete' => 'Hapus',
-    'edit' => 'Edit',
+    'edit' => 'Ubah',
     'back' => 'Kembali',
     'reset' => 'Reset',
     'apply' => 'Terapkan',
@@ -37,7 +37,7 @@ return [
     'item_details' => 'Detail Barang',
     'create_inventory_title' => 'Tambah Sparepart Baru',
     'create_inventory_subtitle' => 'Isi detail sparepart di bawah ini untuk menambahkan ke inventaris.',
-    'edit_inventory_title' => 'Edit Sparepart',
+    'edit_inventory_title' => 'Ubah Sparepart',
     'edit_inventory_subtitle' => 'Perbarui informasi sparepart.',
     'save_changes' => 'Simpan Perubahan',
     'item_type' => 'Tipe Barang',
@@ -98,7 +98,7 @@ return [
     'no_results_desc' => 'Pencarian Anda tidak cocok dengan data manapun. Coba gunakan kata kunci lain atau reset filter.',
     'inventory_empty' => 'Belum ada inventaris',
     'inventory_empty_desc' => 'Data inventaris masih kosong. Mulai dengan menambahkan sparepart baru.',
-    
+
     'low_stock' => 'Stok Menipis',
     'detail' => 'Detail',
 
@@ -112,9 +112,9 @@ return [
     'borrow_item' => 'Pinjam Barang',
     'cannot_borrow' => 'Tidak Dapat Dipinjam',
     'cannot_borrow_desc' => 'Barang dengan kondisi :condition tidak dapat dipinjam.',
-    'update_stock' => 'Update Stok',
+    'update_stock' => 'Perbarui Stok',
     'request_stock_change' => 'Ajukan Perubahan Stok',
-    
+
     // Stock Change Modal
     'stock_change' => 'Perubahan Stok',
     'change_type' => 'Tipe Perubahan',
@@ -123,14 +123,14 @@ return [
     'quantity' => 'Jumlah',
     'quantity_exceeds_stock' => 'Jumlah melebihi stok tersedia.',
     'reason' => 'Alasan',
-    
+
     // Borrow Modal
     'borrower_name' => 'Nama Peminjam',
     'stock_available' => 'Stok tersedia',
     'expected_return_date' => 'Estimasi Kembali',
     'notes' => 'Catatan',
     'confirm_borrow' => 'Konfirmasi Pinjam',
-    
+
     // QR Code
     'qr_identification' => 'Identifikasi QR Code',
     'download' => 'Unduh',
@@ -138,14 +138,14 @@ return [
     'no_qr' => 'Belum ada QR Code',
     'created_at' => 'Dibuat',
     'updated_at' => 'Diperbarui',
-    
+
     // History
     'borrowing_history' => 'Riwayat Peminjaman',
     'borrower' => 'Peminjam',
     'borrow_date' => 'Tgl Pinjam',
     'status_borrowed' => 'Dipinjam',
     'status_returned_badge' => 'Dikembalikan',
-    
+
     // My Inventory
     'return_action' => 'Kembalikan',
     'confirm_return' => 'Konfirmasi Pengembalian',
@@ -158,13 +158,13 @@ return [
     'return_item_title' => 'Kembalikan Barang',
     'history' => 'Riwayat',
     'no_borrowing_history' => 'Belum ada riwayat peminjaman untuk item ini.',
-    
+
     // Similar Items
     'similar_items' => 'Item Serupa',
     'items_found' => 'item ditemukan',
     'no_brand' => 'Tanpa Merk',
     'no_similar_items' => 'Tidak ada varian atau item serupa lainnya.',
-    
+
     // Return Modal
     'return_item_title' => 'Kembalikan Barang',
     'return_evidence' => 'Bukti Pengembalian',
@@ -180,7 +180,7 @@ return [
     'stock_out_simple' => 'Stok Keluar',
     'reason_placeholder' => 'Contoh: Restock bulanan, Dipinjam untuk perbaikan, Dijual',
     'submit_request' => 'Kirim Pengajuan',
-    
+
     // QR Print
     'print_qr' => 'Cetak QR',
     'print_label' => 'Cetak Label',
@@ -201,7 +201,7 @@ return [
     'scan_pn' => 'Scan Part Number',
     'use_search' => 'Gunakan ":search"',
     'add_new' => 'Tambah ":search"',
-    
+
     // Inventory Types
     'type_sale' => 'Barang Dijual (Sale)',
     'type_sale_desc' => 'Barang dagangan dengan stok dan harga jual.',
@@ -227,7 +227,7 @@ return [
     'ocr_no_data' => 'Tidak menemukan informasi yang relevan (PN/Merk).',
     'ocr_error' => 'Gagal menganalisis',
     'ocr_success' => 'Ditemukan: :brand / :pn',
-    
+
     // User Management
     'user_management' => 'Pengguna',
     'add_user' => 'Tambah Pengguna',
@@ -239,7 +239,7 @@ return [
     'status_inactive' => 'Non-Aktif', // Used for badges
     'active' => 'Aktif', // Used for select options
     'inactive' => 'Nonaktif', // Used for select options
-    
+
     // User Management - Index
     'user_management_desc' => 'Kelola akun, role, dan hak akses pengguna sistem.',
     'search_user_placeholder' => 'Cari nama, email, atau username...',
@@ -257,12 +257,12 @@ return [
     'delete_permanent_confirm' => 'Data yang dihapus tidak akan bisa dikembalikan!',
     'yes_restore' => 'Ya, Pulihkan!',
     'yes_delete' => 'Ya, Hapus!',
-    
+
     // User Management - Create
     'add_new_user' => 'Tambah Pengguna Baru',
     'add_user_desc' => 'Buat akun untuk staff atau admin baru.',
     'account_info' => 'Informasi Akun',
-    'email_address' => 'Email Address',
+    'email_address' => 'Alamat Email',
     'account_status' => 'Status Akun',
     'select_status' => 'Pilih Status',
     'access_job' => 'Akses & Jabatan',
@@ -275,9 +275,9 @@ return [
     'default_password_info' => 'Password Default:',
     'user_can_set_username' => 'User dapat mengatur username sendiri setelah login.',
     'save_user' => 'Simpan Pengguna',
-    
+
     // User Management - Edit
-    'edit_user' => 'Edit Pengguna',
+    'edit_user' => 'Ubah Pengguna',
     'edit_user_desc' => 'Perbarui informasi akses dan jabatan untuk',
     'username' => 'Username',
     'email_immutable' => 'Email tidak dapat diubah untuk menjaga integritas login.',
@@ -289,11 +289,11 @@ return [
     'delete_user' => 'Hapus Pengguna', // Card Header
     'delete_user_warning' => 'Tindakan ini tidak dapat dibatalkan. Pastikan pengguna tidak memiliki data penting yang tertaut.',
     'yes_reset' => 'Ya, Reset!',
-    
+
     // User Management - Show
     'user_detail' => 'Detail Pengguna',
     'user_detail_desc' => 'Informasi lengkap akun dan profil pengguna.',
-    'edit_account' => 'Edit Akun',
+    'edit_account' => 'Ubah Akun',
     'joined_since' => 'Bergabung Sejak',
     'contact_detail_info' => 'Informasi Kontak & Detail',
     'phone_number' => 'Nomor Telepon (WhatsApp)',
@@ -306,7 +306,7 @@ return [
     'status_overdue' => 'Terlambat',
     'status_returned_badge' => 'Dikembalikan',
     'borrowing_history_empty' => 'Belum ada riwayat peminjaman.',
-    
+
     // Scan QR
     'scan_qr_title' => 'Scan QR Code',
     'scan_qr_desc' => 'Gunakan kamera atau upload gambar untuk mencari data sparepart.',
@@ -335,7 +335,7 @@ return [
     'camera_error_not_found' => 'Kamera tidak ditemukan pada perangkat ini.',
     'camera_error_not_readable' => 'Kamera mungkin sedang digunakan oleh aplikasi lain.',
     'camera_error_default' => 'Terjadi kesalahan saat mengakses kamera.',
-    
+
     // Dashboard
     'dashboard' => 'Dashboard',
     'dashboard_desc' => 'Overview Status Inventaris (Terkini)',
@@ -399,7 +399,7 @@ return [
     'items_in' => 'Barang Masuk',
     'items_out' => 'Barang Keluar',
     'total_stock' => 'Total Stok',
-    
+
     // Reports
     'reports_center' => 'Pusat Laporan',
     'reports_desc' => 'Generate dan download laporan sistem dalam format PDF atau Excel.',
@@ -428,7 +428,7 @@ return [
     'pdf_document' => 'Dokumen PDF',
     'excel_document' => 'Excel (.xls)',
     'download_report' => 'Download Laporan',
-    
+
     // PDF Reports
     'period_label' => 'Periode:',
     'all_history' => 'Semua Riwayat',
@@ -457,7 +457,7 @@ return [
     'report_footer_printed_by' => 'Dicetak oleh :name pada :date',
     'late_days' => 'Telat :days hari',
     'status_borrowed' => 'Sedang Dipinjam',
-    'status_returned' => 'Dikembali',
+    'status_returned' => 'Dikembalikan',
     'status_lost' => 'Hilang',
     'condition_good' => 'Baik',
     'condition_broken' => 'Rusak',
@@ -504,10 +504,10 @@ return [
     'until_date' => 'Hingga :date',
     'keyword_label' => 'Kata Kunci:',
     'no_data_filtered' => 'Tidak ada data aktivitas yang sesuai filter.',
-    'subject_inventory' => 'Inventory / Barang',
+    'subject_inventory' => 'Inventaris / Barang',
     'subject_user' => 'Users / Pengguna',
-    'subject_auth' => 'Authentication',
-    'subject_report' => 'Reports / Laporan',
+    'subject_auth' => 'Autentikasi',
+    'subject_report' => 'Laporan',
 
     // Approvals
     'approvals_title' => 'Persetujuan Perubahan Stok',
@@ -567,31 +567,31 @@ return [
     'auth_remember_me' => 'Ingat saya di perangkat ini',
     'auth_btn_login' => 'Masuk Sekarang',
     'auth_back_home' => 'Kembali ke Beranda',
-    
+
     'auth_register_title' => 'Buat Akun Baru',
     'auth_label_name' => 'Nama Lengkap',
     'auth_label_email' => 'Alamat Email',
     'auth_label_password_confirmation' => 'Konfirmasi Kata Sandi',
     'auth_already_registered' => 'Sudah punya akun?',
     'auth_btn_register' => 'Daftar',
-    
+
     'auth_forgot_desc' => 'Jangan khawatir. Masukkan email Anda dan kami akan mengirimkan link untuk mereset kata sandi.',
     'auth_label_email_registered' => 'Alamat Email Terdaftar',
     'auth_btn_send_reset' => 'Kirim Link Reset Password',
     'auth_back_login' => 'Kembali ke Halaman Login',
-    
+
     'auth_reset_title' => 'Atur Ulang Kata Sandi',
     'auth_label_new_password' => 'Kata Sandi Baru',
     'auth_label_new_password_confirmation' => 'Konfirmasi Kata Sandi Baru',
-    
+
     'auth_verify_desc' => 'Terima kasih telah mendaftar! Sebelum memulai, bisakah Anda memverifikasi alamat email Anda dengan mengklik tautan yang baru saja kami kirimkan ke email Anda? Jika Anda tidak menerima email tersebut, kami dengan senang hati akan mengirimkan yang baru.',
     'auth_verify_sent' => 'Tautan verifikasi baru telah dikirimkan ke alamat email yang Anda berikan saat pendaftaran.',
     'auth_btn_resend_verify' => 'Kirim Ulang Email Verifikasi',
     'auth_btn_logout' => 'Keluar',
-    
+
     'auth_confirm_password_desc' => 'Ini adalah area aman aplikasi. Harap konfirmasi kata sandi Anda sebelum melanjutkan.',
     'auth_btn_confirm' => 'Konfirmasi',
-    
+
     'auth_change_password_title' => 'Ganti Kata Sandi Anda',
     'auth_label_username_optional' => 'Username (Ganti jika diperlukan)',
     'auth_username_hint' => 'Username hanya bisa diubah 1 kali saat aktivasi akun.',
@@ -607,7 +607,7 @@ return [
     'profile_password_desc' => 'Pastikan akun Anda menggunakan password yang panjang dan acak agar tetap aman.',
     'profile_delete_title' => 'Hapus Akun',
     'profile_delete_desc' => 'Area berbahaya. Tindakan ini tidak dapat dibatalkan.',
-    
+
     'profile_label_photo' => 'Foto Profil',
     'profile_btn_select_photo' => 'Pilih Foto Baru',
     'profile_no_file' => 'Tidak ada file dipilih',
@@ -618,7 +618,7 @@ return [
     'profile_email_hint' => 'Hubungi admin untuk ganti email.',
     'profile_label_name' => 'Nama Lengkap',
     'profile_label_phone' => 'No. WhatsApp',
-    
+
     // Profile Stats
     'stats_total_borrowed' => 'Total Peminjaman',
     'stats_active_borrows' => 'Sedang Dipinjam',
@@ -653,7 +653,7 @@ return [
     'delete_soft_tooltip' => 'Hapus Sementara',
     'users_empty' => 'Tidak ada pengguna',
     'users_empty_desc' => 'Belum ada data pengguna yang sesuai dengan kriteria.',
-    
+
     // User Actions (SweetAlert)
     'restore_user_title' => 'Pulihkan Pengguna?',
     'restore_user_confirm' => 'Pengguna ini akan dikembalikan ke daftar aktif.',
@@ -663,16 +663,16 @@ return [
     'yes_delete' => 'Ya, Hapus Permanen!',
     'profile_placeholder_phone' => 'Contoh: 08123456789',
     'profile_label_address' => 'Alamat',
-    'profile_btn_edit' => 'Edit Profil',
+    'profile_btn_edit' => 'Ubah Profil',
     'profile_btn_save' => 'Simpan Perubahan',
     'profile_save_success' => 'Data berhasil disimpan.',
-    
+
     'profile_label_current_password' => 'Password Saat Ini',
     'profile_label_new_password' => 'Password Baru',
     'profile_label_confirm_password' => 'Konfirmasi Password Baru',
     'profile_btn_save_password' => 'Simpan Password',
     'profile_password_success' => 'Password berhasil diubah.',
-    
+
     'profile_delete_warning_title' => 'Perhatian: Tindakan Permanen',
     'profile_delete_warning_desc' => 'Setelah akun dihapus, semua data akan hilang selamanya. Pastikan Anda sudah membackup data penting sebelum melanjutkan.',
     'profile_btn_delete_account' => 'Hapus Akun Saya',
@@ -745,7 +745,7 @@ return [
     'guest_welcome_desc' => 'Sistem informasi manajemen inventaris sparepart berbasis web yang terstruktur dan terpusat.',
     'guest_feature_stock' => 'Pemantauan Stok',
     'guest_feature_qr' => 'QR Code Support',
-    
+
     // Filter Toggle
     'show_filter' => 'Tampilkan Filter',
     'hide_filter' => 'Sembunyikan Filter',
@@ -753,9 +753,9 @@ return [
     'select_all' => 'Pilih Semua',
 
     // Notifikasi Harga Belum Diisi
-    'missing_price_alert'        => 'Harga Barang Belum Diisi',
+    'missing_price_alert' => 'Harga Barang Belum Diisi',
     'notification_missing_price' => 'Barang ":name" yang diinput oleh :admin belum memiliki harga. Segera lengkapi.',
-    'widget_missing_price'       => 'Harga Belum Diisi',
-    'no_missing_price'           => 'Semua barang sudah memiliki harga. ✓',
-    'fill_price_now'             => 'Isi Harga Sekarang',
+    'widget_missing_price' => 'Harga Belum Diisi',
+    'no_missing_price' => 'Semua barang sudah memiliki harga.',
+    'fill_price_now' => 'Isi Harga Sekarang',
 ];

@@ -18,6 +18,11 @@
             errors: {},
             successMessage: '',
             
+            // Real-time stock state
+            liveStock: <?php echo e($sparepart->stock ?? 0); ?>,
+            liveUpdateMessage: '',
+            liveUpdateShow: false,
+            
             maxReturnQty: 0,
             returnQty: '',
             returnCondition: '',
@@ -34,6 +39,34 @@
 
             init() {
                 console.log('Alpine Component Initialized via Script');
+
+                // Real-time listener for Inventory Updates
+                if (window.Echo) {
+                    window.Echo.channel('inventory-updates')
+                        .listen('.InventoryUpdated', (e) => {
+                            // Cek jika update berasal dari item yang sedang dibuka
+                            if (e.id === <?php echo e($sparepart->id ?? 0); ?>) {
+                                console.log('Live Stock Update received:', e);
+                                this.handleStockUpdate(e);
+                            }
+                        });
+                }
+            },
+
+            handleStockUpdate(data) {
+                // Update live stock
+                this.liveStock = data.stock;
+                
+                // Show floating warning in modal
+                if (this.stockModalOpen || this.borrowModalOpen) {
+                    this.liveUpdateMessage = `⚠️ Stok baru saja diperbarui menjadi ${this.liveStock} Pcs.`;
+                    this.liveUpdateShow = true;
+                    
+                    // Auto hide warning message after 8 seconds
+                    setTimeout(() => {
+                        this.liveUpdateShow = false;
+                    }, 8000);
+                }
             },
 
             selectCondition(option) {

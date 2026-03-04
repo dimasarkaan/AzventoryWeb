@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Borrowing;
 use App\Notifications\OverdueBorrowingNotification;
+use Illuminate\Console\Command;
 
 class SendOverdueNotifications extends Command
 {
@@ -36,6 +36,7 @@ class SendOverdueNotifications extends Command
 
         if ($overdueBorrowings->isEmpty()) {
             $this->info('Tidak ditemukan peminjaman yang terlambat.');
+
             return;
         }
 

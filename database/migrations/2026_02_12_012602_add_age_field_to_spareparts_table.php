@@ -2,8 +2,8 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -13,9 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         // Cek jika kolom sudah ada untuk menghindari error duplikasi
-        if (!Schema::hasColumn('spareparts', 'age')) {
+        if (! Schema::hasColumn('spareparts', 'age')) {
             Schema::table('spareparts', function (Blueprint $table) {
-                $table->string('age', 50)->default('Bekas')->after('condition'); 
+                $table->string('age', 50)->default('Bekas')->after('condition');
             });
 
             // Isi data awal

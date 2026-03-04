@@ -18,6 +18,7 @@ class NotificationController extends Controller
         }
 
         $notifications = $request->user()->notifications()->paginate(10);
+
         return view('notifications.index', compact('notifications'));
     }
 
@@ -31,21 +32,22 @@ class NotificationController extends Controller
 
         // Redirect kontekstual berdasarkan tipe notifikasi/data
         if (isset($notification->data['url'])) {
-            return $request->wantsJson() 
+            return $request->wantsJson()
                 ? response()->json(['url' => $notification->data['url']])
                 : redirect($notification->data['url']);
         }
-        
+
         // Redirect fallback
         if ($notification->type === 'App\Notifications\LowStockNotification') {
-             $url = route('inventory.index');
-             return $request->wantsJson() 
-                ? response()->json(['url' => $url])
-                : redirect($url);
+            $url = route('inventory.index');
+
+            return $request->wantsJson()
+               ? response()->json(['url' => $url])
+               : redirect($url);
         }
 
-        return $request->wantsJson() 
-            ? response()->json(['success' => true]) 
+        return $request->wantsJson()
+            ? response()->json(['success' => true])
             : back();
     }
 
@@ -56,7 +58,7 @@ class NotificationController extends Controller
     {
         // Gunakan query builder untuk update langsung (lebih cepat & andal)
         $request->user()->unreadNotifications()->update(['read_at' => now()]);
-        
+
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'message' => 'Semua notifikasi ditandai dibaca.']);
         }

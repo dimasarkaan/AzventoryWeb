@@ -22,10 +22,35 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|string|email|max:255|unique:users,email,' . $this->route('user')->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$this->route('user')->id,
             'role' => 'required|in:superadmin,admin,operator',
             'jabatan' => 'required|string|max:255',
             'status' => 'required|in:active,inactive',
+        ];
+    }
+
+    /**
+     * Dapatkan atribut kustom untuk pesan error validator.
+     */
+    public function attributes(): array
+    {
+        return [
+            'email' => 'Alamat Email',
+            'role' => 'Peran',
+            'jabatan' => 'Jabatan',
+            'status' => 'Status Akun',
+        ];
+    }
+
+    /**
+     * Dapatkan pesan validasi kustom.
+     */
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'Alamat email ini sudah digunakan oleh pengguna lain.',
+            'role.in' => 'Peran yang dipilih tidak valid.',
+            'status.in' => 'Status yang dipilih tidak valid.',
         ];
     }
 }

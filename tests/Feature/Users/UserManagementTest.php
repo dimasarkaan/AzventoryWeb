@@ -4,8 +4,8 @@ namespace Tests\Feature\Users;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Illuminate\Support\Facades\Hash; // Import Hash facade
+use Illuminate\Support\Facades\Hash;
+use Tests\TestCase; // Import Hash facade
 
 class UserManagementTest extends TestCase
 {
@@ -24,13 +24,13 @@ class UserManagementTest extends TestCase
         ]);
     }
 
-    public function test_superadmin_can_view_user_list()
+    public function test_superadmin_dapat_melihat_daftar_user()
     {
         $response = $this->actingAs($this->superadmin)->get(route('users.index'));
         $response->assertStatus(200);
     }
 
-    public function test_superadmin_can_create_new_admin()
+    public function test_superadmin_dapat_membuat_admin_baru()
     {
         $response = $this->actingAs($this->superadmin)->post(route('users.store'), [
             'email' => 'newadmin@example.com',
@@ -47,7 +47,7 @@ class UserManagementTest extends TestCase
         ]);
     }
 
-    public function test_superadmin_can_create_new_operator()
+    public function test_superadmin_dapat_membuat_operator_baru()
     {
         $response = $this->actingAs($this->superadmin)->post(route('users.store'), [
             'email' => 'newoperator@example.com',
@@ -64,12 +64,12 @@ class UserManagementTest extends TestCase
         ]);
     }
 
-    public function test_superadmin_can_delete_user()
+    public function test_superadmin_dapat_menghapus_user()
     {
         // Buat user untuk dihapus
         $targetUser = User::factory()->create([
             'role' => 'operator',
-            'password_changed_at' => now(), 
+            'password_changed_at' => now(),
         ]);
 
         $response = $this->actingAs($this->superadmin)->delete(route('users.destroy', $targetUser));
@@ -79,7 +79,8 @@ class UserManagementTest extends TestCase
             'id' => $targetUser->id,
         ]);
     }
-    public function test_superadmin_can_reset_user_password()
+
+    public function test_superadmin_dapat_mereset_password_user()
     {
         $targetUser = User::factory()->create([
             'role' => 'admin',
@@ -90,7 +91,7 @@ class UserManagementTest extends TestCase
         $response = $this->actingAs($this->superadmin)->patch(route('users.reset-password', $targetUser));
 
         $response->assertRedirect();
-        
+
         // Verifikasi password berubah (default adalah 'password123')
         $targetUser->refresh();
         $this->assertTrue(Hash::check('password123', $targetUser->password));

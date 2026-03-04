@@ -3,6 +3,7 @@
 <div class="card p-4 flex flex-col gap-3 h-full">
     <div class="flex items-start justify-between">
         <div class="flex items-center gap-3">
+            <input type="checkbox" name="ids[]" value="{{ $approval->id }}" class="row-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500">
             <div class="h-10 w-10 rounded-lg bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0 relative overflow-hidden group">
                @if($approval->sparepart->image)
                     <img src="{{ asset('storage/' . $approval->sparepart->image) }}" alt="" class="h-full w-full object-cover rounded-lg">
@@ -51,7 +52,7 @@
             @csrf
             @method('PATCH')
             <input type="hidden" name="status" value="approved">
-            <button type="submit" class="btn btn-success w-full text-xs justify-center flex items-center py-2">
+            <button type="submit" class="btn btn-success w-full text-xs justify-center flex items-center py-2" onclick="confirmApprove(event)">
                 {{ __('ui.btn_approve') }}
             </button>
         </form>

@@ -3,11 +3,12 @@
 namespace App\Services;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\Color;
-use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExcelExportService
 {
@@ -37,11 +38,11 @@ class ExcelExportService
                     'borderStyle' => Border::BORDER_THICK,
                     'color' => ['argb' => 'FF0284C7'], // Sky-600
                 ],
-            ]
+            ],
         ]);
 
         $sheet->mergeCells("A3:{$lastColumn}3");
-        $sheet->setCellValue('A3', 'Dicetak pada: ' . now()->format('d/m/Y H:i:s') . ' oleh ' . (auth()->user()->name ?? 'Sistem'));
+        $sheet->setCellValue('A3', 'Dicetak pada: '.now()->format('d/m/Y H:i:s').' oleh '.(auth()->user()?->name ?? 'Sistem')); // FIX: null-safe agar tidak crash jika context tanpa user
         $sheet->getStyle("A3:{$lastColumn}3")->applyFromArray([
             'font' => [
                 'italic' => true,
@@ -50,7 +51,7 @@ class ExcelExportService
             ],
             'alignment' => [
                 'horizontal' => Alignment::HORIZONTAL_RIGHT,
-            ]
+            ],
         ]);
     }
 
@@ -60,7 +61,7 @@ class ExcelExportService
     protected function setupHeaderStyle($sheet, $headerRow, $lastColumn)
     {
         $headerRange = "A{$headerRow}:{$lastColumn}{$headerRow}";
-        
+
         // Style Header
         $sheet->getStyle($headerRange)->applyFromArray([
             'font' => [
@@ -86,8 +87,8 @@ class ExcelExportService
         ]);
 
         // Freeze the rows above data
-        $sheet->freezePane("A" . ($headerRow + 1));
-        
+        $sheet->freezePane('A'.($headerRow + 1));
+
         // Enable AutoFilter
         $sheet->setAutoFilter($headerRange);
     }
@@ -119,7 +120,7 @@ class ExcelExportService
                 ],
                 'alignment' => [
                     'vertical' => Alignment::VERTICAL_CENTER,
-                ]
+                ],
             ]);
         }
     }
@@ -150,12 +151,12 @@ class ExcelExportService
     protected function downloadResponse($spreadsheet, $filename)
     {
         $writer = new Xlsx($spreadsheet);
-        
-        // Output to a temp file
-        $tempFile = tempnam(sys_get_temp_dir(), 'excel');
+
+        // Output to a temp file with proper extension to avoid ZipArchive issues on some systems
+        $tempFile = storage_path('app/temp_'.uniqid().'.xlsx');
         $writer->save($tempFile);
 
-        return response()->download($tempFile, $filename . '.xlsx', [
+        return response()->download($tempFile, $filename.'.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ])->deleteFileAfterSend(true);
     }
@@ -165,7 +166,7 @@ class ExcelExportService
      */
     public function exportActivityLogs($logs, $filename)
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Log Aktivitas');
 
@@ -184,9 +185,11 @@ class ExcelExportService
 
         $this->setupHeaderStyle($sheet, $headerRow, $lastColumn);
 
-        // Data
+        // Data (Stream via lazy loading if it's a query builder)
         $row = $headerRow + 1;
-        foreach ($logs as $log) {
+        $items = ($logs instanceof \Illuminate\Database\Eloquent\Builder) ? $logs->lazy() : $logs;
+
+        foreach ($items as $log) {
             $sheet->setCellValue("A{$row}", $log->created_at->format('d/m/Y H:i:s'));
             $sheet->setCellValue("B{$row}", $log->user ? $log->user->name : 'Sistem');
             $sheet->setCellValue("C{$row}", $log->user ? $log->user->role->label() : '-');
@@ -207,7 +210,7 @@ class ExcelExportService
      */
     public function exportInventoryList($data, $filename)
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Daftar Inventaris');
 
@@ -215,7 +218,7 @@ class ExcelExportService
         $headerRow = 5;
 
         // Setup Title
-        $this->setupReportTitle($sheet, 'Laporan Daftar Inventaris (Suku Cadang & Aset)', $lastColumn);
+        $this->setupReportTitle($sheet, 'Laporan Daftar Inventaris (Sparepart & Aset)', $lastColumn);
 
         // Headers
         $headers = ['Nomor Part', 'Nama Barang', 'Kategori', 'Status', 'Lokasi', 'Stok Saat Ini'];
@@ -226,39 +229,52 @@ class ExcelExportService
 
         $this->setupHeaderStyle($sheet, $headerRow, $lastColumn);
 
-        // Data
+        // Data (Stream via lazy loading if it's a query builder)
         $row = $headerRow + 1;
-        foreach ($data as $item) {
+        $items = ($data instanceof \Illuminate\Database\Eloquent\Builder) ? $data->lazy() : $data;
+
+        foreach ($items as $item) {
             $sheet->setCellValue("A{$row}", $item->part_number);
             $sheet->setCellValue("B{$row}", $item->name);
             $sheet->setCellValue("C{$row}", $item->category);
-            
+
             // Status Logic: Handle both Enum object and string
             $statusText = $item->status instanceof \BackedEnum ? $item->status->label() : (is_string($item->status) ? ucfirst($item->status) : $item->status);
-            
-            if ($item->stock <= 0 && ($item->status instanceof \BackedEnum ? $item->status === \App\Enums\SparepartStatus::ACTIVE : $item->status === 'active')) {
-                 $statusText = 'Habis';
+
+            if ($item->stock <= 0 && ($item->status instanceof \BackedEnum ? $item->status === \App\Enums\SparepartStatus::ACTIVE : $item->status === 'aktif')) {
+                $statusText = 'Habis';
             }
             $sheet->setCellValue("D{$row}", $statusText);
             
+            // Status Color Coding
+            $color = match (strtolower($statusText)) {
+                'aman', 'aktif' => 'FF059669', // Emerald-600
+                'menipis' => 'FFD97706', // Amber-600
+                'habis', 'rusak', 'nonaktif', 'hilang' => 'FFDC2626', // Red-600
+                default => 'FF64748B', // Slate-500
+            };
+            $sheet->getStyle("D{$row}")->applyFromArray([
+                'font' => ['color' => ['argb' => $color], 'bold' => true]
+            ]);
+
             $sheet->setCellValue("E{$row}", $item->location);
             $sheet->setCellValueExplicit("F{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+            $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode('#,##0');
             $row++;
         }
 
         // Add Total Formula
         if ($row > ($headerRow + 1)) {
-            $sheet->setCellValue("E{$row}", "TOTAL STOK KESELURUHAN:");
+            $sheet->setCellValue("E{$row}", 'TOTAL STOK KESELURUHAN:');
             $sheet->getStyle("E{$row}")->applyFromArray(['font' => ['bold' => true], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]]);
-            
+
             $lastDataRow = $row - 1;
-            $sheet->setCellValue("F{$row}", "=SUM(F".($headerRow + 1).":F{$lastDataRow})");
+            $sheet->setCellValue("F{$row}", '=SUM(F'.($headerRow + 1).":F{$lastDataRow})");
             $sheet->getStyle("F{$row}")->applyFromArray(['font' => ['bold' => true]]);
-            
+
             $row++; // Increment so borders cover this
         }
 
-        $this->applyAlternatingRowColors($sheet, $headerRow, $lastColumn, $row - 1);
         $this->applyAlternatingRowColors($sheet, $headerRow, $lastColumn, $row - 1);
         $this->applyDataBorders($sheet, $headerRow, $lastColumn, $row - 1);
         $this->autoSizeColumns($sheet, $lastColumn);
@@ -271,7 +287,7 @@ class ExcelExportService
      */
     public function exportStockMutation($data, $filename)
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Mutasi Stok');
 
@@ -290,25 +306,32 @@ class ExcelExportService
 
         $this->setupHeaderStyle($sheet, $headerRow, $lastColumn);
 
-        // Data
+        // Data (Stream via lazy loading if it's a query builder)
         $row = $headerRow + 1;
-        foreach ($data as $log) {
+        $items = ($data instanceof \Illuminate\Database\Eloquent\Builder) ? $data->lazy() : $data;
+
+        foreach ($items as $log) {
             $sheet->setCellValue("A{$row}", $log->created_at->format('d/m/Y H:i'));
             $sheet->setCellValue("B{$row}", $log->sparepart->part_number ?? '-');
             $sheet->setCellValue("C{$row}", $log->sparepart->name ?? '-');
-            
+
             $typeLabel = $log->type === 'in' ? 'Masuk' : 'Keluar';
-            if ($log->type === 'borrow') $typeLabel = 'Dipinjam';
-            if ($log->type === 'return') $typeLabel = 'Dikembalikan';
-                
+            if ($log->type === 'borrow') {
+                $typeLabel = 'Dipinjam';
+            }
+            if ($log->type === 'return') {
+                $typeLabel = 'Dikembalikan';
+            }
+
             $sheet->setCellValue("D{$row}", $typeLabel);
-            
+
             // Format quantity (+ / -)
             $qtyPrefix = in_array($log->type, ['in', 'return']) ? '+' : '-';
             // Store as explicit string or number, keep format (+ / -)
-            $sheet->setCellValueExplicit("E{$row}", $qtyPrefix . $log->quantity, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
-            
+            $sheet->setCellValueExplicit("E{$row}", $qtyPrefix.$log->quantity, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+
             $sheet->setCellValueExplicit("F{$row}", $log->balance, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+            $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode('#,##0');
             $sheet->setCellValue("G{$row}", $log->user->name ?? '-');
             $sheet->setCellValue("H{$row}", $log->remarks);
             $row++;
@@ -326,7 +349,7 @@ class ExcelExportService
      */
     public function exportBorrowingHistory($data, $filename)
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Riwayat Peminjaman');
 
@@ -345,37 +368,53 @@ class ExcelExportService
 
         $this->setupHeaderStyle($sheet, $headerRow, $lastColumn);
 
-        // Data
+        // Data (Stream via lazy loading if it's a query builder)
         $row = $headerRow + 1;
-        foreach ($data as $borrowing) {
+        $items = ($data instanceof \Illuminate\Database\Eloquent\Builder) ? $data->lazy() : $data;
+
+        foreach ($items as $borrowing) {
             $sheet->setCellValue("A{$row}", $borrowing->user->name ?? $borrowing->borrower_name ?? '-');
             $sheet->setCellValue("B{$row}", $borrowing->sparepart->name ?? '-');
             $sheet->setCellValueExplicit("C{$row}", $borrowing->quantity, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-            
+
             $borrowedAt = $borrowing->borrowed_at ? (\Carbon\Carbon::parse($borrowing->borrowed_at)->format('d/m/Y')) : '-';
             $dueDate = $borrowing->expected_return_at ? (\Carbon\Carbon::parse($borrowing->expected_return_at)->format('d/m/Y')) : ($borrowing->due_date ? (\Carbon\Carbon::parse($borrowing->due_date)->format('d/m/Y')) : '-');
             $returnedAt = $borrowing->returned_at ? \Carbon\Carbon::parse($borrowing->returned_at)->format('d/m/Y') : '-';
-            
+
             $sheet->setCellValue("D{$row}", $borrowedAt);
             $sheet->setCellValue("E{$row}", $dueDate);
             $sheet->setCellValue("F{$row}", $returnedAt);
-            
+
             // Handle Enum or String for Borrowing Status
             $statusText = $borrowing->status instanceof \BackedEnum ? $borrowing->status->label() : (is_string($borrowing->status) ? ucfirst($borrowing->status) : $borrowing->status);
             $sheet->setCellValue("G{$row}", $statusText);
             
+            // Status Color Coding
+            $color = match (strtolower($statusText)) {
+                'dikembalikan', 'selesai', 'disetujui' => 'FF059669', // Emerald-600
+                'dipinjam', 'menunggu', 'pending' => 'FFD97706', // Amber-600
+                'terlambat', 'ditolak', 'hilang' => 'FFDC2626', // Red-600
+                default => 'FF64748B', // Slate-500
+            };
+            $sheet->getStyle("G{$row}")->applyFromArray([
+                'font' => ['color' => ['argb' => $color], 'bold' => true]
+            ]);
+            
+            // Format Quantity Column
+            $sheet->getStyle("C{$row}")->getNumberFormat()->setFormatCode('#,##0');
+
             $row++;
         }
 
         // Add Total Formula
         if ($row > ($headerRow + 1)) {
-            $sheet->setCellValue("B{$row}", "TOTAL ITEM DIPINJAM:");
+            $sheet->setCellValue("B{$row}", 'TOTAL ITEM DIPINJAM:');
             $sheet->getStyle("B{$row}")->applyFromArray(['font' => ['bold' => true], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]]);
-            
+
             $lastDataRow = $row - 1;
-            $sheet->setCellValue("C{$row}", "=SUM(C".($headerRow + 1).":C{$lastDataRow})");
+            $sheet->setCellValue("C{$row}", '=SUM(C'.($headerRow + 1).":C{$lastDataRow})");
             $sheet->getStyle("C{$row}")->applyFromArray(['font' => ['bold' => true]]);
-            
+
             $row++;
         }
 
@@ -391,7 +430,7 @@ class ExcelExportService
      */
     public function exportLowStock($data, $filename)
     {
-        $spreadsheet = new Spreadsheet();
+        $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Stok Menipis');
 
@@ -410,27 +449,30 @@ class ExcelExportService
 
         $this->setupHeaderStyle($sheet, $headerRow, $lastColumn);
 
-        // Data
+        // Data (Stream via lazy loading if it's a query builder)
         $row = $headerRow + 1;
-        foreach ($data as $item) {
+        $items = ($data instanceof \Illuminate\Database\Eloquent\Builder) ? $data->lazy() : $data;
+
+        foreach ($items as $item) {
             $sheet->setCellValue("A{$row}", $item->part_number);
             $sheet->setCellValue("B{$row}", $item->name);
             $sheet->setCellValue("C{$row}", $item->category);
             $sheet->setCellValue("D{$row}", $item->location);
             $sheet->setCellValueExplicit("E{$row}", $item->minimum_stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
             $sheet->setCellValueExplicit("F{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-            
+            $sheet->getStyle("E{$row}:F{$row}")->getNumberFormat()->setFormatCode('#,##0');
+
             // Highlight low stock
             if ($item->stock <= 0) {
-                 $sheet->getStyle("F{$row}")->applyFromArray([
-                     'font' => ['color' => ['argb' => 'FFDC2626'], 'bold' => true], // Red-600
-                 ]);
+                $sheet->getStyle("F{$row}")->applyFromArray([
+                    'font' => ['color' => ['argb' => 'FFDC2626'], 'bold' => true], // Red-600
+                ]);
             } else {
-                 $sheet->getStyle("F{$row}")->applyFromArray([
-                     'font' => ['color' => ['argb' => 'FFD97706'], 'bold' => true], // Amber-600
-                 ]);
+                $sheet->getStyle("F{$row}")->applyFromArray([
+                    'font' => ['color' => ['argb' => 'FFD97706'], 'bold' => true], // Amber-600
+                ]);
             }
-            
+
             $row++;
         }
 

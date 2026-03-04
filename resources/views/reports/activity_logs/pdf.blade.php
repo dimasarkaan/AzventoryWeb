@@ -1,55 +1,59 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Laporan Aktivitas Sistem</title>
+    @include('reports.partials.pdf_style')
     <style>
-        body { font-family: sans-serif; font-size: 10pt; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 18pt; color: #1e40af; }
-        .header p { margin: 5px 0; color: #666; font-size: 10pt; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #000; padding: 6px; text-align: left; vertical-align: top; font-size: 9pt; }
-        th { background-color: #4b5563; color: #ffffff; font-weight: bold; text-transform: uppercase; text-align: center; }
-        tr:nth-child(even) { background-color: #f3f4f6; }
         .badges { font-size: 8pt; padding: 2px 5px; border-radius: 4px; border: 1px solid #ccc; display: inline-block; }
         .badge-info { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
         .badge-warning { background: #fef3c7; color: #92400e; border-color: #fde68a; }
         .badge-danger { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
         .badge-success { background: #d1fae5; color: #065f46; border-color: #a7f3d0; }
-        .footer { text-align: right; margin-top: 30px; font-size: 8pt; color: #999; }
         .meta { font-size: 9pt; margin-bottom: 15px; color: #444; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 style="text-transform: uppercase;">{{ __('ui.report_activity_title') }}</h1>
-        <p>
-            {{ __('ui.period_label') }} 
-            @if(request('start_date') && request('end_date'))
-                {{ \Carbon\Carbon::parse(request('start_date'))->translatedFormat('d F Y') }} - {{ \Carbon\Carbon::parse(request('end_date'))->translatedFormat('d F Y') }}
-            @elseif(request('start_date'))
-                {{ __('ui.since_date', ['date' => \Carbon\Carbon::parse(request('start_date'))->translatedFormat('d F Y')]) }}
-            @elseif(request('end_date'))
-                {{ __('ui.until_date', ['date' => \Carbon\Carbon::parse(request('end_date'))->translatedFormat('d F Y')]) }}
-            @else
-                {{ __('ui.all_history') }}
-            @endif
-        </p>
-    </div>
+    @php
+        // Construct Title and Period Strings for the Header Partial
+        $title = mb_strtoupper(__('ui.report_activity_title'));
+        
+        $request = $request ?? request(); // Ensure request is available from Job or live View
+        
+        if($request->get('start_date') && $request->get('end_date')) {
+            $period = \Carbon\Carbon::parse($request->get('start_date'))->translatedFormat('d F Y') . ' - ' . \Carbon\Carbon::parse($request->get('end_date'))->translatedFormat('d F Y');
+            $startDate = \Carbon\Carbon::parse($request->get('start_date'));
+            $endDate = \Carbon\Carbon::parse($request->get('end_date'));
+        } elseif($request->get('start_date')) {
+            $period = __('ui.since_date', ['date' => \Carbon\Carbon::parse($request->get('start_date'))->translatedFormat('d F Y')]);
+            $startDate = \Carbon\Carbon::parse($request->get('start_date'));
+            $endDate = null;
+        } elseif($request->get('end_date')) {
+            $period = __('ui.until_date', ['date' => \Carbon\Carbon::parse($request->get('end_date'))->translatedFormat('d F Y')]);
+            $startDate = null;
+            $endDate = \Carbon\Carbon::parse($request->get('end_date'));
+        } else {
+            $period = __('ui.all_history');
+            $startDate = null;
+            $endDate = null;
+        }
+        
+        $type = 'activity_log';
+    @endphp
+
+    @include('reports.partials.pdf_header')
 
     <div class="meta">
-        @if(request('role') && request('role') !== 'Semua Role')
-            <strong>{{ __('ui.role_filter') }}:</strong> {{ ucfirst(request('role')) }} &nbsp; | &nbsp;
+        @if($request->get('role') && $request->get('role') !== 'Semua Role')
+            <strong>{{ __('ui.role_filter') }}:</strong> {{ ucfirst($request->get('role')) }} &nbsp; | &nbsp;
         @endif
-        @if(request('user_id'))
-            <strong>User ID:</strong> {{ request('user_id') }} &nbsp; | &nbsp;
+        @if($request->get('user_id'))
+            <strong>User ID:</strong> {{ $request->get('user_id') }} &nbsp; | &nbsp;
         @endif
-        @if(request('action'))
-            <strong>{{ __('ui.action_type') }}:</strong> {{ request('action') }} &nbsp; | &nbsp;
+        @if($request->get('action'))
+            <strong>{{ __('ui.action_type') }}:</strong> {{ $request->get('action') }} &nbsp; | &nbsp;
         @endif
-        @if(request('search'))
-            <strong>{{ __('ui.keyword_label') }}</strong> "{{ request('search') }}"
+        @if($request->get('search'))
+            <strong>{{ __('ui.keyword_label') }}</strong> "{{ $request->get('search') }}"
         @endif
     </div>
 
@@ -60,11 +64,11 @@
     <table style="width: {{ $isPdf ? '100%' : 'auto' }};">
         <thead>
             <tr>
-                <th style="{{ $isPdf ? 'width: 15%' : 'width: 120px' }}">{{ __('ui.time_header') }}</th>
-                <th style="{{ $isPdf ? 'width: 20%' : 'width: 150px' }}">{{ __('ui.user_header') }}</th>
-                <th style="{{ $isPdf ? 'width: 10%' : 'width: 100px' }}">{{ __('ui.role_filter') }}</th>
-                <th style="{{ $isPdf ? 'width: 20%' : 'width: 180px' }}">{{ __('ui.action_header') }}</th>
-                <th style="{{ $isPdf ? 'width: 35%' : 'width: 400px' }}">{{ __('ui.description_header') }}</th>
+                <th style="width: 15%">{{ __('ui.time_header') }}</th>
+                <th style="width: 20%">{{ __('ui.user_header') }}</th>
+                <th style="width: 10%">{{ __('ui.role_filter') }}</th>
+                <th style="width: 20%">{{ __('ui.action_header') }}</th>
+                <th style="width: 35%">{{ __('ui.description_header') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -109,9 +113,5 @@
             @endforelse
         </tbody>
     </table>
-
-    <div class="footer">
-        <p>Azventory &bull; {{ __('ui.report_footer_printed_by', ['name' => auth()->user()->name, 'date' => now()->translatedFormat('d F Y H:i')]) }}</p>
-    </div>
 </body>
 </html>

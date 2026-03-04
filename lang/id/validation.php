@@ -19,6 +19,11 @@ return [
     'in' => ':attribute yang dipilih tidak valid.',
     'current_password' => 'Kata sandi saat ini tidak cocok.',
     'confirmed' => 'Konfirmasi :attribute tidak cocok.',
+    'image' => 'Kolom :attribute harus berupa file gambar.',
+    'mimes' => 'Format file :attribute harus berupa :values.',
+    'after_or_equal' => 'Kolom :attribute harus berupa tanggal setelah atau sama dengan :date.',
+    'date' => 'Kolom :attribute bukan tanggal yang valid.',
+    'lowercase' => 'Kolom :attribute harus berupa huruf kecil.',
 
     'password' => [
         'letters' => ':attribute harus mengandung setidaknya satu huruf.',
@@ -26,7 +31,7 @@ return [
     ],
 
     'attributes' => [
-        'name' => 'Nama Sparepart',
+        'name' => 'Nama',
         'part_number' => 'Part Number',
         'category' => 'Kategori',
         'location' => 'Lokasi Gudang',
@@ -37,6 +42,16 @@ return [
         'login' => 'Username atau Email',
         'password' => 'Kata Sandi',
         'current_password' => 'Kata Sandi Saat Ini',
+        'email' => 'Alamat Email',
+        'role' => 'Peran',
+        'jabatan' => 'Jabatan',
+        'quantity' => 'Jumlah Peminjaman',
+        'notes' => 'Catatan',
+        'expected_return_at' => 'Rencana Pengembalian',
+        'avatar' => 'Foto Profil',
+        'username' => 'Username',
+        'phone' => 'No. HP',
+        'address' => 'Alamat',
     ],
 
 ];

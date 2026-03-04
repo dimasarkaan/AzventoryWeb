@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Sparepart;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class SparepartPolicy
 {
@@ -77,6 +76,7 @@ class SparepartPolicy
         // Hanya Superadmin
         return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
+
     /**
      * Tentukan apakah user bisa mengubah harga barang.
      */

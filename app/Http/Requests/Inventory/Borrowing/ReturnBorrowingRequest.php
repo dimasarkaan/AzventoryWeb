@@ -11,7 +11,7 @@ class ReturnBorrowingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; 
+        return true;
     }
 
     /**
@@ -25,14 +25,14 @@ class ReturnBorrowingRequest extends FormRequest
         $remaining = $borrowing ? $borrowing->remaining_quantity : 999999;
 
         return [
-            'return_quantity' => 'required|integer|min:1|max:' . $remaining,
+            'return_quantity' => 'required|integer|min:1|max:'.$remaining,
             'return_condition' => 'required|in:good,bad,lost',
             'return_notes' => 'nullable|string',
             'return_photos' => [
                 'required_if:return_condition,good,bad',
                 'array',
                 'min:1',
-                'max:5'
+                'max:5',
             ],
             'return_photos.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120', // Max 5MB
         ];

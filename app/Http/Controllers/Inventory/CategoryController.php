@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Http\Controllers\Inventory;
+
+use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\Sparepart;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+
+class CategoryController extends Controller
+{
+    public function index()
+    {
+        $categories = Category::all()->map(function ($cat) {
+            return [
+                'id' => $cat->id,
+                'name' => $cat->name,
+                'items_count' => Sparepart::where('category', $cat->name)->count(),
+            ];
+        });
+
+        return response()->json($categories);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name',
+        ]);
+
+        $category = Category::create(['name' => $request->name]);
+        Cache::forget('inventory_categories');
+
+        return response()->json([
+            'message' => 'Kategori baru berhasil ditambahkan.',
+            'category' => $category
+        ], 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $id,
+        ]);
+
+        $category = Category::findOrFail($id);
+        $oldName = $category->name;
+        $newName = $request->name;
+
+        DB::transaction(function () use ($category, $oldName, $newName) {
+            $category->update(['name' => $newName]);
+
+            // Update all spareparts that use this category string
+            Sparepart::where('category', $oldName)->update(['category' => $newName]);
+        });
+
+        Cache::forget('inventory_categories');
+
+        return response()->json(['message' => 'Kategori berhasil diperbarui.']);
+    }
+
+    public function destroy($id)
+    {
+        $category = Category::findOrFail($id);
+
+        // Check if category is in use
+        $count = Sparepart::where('category', $category->name)->count();
+
+        if ($count > 0) {
+            return response()->json([
+                'message' => "Tidak dapat menghapus. Masih ada $count barang dalam kategori ini. Kosongkan terlebih dahulu."
+            ], 422);
+        }
+
+        $category->delete();
+        Cache::forget('inventory_categories');
+
+        return response()->json(['message' => 'Kategori berhasil dihapus.']);
+    }
+}

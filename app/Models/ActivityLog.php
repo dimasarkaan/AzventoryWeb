@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Prunable;
 
 /**
  * Model ActivityLog untuk mencatat riwayat aktivitas pengguna.
- * 
+ *
  * Menggunakan fitur Prunable untuk otomatis menghapus log lama.
  */
 class ActivityLog extends Model
@@ -28,7 +28,7 @@ class ActivityLog extends Model
 
     /**
      * Query untuk pruning (pembersihan otomatis) model.
-     * 
+     *
      * Menghapus log yang lebih tua dari 1 tahun.
      */
     public function prunable()

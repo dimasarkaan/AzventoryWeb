@@ -16,12 +16,12 @@ class GlobalSearchController extends Controller
     public function __invoke(Request $request)
     {
         $query = $request->input('query');
-        
+
         if (strlen($query) < 2) {
             return response()->json([
                 'menus' => [],
                 'spareparts' => [],
-                'users' => []
+                'users' => [],
             ]);
         }
 
@@ -40,20 +40,20 @@ class GlobalSearchController extends Controller
             ->orWhere('brand', 'like', "%{$query}%")
             ->limit(5)
             ->get()
-            ->map(function ($item) use ($role) {
+            ->map(function ($item) {
                 // Tentukan rute berdasarkan role
                 $routePrefix = 'inventory.show';
-                
+
                 // Fallback jika rute tidak ada untuk role tersebut
                 $url = Route::has($routePrefix) ? route($routePrefix, $item) : '#';
 
                 return [
                     'id' => $item->id,
                     'title' => $item->name,
-                    'subtitle' => $item->part_number . ' • Stok: ' . $item->stock,
-                    'image' => $item->image ? asset('storage/' . $item->image) : null,
+                    'subtitle' => $item->part_number.' • Stok: '.$item->stock,
+                    'image' => $item->image ? asset('storage/'.$item->image) : null,
                     'url' => $url,
-                    'type' => 'Inventaris'
+                    'type' => 'Inventaris',
                 ];
             });
 
@@ -68,10 +68,10 @@ class GlobalSearchController extends Controller
                     return [
                         'id' => $item->id,
                         'title' => $item->name,
-                        'subtitle' => $item->email . ' • ' . $item->role->label(),
+                        'subtitle' => $item->email.' • '.$item->role->label(),
                         'image' => null, // Logika avatar jika diperlukan
                         'url' => route('users.edit', $item),
-                        'type' => 'Pengguna'
+                        'type' => 'Pengguna',
                     ];
                 });
         }
@@ -79,7 +79,7 @@ class GlobalSearchController extends Controller
         return response()->json([
             'menus' => $filteredMenus,
             'spareparts' => $spareparts,
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
@@ -93,7 +93,7 @@ class GlobalSearchController extends Controller
             ['title' => 'Profil Saya', 'url' => route('profile.edit'), 'icon' => 'user'],
         ];
 
-        $roleMenus = match($role) {
+        $roleMenus = match ($role) {
             \App\Enums\UserRole::SUPERADMIN => [
                 ['title' => 'Manajemen Inventaris', 'url' => route('inventory.index'), 'icon' => 'cube'],
                 ['title' => 'Tambah Sparepart', 'url' => route('inventory.create'), 'icon' => 'plus'],

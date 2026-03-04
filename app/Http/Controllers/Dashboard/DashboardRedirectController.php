@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Dashboard;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Enums\UserRole;
 
 class DashboardRedirectController extends Controller
 {
     /**
      * Menangani request yang masuk.
-     * 
+     *
      * Mengarahkan user ke dashboard yang sesuai berdasarkan role.
      */
     public function __invoke(Request $request)

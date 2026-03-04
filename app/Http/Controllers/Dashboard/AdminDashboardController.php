@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Services\DashboardService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
@@ -33,25 +34,48 @@ class AdminDashboardController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Tentukan Rentang Tanggal berdasarkan filter periode dari request
+        // 1. Validasi Input
+        $request->validate([
+            'period' => 'nullable|string|in:today,this_week,this_month,this_year,custom,custom_year,custom_range',
+            'year' => 'nullable|integer|min:2000|max:'.(now()->year + 1),
+            'month' => 'nullable|string|regex:/^([1-9]|1[0-2]|all|)$/',
+            'start_date' => 'nullable|date',
+            'end_date' => [
+                'nullable',
+                'date',
+                'after_or_equal:start_date',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->start_date && $value) {
+                        $diff = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($value));
+                        if ($diff > 365) {
+                            $fail('Rentang tanggal maksimal 365 hari.');
+                        }
+                    }
+                },
+            ],
+        ]);
+
+        // 2. Tentukan Rentang Tanggal berdasarkan filter periode dari request
         [$start, $end, $period] = $this->dashboardService->getDateRange(
             $request->input('period'),
             $request->input('year'),
-            $request->input('month')
+            $request->input('month'),
+            $request->input('start_date'),
+            $request->input('end_date')
         );
 
-        $year  = $request->input('year');
+        $year = $request->input('year');
         $month = $request->input('month');
-        $user  = auth()->user();
+        $user = auth()->user();
 
         // 2. Generate Cache Key unik berdasarkan filter & user
         //    Disertai timestamp update terakhir inventaris untuk invalidasi otomatis
         $lastUpdated = Cache::get('inventory_last_updated', 'init');
-        $cacheKey    = 'admin_dashboard_stats_' . $period
-                     . '_' . ($year ?? 'nay')
-                     . '_' . ($month ?? 'nam')
-                     . '_' . $user->id
-                     . '_' . $lastUpdated;
+        $cacheKey = 'admin_dashboard_stats_'.$period
+                     .'_'.($year ?? 'nay')
+                     .'_'.($month ?? 'nam')
+                     .'_'.$user->id
+                     .'_'.$lastUpdated;
 
         // 3. Ambil data dengan cache 10 menit (600 detik)
         $data = Cache::remember($cacheKey, 600, function () use ($start, $end, $period, $user) {
@@ -60,9 +84,9 @@ class AdminDashboardController extends Controller
             $snapshots = $this->dashboardService->getStockSnapshots();
 
             // --- Analitik berdasarkan periode yang dipilih ---
-            $movementData  = $this->dashboardService->getStockMovements($start, $end);
-            $topExited     = $this->dashboardService->getTopItems($start, $end, 'keluar');
-            $topEntered    = $this->dashboardService->getTopItems($start, $end, 'masuk');
+            $movementData = $this->dashboardService->getStockMovements($start, $end);
+            $topExited = $this->dashboardService->getTopItems($start, $end, 'keluar');
+            $topEntered = $this->dashboardService->getTopItems($start, $end, 'masuk');
             $deadStockItems = $this->dashboardService->getDeadStock($start, $end, $period);
 
             // Leaderboard: Admin hanya ingin melihat aktivitas Operator di bawahnya
@@ -76,32 +100,32 @@ class AdminDashboardController extends Controller
             $borrowingStats = $this->dashboardService->getBorrowingStats($user);
 
             // --- Aktivitas terbaru: disaring berdasarkan role (Admin + Operator saja) ---
-            $recentActivitiesRaw = $this->dashboardService->getRecentActivities($start, $end, $user);
-            $recentActivities    = $recentActivitiesRaw->map(function ($log) {
+            $recentActivitiesRaw = $this->dashboardService->getRecentActivities($user);
+            $recentActivities = $recentActivitiesRaw->map(function ($log) {
                 return [
-                    'id'               => $log->id,
-                    'description'      => $log->description,
-                    'user_name'        => $log->user->name ?? 'Sistem',
-                    'created_at_diff'  => $log->created_at->diffForHumans(),
-                    'user'             => $log->user,
-                    'created_at'       => $log->created_at,
+                    'id' => $log->id,
+                    'description' => $log->description,
+                    'user_name' => $log->user->name ?? 'Sistem',
+                    'created_at_diff' => $log->created_at->diffForHumans(),
+                    'user' => $log->user,
+                    'created_at' => $log->created_at,
                 ];
             });
 
             // --- Daftar peminjaman aktif (max 5) — scope Admin + Operator ---
             $activeBorrowingsList = \App\Models\Borrowing::with([
-                    'sparepart' => fn($q) => $q->withTrashed(),
-                    'user',
-                ])
+                'sparepart' => fn ($q) => $q->withTrashed(),
+                'user',
+            ])
                 ->where('status', 'borrowed')
                 ->whereIn('user_id', function ($q) use ($user) {
                     // Admin melihat peminjaman dirinya sendiri + semua Operator
                     $q->select('id')
-                      ->from('users')
-                      ->where(fn($inner) => $inner
-                          ->where('role', \App\Enums\UserRole::OPERATOR)
-                          ->orWhere('id', $user->id)
-                      );
+                        ->from('users')
+                        ->where(fn ($inner) => $inner
+                            ->where('role', \App\Enums\UserRole::OPERATOR)
+                            ->orWhere('id', $user->id)
+                        );
                 })
                 ->latest()
                 ->take(5)
@@ -109,52 +133,69 @@ class AdminDashboardController extends Controller
 
             // --- Daftar peminjaman terlambat (max 5) — scope Admin + Operator ---
             $overdueRaw = \App\Models\Borrowing::with([
-                    'sparepart' => fn($q) => $q->withTrashed(),
-                    'user',
-                ])
+                'sparepart' => fn ($q) => $q->withTrashed(),
+                'user',
+            ])
                 ->where('status', 'borrowed')
                 ->where('expected_return_at', '<', now())
                 ->whereIn('user_id', function ($q) use ($user) {
                     $q->select('id')
-                      ->from('users')
-                      ->where(fn($inner) => $inner
-                          ->where('role', \App\Enums\UserRole::OPERATOR)
-                          ->orWhere('id', $user->id)
-                      );
+                        ->from('users')
+                        ->where(fn ($inner) => $inner
+                            ->where('role', \App\Enums\UserRole::OPERATOR)
+                            ->orWhere('id', $user->id)
+                        );
                 })
                 ->orderBy('expected_return_at', 'asc')
                 ->take(5)
                 ->get();
 
+            $lowStockItemsRaw = \App\Models\Sparepart::whereColumn('stock', '<=', 'minimum_stock')
+                ->where('stock', '>', 0)
+                ->orderBy('stock', 'asc')
+                ->take(5)
+                ->get();
+
+            $lowStockItems = $lowStockItemsRaw->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'stock' => $item->stock,
+                    'minimum_stock' => $item->minimum_stock,
+                    'category_name' => $item->category ?? 'Unknown',
+                ];
+            });
+
             // Mapping ke format yang aman untuk di-pass ke JavaScript
             $overdueBorrowingsList = $overdueRaw->map(function ($borrow) {
                 return [
-                    'id'                 => $borrow->id,
-                    'user_name'          => $borrow->user->name ?? $borrow->borrower_name,
-                    'sparepart_name'     => $borrow->sparepart->name ?? 'Unknown item',
-                    'quantity'           => $borrow->quantity,
+                    'id' => $borrow->id,
+                    'user_name' => $borrow->user->name ?? $borrow->borrower_name,
+                    'sparepart_name' => $borrow->sparepart->name ?? 'Unknown item',
+                    'quantity' => $borrow->quantity,
                     'due_date_formatted' => $borrow->expected_return_at->format('d M Y'),
-                    'due_date_rel'       => $borrow->expected_return_at->diffForHumans(['parts' => 1]),
-                    'user'               => $borrow->user,
-                    'sparepart'          => $borrow->sparepart,
+                    'due_date_rel' => $borrow->expected_return_at->diffForHumans(['parts' => 1]),
+                    'user' => $borrow->user,
+                    'sparepart' => $borrow->sparepart,
                     'expected_return_at' => $borrow->expected_return_at,
-                    'borrower_name'      => $borrow->borrower_name,
+                    'borrower_name' => $borrow->borrower_name,
                 ];
             });
 
             return array_merge(
                 $snapshots,
                 [
-                    'movementData'          => $movementData,
-                    'topExited'             => $topExited,
-                    'topEntered'            => $topEntered,
-                    'deadStockItems'        => $deadStockItems,
-                    'activeUsers'           => $activeUsers,
-                    'stockByCategory'       => $stockByCategory,
-                    'stockByLocation'       => $stockByLocation,
-                    'recentActivities'      => $recentActivities,
-                    'activeBorrowingsList'  => $activeBorrowingsList,
+                    'movementData' => $movementData,
+                    'topExited' => $topExited,
+                    'topEntered' => $topEntered,
+                    'deadStockItems' => $deadStockItems,
+                    'activeUsers' => $activeUsers,
+                    'stockByCategory' => $stockByCategory,
+                    'stockByLocation' => $stockByLocation,
+                    'recentActivities' => $recentActivities,
+                    'activeBorrowingsList' => $activeBorrowingsList,
                     'overdueBorrowingsList' => $overdueBorrowingsList,
+                    'lowStockItems' => $lowStockItems,
                 ],
                 $borrowingStats
             );
@@ -168,10 +209,11 @@ class AdminDashboardController extends Controller
         // 5. Render view dashboard Admin
         return view('dashboard.admin', array_merge($data, [
             'period' => $period,
-            'start'  => $start,
-            'end'    => $end,
-            'year'   => $year,
-            'month'  => $month,
+            'start' => $start,
+            'end' => $end,
+            'year' => $year,
+            'month' => $month,
+            'availableYears' => $this->dashboardService->getAvailableYears(),
         ]));
     }
 
@@ -191,7 +233,7 @@ class AdminDashboardController extends Controller
         $range = max(1, min($range, 365));
 
         $start = now()->subDays($range - 1)->startOfDay();
-        $end   = now()->endOfDay();
+        $end = now()->endOfDay();
 
         $data = $this->dashboardService->getStockMovements($start, $end);
 

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\General;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class LandingPageTest extends TestCase
 {
-    /** @test */
-    public function landing_page_is_accessible()
+    #[Test]
+    public function halaman_landing_dapat_diakses()
     {
         $response = $this->get('/');
 
@@ -17,13 +17,13 @@ class LandingPageTest extends TestCase
         $response->assertSee('Azzahra Computer');
     }
 
-    /** @test */
-    public function landing_page_has_correct_cta_buttons()
+    #[Test]
+    public function halaman_landing_memiliki_tombol_cta_yang_benar()
     {
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        
+
         // Cek tombol Masuk Aplikasi
         $response->assertSee('Masuk Aplikasi');
         $response->assertSee(route('login'));
@@ -33,8 +33,8 @@ class LandingPageTest extends TestCase
         $response->assertSee('#features');
     }
 
-    /** @test */
-    public function landing_page_has_feature_cards()
+    #[Test]
+    public function halaman_landing_memiliki_kartu_fitur()
     {
         $response = $this->get('/');
 
@@ -44,8 +44,8 @@ class LandingPageTest extends TestCase
         $response->assertSee('Monitoring Aktivitas');
     }
 
-    /** @test */
-    public function landing_page_has_footer_credit()
+    #[Test]
+    public function halaman_landing_memiliki_kredit_footer()
     {
         $response = $this->get('/');
 

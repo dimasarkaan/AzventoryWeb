@@ -8,6 +8,346 @@
 <?php $attributes = $attributes->except(\App\View\Components\AppLayout::ignoredParameterNames()); ?>
 <?php endif; ?>
 <?php $component->withAttributes([]); ?>
+    <?php $__env->startPush('styles'); ?>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" crossorigin="anonymous">
+        <style>
+            /* --- Flatpickr Premium Theme (Figma Auto Layout) --- */
+            .flatpickr-calendar { 
+                background: #ffffff; 
+                border: 1px solid #f1f5f9; 
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02); 
+                border-radius: 28px; 
+                z-index: 99999 !important;
+                padding: 24px; 
+                font-family: inherit;
+                width: 380px !important; 
+                max-width: 95vw !important; /* Mobile Fix */
+                overflow: visible !important; 
+                margin-top: 12px !important; /* Proper spacing from input */
+                position: absolute; /* Auto fallback bila CDN lambat */
+            }
+
+            /* Mencegah kalender ngablak / bocor jika CDN JSDelivr diblokir atau telat me-load */
+            .flatpickr-calendar:not(.open):not(.inline) {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+            }
+
+            @media (max-width: 480px) {
+                .flatpickr-calendar {
+                    padding: 16px 12px !important;
+                    width: 320px !important;
+                    border-radius: 20px;
+                }
+                .custom-month-selector {
+                    min-width: 65px !important;
+                    padding: 0 8px !important;
+                    font-size: 0.8rem !important;
+                    justify-content: center !important;
+                }
+                .numInputWrapper {
+                    width: 70px !important;
+                    grid-column: span 1 / span 1 !important;
+                }
+                .stat-card {
+                    padding: 16px !important;
+                }
+                .flatpickr-months {
+                    gap: 8px !important;
+                }
+            }
+            
+            /* --- Export Mode Styles (PDF & PNG) --- */
+            body.is-exporting, .is-exporting .min-h-screen {
+                background-color: #ffffff !important;
+            }
+            .is-exporting .export-hide {
+                display: none !important;
+            }
+            .is-exporting .export-show {
+                display: block !important;
+                margin-bottom: 24px;
+            }
+            .is-exporting .max-w-7xl {
+                max-width: 100% !important;
+                padding: 20px !important;
+            }
+            @media print {
+                body, .min-h-screen, .bg-gray-100 { 
+                    background-color: #ffffff !important; 
+                    -webkit-print-color-adjust: exact !important; 
+                    print-color-adjust: exact !important; 
+                }
+                
+                /* Sembunyikan elemen skeleton, navigasi, dan elemen non-cetak */
+                nav, header, form, button, .btn, .no-print, .animate-pulse { display: none !important; }
+                .export-hide { display: none !important; }
+
+                /* Aturan Print Table Header agar berulang di setiap halaman */
+                thead.export-show { display: table-header-group !important; }
+                tfoot.export-show { display: table-footer-group !important; }
+                .export-show { display: block !important; }
+                .print-container { display: table !important; width: 100% !important; }
+
+                /* Mencegah grid collapse */
+                .max-w-7xl { max-width: none !important; margin: 0 !important; padding: 0 !important; }
+
+                /* Mencegah grafik mencetak terlalu besar */
+                canvas { max-height: 280px !important; width: auto !important; margin: 0 auto !important; }
+                .card-body.min-h-\[300px\] { min-height: 280px !important; }
+                
+                @page { 
+                    margin: 12mm; 
+                    size: auto; /* Mencegah browser print dialog menambahkan header/footer bawaan (URL, tgl) */
+                }
+            }
+            
+            /* Normalisasi tabel menjadi block di layar monitor agar layout CSS Grid Tailwind tidak rusak */
+            @media screen {
+                table.print-container, 
+                table.print-container > tbody, 
+                table.print-container > tbody > tr, 
+                table.print-container > tbody > tr > td {
+                    display: block; 
+                    width: 100%;
+                }
+                /* Pastikan header dan footer cetak benar-benar tersembunyi di layar reguler */
+                table.print-container > thead, 
+                table.print-container > tfoot {
+                    display: none;
+                }
+            }
+            
+            /* FORCE ALL INTERNAL CONTAINERS TO ALLOW DROPDOWN OVERLAP & CENTERING */
+            .flatpickr-innerContainer {
+                display: flex !important;
+                justify-content: center !important;
+            }
+            .flatpickr-rContainer {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                max-width: 100% !important;
+                overflow: visible !important;
+            }
+            .flatpickr-days, 
+            .flatpickr-weeks,
+            .flatpickr-month, 
+            .flatpickr-current-month { 
+                overflow: visible !important; 
+            }
+            .dayContainer, .flatpickr-weekdaycontainer {
+                margin: 0 auto !important;
+                justify-content: center !important;
+                display: flex !important;
+                flex-wrap: wrap !important;
+            }
+            .flatpickr-weekdaycontainer { width: 100% !important; }
+
+            /* Header: True Auto Layout & Stacking Context */
+            .flatpickr-months { 
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important; /* CENTER EVERYTHING */
+                padding: 4px 0 !important;
+                margin-bottom: 20px;
+                position: relative !important;
+                z-index: 100 !important; /* Higher than days */
+                gap: 16px !important; /* Slightly more gap for balance */
+                overflow: visible !important;
+                width: 100% !important;
+            }
+            .flatpickr-month { 
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                height: 44px !important;
+                width: 100% !important;
+                margin: 0 !important;
+            }
+            .flatpickr-current-month { 
+                position: static !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: 100% !important;
+                padding: 0 !important;
+                gap: 12px !important;
+                font-size: 1rem;
+                font-weight: 700;
+            }
+            
+            /* Custom Dropdown Trigger (Replaces Static/Native) */
+            .custom-month-selector {
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: #ffffff;
+                border: 2px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 0 16px;
+                height: 44px;
+                min-width: 155px; 
+                cursor: pointer;
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                z-index: 101 !important;
+            }
+            .custom-month-selector:hover { border-color: #3b82f6; background: #f8fafc; }
+            .custom-month-selector.active { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+            .custom-month-selector .month-name { font-weight: 800; color: #1e293b; font-size: 0.9rem; flex: 1; text-align: center; }
+            .custom-month-selector svg { color: #3b82f6; width: 14px; height: 14px; }
+            
+            /* Custom Month List Panel */
+            .custom-month-list {
+                position: absolute;
+                top: calc(100% + 8px);
+                left: 0;
+                width: 100%;
+                background: #ffffff !important;
+                border: 1px solid #e2e8f0;
+                border-radius: 16px;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                z-index: 9999999 !important; /* Ensure it stays above days */
+                display: none;
+                padding: 6px;
+                max-height: 280px;
+                overflow-y: auto;
+            }
+            .custom-month-list div {
+                padding: 10px 14px;
+                border-radius: 10px;
+                font-size: 0.85rem;
+                color: #475569;
+                cursor: pointer;
+                transition: all 0.15s;
+                font-weight: 600;
+            }
+            .custom-month-list div:hover { background: #eff6ff; color: #3b82f6; }
+            .custom-month-list div.active { background: #3b82f6; color: #ffffff; font-weight: 700; }
+            
+            /* Year Input - Figma Precision */
+            .numInputWrapper { 
+                width: 85px !important;
+                height: 44px !important;
+                background: #ffffff;
+                border: 2px solid #e2e8f0;
+                border-radius: 12px;
+                padding: 0 !important;
+                transition: all 0.2s ease;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+                overflow: visible !important;
+            }
+            .numInputWrapper:hover, .numInputWrapper:focus-within { border-color: #3b82f6; }
+            .numInputWrapper:focus-within { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+            .numInputWrapper input { 
+                font-weight: 800 !important; 
+                color: #1e293b !important; 
+                font-size: 0.95rem !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+                text-align: center !important;
+                background: transparent !important;
+                border: none !important;
+                outline: none !important;
+            }
+            .numInputWrapper span { display: none !important; }
+
+            /* Navigation Buttons - Locked 44px */
+            .flatpickr-prev-month, .flatpickr-next-month {
+                position: static !important;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                height: 44px !important;
+                width: 44px !important;
+                border-radius: 12px !important;
+                background: #ffffff !important;
+                border: 2px solid #f1f5f9 !important;
+                transition: all 0.2s ease;
+                z-index: 10;
+            }
+            .flatpickr-prev-month:hover, .flatpickr-next-month:hover { 
+                background: #eff6ff !important; 
+                border-color: #3b82f6 !important;
+                transform: translateY(-1px);
+            }
+            .flatpickr-prev-month svg, .flatpickr-next-month svg { width: 14px !important; height: 14px !important; fill: #3b82f6 !important; }
+            
+            /* Weekdays & Days Polishing */
+            .flatpickr-weekday { color: #94a3b8; font-weight: 800; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 16px 0; }
+            
+            /* Default: Current Month Days (Deep & Circular) */
+            .flatpickr-day { 
+                border-radius: 9999px !important; /* PERFECT CIRCLE */
+                color: #0f172a !important; /* Deepest Slate */
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+                border: 2px solid transparent !important; 
+                height: 40px !important; /* Adjusted slightly for perfect circle in 44px cell */
+                line-height: 36px !important; 
+                font-weight: 800 !important; 
+                width: 40px !important;
+                margin: 2px auto !important;
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .flatpickr-day.today { 
+                background: #eff6ff !important; 
+                color: #3b82f6 !important; 
+                border-color: #3b82f6 !important;
+                box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            }
+            
+            /* Non-current Month Days - Extreme Transition */
+            .flatpickr-day.prevMonthDay, 
+            .flatpickr-day.nextMonthDay,
+            .flatpickr-day.prevMonthDay.inRange,
+            .flatpickr-day.nextMonthDay.inRange {
+                color: #94a3b8 !important; /* Neutral Gray */
+                opacity: 0.45 !important; /* Slightly more visible */
+                font-weight: 400 !important;
+                background: transparent !important;
+                border-color: transparent !important;
+                pointer-events: all; /* Re-enable selection as requested */
+            }
+            .flatpickr-day.prevMonthDay:hover, .flatpickr-day.nextMonthDay:hover {
+                background: #f1f5f9 !important;
+                opacity: 0.8 !important;
+                color: #94a3b8 !important;
+            }
+
+            .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { 
+                background: #3b82f6 !important; 
+                color: #ffffff !important;
+                box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
+                opacity: 1 !important;
+                border-color: #3b82f6 !important;
+            }
+            .flatpickr-day.inRange { 
+                background: #f1f7ff !important; 
+                color: #3b82f6 !important; 
+                border-radius: 0 !important; /* Keep range segments square-ish for continuity */
+                opacity: 1 !important;
+            }
+            .flatpickr-day.startRange { border-radius: 9999px 0 0 9999px !important; }
+            .flatpickr-day.endRange { border-radius: 0 9999px 9999px 0 !important; }
+            .flatpickr-day.selected.startRange.endRange { border-radius: 9999px !important; }
+
+            .flatpickr-day:not(.selected):not(.prevMonthDay):not(.nextMonthDay):hover { 
+                background: #f1f5f9; 
+                border-color: #e2e8f0;
+                transform: scale(1.1); 
+            }
+        </style>
+    <?php $__env->stopPush(); ?>
 <script>
     (function () {
         const STORAGE_KEY = 'dashboard_period';
@@ -37,12 +377,688 @@
         };
     })();
 </script>
+
+<script>
+    function dashboardData() {
+        const userSettings = <?php echo json_encode(auth()->user()->settings ?? [], 15, 512) ?>;
+
+        return {
+            showStats: userSettings.showStats ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showStats') !== 'false'),
+            showCharts: userSettings.showCharts ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showCharts') !== 'false'),
+            showLowStock: userSettings.showLowStock ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showLowStock') !== 'false'),
+            showBorrowings: userSettings.showBorrowings ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showBorrowings') !== 'false'),
+            showOverdue: userSettings.showOverdue ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showOverdue') !== 'false'),
+            showNoPriceItems: userSettings.showNoPriceItems ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showNoPriceItems') !== 'false'),
+            showMovement: userSettings.showMovement ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showMovement') !== 'false'),
+            showRecent: userSettings.showRecent ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showRecent') !== 'false'),
+            showTopItems: userSettings.showTopItems ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showTopItems') === 'true'),
+            showDeadStock: userSettings.showDeadStock ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showDeadStock') === 'true'),
+            showLeaderboard: userSettings.showLeaderboard ?? (localStorage.getItem('dashboard_<?php echo e(auth()->id()); ?>_showLeaderboard') === 'true'),
+            
+            isLoading: true,
+            showActivityModal: false,
+            selectedActivity: null,
+
+            // Toast Helper
+            showToast(type, message) {
+                if (window.Toast) {
+                    window.Toast.fire({ icon: type, title: message });
+                } else if (window.Swal) {
+                    window.Swal.fire({ toast: true, position: 'top-end', icon: type, title: message, showConfirmButton: false, timer: 3000 });
+                } else {
+                    alert(message);
+                }
+            },
+
+            // Location Management
+            showLocationModal: false,
+            locationsList: [],
+            isLoadingLocations: false,
+            editingId: null,
+            editingName: '',
+            confirmDeleteId: null,
+            confirmDeleteName: '',
+            isDeleting: false,
+
+            // Category Management
+            showCategoryModal: false,
+            categoriesList: [],
+            isLoadingCategories: false,
+            catEditingId: null,
+            catEditingName: '',
+            catConfirmDeleteId: null,
+            catConfirmDeleteName: '',
+            isDeletingCat: false,
+
+            // Brand Management
+            showBrandModal: false,
+            brandsList: [],
+            isLoadingBrands: false,
+            brandEditingId: null,
+            brandEditingName: '',
+            brandConfirmDeleteId: null,
+            brandConfirmDeleteName: '',
+            isDeletingBrand: false,
+            newBrandName: '',
+            isAddingBrand: false,
+
+            // Add Location
+            newLocationName: '',
+            isAddingLocation: false,
+
+            async addLocation() {
+                if (!this.newLocationName.trim()) return;
+                this.isAddingLocation = true;
+                try {
+                    const response = await fetch('<?php echo e(route("locations.store")); ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ name: this.newLocationName })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.showToast('success', data.message);
+                        this.newLocationName = '';
+                        this.fetchLocations();
+                        this.refreshData();
+                    } else {
+                        this.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Add failed:', e);
+                    this.showToast('error', 'Terjadi kesalahan.');
+                } finally {
+                    this.isAddingLocation = false;
+                }
+            },
+
+            async openLocationModal() {
+                this.showLocationModal = true;
+                this.editingId = null;
+                this.confirmDeleteId = null;
+                this.fetchLocations();
+            },
+
+            startEdit(loc) {
+                this.editingId = loc.id;
+                this.editingName = loc.name;
+                this.$nextTick(() => {
+                    const input = document.getElementById('edit-input-' + loc.id);
+                    if (input) input.focus();
+                });
+            },
+
+            cancelEdit() {
+                this.editingId = null;
+                this.editingName = '';
+            },
+
+            async saveEdit(id) {
+                if (!this.editingName || this.editingName.trim() === '') {
+                    this.cancelEdit();
+                    return;
+                }
+                await this.updateLocationName(id, this.editingName);
+                this.cancelEdit();
+            },
+
+            askDelete(loc) {
+                this.confirmDeleteId = loc.id;
+                this.confirmDeleteName = loc.name;
+            },
+
+            cancelDelete() {
+                this.confirmDeleteId = null;
+                this.confirmDeleteName = '';
+                this.isDeleting = false;
+            },
+
+            // Category Methods
+            // Add Category
+            newCategoryName: '',
+            isAddingCategory: false,
+
+            async addCategory() {
+                if (!this.newCategoryName.trim()) return;
+                this.isAddingCategory = true;
+                try {
+                    const response = await fetch('<?php echo e(route("categories.store")); ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ name: this.newCategoryName })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.showToast('success', data.message);
+                        this.newCategoryName = '';
+                        this.fetchCategories();
+                        this.refreshData();
+                    } else {
+                        this.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Add failed:', e);
+                    this.showToast('error', 'Terjadi kesalahan.');
+                } finally {
+                    this.isAddingCategory = false;
+                }
+            },
+
+            async openCategoryModal() {
+                console.log('📂 [Alpine] openCategoryModal called');
+                this.showCategoryModal = true;
+                console.log('📂 [Alpine] showCategoryModal set to true');
+                await this.fetchCategories();
+            },
+
+            async fetchCategories() {
+                this.isLoadingCategories = true;
+                try {
+                    const response = await fetch('<?php echo e(route("categories.index")); ?>');
+                    this.categoriesList = await response.json();
+                } catch (e) {
+                    console.error('Failed to fetch categories:', e);
+                    this.showToast('error', 'Gagal memuat data kategori.');
+                } finally {
+                    this.isLoadingCategories = false;
+                }
+            },
+
+            startCatEdit(cat) {
+                this.catEditingId = cat.id;
+                this.catEditingName = cat.name;
+                this.$nextTick(() => {
+                    const input = document.getElementById('cat-edit-input-' + cat.id);
+                    if (input) input.focus();
+                });
+            },
+
+            cancelCatEdit() {
+                this.catEditingId = null;
+                this.catEditingName = '';
+            },
+
+            async saveCatEdit(id) {
+                if (!this.catEditingName.trim()) return;
+                try {
+                    const response = await fetch(`/categories/${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ name: this.catEditingName })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.showToast('success', data.message);
+                        this.fetchCategories();
+                        this.cancelCatEdit();
+                    } else {
+                        this.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Update failed:', e);
+                    this.showToast('error', 'Terjadi kesalahan saat memperbarui kategori.');
+                }
+            },
+
+            askCatDelete(cat) {
+                this.catConfirmDeleteId = cat.id;
+                this.catConfirmDeleteName = cat.name;
+            },
+
+            cancelCatDelete() {
+                this.catConfirmDeleteId = null;
+                this.catConfirmDeleteName = '';
+                this.isDeletingCat = false;
+            },
+
+            // Brand Methods
+            async addBrand() {
+                if (!this.newBrandName.trim()) return;
+                this.isAddingBrand = true;
+                try {
+                    const response = await fetch('<?php echo e(route("brands.store")); ?>', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ name: this.newBrandName })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (window.showToast) window.showToast('success', data.message);
+                        this.newBrandName = '';
+                        this.fetchBrands();
+                        this.refreshData();
+                    } else {
+                        if (window.showToast) window.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Add failed:', e);
+                    if (window.showToast) window.showToast('error', 'Terjadi kesalahan.');
+                } finally {
+                    this.isAddingBrand = false;
+                }
+            },
+
+            async openBrandModal() {
+                this.showBrandModal = true;
+                await this.fetchBrands();
+            },
+
+            async fetchBrands() {
+                this.isLoadingBrands = true;
+                try {
+                    const response = await fetch('<?php echo e(route("brands.index")); ?>');
+                    this.brandsList = await response.json();
+                } catch (e) {
+                    console.error('Failed to fetch brands:', e);
+                    if (window.showToast) window.showToast('error', 'Gagal memuat data merk.');
+                } finally {
+                    this.isLoadingBrands = false;
+                }
+            },
+
+            startBrandEdit(brand) {
+                this.brandEditingId = brand.id;
+                this.brandEditingName = brand.name;
+                this.$nextTick(() => {
+                    const input = document.getElementById('brand-edit-input-' + brand.id);
+                    if (input) input.focus();
+                });
+            },
+
+            cancelBrandEdit() {
+                this.brandEditingId = null;
+                this.brandEditingName = '';
+            },
+
+            async saveBrandEdit(id) {
+                if (!this.brandEditingName.trim()) return;
+                try {
+                    const response = await fetch(`/brands/${id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ name: this.brandEditingName })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (window.showToast) window.showToast('success', data.message);
+                        this.fetchBrands();
+                        this.cancelBrandEdit();
+                    } else {
+                        if (window.showToast) window.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Update failed:', e);
+                    if (window.showToast) window.showToast('error', 'Terjadi kesalahan saat memperbarui merk.');
+                }
+            },
+
+            askBrandDelete(brand) {
+                this.brandConfirmDeleteId = brand.id;
+                this.brandConfirmDeleteName = brand.name;
+            },
+
+            cancelBrandDelete() {
+                this.brandConfirmDeleteId = null;
+                this.brandConfirmDeleteName = '';
+                this.isDeletingBrand = false;
+            },
+
+            async deleteBrand(id) {
+                if (this.isDeletingBrand) return;
+                this.isDeletingBrand = true;
+                try {
+                    const response = await fetch(`/brands/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (window.showToast) window.showToast('success', data.message);
+                        this.fetchBrands();
+                        this.cancelBrandDelete();
+                    } else {
+                        if (window.showToast) window.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Delete failed:', e);
+                    if (window.showToast) window.showToast('error', 'Terjadi kesalahan saat menghapus merk.');
+                } finally {
+                    this.isDeletingBrand = false;
+                }
+            },
+
+            resetWidgets() {
+                const defaults = {
+                    showStats: true,
+                    showCharts: true,
+                    showMovement: false,
+                    showTopItems: false,
+                    showLowStock: true,
+                    showRecent: true,
+                    showDeadStock: false,
+                    showLeaderboard: false,
+                    showBorrowings: true,
+                    showOverdue: true,
+                    showNoPriceItems: true
+                };
+                Object.keys(defaults).forEach(key => {
+                    this[key] = defaults[key];
+                    localStorage.setItem('dashboard_<?php echo e(auth()->id()); ?>_' + key, defaults[key]);
+                });
+                this.showToast('success', 'Tampilan dashboard telah direset.');
+            },
+
+            async deleteCategory(id) {
+                if (this.isDeletingCat) return;
+                this.isDeletingCat = true;
+                try {
+                    const response = await fetch(`/categories/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.showToast('success', data.message);
+                        this.fetchCategories();
+                        this.cancelCatDelete();
+                    } else {
+                        this.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Delete failed:', e);
+                    this.showToast('error', 'Terjadi kesalahan saat menghapus kategori.');
+                } finally {
+                    this.isDeletingCat = false;
+                }
+            },
+
+            async fetchLocations() {
+                this.isLoadingLocations = true; // Fixed typo
+                try {
+                    const response = await fetch('<?php echo e(route("locations.index")); ?>');
+                    this.locationsList = await response.json();
+                } catch (e) {
+                    console.error('Failed to fetch locations:', e);
+                } finally {
+                    this.isLoadingLocations = false; // Fixed typo
+                }
+            },
+
+            async updateLocationName(id, newName) {
+                if (!newName || newName.trim() === '') return;
+                try {
+                    const response = await fetch(`/locations/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ name: newName })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (window.showToast) window.showToast('success', data.message);
+                        this.fetchLocations();
+                        this.refreshData(); // Refresh counts on dashboard
+                    } else {
+                        if (window.showToast) window.showToast('error', data.message);
+                    }
+                } catch (e) {
+                    console.error('Update failed:', e);
+                }
+            },
+
+            async deleteLocation(id) {
+                if (this.isDeleting) return;
+                this.isDeleting = true;
+                try {
+                    const response = await fetch(`/locations/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.showToast('success', data.message);
+                        this.fetchLocations();
+                        this.totalLocations--;
+                        this.cancelDelete();
+                    } else {
+                        this.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Delete failed:', e);
+                    this.showToast('error', 'Terjadi kesalahan saat menghapus lokasi.');
+                } finally {
+                    this.isDeleting = false;
+                }
+            },
+            
+            // Data Statis & List
+            totalSpareparts: <?php echo e($totalSpareparts); ?>,
+            totalStock: <?php echo e($totalStock); ?>,
+            totalCategories: <?php echo e($totalCategories); ?>,
+            totalBrands: <?php echo e($totalBrands); ?>,
+            totalLocations: <?php echo e($totalLocations); ?>,
+            pendingApprovalsCount: <?php echo e($pendingApprovalsCount); ?>,
+            activeBorrowingsCount: <?php echo e($activeBorrowingsCount); ?>,
+
+            // Arrays (untuk x-for)
+            recentActivities: <?php echo json_encode($recentActivities, 15, 512) ?>,
+            topExited: <?php echo json_encode($topExited, 15, 512) ?>,
+            topEntered: <?php echo json_encode($topEntered, 15, 512) ?>,
+            deadStockItems: <?php echo json_encode($deadStockItems, 15, 512) ?>,
+            activeUsers: <?php echo json_encode($activeUsers, 15, 512) ?>,
+            activeBorrowingsList: <?php echo json_encode($activeBorrowingsList, 15, 512) ?>,
+            overdueBorrowingsList: <?php echo json_encode($overdueBorrowingsList, 15, 512) ?>,
+            lowStockItems: <?php echo json_encode($lowStockItems, 15, 512) ?>,
+            noPriceItems: <?php echo json_encode($noPriceItems ?? [], 15, 512) ?>,
+
+            init() {
+                // Cek jika ada parameter untuk buka modal lokasi otomatis
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('manage_locations') === 'true') {
+                    this.openLocationModal();
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                if (params.get('manage_categories') === 'true') {
+                    this.openCategoryModal();
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+
+                // Tampilkan konten setelah loading selesai
+                setTimeout(() => {
+                    this.isLoading = false;
+                    if (this.showMovement && window.fetchMovementData) {
+                        window.fetchMovementData(30);
+                    }
+                }, 300);
+
+                // Listener untuk event real-time global (dari realtime-inventory.js)
+                window.addEventListener('dashboard-refresh', (e) => {
+                    this.updateState(e.detail);
+                });
+
+                // Offline/Online Listeners
+                window.addEventListener('online', () => {
+                    this.refreshData();
+                    if (window.showToast) window.showToast('success', 'Koneksi kembali online.');
+                });
+
+                window.addEventListener('offline', () => {
+                    if (window.showToast) window.showToast('error', 'Koneksi terputus.');
+                });
+            },
+
+            // Charts Data
+            movementData: <?php echo json_encode($movementData, 15, 512) ?>,
+            stockByCategory: <?php echo json_encode($stockByCategory, 15, 512) ?>,
+            stockByLocation: <?php echo json_encode($stockByLocation, 15, 512) ?>,
+            
+            updateState(data) {
+                if (!data) return;
+                this.totalSpareparts = data.totalSpareparts ?? this.totalSpareparts;
+                this.totalStock = data.totalStock ?? this.totalStock;
+                this.totalCategories = data.totalCategories ?? this.totalCategories;
+                this.totalBrands = data.totalBrands ?? this.totalBrands;
+                this.totalLocations = data.totalLocations ?? this.totalLocations;
+                this.pendingApprovalsCount = data.pendingApprovalsCount ?? this.pendingApprovalsCount;
+                this.activeBorrowingsCount = data.activeBorrowingsCount ?? this.activeBorrowingsCount;
+
+                if (data.recentActivities) this.recentActivities = data.recentActivities;
+                if (data.activeBorrowingsList) this.activeBorrowingsList = data.activeBorrowingsList;
+                if (data.overdueBorrowingsList) this.overdueBorrowingsList = data.overdueBorrowingsList;
+
+                if (window.updateDashboardCharts) {
+                    window.updateDashboardCharts(data.movementData, data.stockByCategory, data.stockByLocation, data);
+                }
+            },
+
+            async refreshData() {
+               try {
+                   const url = new URL('<?php echo e(route("dashboard.superadmin")); ?>');
+                   const currentParams = new URLSearchParams(window.location.search);
+                   currentParams.forEach((val, key) => url.searchParams.set(key, val));
+
+                   const response = await fetch(url.toString(), {
+                       headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+                   });
+                   
+                   if (!response.ok) throw new Error('Refresh failed');
+                   const data = await response.json();
+                   this.updateState(data);
+               } catch (error) {
+                   console.error('Failed to refresh dashboard data:', error);
+               }
+            },
+
+            viewActivityDetails(activity) {
+                this.selectedActivity = activity;
+                this.showActivityModal = true;
+            },
+
+            async toggle(key) {
+                const widgetKeys = ['showStats', 'showCharts', 'showMovement', 'showTopItems', 'showLowStock', 'showRecent', 'showDeadStock', 'showLeaderboard', 'showBorrowings', 'showOverdue', 'showNoPriceItems'];
+                const activeCount = widgetKeys.filter(k => this[k]).length;
+                if (this[key] && activeCount <= 1) {
+                     if (window.showToast) window.showToast('warning', 'Minimal satu widget harus tetap aktif.');
+                     return;
+                }
+
+                this[key] = !this[key];
+                localStorage.setItem('dashboard_<?php echo e(auth()->id()); ?>_' + key, this[key]);
+                if (key === 'showMovement' && this[key] && window.fetchMovementData) {
+                    window.fetchMovementData(30);
+                }
+
+                try {
+                    await fetch('<?php echo e(route("profile.settings.update")); ?>', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+                        body: JSON.stringify({ settings: { [key]: this[key] } })
+                    });
+                } catch (e) { console.error('Settings sync failed:', e); }
+            },
+
+            async resetWidgets() {
+                const defaults = {
+                    showStats: true,
+                    showCharts: true,
+                    showLowStock: true,
+                    showBorrowings: true,
+                    showOverdue: true,
+                    showNoPriceItems: true,
+                    showMovement: true,
+                    showRecent: true,
+                    showTopItems: false,
+                    showDeadStock: false,
+                    showLeaderboard: false
+                };
+
+                for (const [key, value] of Object.entries(defaults)) {
+                    this[key] = value;
+                    localStorage.setItem('dashboard_<?php echo e(auth()->id()); ?>_' + key, value);
+                }
+
+                if (window.showToast) window.showToast('success', 'Tampilan kembali ke default.');
+                if (this.showMovement && window.fetchMovementData) window.fetchMovementData(30);
+
+                try {
+                    await fetch('<?php echo e(route("profile.settings.update")); ?>', {
+                        method: 'PATCH',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>', 'Accept': 'application/json' },
+                        body: JSON.stringify({ settings: defaults })
+                    });
+                } catch (e) { console.error('Settings sync failed:', e); }
+            }
+        };
+    }
+</script>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" 
              x-data="dashboardData()">
              
+            <?php echo $__env->make('dashboard._location_modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php echo $__env->make('dashboard._category_modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php echo $__env->make('dashboard._brand_modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+            <?php echo $__env->make('dashboard._activity_modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
+             
             
-            <div class="mb-6">
+            <table class="w-full print-container">
+                <thead class="hidden export-show pb-4 border-b-2 border-primary-900 mb-6">
+                    <tr><td>
+                        <div class="flex items-start justify-between w-full">
+                            <div class="flex items-center gap-4">
+                                <img src="<?php echo e(asset('images/logo/logo_azzahracomputer.png')); ?>" class="h-12 w-auto" alt="Logo Azzahra">
+                                <div>
+                                    <h1 class="text-2xl font-bold text-gray-900 uppercase">AZZAHRA COMPUTER</h1>
+                                    <p class="text-sm text-gray-500">Solusi Teknologi Terpercaya &bull; Laporan Resmi Inventaris</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <h2 class="text-xl font-bold text-primary-900">LAPORAN DASHBOARD</h2>
+                                <p class="text-sm text-gray-600 mt-1">Dicetak: <?php echo e(now()->translatedFormat('d F Y, H:i')); ?></p>
+                                <p class="text-sm text-gray-600">Oleh: <?php echo e(auth()->user()->name); ?></p>
+                            </div>
+                        </div>
+                    </td></tr>
+                </thead>
+
+                <tbody>
+                    <tr><td class="print:pt-8">
+
+            
+            <div class="mb-6 export-hide print:hidden">
                 
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                     <div>
@@ -108,6 +1124,13 @@
                                     <input type="checkbox" :checked="showRecent" @change="toggle('showRecent')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700"><?php echo e(__('ui.widget_recent_activity')); ?></span>
                                 </label>
+                                
+                                <div class="border-t border-secondary-100 my-1"></div>
+                                <div class="px-4 py-2">
+                                    <button @click="resetWidgets()" class="w-full text-xs text-center text-secondary-500 hover:text-danger-600 transition-colors py-1 rounded hover:bg-danger-50">
+                                        ↺ Reset ke Tampilan Default
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -185,7 +1208,7 @@
                                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                             <span>Custom</span>
-                            <?php if(in_array($activePeriod, ['custom','custom_year'])): ?>
+                            <?php if(in_array($activePeriod, ['custom','custom_year']) && $year): ?>
                                 <span class="text-xs text-secondary-500">
                                     (<?php echo e($year); ?><?php echo e(isset($month) && $month !== 'all' ? '/' . str_pad($month,2,'0',STR_PAD_LEFT) : ''); ?>)
                                 </span>
@@ -201,91 +1224,49 @@
 
                     
                     <div x-show="showCustom"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 -translate-y-4"
                          x-transition:enter-end="opacity-100 translate-y-0"
-                         x-cloak>
+                         x-cloak
+                         class="mt-4">
                         <form method="GET" action="<?php echo e(route('dashboard.superadmin')); ?>"
-                              class="bg-white border border-secondary-200 rounded-xl p-4 flex flex-wrap items-end gap-3 shadow-sm">
+                              class="bg-white border border-secondary-100 rounded-[24px] p-5 shadow-xl shadow-secondary-900/5 flex flex-col md:flex-row items-stretch md:items-end gap-6 transition-all">
                             <input type="hidden" name="period" value="custom">
 
                             
-                            <div x-data="{
-                                    open: false,
-                                    selected: '<?php echo e($year ?? now()->year); ?>',
-                                    options: [<?php echo e(implode(',', range(now()->year, now()->year - 5))); ?>]
-                                }" class="relative">
-                                <label class="block text-xs font-semibold text-secondary-600 mb-1">Tahun</label>
-                                <input type="hidden" name="year" :value="selected">
-                                <button type="button" @click="open = !open" @click.away="open = false"
-                                        class="flex items-center justify-between gap-2 w-28 px-3 py-2 text-sm bg-white border border-secondary-300 rounded-lg text-secondary-800 hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all">
-                                    <span x-text="selected"></span>
-                                    <svg class="w-4 h-4 text-secondary-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
-                                </button>
-                                <div x-show="open" x-transition
-                                     class="absolute z-50 mt-1 w-28 bg-white border border-secondary-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
-                                    <template x-for="opt in options" :key="opt">
-                                        <button type="button"
-                                                @click="selected = opt; open = false"
-                                                class="w-full text-left px-3 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 transition-colors"
-                                                :class="selected == opt ? 'text-primary-700 bg-primary-50 font-semibold' : 'text-secondary-700'"
-                                                x-text="opt">
-                                        </button>
-                                    </template>
+                            <div class="flex-grow space-y-3">
+                                <div class="flex items-center justify-between px-1">
+                                    <label class="text-[11px] font-extrabold text-secondary-400 uppercase tracking-[0.1em]">Rentang Tanggal</label>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" onclick="setPickerRange(0)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">HARI INI</button>
+                                        <button type="button" onclick="setPickerRange(7)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">7 HARI TERAKHIR</button>
+                                        <button type="button" onclick="setPickerRange(30)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">30 HARI TERAKHIR</button>
+                                    </div>
                                 </div>
+                                
+                                <div class="relative group">
+                                    <input type="text" id="date_range_picker" 
+                                           class="w-full pl-12 pr-4 py-3 text-sm bg-secondary-50/50 border-secondary-200 rounded-2xl text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer font-semibold placeholder:text-secondary-400"
+                                           placeholder="Pilih rentang tanggal...">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-secondary-400 group-focus-within:text-primary-500 transition-colors">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="start_date" id="start_date" value="<?php echo e($start->format('Y-m-d')); ?>">
+                                <input type="hidden" name="end_date" id="end_date" value="<?php echo e($end->format('Y-m-d')); ?>">
                             </div>
 
                             
-                            <?php
-                                $bulanList = [
-                                    '' => 'Semua Bulan',
-                                    '1' => 'Januari', '2' => 'Februari', '3' => 'Maret',
-                                    '4' => 'April', '5' => 'Mei', '6' => 'Juni',
-                                    '7' => 'Juli', '8' => 'Agustus', '9' => 'September',
-                                    '10' => 'Oktober', '11' => 'November', '12' => 'Desember',
-                                ];
-                                $activeMonthLabel = $bulanList[$month ?? ''] ?? 'Semua Bulan';
-                            ?>
-                            <div x-data="{
-                                    open: false,
-                                    selectedVal: '<?php echo e($month ?? ''); ?>',
-                                    selectedLabel: '<?php echo e($activeMonthLabel); ?>',
-                                    options: [
-                                        { val: '', label: 'Semua Bulan' },
-                                        { val: '1', label: 'Januari' }, { val: '2', label: 'Februari' },
-                                        { val: '3', label: 'Maret' }, { val: '4', label: 'April' },
-                                        { val: '5', label: 'Mei' }, { val: '6', label: 'Juni' },
-                                        { val: '7', label: 'Juli' }, { val: '8', label: 'Agustus' },
-                                        { val: '9', label: 'September' }, { val: '10', label: 'Oktober' },
-                                        { val: '11', label: 'November' }, { val: '12', label: 'Desember' },
-                                    ]
-                                }" class="relative">
-                                <label class="block text-xs font-semibold text-secondary-600 mb-1">Bulan</label>
-                                <input type="hidden" name="month" :value="selectedVal">
-                                <button type="button" @click="open = !open" @click.away="open = false"
-                                        class="flex items-center justify-between gap-2 w-40 px-3 py-2 text-sm bg-white border border-secondary-300 rounded-lg text-secondary-800 hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all">
-                                    <span x-text="selectedLabel" class="truncate"></span>
-                                    <svg class="w-4 h-4 text-secondary-400 transition-transform flex-shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                    </svg>
+                            <div class="flex items-center gap-3 pt-2 md:pt-0">
+                                <button type="submit" class="flex-grow md:flex-none btn btn-primary px-8 h-[44px] rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95 transition-transform">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    <span class="font-bold tracking-wide">Terapkan</span>
                                 </button>
-                                <div x-show="open" x-transition
-                                     class="absolute z-50 mt-1 w-40 bg-white border border-secondary-200 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto">
-                                    <template x-for="opt in options" :key="opt.val">
-                                        <button type="button"
-                                                @click="selectedVal = opt.val; selectedLabel = opt.label; open = false"
-                                                class="w-full text-left px-3 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 transition-colors"
-                                                :class="selectedVal === opt.val ? 'text-primary-700 bg-primary-50 font-semibold' : 'text-secondary-700'"
-                                                x-text="opt.label">
-                                        </button>
-                                    </template>
-                                </div>
+                                <button type="button" 
+                                        onclick="resetCustomPicker()"
+                                        class="btn btn-secondary h-[44px] px-6 rounded-xl border-secondary-200 hover:bg-secondary-50 font-bold active:scale-95 transition-transform flex items-center justify-center">Reset</button>
                             </div>
-
-                            <button type="submit" class="btn btn-primary text-sm">Terapkan</button>
-                            <a href="<?php echo e(route('dashboard.superadmin')); ?>" class="btn btn-secondary text-sm">Reset</a>
                         </form>
                     </div>
                 </div>
@@ -296,7 +1277,7 @@
 
             <!-- Bagian Ikhtisar Statistik -->
             <!-- Loading Skeleton -->
-            <div x-show="showStats && isLoading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6 animate-pulse">
+            <div x-show="showStats && isLoading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6 animate-pulse print:hidden">
                 <?php for($i = 0; $i < 5; $i++): ?>
                     <div class="card p-6 flex flex-col justify-between h-40">
                         <div class="flex justify-between items-start">
@@ -313,19 +1294,21 @@
             </div>
 
             <!-- Konten Asli -->
-            <div x-show="showStats && !isLoading" 
+            <div x-show="!isLoading" 
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100"
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-95"
-                 class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6">
-                <!-- Total Sparepart -->
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 print:grid-cols-6 gap-6 mb-6 print:break-inside-avoid">
+                
+                <!-- 1. Total Sparepart (Interactive) -->
+                <div @click="window.location.href='<?php echo e(route('inventory.index')); ?>'" 
+                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-primary-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-primary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary-200"></div>
                     <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative"><?php echo e(__('ui.total_items')); ?></p>
+                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Total<br>Barang</p>
                         <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalSpareparts"><?php echo e($totalSpareparts); ?></h3>
                     </div>
                     <div class="mt-4 flex items-center text-primary-600 z-10 relative">
@@ -355,11 +1338,12 @@
                     </div>
                 </div>
 
-                <!-- Total Stok -->
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+                <!-- 2. Total Stok (Interactive) -->
+                <div @click="document.getElementById('stockByCategoryChart').scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-success-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-success-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-success-200"></div>
                     <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative"><?php echo e(__('ui.total_physical_stock')); ?></p>
+                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Total Stok<br>Fisik</p>
                         <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalStock"><?php echo e($totalStock); ?></h3>
                     </div>
                     <div class="mt-4 flex items-center text-success-600 z-10 relative">
@@ -389,11 +1373,48 @@
                     </div>
                 </div>
 
-                <!-- Total Kategori -->
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
+                <!-- 3. Widget Peminjaman Aktif (Interactive) -->
+                <div @click="window.location.href='<?php echo e(route('inventory.index', ['filter' => 'borrowed'])); ?>'" 
+                     x-show="showBorrowings" 
+                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-fuchsia-100">
+                    <div class="absolute right-0 top-0 h-24 w-24 bg-fuchsia-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-fuchsia-200"></div>
+                    <div>
+                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Sedang<br>Dipinjam</p>
+                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative"><?php echo e($activeBorrowingsCount); ?></h3>
+                    </div>
+                    <div class="mt-4 flex items-center text-fuchsia-600 z-10 relative">
+                        <div class="p-2 bg-fuchsia-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
+                            <?php if (isset($component)) { $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.borrow-user','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.borrow-user'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
+<?php $attributes = $attributes->except(\Illuminate\View\AnonymousComponent::ignoredParameterNames()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'w-5 h-5']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $attributes = $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
+<?php $component = $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
+<?php unset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php endif; ?>
+                        </div>
+                        <span class="ml-2 text-xs font-semibold bg-fuchsia-50 text-fuchsia-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.units_out')); ?></span>
+                    </div>
+                </div>
+
+                <!-- 4. Total Kategori (Interactive - Trigger Modal) -->
+                <div @click="openCategoryModal()" 
+                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-warning-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-warning-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-warning-200"></div>
                      <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative"><?php echo e(__('ui.categories')); ?></p>
+                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Kategori<br>Barang</p>
                         <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative"><?php echo e($totalCategories); ?></h3>
                     </div>
                     <div class="mt-4 flex items-center text-warning-600 z-10 relative">
@@ -423,19 +1444,20 @@
                     </div>
                 </div>
 
-                <!-- Widget Peminjaman Aktif -->
-                <div x-show="showBorrowings" class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-indigo-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-indigo-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative"><?php echo e(__('ui.currently_borrowed')); ?></p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative"><?php echo e($activeBorrowingsCount); ?></h3>
+                <!-- 5. Total Merk (Interactive - Trigger Modal) -->
+                <div @click="openBrandModal()" 
+                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-pink-100">
+                    <div class="absolute right-0 top-0 h-24 w-24 bg-pink-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-pink-200"></div>
+                     <div>
+                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Total<br>Merk</p>
+                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalBrands"><?php echo e($totalBrands); ?></h3>
                     </div>
-                    <div class="mt-4 flex items-center text-indigo-600 z-10 relative">
-                        <div class="p-2 bg-indigo-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <?php if (isset($component)) { $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab = $component; } ?>
-<?php if (isset($attributes)) { $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab = $attributes; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.borrow-user','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
-<?php $component->withName('icon.borrow-user'); ?>
+                    <div class="mt-4 flex items-center text-pink-600 z-10 relative">
+                        <div class="p-2 bg-pink-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
+                            <?php if (isset($component)) { $__componentOriginal25b175be958d107d1be4a494690443f6 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal25b175be958d107d1be4a494690443f6 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.tag','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
+<?php $component->withName('icon.tag'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag): ?>
@@ -444,28 +1466,29 @@
 <?php $component->withAttributes(['class' => 'w-5 h-5']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
-<?php if (isset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
-<?php $attributes = $__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
-<?php unset($__attributesOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php if (isset($__attributesOriginal25b175be958d107d1be4a494690443f6)): ?>
+<?php $attributes = $__attributesOriginal25b175be958d107d1be4a494690443f6; ?>
+<?php unset($__attributesOriginal25b175be958d107d1be4a494690443f6); ?>
 <?php endif; ?>
-<?php if (isset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab)): ?>
-<?php $component = $__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab; ?>
-<?php unset($__componentOriginalfc9bbac9aef314c397aa6cd49daa26ab); ?>
+<?php if (isset($__componentOriginal25b175be958d107d1be4a494690443f6)): ?>
+<?php $component = $__componentOriginal25b175be958d107d1be4a494690443f6; ?>
+<?php unset($__componentOriginal25b175be958d107d1be4a494690443f6); ?>
 <?php endif; ?>
                         </div>
-                        <span class="ml-2 text-xs font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.units_out')); ?></span>
+                        <span class="ml-2 text-xs font-semibold bg-pink-50 text-pink-700 px-2 py-0.5 rounded-full">Daftar Merk</span>
                     </div>
                 </div>
 
-                <!-- Total Lokasi -->
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-secondary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-secondary-200"></div>
+                <!-- 6. Total Lokasi (Interactive - Trigger Modal) -->
+                <div @click="openLocationModal()" 
+                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-cyan-100">
+                    <div class="absolute right-0 top-0 h-24 w-24 bg-cyan-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-cyan-200"></div>
                      <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative"><?php echo e(__('ui.storage_locations')); ?></p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative"><?php echo e($totalLocations); ?></h3>
+                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Lokasi<br>Penyimpanan</p>
+                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalLocations"><?php echo e($totalLocations); ?></h3>
                     </div>
-                    <div class="mt-4 flex items-center text-secondary-600 z-10 relative">
-                        <div class="p-2 bg-secondary-200 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
+                    <div class="mt-4 flex items-center text-cyan-600 z-10 relative">
+                        <div class="p-2 bg-cyan-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
                             <?php if (isset($component)) { $__componentOriginalb6952584d5242e7a54c1423e310b3baa = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginalb6952584d5242e7a54c1423e310b3baa = $attributes; } ?>
 <?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.icon.location','data' => ['class' => 'w-5 h-5']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -487,7 +1510,7 @@
 <?php unset($__componentOriginalb6952584d5242e7a54c1423e310b3baa); ?>
 <?php endif; ?>
                         </div>
-                        <span class="ml-2 text-xs font-semibold bg-secondary-100 text-secondary-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.warehouse_racks')); ?></span>
+                        <span class="ml-2 text-xs font-semibold bg-cyan-50 text-cyan-700 px-2 py-0.5 rounded-full"><?php echo e(__('ui.warehouse_racks')); ?></span>
                     </div>
                 </div>
             </div>
@@ -495,16 +1518,17 @@
 
             
             <div class="mb-6"
-                 x-show="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0) || (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>)"
+                 x-show="(showOverdue && overdueBorrowingsList.length > 0) || (showNoPriceItems && noPriceItems.length > 0)"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 translate-y-4"
-                 x-transition:enter-end="opacity-100 translate-y-0">
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-cloak>
 
-                <div class="grid gap-4 items-stretch"
-                     :class="(showOverdue && <?php echo e($totalOverdueCount); ?> > 0) && (showNoPriceItems && <?php echo e(isset($noPriceItems) && $noPriceItems->count() > 0 ? 'true' : 'false'); ?>) ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'">
+                <div class="grid gap-4 items-stretch print:break-inside-avoid"
+                     :class="(showOverdue && overdueBorrowingsList.length > 0) && (showNoPriceItems && noPriceItems.length > 0) ? 'grid-cols-1 lg:grid-cols-2 print:grid-cols-2' : 'grid-cols-1'">
 
                     
-                    <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && isLoading" class="h-full animate-pulse">
+                    <div x-show="showOverdue && overdueBorrowingsList.length > 0 && isLoading" class="h-full animate-pulse print:hidden">
                         <div class="card border-l-4 border-danger-200 h-full">
                             <div class="card-header p-4 border-b border-gray-100 flex justify-between">
                                  <div class="h-6 bg-gray-200 rounded w-64"></div>
@@ -521,7 +1545,7 @@
                     </div>
 
                     
-                    <div x-show="showOverdue && <?php echo e($totalOverdueCount); ?> > 0 && !isLoading" class="h-full">
+                    <div x-show="showOverdue && overdueBorrowingsList.length > 0 && !isLoading" class="h-full">
                         <div class="card bg-white shadow-lg border-none overflow-hidden h-full">
                             
                             <div class="p-4 bg-gradient-to-r from-red-500 to-orange-600 flex justify-between items-center">
@@ -553,8 +1577,7 @@
                     </div>
 
                     
-                    <?php if(isset($noPriceItems) && $noPriceItems->count() > 0): ?>
-                    <div x-show="showNoPriceItems" class="h-full">
+                    <div x-show="showNoPriceItems && noPriceItems.length > 0 && !isLoading" class="h-full">
                         <div class="card bg-white shadow-lg border-none overflow-hidden h-full">
                             
                             <div class="p-4 bg-gradient-to-r from-amber-500 to-orange-500 flex justify-between items-center">
@@ -562,49 +1585,70 @@
                                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                     </svg>
-                                    <h3 class="font-bold text-white text-sm"><?php echo e(__('ui.widget_missing_price')); ?> (<?php echo e($noPriceItems->count()); ?>)</h3>
+                                    <h3 class="font-bold text-white text-sm">
+                                        <?php echo e(__('ui.widget_missing_price')); ?> (<span x-text="noPriceItems.length"></span>)
+                                    </h3>
                                 </div>
                                 <a href="<?php echo e(route('inventory.index', ['type' => 'sale', 'filter' => 'no_price'])); ?>" class="text-xs text-white hover:text-amber-100 font-bold underline decoration-white/50"><?php echo e(__('ui.view_all')); ?></a>
                             </div>
                             
                             <div class="divide-y divide-secondary-100">
-                                <?php $__currentLoopData = $noPriceItems->take(5); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <div class="px-4 py-3 hover:bg-amber-50 transition-colors group flex justify-between items-center gap-3">
-                                    <div class="min-w-0">
-                                        <p class="font-semibold text-secondary-900 text-sm truncate"><?php echo e($item->name); ?></p>
-                                        <p class="text-xs text-secondary-500 truncate"><?php echo e($item->part_number); ?></p>
+                                <template x-for="item in noPriceItems.slice(0, 5)" :key="item.id">
+                                    <div class="px-4 py-3 hover:bg-amber-50 transition-colors group flex justify-between items-center gap-3">
+                                        <div class="min-w-0">
+                                            <p class="font-semibold text-secondary-900 text-sm truncate" x-text="item.name"></p>
+                                            <p class="text-xs text-secondary-500 truncate" x-text="item.part_number"></p>
+                                        </div>
+                                        <div class="flex items-center gap-2 flex-shrink-0">
+                                            <span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">Rp 0</span>
+                                            <a :href="'/inventory/' + item.id + '/edit'"
+                                               class="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 px-2 py-1 rounded-lg transition-all">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                                Isi
+                                            </a>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center gap-2 flex-shrink-0">
-                                        <span class="text-xs bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded-full">Rp 0</span>
-                                        <a href="<?php echo e(route('inventory.edit', $item->id)); ?>"
-                                           class="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-xs font-semibold text-primary-600 bg-primary-50 hover:bg-primary-100 px-2 py-1 rounded-lg transition-all">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                            </svg>
-                                            Isi
-                                        </a>
-                                    </div>
-                                </div>
-                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </template>
                             </div>
                         </div>
                     </div>
-                    <?php endif; ?>
 
                 </div>
             </div>
 
-            <!-- Baru: Grafik Pergerakan Stok -->
-            <div x-show="showMovement && isLoading" class="card mb-4 animate-pulse">
-                <div class="card-header border-b border-gray-100 p-5">
-                    <div class="h-5 bg-gray-200 rounded w-48 mb-2"></div>
-                    <div class="h-3 bg-gray-200 rounded w-64"></div>
+            <div x-show="showMovement && isLoading" class="card mb-4 animate-pulse print:hidden">
+                <div class="card-header border-b border-gray-100 p-5 flex justify-between items-center">
+                    <div class="space-y-2">
+                        <div class="h-5 bg-gray-200 rounded w-40"></div>
+                        <div class="h-3 bg-gray-200 rounded w-56"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="h-7 bg-gray-200 rounded-lg w-14"></div>
+                        <div class="h-7 bg-gray-200 rounded-lg w-16"></div>
+                        <div class="h-7 bg-gray-200 rounded-lg w-16"></div>
+                    </div>
                 </div>
-                <div class="card-body p-6">
-                    <div class="h-[250px] w-full bg-gray-100 rounded flex items-end justify-between px-4 pb-4 gap-2">
-                         <?php for($i=0; $i<12; $i++): ?>
-                            <div class="w-full bg-gray-200 rounded-t" style="height: <?php echo e(rand(20, 80)); ?>%"></div>
-                         <?php endfor; ?>
+                <div class="p-5">
+                    
+                    <div class="flex gap-3 h-[250px]">
+                        <div class="flex flex-col justify-between py-1">
+                            <?php for($i=0; $i<6; $i++): ?>
+                                <div class="h-2 bg-gray-200 rounded w-6"></div>
+                            <?php endfor; ?>
+                        </div>
+                        <div class="flex-1 flex flex-col justify-between">
+                            <?php for($i=0; $i<6; $i++): ?>
+                                <div class="h-px bg-gray-100 w-full"></div>
+                            <?php endfor; ?>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between mt-2 pl-9">
+                        <?php for($i=0; $i<7; $i++): ?>
+                            <div class="h-2 bg-gray-200 rounded w-8"></div>
+                        <?php endfor; ?>
                     </div>
                 </div>
             </div>
@@ -616,7 +1660,7 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-4"
-                 class="card mb-4">
+                 class="card mb-4 print:break-inside-avoid">
                 <div class="card-header border-b border-secondary-100 p-5">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
@@ -627,37 +1671,45 @@
                         <div class="flex flex-wrap gap-2" id="movement-kpi-badges">
                             <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
-                                <span class="text-xs text-emerald-700 font-medium whitespace-nowrap">Masuk: <span id="kpi-masuk" class="font-bold">0</span> unit</span>
+                                <span class="text-xs text-emerald-700 font-medium whitespace-nowrap">Masuk: <span id="kpi-masuk" class="font-bold">0</span> unit <span id="kpi-masuk-pct" class="text-[10px] ml-1 opacity-80"></span></span>
                             </div>
                             <div class="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-lg px-3 py-1.5">
                                 <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
-                                <span class="text-xs text-red-700 font-medium whitespace-nowrap">Keluar: <span id="kpi-keluar" class="font-bold">0</span> unit</span>
+                                <span class="text-xs text-red-700 font-medium whitespace-nowrap">Keluar: <span id="kpi-keluar" class="font-bold">0</span> unit <span id="kpi-keluar-pct" class="text-[10px] ml-1 opacity-80"></span></span>
                             </div>
                             <div class="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5" id="kpi-net-badge">
                                 <span class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" id="kpi-net-dot"></span>
-                                <span class="text-xs font-medium whitespace-nowrap" id="kpi-net-label">Net: <span id="kpi-net" class="font-bold">0</span></span>
+                                <span class="text-xs font-medium whitespace-nowrap" id="kpi-net-label">Net: <span id="kpi-net" class="font-bold">0</span> <span id="kpi-net-pct" class="text-[10px] ml-1 opacity-80"></span></span>
                             </div>
                         </div>
                         
                         <div class="flex items-center gap-1 bg-secondary-100 rounded-lg p-0.5" id="movement-range-btns">
                             <button onclick="fetchMovementData(7)" id="mov-btn-7"
-                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all bg-white shadow-sm text-primary-700">7 Hari</button>
+                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-secondary-600 hover:bg-white/70">7 Hari</button>
                             <button onclick="fetchMovementData(30)" id="mov-btn-30"
-                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-secondary-600 hover:bg-white/70">30 Hari</button>
+                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all bg-white shadow-sm text-primary-700">30 Hari</button>
                             <button onclick="fetchMovementData(90)" id="mov-btn-90"
                                     class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-secondary-600 hover:bg-white/70">3 Bulan</button>
                         </div>
                     </div>
+                    
+                    <p class="text-xs text-secondary-400 mt-1" id="movement-period-label">Memuat data...</p>
                 </div>
                 <div class="card-body p-4 md:p-6">
-                    <div class="min-h-[200px] md:h-[280px] w-full">
+                    
+                    <div id="movement-error" class="hidden flex-col items-center justify-center h-[280px] gap-3">
+                        <svg class="w-10 h-10 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+                        <p class="text-sm font-medium text-secondary-600">Gagal memuat data chart</p>
+                        <button onclick="fetchMovementData(movementActiveRange)" class="text-xs text-primary-600 hover:text-primary-700 font-semibold border border-primary-200 rounded-lg px-3 py-1.5 hover:bg-primary-50 transition-colors">↻ Coba Lagi</button>
+                    </div>
+                    <div class="min-h-[200px] md:h-[280px] w-full" id="movement-chart-wrap">
                         <canvas id="stockMovementChart"></canvas>
                     </div>
                 </div>
             </div>
 
             <!-- Baru: Bagian Item Teratas -->
-            <div x-show="showTopItems && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-pulse">
+            <div x-show="showTopItems && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-pulse print:hidden">
                  <!-- Skeleton Teratas Keluar -->
                  <div class="card">
                      <div class="card-header border-b border-gray-100 p-4">
@@ -777,7 +1829,7 @@
              </div>
 
             <!-- Bagian Grafik -->
-            <div x-show="showCharts && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-pulse">
+            <div x-show="showCharts && isLoading" class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4 animate-pulse print:hidden">
                 <!-- Skeleton Donut -->
                 <div class="card flex flex-col h-[400px]">
                     <div class="card-header border-b border-gray-100 p-5">
@@ -807,7 +1859,7 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-4"
-                 class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                 class="grid grid-cols-1 lg:grid-cols-2 print:grid-cols-1 print:gap-y-8 gap-4 mb-4 print:break-inside-avoid">
                 <!-- Grafik Donut -->
                 <div class="card flex flex-col">
                     <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
@@ -836,11 +1888,11 @@
             </div>
 
             <!-- Bagian Bawah: Stok Rendah & Aktivitas -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-1 gap-4 print:gap-y-8">
                 <!-- Skeleton Stok Rendah -->
                 <div x-show="showLowStock && isLoading" 
-                     class="card animate-pulse h-[400px]"
-                     :class="{ 'lg:col-span-3': !showRecent, 'lg:col-span-2': showRecent }">
+                     class="card animate-pulse h-[400px] print:hidden"
+                     :class="{ 'lg:col-span-3 print:col-span-1': !showRecent, 'lg:col-span-2 print:col-span-1': showRecent }">
                     <div class="card-header p-5 border-b border-gray-100 flex justify-between">
                         <div class="h-5 bg-gray-200 rounded w-48"></div>
                         <div class="h-4 bg-gray-200 rounded w-20"></div>
@@ -866,7 +1918,7 @@
                      x-transition:leave="transition ease-in duration-200"
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 translate-y-4"
-                     class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden" :class="{ 'lg:col-span-3': !showRecent, 'lg:col-span-2': showRecent }">
+                     class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden print:break-inside-avoid" :class="{ 'lg:col-span-3 print:col-span-1': !showRecent, 'lg:col-span-2 print:col-span-1': showRecent }">
                     <div class="card-header p-5 bg-gradient-to-r from-amber-500 to-orange-500 flex justify-between items-center">
                         <div class="flex items-center gap-2">
                              <div class="p-1.5 bg-white/20 text-white rounded-lg backdrop-blur-sm">
@@ -887,7 +1939,6 @@
                                     <th class="px-6 py-3 font-semibold tracking-wider text-center"><?php echo e(__('ui.status')); ?></th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-secondary-100">
                             <tbody class="divide-y divide-secondary-100">
                                 <template x-for="item in lowStockItems" :key="item.id">
                                     <tr class="bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href = '/inventory/' + item.id">
@@ -941,7 +1992,7 @@
                      x-transition:leave="transition ease-in duration-200"
                      x-transition:leave-start="opacity-100 translate-y-0"
                      x-transition:leave-end="opacity-0 translate-y-4"
-                     class="card p-0 flex flex-col h-full print-safe" :class="{ 'lg:col-span-3': !showLowStock, 'lg:col-span-1': showLowStock }">
+                     class="card p-0 flex flex-col h-full print-safe" :class="{ 'lg:col-span-3 print:col-span-1': !showLowStock, 'lg:col-span-1 print:col-span-1': showLowStock }">
                      <div class="card-header p-5 border-b border-secondary-100 flex justify-between items-center">
                         <h3 class="font-bold text-secondary-900"><?php echo e(__('ui.recent_activities')); ?></h3>
                         <a href="<?php echo e(route('reports.activity-logs.index')); ?>" class="text-sm text-primary-600 hover:text-primary-700 font-medium"><?php echo e(__('ui.view_all')); ?></a>
@@ -950,14 +2001,15 @@
                         <div class="flex flex-col">
                             <!-- Alpine Loop -->
                             <template x-for="log in recentActivities" :key="log.id">
-                                <div class="px-5 py-4 hover:bg-secondary-50 transition-colors group">
+                                <div class="px-5 py-2.5 hover:bg-secondary-50 transition-colors group">
                                     <div class="flex gap-4">
                                         <div class="flex-shrink-0 mt-1">
                                             <div class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-all ring-2 ring-white">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                             </div>
                                         </div>
-                                        <div class="flex-1 min-w-0">
+                                        <div class="flex-1 min-w-0 cursor-pointer hover:bg-secondary-100 p-2 rounded-lg transition-colors"
+                                             @click="viewActivityDetails(log)">
                                             <p class="text-sm font-medium text-secondary-900 line-clamp-2" x-text="log.description"></p>
                                             <div class="flex items-center gap-2 mt-1">
                                                 <p class="text-xs text-secondary-500 font-semibold" x-text="log.user_name || log.user?.name || 'Sistem'"></p>
@@ -970,7 +2022,7 @@
                             </template>
                             
                             <!-- Empty State -->
-                            <div x-show="recentActivities.length === 0" class="px-5 py-12 text-center">
+                            <div x-show="recentActivities.length === 0" class="px-5 py-12 text-center min-h-[300px] flex flex-col items-center justify-center">
                                 <div class="flex flex-col items-center gap-3">
                                     <div class="w-16 h-16 rounded-full bg-secondary-100 flex items-center justify-center">
                                         <svg class="w-8 h-8 text-secondary-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -1108,44 +2160,22 @@
                 </div>
             </div>
 
-            <!-- Footer Cetak -->
-            <div class="hidden print:block mt-8 text-center text-xs text-secondary-400">
-                <p><?php echo e(__('ui.printed_at')); ?> <?php echo e(now()->format('d M Y H:i')); ?> <?php echo e(__('ui.by')); ?> <?php echo e(auth()->user()->name); ?></p>
-                <p>Azventory Management System - <?php echo e(__('ui.stock_inventory_report')); ?></p>
-            </div>
+            
+            
 
-            <style>
-                @media print {
-                    @page { margin: 0.5cm; }
-                    body { visibility: hidden; background: white; }
-                    .print-safe, .print-safe * { visibility: visible; }
-                    .max-w-7xl { max-width: none !important; margin: 0 !important; padding: 0 !important; }
-                    
-                    /* Sembunyikan Sidebar, Header, Tombol */
-                    nav, header, form, button, .btn, .no-print { display: none !important; }
-                    
-                    /* Pastikan Tata Letak Grid berfungsi saat dicetak */
-                    .grid { display: grid !important; }
-                    .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
-                    .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
-                    .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
-                    .print-grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
 
-                    /* Buat konten terlihat absolut ke atas */
-                    .py-6 > div {
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        visibility: visible;
-                    }
-                    
-                    .card { break-inside: avoid; border: 1px solid #ddd; box-shadow: none; }
-                    .text-3xl { font-size: 1.5rem; } /* Perkecil judul */
-                }
-            </style>
-        </div>
-    </div>
+                    </td></tr>
+                </tbody>
+
+                
+                <tfoot class="hidden export-show mt-8 pt-4 border-t border-secondary-200 w-full">
+                    <tr><td>
+                        <div class="text-center text-xs text-secondary-500">
+                            Azventory Management System - Laporan Stok & Inventaris
+                        </div>
+                    </td></tr>
+                </tfoot>
+            </table> 
 
     <?php $__env->startPush('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -1170,12 +2200,30 @@
             const elNetLabel = document.getElementById('kpi-net-label');
             const elNetBadge = document.getElementById('kpi-net-badge');
 
+            // Trend elements
+            const elMasukPct = document.getElementById('kpi-masuk-pct');
+            const elKeluarPct = document.getElementById('kpi-keluar-pct');
+            const elNetPct = document.getElementById('kpi-net-pct');
+
             if (elMasuk) elMasuk.textContent = totalMasuk.toLocaleString('id-ID');
             if (elKeluar) elKeluar.textContent = totalKeluar.toLocaleString('id-ID');
-            if (elNet && elNetDot && elNetLabel && elNetBadge) {
-                const prefix = net >= 0 ? '+' : '';
-                elNet.textContent = prefix + net.toLocaleString('id-ID');
-                // Warna dinamis: hijau positif, merah negatif, abu netral
+            if (elNet) elNet.textContent = (net >= 0 ? '+' : '') + net.toLocaleString('id-ID');
+
+            const comp = movementData.comparison || {};
+            
+            const updateTrend = (el, val) => {
+                if (!el) return;
+                if (val === undefined || val === null) { el.textContent = ''; return; }
+                const prefix = val > 0 ? '↑' : (val < 0 ? '↓' : '');
+                el.textContent = `${prefix} ${Math.abs(val)}%`;
+                el.className = `text-[10px] ml-1 font-bold ${val >= 0 ? 'text-emerald-600' : 'text-red-600'}`;
+            };
+
+            updateTrend(elMasukPct, comp.masuk_pct);
+            updateTrend(elKeluarPct, comp.keluar_pct);
+            updateTrend(elNetPct, comp.net_pct);
+
+            if (elNetBadge && elNetDot && elNetLabel) {
                 if (net > 0) {
                     elNetBadge.className = 'flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5';
                     elNetDot.className = 'w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0';
@@ -1222,30 +2270,39 @@
         }
 
         function doCapture(toastEl) {
-            const target = document.querySelector('[x-data]') || document.body;
-            html2canvas(target, {
-                scale: 1.5,
-                useCORS: true,
-                backgroundColor: '#f8fafc',
-                logging: false,
-            }).then(canvas => {
-                const link = document.createElement('a');
-                const d = new Date();
-                const dateStr = d.toISOString().slice(0, 10);
-                link.download = `dashboard-azventory-${dateStr}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                if (toastEl) toastEl.remove();
-            }).catch(() => {
-                if (toastEl) toastEl.remove();
-                alert('Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.');
-            });
+            document.body.classList.add('is-exporting'); // Add export class to trigger pure white mode
+
+            // Tunggu sebentar agar CSS apply sebelum direkam
+            setTimeout(() => {
+                const target = document.querySelector('[x-data]') || document.body;
+                html2canvas(target, {
+                    scale: 1.5,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    windowWidth: 1280, // force desktop width so it doesn't squish
+                    logging: false,
+                }).then(canvas => {
+                    document.body.classList.remove('is-exporting'); // Remove immediately
+                    const link = document.createElement('a');
+                    const d = new Date();
+                    const dateStr = d.toISOString().slice(0, 10);
+                    link.download = `dashboard-azventory-${dateStr}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    if (toastEl) toastEl.remove();
+                }).catch(() => {
+                    document.body.classList.remove('is-exporting');
+                    if (toastEl) toastEl.remove();
+                    alert('Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.');
+                });
+            }, 300);
         }
 
-        const movementDataKey = <?php echo json_encode($movementData, 15, 512) ?>;
+        // Muat data 7 hari via AJAX saat pertama load — ini adalah default tampilan chart
+        const movementDataKey = { labels: [], masuk: [], keluar: [] };
 
         // Inisialisasi KPI Badge saat load
-        updateMovementKPI(movementDataKey);
+        updateMovementKPI(<?php echo json_encode($movementData, 15, 512) ?>);
 
         // Fungsi pembuatan gradient (dipakai ulang)
         function makeGradient(ctx, color1, color2) {
@@ -1264,13 +2321,37 @@
         const movMasuk  = movementDataKey.masuk.length > 0  ? movementDataKey.masuk  : [0];
         const movKeluar = movementDataKey.keluar.length > 0 ? movementDataKey.keluar : [0];
 
+        // Plugin Custom untuk Garis Vertikal (Crosshair)
+        const verticalLine = {
+            id: 'verticalLine',
+            beforeDraw(chart) {
+                if (chart.tooltip?._active?.length) {
+                    const ctx = chart.ctx;
+                    const x = chart.tooltip._active[0].element.x;
+                    const topY = chart.scales.y.top;
+                    const bottomY = chart.scales.y.bottom;
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(x, topY);
+                    ctx.lineTo(x, bottomY);
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = 'rgba(100, 116, 139, 0.4)'; // Gray-400
+                    ctx.setLineDash([4, 4]); // Dashed
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+        };
+
         let movementChart = new Chart(movCtx, {
             type: 'line',
+            plugins: [verticalLine], // Register plugin
             data: {
                 labels: movLabels,
                 datasets: [
                     {
-                        label: '📦 Barang Masuk',
+                        label: 'Barang Masuk',
                         data: movMasuk,
                         backgroundColor: gradMasuk,
                         borderColor: '#10b981',
@@ -1284,7 +2365,7 @@
                         pointBorderWidth: 2,
                     },
                     {
-                        label: '📤 Barang Keluar',
+                        label: 'Barang Keluar',
                         data: movKeluar,
                         backgroundColor: gradKeluar,
                         borderColor: '#ef4444',
@@ -1326,7 +2407,7 @@
                         cornerRadius: 8,
                         callbacks: {
                             title(ctx) {
-                                return '🗓 ' + ctx[0].label;
+                                return ctx[0].label;
                             },
                             label(ctx) {
                                 const val = ctx.parsed.y.toLocaleString('id-ID');
@@ -1338,12 +2419,21 @@
                                 const keluar = ctx.find(c => c.datasetIndex === 1)?.parsed.y ?? 0;
                                 const net = masuk - keluar;
                                 const prefix = net >= 0 ? '+' : '';
-                                return [`  ─────────────────`, `  🔄 Net Stok: ${prefix}${net.toLocaleString('id-ID')} unit`];
+                                return [`  ─────────────────`, `  Net Stok: ${prefix}${net.toLocaleString('id-ID')} unit`];
                             }
                         }
                     }
                 },
                 scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10, // Batasi jumlah label agar tidak sesak
+                            padding: 10
+                        }
+                    },
                     y: {
                         beginAtZero: true,
                         grid: {
@@ -1364,6 +2454,7 @@
                 }
             }
         });
+
 
         // =====================================================================
         // Grafik Donut: Stok berdasarkan Kategori
@@ -1432,13 +2523,26 @@
                     hoverOffset: 8
                 }]
             },
-            plugins: [outerDashedRing], // Register plugin
+            plugins: [outerDashedRing, {
+                id: 'noData',
+                afterDraw: (chart) => {
+                    const dataCount = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    if (dataCount === 0) {
+                        const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
+                        ctx.save();
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.font = '14px sans-serif'; ctx.fillStyle = '#94a3b8';
+                        ctx.fillText('Tidak ada data distribusi', left + width / 2, top + height / 2);
+                        ctx.restore();
+                    }
+                }
+            }],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 cutout: '70%', // Balanced & Modern
                 layout: {
-                    padding: 20 // Extra padding for ring
+                    padding: 40 // Extra padding for ring
                 },
                 elements: {
                     arc: {
@@ -1499,8 +2603,23 @@
                     borderRadius: 6,
                     borderSkipped: false,
                     barPercentage: 0.65,
+                    maxBarThickness: 60
                 }]
             },
+            plugins: [{
+                id: 'noData',
+                afterDraw: (chart) => {
+                    const dataCount = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    if (dataCount === 0) {
+                        const { ctx, chartArea: { top, bottom, left, right, width, height } } = chart;
+                        ctx.save();
+                        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                        ctx.font = '14px sans-serif'; ctx.fillStyle = '#94a3b8';
+                        ctx.fillText('Tidak ada data lokasi', left + width / 2, top + height / 2);
+                        ctx.restore();
+                    }
+                }
+            }],
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
@@ -1517,7 +2636,7 @@
                         cornerRadius: 8,
                         callbacks: {
                             label(ctx) {
-                                return `  📦 Stok: ${ctx.parsed.y.toLocaleString('id-ID')} unit`;
+                                return `  Stok: ${ctx.parsed.y.toLocaleString('id-ID')} unit`;
                             }
                         }
                     }
@@ -1577,114 +2696,6 @@
             }
         };
 
-        function dashboardData() {
-            return {
-                showStats: localStorage.getItem('dashboard_showStats') !== 'false',
-                showCharts: localStorage.getItem('dashboard_showCharts') !== 'false',
-                showMovement: localStorage.getItem('dashboard_showMovement') !== 'false',
-                showTopItems: localStorage.getItem('dashboard_showTopItems') !== 'false',
-                showLowStock: localStorage.getItem('dashboard_showLowStock') !== 'false',
-                showRecent: localStorage.getItem('dashboard_showRecent') !== 'false',
-                showDeadStock: localStorage.getItem('dashboard_showDeadStock') !== 'false',
-                showLeaderboard: localStorage.getItem('dashboard_showLeaderboard') !== 'false',
-                showBorrowings: localStorage.getItem('dashboard_showBorrowings') !== 'false',
-                showOverdue: localStorage.getItem('dashboard_showOverdue') !== 'false',
-                showNoPriceItems: localStorage.getItem('dashboard_showNoPriceItems') !== 'false',
-                
-                isLoading: true,
-                
-                // Data Statis & List
-                totalSpareparts: <?php echo e($totalSpareparts); ?>,
-                totalStock: <?php echo e($totalStock); ?>,
-                totalCategories: <?php echo e($totalCategories); ?>,
-                totalLocations: <?php echo e($totalLocations); ?>,
-                pendingApprovalsCount: <?php echo e($pendingApprovalsCount); ?>,
-                activeBorrowingsCount: <?php echo e($activeBorrowingsCount); ?>,
-
-                // Arrays (untuk x-for)
-                recentActivities: <?php echo json_encode($recentActivities, 15, 512) ?>,
-                topExited: <?php echo json_encode($topExited, 15, 512) ?>,
-                topEntered: <?php echo json_encode($topEntered, 15, 512) ?>,
-                deadStockItems: <?php echo json_encode($deadStockItems, 15, 512) ?>,
-                activeUsers: <?php echo json_encode($activeUsers, 15, 512) ?>,
-                activeBorrowingsList: <?php echo json_encode($activeBorrowingsList, 15, 512) ?>,
-                overdueBorrowingsList: <?php echo json_encode($overdueBorrowingsList, 15, 512) ?>,
-                lowStockItems: <?php echo json_encode($lowStockItems, 15, 512) ?>,
-
-                // Charts Data (Disimpan sementara untuk update chart)
-                movementData: <?php echo json_encode($movementData, 15, 512) ?>,
-                stockByCategory: <?php echo json_encode($stockByCategory, 15, 512) ?>,
-                stockByLocation: <?php echo json_encode($stockByLocation, 15, 512) ?>,
-                
-                init() {
-                    // Simulasikan delay loading
-                    setTimeout(() => {
-                        this.isLoading = false;
-                    }, 800);
-
-                    // Real-time listener
-                    if (window.Echo) {
-                        window.Echo.channel('inventory-updates')
-                            .listen('.InventoryUpdated', (e) => {
-                                console.log('Realtime Update:', e);
-                                this.refreshData();
-                                
-                                // Tampilkan notifikasi toast
-                                if (window.showToast) {
-                                    window.showToast('info', e.message);
-                                }
-                            });
-                    }
-                },
-
-                async refreshData() {
-                   try {
-                       const response = await fetch('<?php echo e(route("dashboard.superadmin")); ?>', {
-                           headers: {
-                               'X-Requested-With': 'XMLHttpRequest',
-                               'Accept': 'application/json'
-                           }
-                       });
-                       
-                       if (!response.ok) throw new Error('Network response was not ok');
-                       
-                       const data = await response.json();
-                       
-                       // Update Single Values
-                       this.totalSpareparts = data.totalSpareparts;
-                       this.totalStock = data.totalStock;
-                       this.totalCategories = data.totalCategories;
-                       this.totalLocations = data.totalLocations;
-                       this.pendingApprovalsCount = data.pendingApprovalsCount;
-                       this.activeBorrowingsCount = data.activeBorrowingsCount;
-
-                       // Update Lists
-                       this.recentActivities = data.recentActivities;
-                       this.topExited = data.topExited;
-                       this.topEntered = data.topEntered;
-                       this.forecasts = data.forecasts;
-                       this.deadStockItems = data.deadStockItems;
-                       this.activeUsers = data.activeUsers;
-                       this.activeBorrowingsList = data.activeBorrowingsList;
-                       this.overdueBorrowingsList = data.overdueBorrowingsList;
-                       this.lowStockItems = data.lowStockItems;
-
-                       // Update Charts (Function defined globally or attached to window)
-                       if (window.updateDashboardCharts) {
-                           window.updateDashboardCharts(data.movementData, data.stockByCategory, data.stockByLocation);
-                       }
-
-                   } catch (error) {
-                       console.error('Failed to refresh dashboard data:', error);
-                   }
-                },
-
-                toggle(key) {
-                    this[key] = !this[key];
-                    localStorage.setItem('dashboard_' + key, this[key]);
-                }
-            };
-        }
         // =====================================================================
         // Alpine Component: Tab Period Global
         // Mengelola state panel "Custom" (Opsi F)
@@ -1700,7 +2711,7 @@
         // Opsi C: Quick-filter per-widget Pergerakan Stok
         // Fetch data movement dari endpoint ringan tanpa reload halaman
         // =====================================================================
-        let movementActiveRange = 7; // default aktif
+        let movementActiveRange = 30; // default aktif
 
         async function fetchMovementData(range) {
             movementActiveRange = range;
@@ -1719,6 +2730,15 @@
             // Tampilkan loading state pada canvas
             const canvas = document.getElementById('stockMovementChart');
             if (canvas) canvas.style.opacity = '0.5';
+
+            // Update label periode dan reset error state
+            const periodLabel = document.getElementById('movement-period-label');
+            const rangeLabel = range === 7 ? '7 hari terakhir' : range === 30 ? '30 hari terakhir' : '3 bulan terakhir';
+            if (periodLabel) periodLabel.textContent = 'Data: ' + rangeLabel;
+            const errEl = document.getElementById('movement-error');
+            const wrapEl = document.getElementById('movement-chart-wrap');
+            if (errEl)  errEl.classList.replace('flex', 'hidden');
+            if (wrapEl) wrapEl.classList.remove('hidden');
 
             try {
                 const response = await fetch('<?php echo e(route("dashboard.movement-data")); ?>?range=' + range, {
@@ -1750,6 +2770,11 @@
 
             } catch (err) {
                 console.error('fetchMovementData error:', err);
+                // Tampilkan error state di chart
+                const errEl2 = document.getElementById('movement-error');
+                const wrapEl2 = document.getElementById('movement-chart-wrap');
+                if (errEl2)  errEl2.classList.replace('hidden', 'flex');
+                if (wrapEl2) wrapEl2.classList.add('hidden');
             } finally {
                 // Hapus loading state
                 if (canvas) canvas.style.opacity = '1';
@@ -1757,6 +2782,170 @@
         }
     </script>
     <?php $__env->stopPush(); ?>
+    <?php $__env->startPush('scripts'); ?>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const startInput = document.getElementById('start_date');
+                const endInput = document.getElementById('end_date');
+                const pickerInput = document.getElementById('date_range_picker');
+                
+                if (pickerInput) {
+                    const picker = flatpickr("#date_range_picker", {
+                        locale: {
+                            rangeSeparator: " - ",
+                            weekdays: {
+                                shorthand: ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
+                                longhand: ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"]
+                            },
+                            months: {
+                                shorthand: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"],
+                                longhand: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+                            }
+                        },
+                        mode: "range",
+                        position: "below center", // Precise alignment
+                        monthSelectorType: 'static', // MUST be static to replace with custom
+                        conjunction: " - ",
+                        altInput: true,
+                        altFormat: "j F Y",
+                        dateFormat: "Y-m-d",
+                        altInputClass: "w-full pl-12 pr-4 py-3 text-sm bg-secondary-50/50 border-secondary-200 rounded-2xl text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer font-semibold placeholder:text-secondary-400",
+                        allowInput: false,
+                        animate: true,
+                        minDate: "2010-01-01",
+                        maxDate: new Date().getFullYear() + 20 + "-12-31",
+                        defaultDate: ["<?php echo e(\Carbon\Carbon::parse($start)->format('Y-m-d')); ?>", "<?php echo e(\Carbon\Carbon::parse($end)->format('Y-m-d')); ?>"],
+                        onOpen: function(selectedDates, dateStr, instance) {
+                            // Selalu lompat ke hari ini saat dibuka agar tidak "nyasar" ke Januari
+                            instance.jumpToDate(new Date());
+                        },
+                        onReady: function(selectedDates, dateStr, instance) {
+                            const injectCustomUI = () => {
+                                const container = instance.calendarContainer.querySelector('.flatpickr-current-month');
+                                if (!container) return;
+
+                                container.innerHTML = `
+                                    <div class="custom-month-selector" id="custom-month-btn">
+                                        <span class="month-name">
+                                            <span class="hidden sm:inline">${instance.l10n.months.longhand[instance.currentMonth]}</span>
+                                            <span class="sm:hidden font-extrabold text-lg">${instance.currentMonth + 1}</span>
+                                        </span>
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'></path></svg>
+                                        <div class="custom-month-list" id="custom-month-panel">
+                                            ${instance.l10n.months.longhand.map((m, i) => `
+                                                <div class="${i === instance.currentMonth ? 'active' : ''}" data-index="${i}">${m}</div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                    <div class="numInputWrapper">
+                                        <input class="numInput cur-year" type="text" inputmode="numeric" value="${instance.currentYear}">
+                                    </div>
+                                `;
+
+                                const trigger = container.querySelector('#custom-month-btn');
+                                const panel = container.querySelector('#custom-month-panel');
+                                const yearInput = container.querySelector('.numInput');
+
+                                trigger.addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    const isVisible = panel.style.display === 'block';
+                                    panel.style.display = isVisible ? 'none' : 'block';
+                                    trigger.classList.toggle('active', !isVisible);
+                                });
+
+                                panel.querySelectorAll('div').forEach(item => {
+                                    item.addEventListener('click', (e) => {
+                                        const index = parseInt(item.getAttribute('data-index'));
+                                        instance.changeMonth(index);
+                                        panel.style.display = 'none';
+                                        trigger.classList.remove('active');
+                                    });
+                                });
+
+                                // Year Input Logic - Block 'e' and non-digits
+                                if (yearInput) {
+                                    yearInput.addEventListener('keydown', (e) => {
+                                        // Allow navigation keys, backspace, delete, etc.
+                                        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) return;
+                                        if (!/[0-9]/.test(e.key)) e.preventDefault();
+                                    });
+
+                                    yearInput.addEventListener('input', function() {
+                                        this.value = this.value.replace(/[^0-9]/g, ''); // Double safety
+                                        if (this.value.length > 4) this.value = this.value.slice(0, 4);
+                                        if (this.value.length === 4) instance.changeYear(parseInt(this.value));
+                                    });
+
+                                    yearInput.addEventListener('blur', function() {
+                                        const val = parseInt(this.value);
+                                        if (isNaN(val) || val < 2010) {
+                                            this.value = new Date().getFullYear();
+                                            instance.changeYear(parseInt(this.value));
+                                        }
+                                    });
+                                }
+                            };
+
+                            injectCustomUI();
+
+                            // Ensure logic persists on navigation
+                            instance.currentInject = injectCustomUI;
+                            document.addEventListener('click', () => {
+                                const panels = document.querySelectorAll('.custom-month-list');
+                                panels.forEach(p => p.style.display = 'none');
+                                document.querySelectorAll('.custom-month-selector').forEach(s => s.classList.remove('active'));
+                            });
+                        },
+                        onMonthChange: function(selectedDates, dateStr, instance) {
+                            if (instance.currentInject) instance.currentInject();
+                        },
+                        onYearChange: function(selectedDates, dateStr, instance) {
+                            if (instance.currentInject) instance.currentInject();
+                        },
+                        onChange: function(selectedDates, dateStr, instance) {
+                            if (selectedDates.length === 2) {
+                                // Validasi: max range 365 hari
+                                const diffDays = Math.round((selectedDates[1] - selectedDates[0]) / (1000 * 60 * 60 * 24));
+                                if (diffDays > 365) {
+                                    instance.clear();
+                                    if (startInput) startInput.value = '';
+                                    if (endInput) endInput.value = '';
+                                    if (window.showToast) window.showToast('warning', 'Rentang tanggal maksimal 365 hari. Silakan pilih ulang.');
+                                    return;
+                                }
+                                if (startInput) startInput.value = instance.formatDate(selectedDates[0], "Y-m-d");
+                                if (endInput) endInput.value = instance.formatDate(selectedDates[1], "Y-m-d");
+                            }
+                        }
+                    });
+
+                    window.setPickerRange = function(days) {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(end.getDate() - (days > 0 ? days - 1 : 0)); // Adjust to include today if 7/30
+                        picker.setDate([start, end], true);
+                    };
+
+                    window.resetCustomPicker = function() {
+                        // Reset ke default "Hari Ini" (tanpa query string)
+                        window.location.href = '<?php echo e(route("dashboard.superadmin")); ?>';
+                    };
+
+                    // Responsive altFormat: Gunakan angka jika layar sempit agar tidak terpotong
+                    const updateResponsiveFormat = () => {
+                        const isMobile = window.innerWidth < 480;
+                        picker.set('altFormat', isMobile ? "d/m/y" : "j F Y");
+                    };
+                    window.addEventListener('resize', updateResponsiveFormat);
+                    updateResponsiveFormat();
+                }
+            });
+        </script>
+    <?php $__env->stopPush(); ?>
+    </div>
+</div>
  <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>

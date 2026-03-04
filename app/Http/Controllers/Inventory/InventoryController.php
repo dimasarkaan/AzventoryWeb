@@ -2,26 +2,22 @@
 
 namespace App\Http\Controllers\Inventory;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Services\InventoryService;
-use App\Http\Requests\Inventory\StoreSparepartRequest;
 use App\Notifications\MissingPriceNotification;
-use App\Enums\UserRole;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
+use App\Services\InventoryService;
 use App\Traits\ActivityLogger;
-use Barryvdh\DomPDF\Facade\Pdf;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class InventoryController extends Controller
 {
     use ActivityLogger;
 
     protected $inventoryService;
+
     protected $qrCodeService;
 
     public function __construct(InventoryService $inventoryService, \App\Services\QrCodeService $qrCodeService)
@@ -31,7 +27,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Menampilkan daftar barang inventaris.
+     * Menampilkan daftar barang inventaris dengan dukungan filter dan paginasi.
      */
     public function index(Request $request)
     {
@@ -44,24 +40,21 @@ class InventoryController extends Controller
     }
 
     /**
-     * Menampilkan form untuk membuat barang baru.
+     * Menampilkan form pendaftaran barang baru.
      */
     public function create()
     {
         $this->authorize('create', Sparepart::class);
-        $options = $this->inventoryService->getDropdownOptions();
-        return view('inventory.create', $options);
+
+        return view('inventory.create', $this->inventoryService->getDropdownOptions());
     }
 
     /**
-     * Menyimpan barang baru ke database.
+     * Menyimpan data barang baru dan mengirimkan notifikasi jika harga belum lengkap.
      */
     public function store(\App\Http\Requests\Inventory\StoreSparepartRequest $request)
     {
-
         $this->authorize('create', Sparepart::class);
-        \Illuminate\Support\Facades\Log::info('InventoryController store all: ' . print_r($request->all(), true));
-        \Illuminate\Support\Facades\Log::info('InventoryController store validated: ' . print_r($request->validated(), true));
 
         $result = $this->inventoryService->createSparepart($request->validated());
 
@@ -69,8 +62,7 @@ class InventoryController extends Controller
             return redirect()->back()->withInput()->with('warning', $result['message']);
         }
 
-        // Jika barang bertipe 'sale' dan harga belum diisi (0 atau null),
-        // kirim notifikasi ke semua Superadmin agar segera melengkapi harga.
+        // Otomatisasi notifikasi jika barang bertipe jual namun harganya kosong
         if (isset($result['data'])) {
             $sparepart = $result['data'];
             if ($sparepart->type === 'sale' && ($sparepart->price === null || $sparepart->price == 0)) {
@@ -85,22 +77,23 @@ class InventoryController extends Controller
     }
 
     /**
-     * Menampilkan detail barang spesifik.
+     * Menampilkan detail informasi barang beserta riwayat peminjaman.
      */
     public function show(Sparepart $inventory)
     {
-        // Ambil data peminjaman dengan paginasi (5 per halaman)
         $borrowingQuery = $inventory->borrowings()
             ->with(['user', 'returns'])
+            ->withSum('returns', 'quantity')
             ->latest();
 
+        // Operator hanya diizinkan melihat riwayat peminjamannya sendiri
         if (auth()->user()->role === \App\Enums\UserRole::OPERATOR) {
             $borrowingQuery->where('user_id', auth()->id());
         }
 
         $borrowings = $borrowingQuery->paginate(5, ['*'], 'history_page');
 
-        // Ambil item serupa dengan paginasi (3 per halaman) 
+        // Mengambil aset serupa (berdasarkan Part Number) untuk memudahkan manajemen stok
         $similarItems = Sparepart::where('part_number', $inventory->part_number)
             ->where('id', '!=', $inventory->id)
             ->paginate(3, ['*'], 'similar_page');
@@ -108,130 +101,117 @@ class InventoryController extends Controller
         return view('inventory.show', [
             'sparepart' => $inventory,
             'similarItems' => $similarItems,
-            'borrowings' => $borrowings
+            'borrowings' => $borrowings,
         ]);
     }
 
     /**
-     * Menampilkan form untuk mengedit barang.
+     * Menampilkan form penyuntingan data barang.
      */
     public function edit(Sparepart $inventory)
     {
         $this->authorize('update', $inventory);
         $options = $this->inventoryService->getDropdownOptions();
+
         return view('inventory.edit', array_merge(['sparepart' => $inventory], $options));
     }
 
     /**
-     * Memperbarui data barang di database.
+     * Memperbarui data barang dengan deteksi potensi duplikasi data.
      */
     public function update(\App\Http\Requests\Inventory\UpdateSparepartRequest $request, Sparepart $inventory)
     {
         $this->authorize('update', $inventory);
 
         $validated = $request->validated();
-
-        // Cek apakah ada request untuk merge atau keep separate
         $mergeConfirmed = $request->input('merge_confirmed') === 'true';
         $keepSeparate = $request->input('keep_separate') === 'true';
 
-        // Jika belum ada konfirmasi, cek duplikat
-        if (!$mergeConfirmed && !$keepSeparate) {
+        // Validasi duplikasi sebelum menyimpan perubahan
+        if (! $mergeConfirmed && ! $keepSeparate) {
             $duplicateItem = $this->inventoryService->checkUpdateDuplicate($inventory, $validated);
 
             if ($duplicateItem) {
-                // Duplikat ditemukan, redirect kembali dengan modal konfirmasi
+                // Return data duplikat untuk memicu modal konfirmasi di frontend
                 return redirect()->back()
                     ->withInput()
                     ->with('duplicate_detected', true)
                     ->with('duplicate_item', [
-                        'id' => $duplicateItem->id,
-                        'name' => $duplicateItem->name,
-                        'part_number' => $duplicateItem->part_number,
-                        'brand' => $duplicateItem->brand,
-                        'category' => $duplicateItem->category,
-                        'condition' => $duplicateItem->condition,
-                        'location' => $duplicateItem->location,
-                        'stock' => $duplicateItem->stock,
+                        'id' => $duplicateItem->id, 'name' => $duplicateItem->name,
+                        'part_number' => $duplicateItem->part_number, 'brand' => $duplicateItem->brand,
+                        'category' => $duplicateItem->category, 'condition' => $duplicateItem->condition,
+                        'location' => $duplicateItem->location, 'stock' => $duplicateItem->stock,
                         'unit' => $duplicateItem->unit,
                     ])
                     ->with('current_item', [
-                        'id' => $inventory->id,
-                        'name' => $inventory->name,
-                        'part_number' => $inventory->part_number,
-                        'stock' => $inventory->stock,
+                        'id' => $inventory->id, 'name' => $inventory->name,
+                        'part_number' => $inventory->part_number, 'stock' => $inventory->stock,
                     ]);
             }
         }
 
-        // Jika user pilih merge
         if ($mergeConfirmed) {
-            $duplicateId = $request->input('duplicate_id');
-            $duplicateItem = Sparepart::findOrFail($duplicateId);
-
+            $duplicateItem = Sparepart::findOrFail($request->input('duplicate_id'));
             $result = $this->inventoryService->mergeSpareparts($inventory, $duplicateItem);
 
             if ($result['status'] === 'error') {
-                return redirect()->route('inventory.edit', $inventory)
-                    ->with('error', $result['message']);
+                return redirect()->route('inventory.edit', $inventory)->with('error', $result['message']);
             }
 
-            return redirect()->route('inventory.index')
-                ->with('success', $result['message']);
+            return redirect()->route('inventory.index')->with('success', $result['message']);
         }
 
-        // Normal update (no duplicate atau user pilih keep separate)
         $result = $this->inventoryService->updateSparepart($inventory, $validated);
 
-        return redirect()->route('inventory.index')
-            ->with('success', $result['message']);
+        return redirect()->route('inventory.index')->with('success', $result['message']);
     }
 
     /**
-     * Menghapus barang dari database (Soft Delete).
+     * Menghapus barang (Soft Delete).
      */
     public function destroy($id)
     {
         $inventory = Sparepart::findOrFail($id);
         $this->authorize('delete', $inventory);
 
-        // Check for active borrowings
         if ($inventory->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
             return redirect()->back()->with('error', __('ui.error_cannot_delete_borrowed'));
         }
 
         $result = $this->inventoryService->deleteSparepart($inventory);
 
-        if ($result['status'] === 'error') {
-            return redirect()->back()->with('error', $result['message']);
-        }
-
-        return redirect()->route('inventory.index')
-            ->with('success', $result['message']);
+        return redirect()->route('inventory.index')->with('success', $result['message']);
     }
 
+    /**
+     * Mengunduh label QR dalam format SVG.
+     */
     public function downloadQrCode(Sparepart $inventory)
     {
         $svgResponse = $this->qrCodeService->generateLabelSvg($inventory);
-
         $filename = $this->qrCodeService->getLabelFilename($inventory);
-
 
         return response($svgResponse, 200, [
             'Content-Type' => 'image/svg+xml',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
     }
 
+    /**
+     * Menampilkan halaman khusus untuk pencetakan label QR.
+     */
     public function printQrCode(Sparepart $inventory)
     {
-        if (!$inventory->qr_code_path) {
+        if (! $inventory->qr_code_path) {
             abort(404, __('messages.qr_code_not_found'));
         }
 
         return view('inventory.print_label', ['sparepart' => $inventory]);
     }
 
+    /**
+     * Endpoint API untuk pengecekan otomatis keberadaan aset berdasarkan Part Number.
+     */
     public function checkPartNumber(Request $request)
     {
         $partNumber = $request->query('part_number');
@@ -241,15 +221,12 @@ class InventoryController extends Controller
             return response()->json([
                 'exists' => true,
                 'data' => [
-                    'name' => $sparepart->name,
-                    'brand' => $sparepart->brand,
-                    'category' => $sparepart->category,
-                    'type' => $sparepart->type,
-                    'unit' => $sparepart->unit,
-                    'price' => $sparepart->price,
+                    'name' => $sparepart->name, 'brand' => $sparepart->brand,
+                    'category' => $sparepart->category, 'type' => $sparepart->type,
+                    'unit' => $sparepart->unit, 'price' => $sparepart->price,
                     'image_url' => $sparepart->image ? Storage::url($sparepart->image) : null,
                     'image_path' => $sparepart->image,
-                ]
+                ],
             ]);
         }
 
@@ -257,7 +234,7 @@ class InventoryController extends Controller
     }
 
     /**
-     * Memulihkan barang yang dihapus (Restore).
+     * Memulihkan aset yang sebelumnya telah dihapus secara lunak.
      */
     public function restore($id)
     {
@@ -266,12 +243,11 @@ class InventoryController extends Controller
 
         $result = $this->inventoryService->restoreSparepart($id);
 
-        return redirect()->route('inventory.index', ['trash' => 'true'])
-            ->with('success', $result['message']);
+        return redirect()->route('inventory.index', ['trash' => 'true'])->with('success', $result['message']);
     }
 
     /**
-     * Menghapus permanen barang.
+     * Menghapus aset dari database secara permanen.
      */
     public function forceDelete($id)
     {
@@ -284,16 +260,15 @@ class InventoryController extends Controller
             return redirect()->back()->with('error', $result['message']);
         }
 
-        return redirect()->route('inventory.index', ['trash' => 'true'])
-            ->with('success', $result['message']);
+        return redirect()->route('inventory.index', ['trash' => 'true'])->with('success', $result['message']);
     }
 
     /**
-     * Menghapus permanen semua barang di sampah.
+     * Menghapus seluruh aset di tong sampah secara permanen.
      */
     public function forceDeleteAll()
     {
-        $this->authorize('forceDelete', new Sparepart());
+        $this->authorize('forceDelete', new Sparepart);
         $result = $this->inventoryService->forceDeleteAllSpareparts();
 
         return redirect()->route('inventory.index', ['trash' => 'true'])
@@ -301,11 +276,11 @@ class InventoryController extends Controller
     }
 
     /**
-     * Memulihkan banyak barang sekaligus.
+     * Memulihkan banyak aset sekaligus dari tong sampah.
      */
     public function bulkRestore(Request $request)
     {
-        $this->authorize('restore', new Sparepart());
+        $this->authorize('restore', new Sparepart);
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:spareparts,id',
@@ -313,30 +288,22 @@ class InventoryController extends Controller
 
         $result = $this->inventoryService->bulkRestore($request->ids);
 
-        if ($result['status'] === 'empty') {
-             return redirect()->back()->with('error', $result['message']);
-        }
-
-        return redirect()->back()->with('success', $result['message']);
+        return redirect()->back()->with($result['status'] === 'empty' ? 'error' : 'success', $result['message']);
     }
 
     /**
-     * Menghapus permanen banyak barang sekaligus.
+     * Menghapus banyak aset secara permanen sekaligus.
      */
     public function bulkForceDelete(Request $request)
     {
-         $this->authorize('forceDelete', new Sparepart());
-         $request->validate([
+        $this->authorize('forceDelete', new Sparepart);
+        $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:spareparts,id',
         ]);
 
         $result = $this->inventoryService->bulkForceDelete($request->ids);
 
-        if ($result['status'] === 'empty') {
-            return redirect()->back()->with('error', $result['message']);
-        }
-
-        return redirect()->back()->with('success', $result['message']);
+        return redirect()->back()->with($result['status'] === 'empty' ? 'error' : 'success', $result['message']);
     }
 }

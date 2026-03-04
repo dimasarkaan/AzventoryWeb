@@ -45,12 +45,12 @@ return new class extends Migration
             $table->timestamp('returned_at')->nullable();
             $table->text('notes')->nullable();
             $table->enum('status', ['borrowed', 'returned', 'lost'])->default('borrowed');
-            
+
             // Return Check
             $table->string('return_condition')->nullable();
             $table->text('return_notes')->nullable();
             $table->json('return_photos')->nullable();
-            
+
             $table->timestamps();
         });
 

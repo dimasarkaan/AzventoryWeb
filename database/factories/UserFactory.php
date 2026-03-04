@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -26,6 +25,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => 'password',
             'role' => 'operator', // Default valid role
+            'status' => 'aktif', // Required for RoleMiddleware
             'password_changed_at' => now(), // Bypass middleware
             'remember_token' => Str::random(10),
         ];

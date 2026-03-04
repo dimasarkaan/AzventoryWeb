@@ -2,40 +2,25 @@
 <html>
 <head>
     <title>{{ $title }}</title>
+    @include('reports.partials.pdf_style')
     <style>
-        body { font-family: sans-serif; font-size: 10pt; }
-        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .header h1 { margin: 0; font-size: 18pt; color: #1e40af; }
-        .header p { margin: 5px 0; color: #666; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #000; padding: 8px; text-align: left; vertical-align: top; }
-        th { background-color: #1e40af; color: #ffffff; font-weight: bold; text-transform: uppercase; font-size: 9pt; text-align: center; }
+        /* Borrowing-specific styles (supplement pdf_header partial) */
+        .borrowed { background-color: #3b82f6 !important; color: white !important; }
+        .returned { background-color: #10b981 !important; color: white !important; }
+        .overdue  { background-color: #dc2626 !important; color: white !important; }
+        .late { color: #dc2626; font-weight: bold; font-size: 8.5pt; display: block; margin-top: 2px; }
         tr:nth-child(even) { background-color: #eff6ff; }
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 8pt; color: white; display: inline-block; font-weight: bold; }
-        .borrowed { background-color: #3b82f6; } /* Blue */
-        .returned { background-color: #10b981; } /* Green */
-        .late { color: #dc2626; font-weight: bold; font-size: 9pt; display: block; margin-top: 2px; }
-        .footer { text-align: right; margin-top: 30px; font-size: 8pt; color: #999; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 style="text-transform: uppercase;">{{ $title }}</h1>
-        <p style="font-size: 10pt; margin-top: 5px;">
-            @if(isset($startDate) && isset($endDate))
-                {{ __('ui.period_label') }} {{ $startDate->translatedFormat('d F Y') }} - {{ $endDate->translatedFormat('d F Y') }}
-            @else
-                {{ __('ui.period_label') }} {{ __('ui.all_history') }}
-            @endif
-        </p>
-    </div>
+    @include('reports.partials.pdf_header')
 
     <table>
         <thead>
             <tr>
                 <th style="width: 5%;">{{ __('ui.no_column') }}</th>
-                <th style="width: 20%;">{{ __('ui.borrower_column') }}</th>
-                <th style="width: 25%;">{{ __('ui.item_column') }}</th>
+                <th style="width: 18%;">{{ __('ui.borrower_column') }}</th>
+                <th style="width: 21%;">{{ __('ui.item_column') }}</th>
                 <th style="width: 12%;">{{ __('ui.borrow_date_column') }}</th>
                 <th style="width: 12%;">{{ __('ui.due_date_column') }}</th>
                 <th style="width: 12%;">{{ __('ui.return_date_column') }}</th>
@@ -87,8 +72,5 @@
         </tbody>
     </table>
 
-    <div class="footer">
-        <p>Azventory &bull; {{ __('ui.report_footer_printed_by', ['name' => auth()->user()->name, 'date' => now()->translatedFormat('d F Y H:i')]) }}</p>
-    </div>
 </body>
 </html>

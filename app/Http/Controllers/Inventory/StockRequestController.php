@@ -6,10 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Sparepart;
 use App\Models\User;
 use App\Notifications\StockRequestNotification;
-use Illuminate\Support\Facades\Notification;
+use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\ActivityLogger;
+use Illuminate\Support\Facades\Notification;
 
 class StockRequestController extends Controller
 {
@@ -48,19 +48,19 @@ class StockRequestController extends Controller
 
         // DB Transaction to ensure data consistency
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $sparepart, $user, $status, $approvedBy, $isAutoApproved) {
-            
+
             // If Auto Approved, update stock immediately
             if ($isAutoApproved) {
                 if ($request->type === 'masuk') {
                     $sparepart->stock += $request->quantity;
                 } else { // keluar
                     if ($sparepart->stock < $request->quantity) {
-                         throw \Illuminate\Validation\ValidationException::withMessages(['quantity' => 'Stok tidak mencukupi untuk pengurangan ini.']);
+                        throw \Illuminate\Validation\ValidationException::withMessages(['quantity' => 'Stok tidak mencukupi untuk pengurangan ini.']);
                     }
                     $sparepart->stock -= $request->quantity;
                 }
                 $sparepart->save();
-                
+
                 // Clear Dashboard Cache & Broadcast Update
                 $this->inventoryService->clearCache();
                 $this->inventoryService->broadcastUpdate($sparepart, 'updated');
@@ -81,17 +81,20 @@ class StockRequestController extends Controller
                 // Determine Log Title
                 $actionTitle = $request->type === 'masuk' ? 'Penambahan Stok' : 'Pengurangan Stok';
                 $this->logActivity($actionTitle, "{$actionTitle}: {$request->quantity} {$sparepart->unit} untuk '{$sparepart->name}'. Alasan: {$request->reason}");
-                
+
                 // Low Stock Notification Check (if reduced)
                 if ($request->type === 'keluar' && $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
                     $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                     Notification::send($admins, new \App\Notifications\LowStockNotification($sparepart));
+                    Notification::send($admins, new \App\Notifications\LowStockNotification($sparepart));
                 }
 
             } else {
                 // Pending Request Logic
                 $this->logActivity('Pengajuan Stok', "Pengajuan stok {$request->type} sebanyak {$request->quantity} untuk '{$sparepart->name}' dengan alasan '{$request->reason}'.");
-                
+
+                // Broadcast real-time new stock request (add to list)
+                broadcast(new \App\Events\StockApprovalUpdatedEvent($stockLog->fresh(), 'created'))->toOthers();
+
                 // Notify admins
                 $admins = User::whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::SUPERADMIN])->get();
                 $type = $request->type == 'masuk' ? __('ui.type_in') : __('ui.type_out');
@@ -104,8 +107,8 @@ class StockRequestController extends Controller
             }
         });
 
-        $message = $isAutoApproved 
-            ? 'Stok berhasil diperbarui secara langsung.' 
+        $message = $isAutoApproved
+            ? 'Stok berhasil diperbarui secara langsung.'
             : 'Pengajuan perubahan stok berhasil dikirim, menunggu persetujuan Admin/Superadmin.';
 
         return redirect()->route('inventory.show', $sparepart)

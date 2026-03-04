@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Event untuk alert stok kritis.
- * 
+ *
  * Di-trigger saat stock < 50% dari minimum stock atau habis total.
  * Broadcast ke public channel 'stock-alerts' untuk semua Admin/Superadmin.
  */
@@ -19,6 +19,7 @@ class StockCriticalEvent implements ShouldBroadcast
     use InteractsWithSockets, SerializesModels;
 
     public $sparepart;
+
     public $severity; // 'critical' | 'warning' | 'depleted'
 
     public function __construct(Sparepart $sparepart, string $severity = 'critical')
@@ -60,7 +61,7 @@ class StockCriticalEvent implements ShouldBroadcast
         if ($this->sparepart->minimum_stock == 0) {
             return 0;
         }
-        
+
         return round(($this->sparepart->stock / $this->sparepart->minimum_stock) * 100, 2);
     }
 }

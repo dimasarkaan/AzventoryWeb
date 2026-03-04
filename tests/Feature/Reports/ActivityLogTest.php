@@ -2,10 +2,11 @@
 
 namespace Tests\Feature\Reports;
 
-use App\Models\User;
 use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ActivityLogTest extends TestCase
@@ -20,8 +21,8 @@ class ActivityLogTest extends TestCase
         $this->superAdmin = User::factory()->create(['role' => \App\Enums\UserRole::SUPERADMIN]);
     }
 
-    /** @test */
-    public function can_filter_logs_by_action_and_user()
+    #[Test]
+    public function dapat_memfilter_log_berdasarkan_aksi_dan_user()
     {
         $user1 = User::factory()->create(['name' => 'Alice']);
         $user2 = User::factory()->create(['name' => 'Bob']);
@@ -29,54 +30,54 @@ class ActivityLogTest extends TestCase
         ActivityLog::factory()->create([
             'user_id' => $user1->id,
             'action' => 'Login',
-            'description' => 'User Alice logged in'
+            'description' => 'User Alice logged in',
         ]);
 
         ActivityLog::factory()->create([
             'user_id' => $user2->id,
             'action' => 'Update Profile',
-            'description' => 'User Bob updated profile'
+            'description' => 'User Bob updated profile',
         ]);
 
         // Filter berdasarkan User Alice
         $response = $this->actingAs($this->superAdmin)->get(route('reports.activity-logs.index', [
-            'user_id' => $user1->id
+            'user_id' => $user1->id,
         ]));
-        
+
         $response->assertViewHas('activityLogs', function ($logs) use ($user1) {
             return $logs->count() === 1 && $logs->first()->user_id === $user1->id;
         });
 
         // Filter berdasarkan Action 'Update Profile'
         $response2 = $this->actingAs($this->superAdmin)->get(route('reports.activity-logs.index', [
-            'action' => 'Update Profile'
+            'action' => 'Update Profile',
         ]));
 
-        $response2->assertViewHas('activityLogs', function ($logs) use ($user2) {
-             return $logs->count() === 1 && $logs->first()->description === 'User Bob updated profile';
+        $response2->assertViewHas('activityLogs', function ($logs) {
+            return $logs->count() === 1 && $logs->first()->description === 'User Bob updated profile';
         });
     }
 
-    /** @test */
-    public function can_export_logs_to_excel_directly()
+    #[Test]
+    public function dapat_mengekspor_log_ke_excel_secara_langsung()
     {
         ActivityLog::factory()->count(5)->create();
 
         $response = $this->actingAs($this->superAdmin)->get(route('reports.activity-logs.export', [
-            'format' => 'excel'
+            'format' => 'excel',
         ]));
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
 
-    /** @test */
-    public function export_pdf_dispatches_job()
+    #[Test]
+    public function ekspor_pdf_mendorong_job_ke_antrean()
     {
         Queue::fake();
 
         $response = $this->actingAs($this->superAdmin)->get(route('reports.activity-logs.export', [
-            'format' => 'pdf'
+            'format' => 'pdf',
         ]));
 
         $response->assertRedirect();

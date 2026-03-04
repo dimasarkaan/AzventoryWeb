@@ -7,6 +7,7 @@ use App\Models\StockLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class StockApprovalTest extends TestCase
@@ -14,23 +15,24 @@ class StockApprovalTest extends TestCase
     use RefreshDatabase;
 
     protected $superAdmin;
+
     protected $operator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->superAdmin = User::factory()->create(['role' => 'superadmin']);
         $this->operator = User::factory()->create(['role' => 'operator']);
 
         Notification::fake();
     }
 
-    /** @test */
-    public function superadmin_can_view_pending_approvals()
+    #[Test]
+    public function superadmin_dapat_melihat_persetujuan_tertunda()
     {
         $item = Sparepart::factory()->create(['stock' => 10]);
-        
+
         // Seed Pending Log
         StockLog::create([
             'sparepart_id' => $item->id,
@@ -48,11 +50,11 @@ class StockApprovalTest extends TestCase
         $response->assertSee($item->name);
     }
 
-    /** @test */
-    public function superadmin_can_approve_stock_request()
+    #[Test]
+    public function superadmin_dapat_menyetujui_permintaan_stok()
     {
         $item = Sparepart::factory()->create(['stock' => 10]);
-        
+
         $log = StockLog::create([
             'sparepart_id' => $item->id,
             'user_id' => $this->operator->id,
@@ -64,7 +66,7 @@ class StockApprovalTest extends TestCase
 
         $response = $this->actingAs($this->superAdmin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status' => 'approved'
+                'status' => 'approved',
             ]);
 
         $response->assertRedirect();
@@ -90,11 +92,11 @@ class StockApprovalTest extends TestCase
         );
     }
 
-    /** @test */
-    public function superadmin_can_reject_stock_request()
+    #[Test]
+    public function superadmin_dapat_menolak_permintaan_stok()
     {
         $item = Sparepart::factory()->create(['stock' => 10]);
-        
+
         $log = StockLog::create([
             'sparepart_id' => $item->id,
             'user_id' => $this->operator->id,
@@ -104,11 +106,9 @@ class StockApprovalTest extends TestCase
             'status' => 'pending',
         ]);
 
-
-
         $response = $this->actingAs($this->superAdmin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status' => 'rejected'
+                'status' => 'rejected',
             ]);
 
         // Check DB

@@ -17,6 +17,6 @@ return [
     'sent' => 'Kami sudah mengirimkan link reset kata sandi ke email Anda!',
     'throttled' => 'Terlalu banyak permintaan. Mohon tunggu beberapa saat sebelum mencoba lagi.',
     'token' => 'Token reset kata sandi ini tidak valid.',
-    'user' => "Kami tidak dapat menemukan pengguna dengan alamat email tersebut.",
+    'user' => 'Kami tidak dapat menemukan pengguna dengan alamat email tersebut.',
 
 ];

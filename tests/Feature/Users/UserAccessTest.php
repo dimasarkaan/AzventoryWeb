@@ -10,7 +10,7 @@ class UserAccessTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_operator_cannot_view_user_list()
+    public function test_operator_tidak_dapat_melihat_daftar_user()
     {
         $operator = User::factory()->create(['role' => 'operator']);
 
@@ -19,7 +19,7 @@ class UserAccessTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_admin_cannot_view_user_list()
+    public function test_admin_tidak_dapat_melihat_daftar_user()
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
@@ -28,7 +28,7 @@ class UserAccessTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_operator_cannot_create_user()
+    public function test_operator_tidak_dapat_membuat_user()
     {
         $operator = User::factory()->create(['role' => 'operator']);
 
@@ -42,7 +42,7 @@ class UserAccessTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_operator_cannot_delete_user()
+    public function test_operator_tidak_dapat_menghapus_user()
     {
         $operator = User::factory()->create(['role' => 'operator']);
         $targetUser = User::factory()->create();

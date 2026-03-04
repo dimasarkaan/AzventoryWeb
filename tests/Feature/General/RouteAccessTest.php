@@ -14,7 +14,7 @@ class RouteAccessTest extends TestCase
     /**
      * Test: Halaman publik harus bisa diakses oleh guest (pengunjung).
      */
-    public function test_public_pages_accessible_by_guest()
+    public function test_halaman_publik_dapat_diakses_oleh_guest()
     {
         // Halaman Login
         $response = $this->get('/login');
@@ -32,7 +32,7 @@ class RouteAccessTest extends TestCase
     /**
      * Test: Halaman terproteksi harus redirect ke login jika belum login.
      */
-    public function test_protected_routes_redirect_unauthenticated_users()
+    public function test_rute_terproteksi_mengarahkan_ke_login_untuk_user_tanpa_autentikasi()
     {
         $routes = [
             '/dashboard',
@@ -50,7 +50,7 @@ class RouteAccessTest extends TestCase
     /**
      * Test: Superadmin bisa mengakses semua halaman vital.
      */
-    public function test_superadmin_can_access_all_critical_pages()
+    public function test_superadmin_dapat_mengakses_semua_halaman_kritis()
     {
         $superadmin = User::factory()->create(['role' => UserRole::SUPERADMIN]);
 
@@ -74,7 +74,7 @@ class RouteAccessTest extends TestCase
     /**
      * Test: Operator memiliki akses terbatas.
      */
-    public function test_operator_has_limited_access()
+    public function test_operator_memiliki_akses_terbatas()
     {
         $operator = User::factory()->create(['role' => UserRole::OPERATOR]);
 
@@ -82,7 +82,7 @@ class RouteAccessTest extends TestCase
 
         // Bisa akses inventory standard
         $this->get('/inventory')->assertStatus(200);
-        
+
         // Bisa akses dashboard operator
         $this->get('/dashboard/operator')->assertStatus(200);
 
@@ -91,7 +91,7 @@ class RouteAccessTest extends TestCase
 
         // TIDAK BISA akses manajemen user
         $this->get('/users')->assertStatus(403);
-        
+
         // TIDAK BISA akses laporan
         $this->get('/reports')->assertStatus(403);
     }
@@ -99,24 +99,24 @@ class RouteAccessTest extends TestCase
     /**
      * Test: Redirect dashboard sesuai role.
      */
-    public function test_dashboard_redirects_based_on_role()
+    public function test_dashboard_mengarahkan_sesuai_role()
     {
         // 1. Superadmin -> /dashboard/superadmin
         $superadmin = User::factory()->create(['role' => UserRole::SUPERADMIN]);
         $this->actingAs($superadmin)
-             ->get('/dashboard')
-             ->assertRedirect(route('dashboard.superadmin'));
+            ->get('/dashboard')
+            ->assertRedirect(route('dashboard.superadmin'));
 
         // 2. Admin -> /dashboard/admin
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
         $this->actingAs($admin)
-             ->get('/dashboard')
-             ->assertRedirect(route('dashboard.admin'));
+            ->get('/dashboard')
+            ->assertRedirect(route('dashboard.admin'));
 
         // 3. Operator -> /dashboard/operator
         $operator = User::factory()->create(['role' => UserRole::OPERATOR]);
         $this->actingAs($operator)
-             ->get('/dashboard')
-             ->assertRedirect(route('dashboard.operator'));
+            ->get('/dashboard')
+            ->assertRedirect(route('dashboard.operator'));
     }
 }

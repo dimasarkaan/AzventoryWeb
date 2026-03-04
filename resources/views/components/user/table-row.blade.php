@@ -8,8 +8,12 @@
     @endif
     <td class="px-4 py-3">
         <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-full bg-secondary-100 flex-shrink-0 overflow-hidden border border-secondary-200 group-hover:border-primary-200 transition-colors">
-                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="h-full w-full object-cover">
+            <div class="h-10 w-10 rounded-full bg-secondary-100 flex-shrink-0 flex items-center justify-center text-secondary-500 overflow-hidden border border-secondary-200 group-hover:border-primary-200 transition-colors">
+                @if($user->avatar)
+                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" class="h-full w-full object-cover">
+                @else
+                    <span class="font-bold text-sm">{{ substr($user->name, 0, 1) }}</span>
+                @endif
             </div>
             <div>
                 <div class="font-medium text-secondary-900 group-hover:text-primary-600 transition-colors">{{ $user->name }}</div>

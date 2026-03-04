@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
 use App\Services\DashboardService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 
 class SuperAdminDashboardController extends Controller
 {
@@ -19,32 +19,55 @@ class SuperAdminDashboardController extends Controller
 
     /**
      * Menampilkan dashboard utama SuperAdmin dengan statistik lengkap.
-     * 
+     *
      * Menggunakan caching untuk performa dan filter berdasarkan tanggal.
      */
     public function index(Request $request)
     {
-        // 1. Tentukan Rentang Tanggal
+        // 1. Validasi Input
+        $request->validate([
+            'period' => 'nullable|string|in:today,this_week,this_month,this_year,custom,custom_year,custom_range',
+            'year' => 'nullable|integer|min:2000|max:'.(now()->year + 1),
+            'month' => 'nullable|string|regex:/^([1-9]|1[0-2]|all|)$/',
+            'start_date' => 'nullable|date',
+            'end_date' => [
+                'nullable',
+                'date',
+                'after_or_equal:start_date',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->start_date && $value) {
+                        $diff = Carbon::parse($request->start_date)->diffInDays(Carbon::parse($value));
+                        if ($diff > 365) {
+                            $fail('Rentang tanggal maksimal 365 hari.');
+                        }
+                    }
+                },
+            ],
+        ]);
+
+        // 2. Tentukan Rentang Tanggal
         [$start, $end, $period] = $this->dashboardService->getDateRange(
             $request->input('period'),
             $request->input('year'),
-            $request->input('month')
+            $request->input('month'),
+            $request->input('start_date'),
+            $request->input('end_date')
         );
 
         $year = $request->input('year');
         $month = $request->input('month');
         $user = auth()->user();
-        
+
         // Generate Cache Key berdasarkan filter, role user, dan timestamp update terakhir
         $lastUpdated = Cache::get('inventory_last_updated', 'init');
-        $cacheKey = 'dashboard_stats_' . $period . '_' . ($year ?? 'nay') . '_' . ($month ?? 'nam') . '_' . $user->id . '_' . $lastUpdated;
-        
+        $cacheKey = 'dashboard_stats_'.$period.'_'.($year ?? 'nay').'_'.($month ?? 'nam').'_'.$user->id.'_'.$lastUpdated;
+
         // Simpan cache selama 10 menit (600 detik)
         $data = Cache::remember($cacheKey, 600, function () use ($start, $end, $period, $user) {
-            
+
             // --- Snapshot (Biasanya tidak difilter tanggal) ---
             $snapshots = $this->dashboardService->getStockSnapshots();
-            
+
             // --- Analitik Terfilter ---
             $movementData = $this->dashboardService->getStockMovements($start, $end);
             $topExited = $this->dashboardService->getTopItems($start, $end, 'keluar');
@@ -52,16 +75,16 @@ class SuperAdminDashboardController extends Controller
             $deadStockItems = $this->dashboardService->getDeadStock($start, $end, $period);
             $activeUsers = $this->dashboardService->getUserLeaderboard($start, $end);
             $forecasts = $this->dashboardService->getForecasts($topExited);
-            
+
             // --- Grafik ---
             $stockByCategory = $this->dashboardService->getStockByAttribute('category');
             $stockByLocation = $this->dashboardService->getStockByAttribute('location');
-            
+
             // --- Peminjaman (Berbasis Role) ---
             $borrowingStats = $this->dashboardService->getBorrowingStats($user);
-            
+
             // --- Aktivitas Terbaru ---
-            $recentActivitiesRaw = $this->dashboardService->getRecentActivities($start, $end);
+            $recentActivitiesRaw = $this->dashboardService->getRecentActivities();
             $recentActivities = $recentActivitiesRaw->map(function ($log) {
                 return [
                     'id' => $log->id,
@@ -76,22 +99,22 @@ class SuperAdminDashboardController extends Controller
 
             // --- Additional Data for Real-time Feeds ---
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart' => function ($query) {
-                    $query->withTrashed();
-                }, 'user'])
+                $query->withTrashed();
+            }, 'user'])
                 ->where('status', 'borrowed')
                 ->latest()
                 ->take(5)
                 ->get();
 
             $overdueBorrowingsListRaw = \App\Models\Borrowing::with(['sparepart' => function ($query) {
-                    $query->withTrashed();
-                }, 'user'])
+                $query->withTrashed();
+            }, 'user'])
                 ->where('status', 'borrowed')
                 ->where('expected_return_at', '<', now())
                 ->orderBy('expected_return_at', 'asc')
                 ->take(5)
                 ->get();
-            
+
             $overdueBorrowingsList = $overdueBorrowingsListRaw->map(function ($borrow) {
                 return [
                     'id' => $borrow->id,
@@ -109,7 +132,7 @@ class SuperAdminDashboardController extends Controller
             });
 
             return array_merge(
-                $snapshots, 
+                $snapshots,
                 [
                     'movementData' => $movementData,
                     'topExited' => $topExited,
@@ -120,42 +143,74 @@ class SuperAdminDashboardController extends Controller
                     'stockByCategory' => $stockByCategory,
                     'stockByLocation' => $stockByLocation,
                     'recentActivities' => $recentActivities,
-                    'activeBorrowingsList' => $activeBorrowingsList, 
+                    'activeBorrowingsList' => $activeBorrowingsList,
                     'overdueBorrowingsList' => $overdueBorrowingsList,
                 ],
                 $borrowingStats
             );
         });
 
-        if ($request->wantsJson()) {
-            return response()->json($data);
-        }
+        // --- Stok Menipis (max 5) ---
+        $lowStockItemsRaw = \App\Models\Sparepart::whereColumn('stock', '<=', 'minimum_stock')
+            ->where('stock', '>', 0)
+            ->orderBy('stock', 'asc')
+            ->take(5)
+            ->get();
+            
+        $lowStockItems = $lowStockItemsRaw->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'stock' => $item->stock,
+                'minimum_stock' => $item->minimum_stock,
+                'category_name' => $item->category ?? 'Unknown',
+            ];
+        });
 
         // Barang bertipe 'sale' yang belum memiliki harga — selalu fresh (tidak di-cache)
-        $noPriceItems = \App\Models\Sparepart::where('type', 'sale')
+        $noPriceItemsRaw = \App\Models\Sparepart::where('type', 'sale')
             ->where(function ($q) {
                 $q->whereNull('price')->orWhere('price', '<=', 0);
             })
             ->latest()
             ->take(10)
             ->get();
+            
+        // Map data agar aman dikonsumsi oleh JavaScript/Alpine
+        $noPriceItems = $noPriceItemsRaw->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'part_number' => $item->part_number,
+                'price' => $item->price,
+            ];
+        });
+
+        if ($request->wantsJson()) {
+            return response()->json(array_merge($data, [
+                'noPriceItems' => $noPriceItems,
+                'lowStockItems' => $lowStockItems
+            ]));
+        }
 
         return view('dashboard.superadmin', array_merge($data, [
-            'period'       => $period,
-            'start'        => $start,
-            'end'          => $end,
-            'year'         => $year,
-            'month'        => $month,
+            'period' => $period,
+            'start' => $start,
+            'end' => $end,
+            'year' => $year,
+            'month' => $month,
             'noPriceItems' => $noPriceItems,
+            'lowStockItems' => $lowStockItems,
+            'availableYears' => $this->dashboardService->getAvailableYears(),
         ]));
     }
 
     /**
      * Endpoint AJAX ringan untuk quick-filter per-widget "Pergerakan Stok".
-     * 
+     *
      * Dipanggil oleh tombol [7 Hari] [30 Hari] [3 Bulan] di widget chart.
      * Hanya menghitung data movement — jauh lebih cepat dari endpoint utama.
-     * 
+     *
      * Query param: ?range=7|30|90 (hari)
      */
     public function movementData(Request $request)
@@ -166,7 +221,7 @@ class SuperAdminDashboardController extends Controller
         $range = max(1, min($range, 365));
 
         $start = now()->subDays($range - 1)->startOfDay();
-        $end   = now()->endOfDay();
+        $end = now()->endOfDay();
 
         $data = $this->dashboardService->getStockMovements($start, $end);
 

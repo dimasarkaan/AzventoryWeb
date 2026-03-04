@@ -26,4 +26,29 @@ class StoreUserRequest extends FormRequest
             'status' => 'required|in:active,inactive',
         ];
     }
+
+    /**
+     * Dapatkan atribut kustom untuk pesan error validator.
+     */
+    public function attributes(): array
+    {
+        return [
+            'email' => 'Alamat Email',
+            'role' => 'Peran',
+            'jabatan' => 'Jabatan',
+            'status' => 'Status Akun',
+        ];
+    }
+
+    /**
+     * Dapatkan pesan validasi kustom.
+     */
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'Alamat email ini sudah digunakan oleh pengguna lain.',
+            'role.in' => 'Peran yang dipilih tidak valid.',
+            'status.in' => 'Status yang dipilih tidak valid.',
+        ];
+    }
 }

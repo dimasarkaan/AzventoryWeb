@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
 /**
- * Mengubah koleksi data Inventaris menjadi struktur JSON standar, 
+ * Mengubah koleksi data Inventaris menjadi struktur JSON standar,
  * lengkap dengan informasi meta tambahan (bisa diperluas nantinya).
  */
 class SparepartCollection extends ResourceCollection
@@ -27,7 +27,7 @@ class SparepartCollection extends ResourceCollection
                 'service' => 'Azventory Integration',
                 // Opsional: informasi tambahan dari request
                 'filters_applied' => $request->only(['search', 'category', 'brand', 'type']),
-            ]
+            ],
         ];
     }
 }

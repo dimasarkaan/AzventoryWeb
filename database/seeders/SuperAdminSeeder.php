@@ -13,7 +13,7 @@ class SuperAdminSeeder extends Seeder
      */
     public function run(): void
     {
-                User::updateOrCreate(
+        User::updateOrCreate(
             ['username' => 'superadmin'],
             [
                 'name' => 'Super Admin',

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Inventory\Borrowing;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Models\Sparepart;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBorrowingRequest extends FormRequest
 {
@@ -33,10 +33,10 @@ class StoreBorrowingRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             $sparepart = $this->route('sparepart'); // Get sparepart from route binding
-            
+
             if ($sparepart instanceof Sparepart) {
                 $check = $sparepart->canBeBorrowed($this->input('quantity', 0));
-                
+
                 if ($check !== true) {
                     // Check is either true or error string
                     $validator->errors()->add('borrow_error', $check);

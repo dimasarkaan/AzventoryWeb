@@ -190,9 +190,6 @@
                                         </button>
                                     </div>
                                     
-                                    <!-- Scan Modal -->
-                                    <!-- Scan Modal -->
-                                    <?php echo $__env->make('inventory.partials.scan-modal', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?>
                                     <?php if (isset($component)) { $__componentOriginal824404ceeb4a1e7de17bfcaedf377360 = $component; } ?>
 <?php if (isset($attributes)) { $__attributesOriginal824404ceeb4a1e7de17bfcaedf377360 = $attributes; } ?>
 <?php $component = App\View\Components\InputError::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? $attributes->all() : [])); ?>
@@ -873,15 +870,18 @@
                                 open: false,
                                 search: '',
                                 selected: '<?php echo e(old('location')); ?>',
-                                options: ['Tegal', 'Cibubur'],
+                                options: <?php echo e(json_encode($locations)); ?>,
                                 get filteredOptions() {
-                                    if (this.search === '' || this.search === this.selected) return this.options;
+                                    if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
                                     return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
                                 },
                                 select(value) {
                                     this.selected = value;
                                     this.search = value; // Show selected value in input
                                     this.open = false;
+                                },
+                                createNew() {
+                                    this.select(this.search);
                                 },
                                 init() {
                                     if(this.selected) this.search = this.selected;
@@ -894,7 +894,7 @@
                                            class="input-field w-full pr-10 cursor-text" 
                                            x-model="search" 
                                            @focus="open = true; $el.select()" 
-                                           @input="open = true; selected = search" 
+                                           @input="open = true; selected = search" @keydown.enter.prevent="createNew()" 
                                            placeholder="<?php echo e(__('ui.select_location')); ?>" 
                                            autocomplete="off">
                                     
@@ -926,15 +926,16 @@
                                     </template>
 
                                     <!-- Create New Option (Superadmin Only) -->
-                                    <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('create', \App\Models\Location::class)): ?>
-                                        <div x-show="search.length > 0 && !filteredOptions.includes(search)" 
-                                             @click="select(search); open = false"
+                                    <?php if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN): ?>
+                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                             @click="createNew()"
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
                                             <span class="block truncate">
                                                 <?php echo __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']); ?>
 
                                             </span>
                                         </div>
+
                                     <?php else: ?>
                                          <div x-show="filteredOptions.length === 0" class="cursor-default select-none relative py-2 pl-3 pr-9 text-secondary-500 italic">
                                             <?php echo e(__('ui.location_not_found')); ?>
@@ -1272,7 +1273,8 @@
         </div>
     </div>
     <?php $__env->startPush('scripts'); ?>
-    <script src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'></script>
+    <!-- Tesseract.js (Di-host secara LOKAL untuk mengantisipasi blokir CORS ISP Indonesia / Browser Security) -->
+    <script src="<?php echo e(asset('vendor/tesseract/tesseract.min.js')); ?>"></script>
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('inventoryForm', () => ({
@@ -1372,9 +1374,19 @@
                 ocrLoading: false,
                 
                 scanErrorMsg: null,
+                scanSuccessMsg: null,
+                scanRawText: null,
                 stream: null,
                 debugMode: false,
                 debugImage: null,
+                debugLog: '',
+                
+                log(msg) {
+                    if (this.debugMode) {
+                        this.debugLog += msg + "\n";
+                    }
+                    console.log("[OCR] " + msg);
+                },
                 videoDevices: [],
                 currentDeviceIndex: 0,
                 currentDeviceLabel: '',
@@ -1394,6 +1406,9 @@
                     this.scanModalOpen = false;
                     this.ocrLoading = false;
                     this.scanErrorMsg = null;
+                    this.scanSuccessMsg = null;
+                    this.scanRawText = null;
+                    this.debugLog = '';
                 },
 
                 async getVideoDevices() {
@@ -1458,6 +1473,9 @@
 
                     this.ocrLoading = true;
                     this.scanErrorMsg = null;
+                    this.scanSuccessMsg = null;
+                    this.scanRawText = null;
+                    this.debugLog = '';
 
                     const video = this.$refs.video;
                     const canvas = document.createElement('canvas');
@@ -1478,58 +1496,41 @@
                 // Image Preprocessing (Upscale + Sharpen + Contrast)
                 async preprocessImage(imageSource) {
                     return new Promise((resolve) => {
+                        this.log("Memulai Pra-Pemrosesan Gambar...");
                         const img = new Image();
                         img.onload = () => {
+                            this.log(`Resolusi Asli: ${img.width}x${img.height}`);
                             const canvas = document.createElement('canvas');
                             const ctx = canvas.getContext('2d');
                             
-                            // 1. Upscale by 2x for better character recognition
-                            const scaleFactor = 2;
-                            canvas.width = img.width * scaleFactor;
-                            canvas.height = img.height * scaleFactor;
+                            let width = img.width;
+                            let height = img.height;
+                            const MAX_WIDTH = 1200;
+                            const MAX_HEIGHT = 1200;
+
+                            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                                if (width > height) {
+                                    height = Math.round((MAX_WIDTH / width) * height);
+                                    width = MAX_WIDTH;
+                                } else {
+                                    width = Math.round((MAX_HEIGHT / height) * width);
+                                    height = MAX_HEIGHT;
+                                }
+                            }
+                            this.log(`Resolusi Setelah Skala: ${width}x${height}`);
+
+                            canvas.width = width;
+                            canvas.height = height;
                             
-                            // Smoothing disabled for pixel-perfect scaling (optional, but usually better for text to be crisp)
-                            ctx.imageSmoothingEnabled = false; 
+                            ctx.imageSmoothingEnabled = true; 
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                            const data = imageData.data;
-                            const width = canvas.width;
-                            const height = canvas.height;
-
-                            // Buffer for sharpening (so we don't read modified pixels)
-                            const outputData = new Uint8ClampedArray(data);
-
-                            // Helper: Get pixel index
-                            const getIdx = (x, y) => (y * width + x) * 4;
-
-                            // 2. Grayscale & Stats (Min/Max)
-                            let min = 255;
-                            let max = 0;
-
-                            // Calculate min/max and convert to gray
-                            for (let i = 0; i < data.length; i += 4) {
-                                const gray = 0.21 * data[i] + 0.72 * data[i + 1] + 0.07 * data[i + 2];
-                                data[i] = gray;
-                                data[i + 1] = gray;
-                                data[i + 2] = gray;
-                                
-                                if (gray < min) min = gray;
-                                if (gray > max) max = gray;
-                            }
-                            if (max === min) max = min + 1;
-
-                            // 3. Contrast Stretching Only (No Sharpening)
-                            // Sharpening was causing noise artifacts (reading barcodes as text)
-                            for (let i = 0; i < data.length; i += 4) {
-                                let gray = data[i];
-                                gray = ((gray - min) * 255) / (max - min);
-                                data[i] = data[i + 1] = data[i + 2] = gray;
-                            }
-
-                            ctx.putImageData(imageData, 0, 0);
-
+                            
+                            this.log("Mengubah format gambar tanpa filter agresif...");
                             resolve(canvas.toDataURL('image/png'));
+                        };
+                        img.onerror = () => {
+                            this.log("Gagal memuat gambar untuk canvas.");
+                            resolve(imageSource); // fallback
                         };
                         img.src = imageSource;
                     });
@@ -1541,6 +1542,9 @@
 
                     this.ocrLoading = true;
                     this.scanErrorMsg = null;
+                    this.scanSuccessMsg = null;
+                    this.scanRawText = null;
+                    this.debugLog = '';
 
                     const reader = new FileReader();
                     reader.onload = async (event) => {
@@ -1555,30 +1559,37 @@
                     let worker = null;
                     try {
                         this.ocrLoading = true;
-                        
-                        worker = await Tesseract.createWorker('eng', 1, {
+                        this.log("Menginisialisasi Mesin OCR Tesseract...");
+                        worker = Tesseract.createWorker({
+                            workerPath: '<?php echo e(asset("vendor/tesseract/worker.min.js")); ?>',
+                            corePath: '<?php echo e(asset("vendor/tesseract/tesseract-core.wasm.js")); ?>',
+                            langPath: '<?php echo e(asset("vendor/tesseract/lang-data")); ?>',
                             logger: m => {
-                                // console.log(m); // Optional logging
-                            }
+                                if(m.status === 'recognizing text') {
+                                    this.log(`Proses OCR: ${Math.round(m.progress * 100)}%`);
+                                } else {
+                                    this.log(`Tesseract: ${m.status}`);
+                                }
+                            },
                         });
-
-                        // Set parameters for general block text reading
-                        await worker.setParameters({
-                            tessedit_pageseg_mode: '11', // PSM 11 = Sparse Text. Finds as much text as possible in no particular order.
+                        this.log("Pekerja Tesseract disiapkan. Memuat bahasa...");
+                        await worker.load();
+                        await worker.loadLanguage('eng');
+                        await worker.initialize('eng');
+                        await worker.setParameters({ 
+                            tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-/. ',
+                            tessedit_pageseg_mode: '11' 
                         });
-
                         const { data: { text } } = await worker.recognize(imageSource);
-                        const rawText = text.toUpperCase(); // Normalize to uppercase
-                        console.log("Raw Analysis:", rawText);
-
-                        // --- Extraction Logic ---
+                        this.log("Teks berhasil diekstrak.");
+                        const rawText = text.toUpperCase();
+                        this.scanRawText = rawText;
                         
-                        // 1. Brand Detection (List of common IT brands)
-                        const knownBrands = ['LENOVO', 'DELL', 'HP', 'ASUS', 'ACER', 'APPLE', 'SAMSUNG', 'TOSHIBA', 'SONY', 'MSI', 'LOGITECH', 'CANON', 'EPSON'];
+                        const knownBrands = ['LENOVO', 'DELL', 'HP', 'ASUS', 'ACER', 'APPLE', 'SAMSUNG', 'TOSHIBA', 'SONY', 'MSI', 'LOGITECH', 'CANON', 'EPSON', 'PROLINK', 'UGREEN'];
                         let foundBrand = '';
                         
                         for (const brand of knownBrands) {
-                            if (rawText.includes(brand)) {
+                            if (rawText.toUpperCase().includes(brand)) {
                                 foundBrand = brand;
                                 console.log("Found Brand:", foundBrand);
                                 // Nice-to-have: Title case (Lenovo instead of LENOVO)
@@ -1587,76 +1598,91 @@
                             }
                         }
 
+                        // 1.5. Name / Description Detection
+                        let foundName = '';
+                        // Looks for "DESC", "DESCRIPTION", "NAME" and captures the rest of the line
+                        const descRegex = /(?:DESC|DESCRIPTION|NAME)[\s.:]*([^\n\r]+)/i;
+                        const matchDesc = rawText.match(descRegex);
+                        if (matchDesc && matchDesc[1]) {
+                            foundName = matchDesc[1].trim();
+                            console.log("Found Description:", foundName);
+                        }
+
                         // 2. Part Number Detection
                         let foundPN = '';
                         
                         // Heuristic A: Explicit Label "PN", "P/N", "Part No", "Orig.PN", etc.
                         // We allow optional characters like 'Orig' or 'Ship' before 'PN'
                         const pnRegex = /(?:ORIG\.?|SHIP|MACHINE)?[\s\.]*(?:P\/N|PN|PART NO|PART NUMBER)[\s.:]*([A-Z0-9\-\/]{3,})/i;
-                        const pnMatch = rawText.match(pnRegex);
-
-                        if (pnMatch && pnMatch[1]) {
-                            foundPN = pnMatch[1];
-                            console.log("Found Explicit PN:", foundPN);
-                        } else {
-                            // Heuristic B: Fallback - Look for the longest alphanumeric string that "looks like" a PN
-                            // We prioritize strings that mix letters and numbers, as pure numbers might be dates/quantities.
-                            const tokens = rawText.split(/[\s\n]+/);
-                            const potentialPNs = tokens.filter(t => {
-                                // Filter out common words/noise
-                                if (knownBrands.includes(t)) return false;
-                                if (['MODEL', 'REV', 'DATE', 'QTY', 'MADE', 'CHINA', 'WIN', 'MB', 'ORIG', 'SHIP'].includes(t)) return false;
+                        const matchA = rawText.match(pnRegex);
+                        if (matchA && matchA[1]) {
+                            foundPN = matchA[1].trim();
+                            console.log("Found PN using Heuristic A:", foundPN);
+                        }
+                        
+                        // Heuristic B: Line by line inspection
+                        if (!foundPN) {
+                            const lines = rawText.split('\n');
+                            for (let i = 0; i < lines.length; i++) {
+                                let line = lines[i].trim();
+                                if(!line) continue;
                                 
-                                // Must be at least 5 chars
-                                if (t.length < 5) return false;
-
-                                // Must contain at least one digit AND (one letter OR one dash/slash)
-                                // This assumes PNs are usually mixed. 
-                                // User said: "kombinasi hurufnya, bukan hanya angka"
-                                const hasDigit = /[0-9]/.test(t);
-                                const hasLetter = /[A-Z]/.test(t);
-                                return hasDigit && hasLetter;
-                            });
-
-                            if (potentialPNs.length > 0) {
-                                // Pick specific ones that match the user's sample format (e.g. 5B21K...)
-                                // For now, taking the longest candidate is often a good heuristic for random labels.
-                                foundPN = potentialPNs.reduce((a, b) => a.length > b.length ? a : b);
-                                console.log("Found Heuristic PN:", foundPN);
+                                // Look for standalone standard PN formats
+                                if (/^[A-Z0-9]{2,}-[A-Z0-9]{3,}$/i.test(line) && line.length > 5 && line.length < 20) {
+                                     foundPN = line;
+                                     console.log("Found PN using Heuristic B (Regex pattern):", foundPN);
+                                     break;
+                                }
+                                
+                                // If the line contains "S/N" (Serial Number) or "MAC", we skip it
+                                if (/S\/N|SN:|MAC/i.test(line)) continue;
                             }
                         }
 
-                        // --- Result Handling ---
-
-                        if (!foundPN && !foundBrand) {
-                            throw new Error("<?php echo e(__('ui.ocr_no_data')); ?>");
-                        }
-
-                        // Fill Form
                         if (foundPN) {
-                            // Clean PN (remove random leading/trailing non-alphanumeric)
+                            // Typos correction: Lenovo specific PNs often start with '5' but OCR reads 'S' or vice-versa
+                            if (foundPN.startsWith('555') && foundPN.length >= 8) {
+                                foundPN = '5SS' + foundPN.substring(3);
+                            } else if (foundPN.startsWith('582') && foundPN.length >= 8) {
+                                // '8' is often misread from 'B' (e.g. 5B2...)
+                                foundPN = '5B2' + foundPN.substring(3);
+                            } else if (foundPN.startsWith('S82') && foundPN.length >= 8) {
+                                // 'S' for '5' and '8' for 'B'
+                                foundPN = '5B2' + foundPN.substring(3);
+                            } else if (foundPN.startsWith('SB2') && foundPN.length >= 8) {
+                                foundPN = '5B2' + foundPN.substring(3);
+                            }
+                            // Clean stray characters from extremities
                             this.partNumber = foundPN.replace(/^[^A-Z0-9]+|[^A-Z0-9]+$/g, '');
-                        }
-                        if (foundBrand) this.itemBrand = foundBrand;
-
-                        // Show Success State (Toast or just close)
-                        if (!this.debugMode) {
-                            this.closeScanModal();
+                            this.scanSuccessMsg = `Part Number terdeteksi: ${this.partNumber}`;
+                            // Automatis trigger pencarian PN
+                            await this.checkPN();
+                            
+                            // Jika PN baru (isLocked masih false), isi otomatis Merek dan Nama jika ditemukan oleh OCR
+                            if (!this.isLocked) {
+                                if (foundBrand) this.itemBrand = foundBrand;
+                                if (foundName) this.itemName = foundName;
+                            }
+                            
+                            // Beri waktu 1 detik bagi pengguna melihat pesan sukses
+                            setTimeout(() => {
+                                this.closeScanModal();
+                            }, 1000);
                         } else {
-                            this.ocrLoading = false;
-                            // Update Debug info if possible or just log
-                            const successMsg = <?php echo json_encode(__('ui.ocr_success', ['brand' => '__BRAND__', 'pn' => '__PN__'])) ?>;
-                            this.scanErrorMsg = successMsg.replace('__BRAND__', foundBrand || '-').replace('__PN__', foundPN || '-');
+                            this.scanErrorMsg = "Part Number tidak dapat ditemukan dalam gambar. Coba pastikan gambar lebih jelas dan terang.";
+                            this.log("Gagal mengekstrak Part Number yang valid.");
                         }
-                        
-                        if (this.partNumber) this.checkPN();
 
-                    } catch (err) {
-                        console.error("Analysis Error:", err);
-                        this.scanErrorMsg = "<?php echo e(__('ui.ocr_error')); ?>: " + (err.message || "Kesalahan sistem.");
+                    } catch (error) {
+                        console.error('OCR Error:', error);
+                        this.log(`Error Terjadi: ${error.message || error}`);
+                        this.scanErrorMsg = `Gagal menganalisis: ${error.message || error}`;
                     } finally {
-                        if (worker) await worker.terminate();
-                        if (!this.scanErrorMsg) this.ocrLoading = false;
+                        this.ocrLoading = false;
+                        if (worker) {
+                            await worker.terminate();
+                            this.log("Pekerja Tesseract dihentikan.");
+                        }
                     }
                 }
             }))

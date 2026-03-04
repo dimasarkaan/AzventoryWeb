@@ -2,69 +2,85 @@
 
 namespace App\Jobs;
 
-use App\Models\Sparepart;
-use App\Models\StockLog;
 use App\Models\User;
+use App\Notifications\ReportReadyNotification;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use App\Notifications\ReportReadyNotification;
-use App\Services\ReportService;
+use Illuminate\Support\Facades\Storage;
 
 class GenerateReportJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $user;
-    protected $params;
 
-    // Buat instance job baru.
-    // @param User $user User yang meminta laporan
-    // @param array $params Parameter filter (tipe, periode, lokasi, dll)
-    public function __construct(User $user, array $params)
+    protected $reportData;
+
+    protected $startDate;
+
+    protected $endDate;
+
+    protected $location;
+
+    protected $type;
+
+    /**
+     * Buat instance job baru dengan data snapshot real-time.
+     */
+    public function __construct(User $user, array $reportData, $startDate, $endDate, $location, $type)
     {
         $this->user = $user;
-        $this->params = $params;
+        $this->reportData = $reportData;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
+        $this->location = $location;
+        $this->type = $type;
     }
 
-    // Eksekusi job.
-    public function handle(ReportService $reportService): void
+    /**
+     * Eksekusi job.
+     */
+    public function handle(): void
     {
-        Log::info('GenerateReportJob: Starting job for user ' . $this->user->id . ' with params: ' . json_encode($this->params)); // Added Log call
+        Log::info('GenerateReportJob: Starting delayed PDF generation for user '.$this->user->id);
 
-        // Extract parameters
-        $type = $this->params['type'] ?? $this->params['report_type'] ?? 'inventory_list'; // Fallback to inventory_list or handle default
-        $location = $this->params['location'] ?? 'all';
-        $startDateParam = $this->params['start_date'] ?? null;
-        $endDateParam = $this->params['end_date'] ?? null;
-        $period = $this->params['period'] ?? 'all';
+        // Fetch Data from the constructor snapshot
+        $data = $this->reportData['data'];
+        $title = $this->reportData['title'];
+        $view = $this->reportData['view'];
 
-        // Resolve Dates
-        [$startDate, $endDate] = $reportService->resolveDateRange($period, $startDateParam, $endDateParam);
+        // Restore relations and aggregates that are dropped by SerializesModels
+        if ($this->type === 'stock_mutation') {
+            $data->loadMissing(['sparepart', 'user']);
+        } elseif ($this->type === 'borrowing_history') {
+            $data->loadMissing(['sparepart', 'user']);
+            // Must reload the sum manually as load() doesn't restore withSum() aggregates
+            $data->loadSum('returns', 'quantity');
+        }
 
-        // Fetch Data via Service
-        $reportData = $reportService->getReportData($type, $location, $startDate, $endDate);
-        
-        $data = $reportData['data'];
-        $title = $reportData['title'];
-        $view = $reportData['view'];
+        // Assign to local variables for the view
+        $startDate = $this->startDate;
+        $endDate = $this->endDate;
+        $location = $this->location;
+        $type = $this->type;
 
-        // Generate PDF
+        // Generate PDF using a fresh resolved instance, bypassing Facade static caching in Queue Worker
         if ($view) {
-            $pdf = Pdf::loadView($view, compact('data', 'startDate', 'endDate', 'title', 'location', 'type'));
-            
+            $pdf = app()->make('dompdf.wrapper')->loadView($view, compact('data', 'startDate', 'endDate', 'title', 'location', 'type'));
+
             if (in_array($type, ['borrowing_history', 'stock_mutation'])) {
                 $pdf->setPaper('a4', 'landscape');
+            } else {
+                $pdf->setPaper('a4', 'portrait');
             }
 
             // Generate Filename
-            $prefix = match($type) {
+            $prefix = match ($type) {
                 'inventory_list' => 'LaporanInventaris',
                 'stock_mutation' => 'LaporanMutasi',
                 'borrowing_history' => 'LaporanPeminjaman',
@@ -77,25 +93,25 @@ class GenerateReportJob implements ShouldQueue
                 $end = $endDate->format('d-m-Y');
                 $filename = "{$prefix}_{$start}sd{$end}.pdf";
             } else {
-                $filename = "{$prefix}SemuaRiwayat_" . now()->format('d-m-Y') . ".pdf";
+                $filename = "{$prefix}SemuaRiwayat_".now()->format('d-m-Y').'.pdf';
             }
 
             // Save to Storage
-            $path = 'reports/' . $filename;
+            $path = 'reports/'.$filename;
             Storage::disk('public')->put($path, $pdf->output());
 
             // Notify User
             $url = Storage::url($path);
-            
+
             // Use friendly title for notification
-            $notifyTitle = match($type) {
+            $notifyTitle = match ($type) {
                 'inventory_list' => 'Laporan Inventaris',
                 'stock_mutation' => 'Laporan Mutasi Stok',
                 'borrowing_history' => 'Laporan Peminjaman',
                 'low_stock' => 'Laporan Stok Menipis',
                 default => 'Laporan Sistem'
             };
-            
+
             $this->user->notify(new ReportReadyNotification($notifyTitle, $url));
         }
     }

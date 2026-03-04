@@ -104,11 +104,7 @@
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.unit_price') }}</span>
                                 <div class="mt-1 text-secondary-900 font-bold text-lg">
-                                    @if(auth()->user()->role === \App\Enums\UserRole::OPERATOR)
-                                        -
-                                    @else
-                                        Rp {{ number_format($sparepart->price, 0, ',', '.') }}
-                                    @endif
+                                    Rp {{ number_format($sparepart->price, 0, ',', '.') }}
                                 </div>
                             </div>
                             @endif
@@ -123,8 +119,8 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.available_stock') }}</span>
-                                <div class="mt-1 text-4xl font-extrabold text-secondary-900">
-                                    {{ $sparepart->stock }}
+                                <div class="mt-1 text-4xl font-extrabold text-secondary-900 transition-all duration-300" :class="{'text-primary-600 scale-105': liveUpdateShow}">
+                                    <span x-text="liveStock">{{ $sparepart->stock }}</span>
                                     <span class="text-base font-medium text-secondary-500">{{ $sparepart->unit ?? 'Pcs' }}</span>
                                 </div>
                             </div>
@@ -133,20 +129,21 @@
                             </div>
                         </div>
                         
-                        @if($sparepart->stock <= $sparepart->minimum_stock)
-                        <div class="mt-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-100">
-                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                             <div>
-                                 <span class="font-bold block">{{ __('ui.low_stock_alert') }}</span>
-                                 {{ __('ui.low_stock_desc') }} ({{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
-                             </div>
-                        </div>
-                        @else
-                         <div class="mt-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-center gap-2 border border-success-100">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                             <span>{{ __('ui.stock_safe') }} (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }})</span>
-                        </div>
-                        @endif
+                        <template x-if="liveStock <= {{ $sparepart->minimum_stock ?? 0 }}">
+                            <div class="mt-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-100">
+                                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                 <div>
+                                     <span class="font-bold block">{{ __('ui.low_stock_alert') }}</span>
+                                     {{ __('ui.low_stock_desc') }} ({{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
+                                 </div>
+                            </div>
+                        </template>
+                        <template x-if="liveStock > {{ $sparepart->minimum_stock ?? 0 }}">
+                             <div class="mt-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-center gap-2 border border-success-100">
+                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                 <span>{{ __('ui.stock_safe') }} (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }})</span>
+                            </div>
+                        </template>
 
                         <!-- Actions Wrapper -->
                         <div>
@@ -193,7 +190,7 @@
                                             type: 'masuk', 
                                             quantity: '', 
                                             reason: '', 
-                                            currentStock: {{ $sparepart->stock }},
+                                            get currentStock() { return liveStock; },
                                             get isValid() {
                                                 return this.quantity > 0 && 
                                                        this.reason.trim() !== '' && 
@@ -218,7 +215,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-t border-gray-100">
+                                                
+                                                <!-- Real-time Warning Banner -->
+                                                <div x-show="liveUpdateShow" x-transition class="mb-4 bg-warning-50 border-l-4 border-warning-400 p-3 rounded shadow-sm flex items-start">
+                                                    <svg class="w-5 h-5 text-warning-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    <span class="text-warning-800 text-sm font-medium" x-text="liveUpdateMessage"></span>
+                                                </div>
+
                                                 <div class="space-y-4">
                                                             <div>
                                                                 <label class="block text-sm font-medium text-gray-700">{{ __('ui.change_type') }} <span class="text-danger-500">*</span></label>
@@ -247,7 +251,7 @@
                                                                 </div>
                                                                 <p x-show="isStockError" x-transition class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
                                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                                    {{ __('ui.quantity_exceeds_stock') }} ({{ $sparepart->stock }}).
+                                                                    {{ __('ui.quantity_exceeds_stock') }} (<span x-text="currentStock"></span>).
                                                                 </p>
                                                             </div>
 
@@ -286,7 +290,7 @@
                                          x-data="{
                                             quantity: '',
                                             dueDate: '',
-                                            maxStock: {{ $sparepart->stock }},
+                                            get maxStock() { return liveStock; },
                                             get isValid() { return this.quantity > 0 && this.quantity <= this.maxStock && this.dueDate; },
                                             get isQuantityError() { return this.quantity !== '' && this.quantity > this.maxStock; }
                                          }"
@@ -305,7 +309,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-t border-gray-100">
+
+                                                <!-- Real-time Warning Banner -->
+                                                <div x-show="liveUpdateShow" x-transition class="mb-4 bg-warning-50 border-l-4 border-warning-400 p-3 rounded shadow-sm flex items-start">
+                                                    <svg class="w-5 h-5 text-warning-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    <span class="text-warning-800 text-sm font-medium" x-text="liveUpdateMessage"></span>
+                                                </div>
+
                                                 <div class="space-y-4">
                                                             <div>
                                                                 <label class="block text-sm font-medium text-gray-700">{{ __('ui.borrower_name') }}</label>
@@ -320,10 +331,10 @@
                                                                 <!-- Custom Error Message -->
                                                                 <p x-show="isQuantityError" style="display: none;" class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
                                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                                                    {{ __('ui.quantity_exceeds_stock') }} ({{ $sparepart->stock }}).
+                                                                    {{ __('ui.quantity_exceeds_stock') }} (<span x-text="maxStock"></span>).
                                                                 </p>
                                                                 <p x-show="!isQuantityError" class="text-secondary-400 text-xs mt-1">
-                                                                    {{ __('ui.stock_available') }}: {{ $sparepart->stock }} {{ $sparepart->unit ?? 'Pcs' }}
+                                                                    {{ __('ui.stock_available') }}: <span x-text="maxStock"></span> {{ $sparepart->unit ?? 'Pcs' }}
                                                                 </p>
                                                             </div>
 

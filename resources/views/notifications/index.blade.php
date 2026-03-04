@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 mb-6">
                 <div>
                      <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.notification_title') }}
@@ -11,10 +11,10 @@
                     </p>
                 </div>
                  @if(!$notifications->isEmpty())
-                <form action="{{ route('notifications.markAllRead') }}" method="POST">
+                <form action="{{ route('notifications.markAllRead') }}" method="POST" class="w-full sm:w-auto">
                     @csrf
                     @method('PATCH')
-                    <button type="submit" class="btn btn-secondary text-xs">
+                    <button type="submit" class="btn btn-secondary text-xs whitespace-nowrap w-full sm:w-auto justify-center">
                         <svg class="w-4 h-4 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                         {{ __('ui.notification_mark_all_read') }}
                     </button>

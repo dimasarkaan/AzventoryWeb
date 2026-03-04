@@ -4,15 +4,13 @@ namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\ImageOptimizationService;
+use App\Traits\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
-
-use App\Traits\ActivityLogger;
-
-use App\Services\ImageOptimizationService;
 
 class ProfileController extends Controller
 {
@@ -24,13 +22,14 @@ class ProfileController extends Controller
     {
         $this->imageOptimizer = $imageOptimizer;
     }
+
     /**
      * Menampilkan form edit profil user.
      */
     public function edit(Request $request): View
     {
         $user = $request->user();
-        
+
         $totalBorrowed = $user->borrowings()->count();
         $activeBorrows = $user->borrowings()->whereNull('returned_at')->count();
 
@@ -58,18 +57,18 @@ class ProfileController extends Controller
         }
 
         if ($request->hasFile('avatar')) {
-             // Hapus avatar lama jika ada
-             if ($request->user()->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($request->user()->avatar)) {
+            // Hapus avatar lama jika ada
+            if ($request->user()->avatar && \Illuminate\Support\Facades\Storage::disk('public')->exists($request->user()->avatar)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($request->user()->avatar);
             }
-            
+
             $path = $this->imageOptimizer->optimizeAndSave($request->file('avatar'), 'avatars');
             $request->user()->avatar = $path;
         }
 
         $request->user()->save();
 
-        $this->logActivity('Profil Diupdate', "User mengupdate profil mereka.");
+        $this->logActivity('Profil Diupdate', 'User mengupdate profil mereka.');
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -85,7 +84,11 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        $this->logActivity('Akun Dihapus', "User menghapus akun mereka sendiri.");
+        if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+            return back()->with('error', 'Anda tidak dapat menghapus akun karena masih memiliki pinjaman barang yang belum dikembalikan.');
+        }
+
+        $this->logActivity('Akun Dihapus', 'User menghapus akun mereka sendiri.');
 
         Auth::logout();
 
@@ -95,6 +98,22 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Memperbarui pengaturan user (JSON settings).
+     */
+    public function updateSettings(Request $request)
+    {
+        $request->validate([
+            'settings' => 'required|array',
+        ]);
+
+        $user = $request->user();
+        $user->settings = array_merge($user->settings ?? [], $request->input('settings'));
+        $user->save();
+
+        return response()->json(['status' => 'success', 'settings' => $user->settings]);
     }
 
     /**

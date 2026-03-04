@@ -28,13 +28,14 @@ class CreateApiToken extends Command
     public function handle()
     {
         $name = $this->argument('name');
-        $email = $this->argument('email') ?? 'api-service-' . \Illuminate\Support\Str::slug($name) . '@system.local';
+        $email = $this->argument('email') ?? 'api-service-'.\Illuminate\Support\Str::slug($name).'@system.local';
 
         // Find or Create User
         $user = User::firstOrCreate(
             ['email' => $email],
             [
-                'name' => 'API Service: ' . $name,
+                'name' => 'API Service: '.$name,
+                'username' => \Illuminate\Support\Str::slug('api-'.$name),
                 'password' => Hash::make(\Illuminate\Support\Str::random(32)),
             ]
         );
@@ -42,11 +43,11 @@ class CreateApiToken extends Command
         // Create Token
         $token = $user->createToken($name);
 
-        $this->info("Token Berhasil Dibuat!");
-        $this->line("User: " . $user->email);
-        $this->line("Nama Token: " . $name);
+        $this->info('Token Berhasil Dibuat!');
+        $this->line('User: '.$user->email);
+        $this->line('Nama Token: '.$name);
         $this->newLine();
-        $this->warn("Akses Token (SIMPAN INI, token tidak akan ditampilkan lagi):");
+        $this->warn('Akses Token (SIMPAN INI, token tidak akan ditampilkan lagi):');
         $this->info($token->plainTextToken);
         $this->newLine();
 

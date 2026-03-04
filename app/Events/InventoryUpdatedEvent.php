@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Event untuk broadcast perubahan inventory ke semua user yang sedang online.
- * 
+ *
  * Event ini di-trigger saat barang dibuat, diupdate, atau dihapus.
  * Berguna untuk update real-time di dashboard atau inventory list tanpa refresh.
  */
@@ -19,14 +19,19 @@ class InventoryUpdatedEvent implements ShouldBroadcast
     use InteractsWithSockets, SerializesModels;
 
     public $sparepart;
+
     public $action; // created|updated|deleted
+
     public $userName;
 
-    public function __construct(Sparepart $sparepart, string $action, string $userName)
+    public $customMessage;
+
+    public function __construct(Sparepart $sparepart, string $action, string $userName, ?string $customMessage = null)
     {
         $this->sparepart = $sparepart;
         $this->action = $action;
         $this->userName = $userName;
+        $this->customMessage = $customMessage;
     }
 
     // Channel untuk broadcast (public channel).
@@ -58,7 +63,11 @@ class InventoryUpdatedEvent implements ShouldBroadcast
     // Generate pesan notifikasi berdasarkan action.
     private function generateMessage(): string
     {
-        return match($this->action) {
+        if ($this->customMessage) {
+            return $this->customMessage;
+        }
+
+        return match ($this->action) {
             'created' => "{$this->userName} menambahkan barang: {$this->sparepart->name}",
             'updated' => "{$this->userName} mengubah data: {$this->sparepart->name}",
             'deleted' => "{$this->userName} menghapus barang: {$this->sparepart->name}",

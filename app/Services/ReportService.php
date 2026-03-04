@@ -2,19 +2,47 @@
 
 namespace App\Services;
 
+use App\Models\Borrowing;
 use App\Models\Sparepart;
 use App\Models\StockLog;
-use App\Models\Borrowing;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
+/**
+ * ReportService mengelola pengambilan data untuk generator laporan (PDF/Excel).
+ */
 class ReportService
 {
-    // Dapatkan data laporan berdasarkan tipe dan filter.
-    // Mengembalikan array dengan ['data', 'title', 'view'].
+    /**
+     * Mengambil dataset laporan berdasarkan tipe, lokasi, dan rentang tanggal.
+     *
+     * @return array ['data', 'title', 'view']
+     */
     public function getReportData($type, $location, $startDate, $endDate)
     {
-        $data = collect();
+        $queryResult = $this->getReportQuery($type, $location, $startDate, $endDate);
+
+        if (! $queryResult['query']) {
+            return [
+                'data' => collect(),
+                'title' => $queryResult['title'],
+                'view' => $queryResult['view'],
+            ];
+        }
+
+        return [
+            'data' => $queryResult['query']->get(),
+            'title' => $queryResult['title'],
+            'view' => $queryResult['view'],
+        ];
+    }
+
+    /**
+     * Mendapatkan query builder untuk laporan (mendukung streaming data/lazy loading).
+     */
+    public function getReportQuery($type, $location, $startDate, $endDate)
+    {
+        $query = null;
         $title = 'Laporan';
         $view = '';
 
@@ -23,45 +51,51 @@ class ReportService
             if ($location !== 'all' && $location) {
                 $query->where('location', $location);
             }
-            $data = $query->get();
             $title = 'Laporan Data Inventaris Saat Ini';
             $view = 'reports.pdf_inventory_list';
 
         } elseif ($type == 'stock_mutation') {
             $query = StockLog::with(['sparepart', 'user']);
             $this->applyDateRange($query, 'created_at', $startDate, $endDate);
-            
+
             if ($location !== 'all' && $location) {
-                $query->whereHas('sparepart', function($q) use ($location) {
+                $query->whereHas('sparepart', function ($q) use ($location) {
                     $q->where('location', $location);
                 });
             }
-            $data = $query->latest()->get();
+            $query->latest();
             $title = 'Laporan Riwayat Stok / Mutasi';
             $view = 'reports.pdf_stock_mutation';
 
         } elseif ($type == 'borrowing_history') {
-            $query = Borrowing::with(['sparepart', 'user']);
+            $query = Borrowing::with(['sparepart', 'user'])->withSum('returns', 'quantity');
             $this->applyDateRange($query, 'borrowed_at', $startDate, $endDate);
-            
-            $data = $query->latest()->get();
+
+            $query->latest();
             $title = 'Laporan Riwayat Peminjaman';
             $view = 'reports.pdf_borrowing_history';
 
         } elseif ($type == 'low_stock') {
-            $query = Sparepart::whereColumn('stock', '<=', 'minimum_stock')->orderBy('stock', 'asc');
+            $query = Sparepart::where('minimum_stock', '>', 0)
+                ->whereColumn('stock', '<=', 'minimum_stock')
+                ->orderBy('stock', 'asc');
             if ($location !== 'all' && $location) {
                 $query->where('location', $location);
             }
-            $data = $query->get();
             $title = 'Laporan Stok Menipis';
             $view = 'reports.pdf_low_stock';
         }
 
-        return compact('data', 'title', 'view');
+        return [
+            'query' => $query,
+            'title' => $title,
+            'view' => $view,
+        ];
     }
 
-    // Urai rentang tanggal dari string periode.
+    /**
+     * Mengonversi string periode menjadi rentang objek Carbon.
+     */
     public function resolveDateRange($period, $customStart = null, $customEnd = null)
     {
         $startDate = null;
@@ -87,6 +121,9 @@ class ReportService
         return [$startDate, $endDate];
     }
 
+    /**
+     * Helper untuk menerapkan filter rentang tanggal pada query builder.
+     */
     private function applyDateRange(Builder $query, $column, $start, $end)
     {
         if ($start && $end) {

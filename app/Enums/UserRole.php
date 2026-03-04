@@ -10,16 +10,16 @@ enum UserRole: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::SUPERADMIN => __('ui.role_superadmin'),
             self::ADMIN => __('ui.role_admin'),
             self::OPERATOR => __('ui.role_operator'),
         };
     }
 
-    public function color(): string 
+    public function color(): string
     {
-        return match($this) {
+        return match ($this) {
             self::SUPERADMIN => 'red',
             self::ADMIN => 'blue',
             self::OPERATOR => 'green',

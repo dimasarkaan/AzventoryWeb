@@ -10,7 +10,7 @@ class ForcePasswordChangeTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_new_user_is_redirected_to_change_password_page()
+    public function test_user_baru_diarahkan_ke_halaman_ganti_password()
     {
         $user = User::factory()->create([
             'password_changed_at' => null, // Simulate new user
@@ -23,7 +23,7 @@ class ForcePasswordChangeTest extends TestCase
         $response->assertSessionHas('warning');
     }
 
-    public function test_user_can_access_change_password_page_without_redirect_loop()
+    public function test_user_dapat_mengakses_halaman_ganti_password_tanpa_redirect_loop()
     {
         $user = User::factory()->create([
             'password_changed_at' => null,
@@ -34,7 +34,7 @@ class ForcePasswordChangeTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_user_with_changed_password_can_access_dashboard()
+    public function test_user_dengan_password_yang_sudah_diganti_dapat_mengakses_dashboard()
     {
         $user = User::factory()->create([
             'password_changed_at' => now(), // Simulate existing user

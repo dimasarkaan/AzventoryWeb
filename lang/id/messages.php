@@ -6,9 +6,9 @@ return [
     'save' => 'Simpan',
     'delete' => 'Hapus',
     'qr_code_not_found' => 'QR Code tidak ditemukan.',
-    'edit' => 'Edit',
+    'edit' => 'Ubah',
     'search' => 'Cari',
-    'filter' => 'Filter',
+    'filter' => 'Saring',
     'choose_file' => 'Pilih file',
     'drag_drop' => 'atau seret dan lepas di sini',
     'image_help' => 'Format: JPG, JPEG, PNG, WEBP. Maksimal ukuran 10MB. Gambar akan dioptimasi otomatis.',
@@ -24,13 +24,13 @@ return [
     'inventory_create_subtitle' => 'Isi detail sparepart di bawah ini untuk menambahkan ke inventaris.',
     'inventory_section_basic' => 'Informasi Dasar',
     'inventory_section_location' => 'Lokasi & Stok',
-    
+
     'item_type' => 'Tipe Barang',
     'type_sale' => 'Barang Dijual (Sale)',
     'type_sale_desc' => 'Barang dagangan dengan stok dan harga jual.',
     'type_asset' => 'Inventaris (Asset)',
     'type_asset_desc' => 'Aset internal kantor, dapat dipinjamkan.',
-    
+
     'part_number' => 'Part Number (PN)',
     'item_name' => 'Nama Barang',
     'brand' => 'Merk',
@@ -44,7 +44,7 @@ return [
     'minimum_stock_help' => 'Sistem akan memberi peringatan jika stok di bawah ini.',
     'unit' => 'Satuan',
     'price' => 'Harga Jual',
-    
+
     // Inventory Actions/Messages
     'stock_merged' => "Stok sparepart ':name' (PN: :part_number) berhasil ditambahkan ke item yang sudah ada.",
     'stock_zero_duplicate' => "Item ':name' (PN: :part_number) sudah ada di inventaris dan stok input adalah 0. Silakan periksa kembali jumlah stok.",
@@ -60,12 +60,12 @@ return [
     'no_item_selected' => 'Tidak ada item yang dipilih.',
     'bulk_restored' => ':count item berhasil dipulihkan.',
     'bulk_force_deleted' => ':count item berhasil dihapus permanen.',
-    'items_merged' => "Berhasil menggabungkan ':source_name' (PN: :source_pn) dengan stock :stock ke ':target_name' (PN: :target_pn).",
-    
+    'items_merged' => "Berhasil menggabungkan ':source_name' (PN: :source_pn) dengan stok :stock ke ':target_name' (PN: :target_pn).",
+
     // Users
-    'user_created' => "User berhasil dibuat. Username Sementara: :username, Password Default: :password",
-    'user_updated' => "Akun pengguna :name berhasil diperbarui.",
-    'user_password_reset' => "Password untuk :name telah direset menjadi: :password",
+    'user_created' => 'User berhasil dibuat. Username Sementara: :username, Password Default: :password',
+    'user_updated' => 'Akun pengguna :name berhasil diperbarui.',
+    'user_password_reset' => 'Password untuk :name telah direset menjadi: :password',
     'cannot_delete_self' => 'Anda tidak dapat menghapus akun Anda sendiri.',
     'user_deleted' => 'User berhasil dihapus.',
     'user_restored' => 'User berhasil dipulihkan.',
@@ -74,7 +74,7 @@ return [
     'bulk_user_restored' => ':count user berhasil dipulihkan.',
     'no_user_selected_delete' => 'Tidak ada item yang dipilih untuk dihapus.',
     'bulk_user_force_deleted' => ':count user berhasil dihapus permanen.',
-    
+
     // Activity Logs
     'log_stock_added_duplicate' => 'Penambahan stok (Duplicate Entry)',
     'log_stock_initial' => 'Stok awal (Item baru)',
@@ -83,15 +83,22 @@ return [
     'log_item_deleted_soft' => "Sparepart ':name' (PN: :part_number) telah dipindahkan ke tong sampah.",
     'log_item_restored' => "Sparepart ':name' (PN: :part_number) telah dipulihkan dari tong sampah.",
     'log_item_deleted_force' => "Sparepart ':name' (PN: :part_number) telah dihapus permanen.",
-    'log_trash_cleared' => "Semua item di tong sampah (:count item) telah dihapus permanen.",
-    'log_bulk_restored' => ":count item berhasil dipulihkan dari tong sampah.",
-    'log_bulk_deleted_force' => ":count item telah dihapus permanen dari tong sampah.",
-    'log_user_created' => "Menambahkan user baru: :name (:role)",
-    'log_user_updated' => "Mengupdate data user: :name",
-    'log_user_password_reset' => "Mereset password user: :name ke default.",
-    'log_user_deleted_soft' => "Menghapus user: :name",
-    'log_user_restored' => "Memulihkan user: :name",
-    'log_user_deleted_force' => "Menghapus permanen user: :name",
-    'log_bulk_user_restored' => ":count user berhasil dipulihkan.",
-    'log_bulk_user_deleted_force' => ":count user dihapus permanen.",
+    'log_trash_cleared' => 'Semua item di tong sampah (:count item) telah dihapus permanen.',
+    'log_bulk_restored' => ':count item berhasil dipulihkan dari tong sampah.',
+    'log_bulk_deleted_force' => ':count item telah dihapus permanen dari tong sampah.',
+    'log_user_created' => 'Menambahkan user baru: :name (:role)',
+    'log_user_updated' => 'Mengupdate data user: :name',
+    'log_user_password_reset' => 'Mereset password user: :name ke default.',
+    'log_user_deleted_soft' => 'Menghapus user: :name',
+    'log_user_restored' => 'Memulihkan user: :name',
+    'log_user_deleted_force' => 'Menghapus permanen user: :name',
+    'log_bulk_user_restored' => ':count user berhasil dipulihkan.',
+    'log_bulk_user_deleted_force' => ':count user dihapus permanen.',
+
+    // Borrowing & Real-time
+    'insufficient_stock' => 'Stok tidak mencukupi untuk peminjaman ini.',
+    'log_borrowing' => 'Peminjaman barang oleh :user',
+    'log_return_good' => 'Pengembalian barang (Kondisi Baik) oleh :user',
+    'realtime_borrowed' => ':user baru saja meminjam :qty :name',
+    'realtime_returned' => ':user baru saja mengembalikan :qty :name',
 ];

@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Broadcast;
 use App\Enums\UserRole;
+use Illuminate\Support\Facades\Broadcast;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -64,7 +65,8 @@ Broadcast::channel('user.{userId}', function ($user, $userId) {
  * Hanya Admin & Superadmin yang bisa listen
  */
 Broadcast::channel('admin-dashboard', function ($user) {
-    return in_array($user->role, [UserRole::ADMIN, UserRole::SUPERADMIN]);
+    $role = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+    return in_array($role, [UserRole::ADMIN->value, UserRole::SUPERADMIN->value]);
 });
 
 /**
@@ -73,7 +75,8 @@ Broadcast::channel('admin-dashboard', function ($user) {
  * Hanya Admin & Superadmin yang bisa approve/reject
  */
 Broadcast::channel('borrowing-requests', function ($user) {
-    return in_array($user->role, [UserRole::ADMIN, UserRole::SUPERADMIN]);
+    $role = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+    return in_array($role, [UserRole::ADMIN->value, UserRole::SUPERADMIN->value]);
 });
 
 /**
@@ -82,7 +85,8 @@ Broadcast::channel('borrowing-requests', function ($user) {
  * Hanya Superadmin yang bisa approve
  */
 Broadcast::channel('stock-approvals', function ($user) {
-    return $user->role === UserRole::SUPERADMIN;
+    $role = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+    return in_array($role, [UserRole::ADMIN->value, UserRole::SUPERADMIN->value]);
 });
 
 /**
@@ -94,6 +98,6 @@ Broadcast::channel('online-users', function ($user) {
     return [
         'id' => $user->id,
         'name' => $user->name,
-        'role' => $user->role->value,
+        'role' => $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role,
     ];
 });

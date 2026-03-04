@@ -19,13 +19,61 @@ document.addEventListener('DOMContentLoaded', function () {
     // INVENTORY UPDATES CHANNEL - Public Channel
     // =================================================================
 
+    // Function untuk refresh data dashboard jika ada di halaman dashboard
+    const refreshDashboardData = () => {
+        const isDashboard = window.location.pathname.includes('/dashboard');
+        if (isDashboard) {
+            console.log('🔄 Dashboard detected. Fetching fresh data...');
+
+            fetch(window.location.href, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📊 Dashboard data fetched. Dispatching refresh event...');
+
+                    // 1. Dispatch event untuk Alpine.js
+                    window.dispatchEvent(new CustomEvent('dashboard-refresh', {
+                        detail: data
+                    }));
+
+                    // 2. Transisi Highlight (Realtime Feedback)
+                    setTimeout(() => {
+                        const highlightTargets = document.querySelectorAll(
+                            '.stat-card, [data-rt-highlight], #stockMovementChart, .inventory-table tr:not(:first-child)'
+                        );
+
+                        highlightTargets.forEach(el => {
+                            // Hapus class jika sudah ada agar animasi reset
+                            el.classList.remove('animate-rt-highlight');
+                            // Force reflow
+                            void el.offsetWidth;
+                            el.classList.add('animate-rt-highlight');
+                        });
+                    }, 100);
+
+                    // 3. Fallback untuk chart non-Alpine (jika ada)
+                    if (typeof window.updateDashboardCharts === 'function') {
+                        window.updateDashboardCharts(data.movementData, data.stockByCategory, data.stockByLocation, data);
+                    }
+                })
+                .catch(error => console.error('❌ Error refreshing dashboard:', error));
+        }
+    };
+
     Echo.channel('inventory-updates')
         // Event: InventoryUpdated (barang dibuat/diupdate/dihapus)
-        .listen('InventoryUpdated', (e) => {
+        .listen('.InventoryUpdated', (e) => {
             console.log('📦 Inventory Updated:', e);
 
             // Show toast notification ke semua user.
             showInventoryToast(e.message, e.action);
+
+            // Refresh dashboard
+            refreshDashboardData();
 
             // Auto-refresh inventory list jika sedang di halaman inventory.
             if (window.location.pathname.includes('/inventory')) {
@@ -36,10 +84,13 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
         // Event: BorrowingStatusChanged (peminjaman di-approve/reject/return)
-        .listen('BorrowingStatusChanged', (e) => {
+        .listen('.BorrowingStatusChanged', (e) => {
             console.log('🔄 Borrowing Status Changed:', e);
 
             showInventoryToast(e.message, 'borrowing');
+
+            // Refresh dashboard
+            refreshDashboardData();
         });
 
     // =================================================================
@@ -48,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     Echo.channel('stock-alerts')
         // Event: StockCritical (stock < 50% minimum atau habis)
-        .listen('StockCritical', (e) => {
+        .listen('.StockCritical', (e) => {
             console.log('⚠️ Stock Critical:', e);
 
             // Tentukan icon dan title berdasarkan severity.

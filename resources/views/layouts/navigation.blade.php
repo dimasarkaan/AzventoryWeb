@@ -322,11 +322,23 @@
                 $resInactiveClass = "border-transparent text-secondary-600 hover:text-secondary-800 hover:bg-secondary-50 hover:border-secondary-300 focus:outline-none focus:text-secondary-800 focus:bg-secondary-50 focus:border-secondary-300";
             @endphp
 
-            @can('viewAny', \App\Models\User::class)
+            @if (Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                 <a href="{{ route('dashboard.superadmin') }}" class="{{ $resNavClass }} {{ request()->routeIs('dashboard.superadmin') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.dashboard') }}
                 </a>
-            @endcan
+            @endif
+
+            @if (Auth::user()->role === \App\Enums\UserRole::ADMIN)
+                <a href="{{ route('dashboard.admin') }}" class="{{ $resNavClass }} {{ request()->routeIs('dashboard.admin') ? $resActiveClass : $resInactiveClass }}">
+                    {{ __('ui.dashboard') }}
+                </a>
+            @endif
+
+            @if (Auth::user()->role === \App\Enums\UserRole::OPERATOR)
+                <a href="{{ route('dashboard.operator') }}" class="{{ $resNavClass }} {{ request()->routeIs('dashboard.operator') ? $resActiveClass : $resInactiveClass }}">
+                    {{ __('ui.dashboard') }}
+                </a>
+            @endif
             
             {{-- Menu Bersama untuk Semua Peran --}}
             <a href="{{ route('inventory.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('inventory.*') ? $resActiveClass : $resInactiveClass }}">

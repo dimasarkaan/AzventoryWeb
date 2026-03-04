@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\Borrowing;
 use App\Models\User;
-use App\Enums\UserRole;
 
 class BorrowingPolicy
 {
@@ -22,7 +22,7 @@ class BorrowingPolicy
     public function view(User $user, Borrowing $borrowing): bool
     {
         // Owner OR Admin/Superadmin
-        return $user->id === $borrowing->user_id || 
+        return $user->id === $borrowing->user_id ||
                in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN]);
     }
 
@@ -41,7 +41,7 @@ class BorrowingPolicy
     public function update(User $user, Borrowing $borrowing): bool
     {
         // Owner (for returning) OR Admin/Superadmin
-        return $user->id === $borrowing->user_id || 
+        return $user->id === $borrowing->user_id ||
                in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN]);
     }
 

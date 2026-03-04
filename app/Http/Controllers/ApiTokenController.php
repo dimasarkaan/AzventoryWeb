@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Enums\UserRole;
+use Illuminate\Http\Request;
 
 class ApiTokenController extends Controller
 {
@@ -11,7 +11,6 @@ class ApiTokenController extends Controller
      * Memproses pembuatan API token baru bagi pengguna.
      * Hanya diberikan hak akses apabila user saat ini adalah Superadmin.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
@@ -38,7 +37,6 @@ class ApiTokenController extends Controller
     /**
      * Mencabut dan menghapus API token yang sudah ada.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  string|int  $tokenId
      * @return \Illuminate\Http\RedirectResponse
      */

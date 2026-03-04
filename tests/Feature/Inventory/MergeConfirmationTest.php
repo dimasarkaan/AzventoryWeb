@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\UserRole;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -37,7 +37,7 @@ class MergeConfirmationTest extends TestCase
             'brand' => 'Logitech',
             'category' => 'Elektronik',
             'condition' => 'Baik', // Berubah tapi tidak ada duplikat
-            'location' => 'Jakarta', // Berubah
+            'location' => 'Tegal', // Berubah
             'type' => 'asset',
             'stock' => 3,
             'unit' => 'Pcs',
@@ -53,7 +53,7 @@ class MergeConfirmationTest extends TestCase
         $this->assertDatabaseHas('spareparts', [
             'id' => $sparepart->id,
             'condition' => 'Baik',
-            'location' => 'Jakarta',
+            'location' => 'Tegal',
         ]);
     }
 
@@ -181,7 +181,7 @@ class MergeConfirmationTest extends TestCase
 
         // Verify: item yang di-merge sudah di-soft delete
         $this->assertSoftDeleted('spareparts', [
-            'id' => $itemToMerge->id
+            'id' => $itemToMerge->id,
         ]);
     }
 

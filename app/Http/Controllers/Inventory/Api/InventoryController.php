@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Inventory\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Sparepart;
-use App\Http\Resources\SparepartResource;
 use App\Http\Resources\SparepartCollection;
+use App\Http\Resources\SparepartResource;
+use App\Models\Sparepart;
+use App\Models\StockLog;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
@@ -35,11 +37,12 @@ class InventoryController extends Controller
     /**
      * Menyimpan barang inventaris baru.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Sparepart::class);
+
         $validated = $request->validate([
             'part_number' => 'required|unique:spareparts,part_number',
             'name' => 'required|string',
@@ -52,6 +55,7 @@ class InventoryController extends Controller
             'minimum_stock' => 'nullable|integer|min:0',
             'category' => 'required|string',
             'condition' => 'required|string',
+            'age' => 'nullable|string|max:50',
             'status' => 'required|in:aktif,nonaktif',
         ]);
 
@@ -60,38 +64,37 @@ class InventoryController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Barang baru berhasil ditambahkan',
-            'data' => new SparepartResource($sparepart)
+            'data' => new SparepartResource($sparepart),
         ], 201);
     }
 
     /**
      * Mendapatkan detail satu barang inventaris.
-     * 
-     * @param int $id
+     *
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
         $sparepart = Sparepart::find($id);
 
-        if (!$sparepart) {
+        if (! $sparepart) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Data Barang tidak ditemukan di katalog.'
+                'message' => 'Data Barang tidak ditemukan di katalog.',
             ], 404);
         }
 
         return response()->json([
             'status' => 'success',
             'message' => 'Detail data barang berhasil diambil',
-            'data' => new SparepartResource($sparepart)
+            'data' => new SparepartResource($sparepart),
         ]);
     }
 
     /**
      * Memperbarui barang inventaris.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
@@ -99,22 +102,25 @@ class InventoryController extends Controller
     {
         $sparepart = Sparepart::find($id);
 
-        if (!$sparepart) {
+        if (! $sparepart) {
             return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
         }
 
+        $this->authorize('update', $sparepart);
+
         $validated = $request->validate([
-            'part_number' => 'sometimes|unique:spareparts,part_number,' . $id,
+            'part_number' => 'sometimes|unique:spareparts,part_number,'.$id,
             'name' => 'sometimes|string',
             'brand' => 'sometimes|string',
             'location' => 'sometimes|string',
             'type' => 'sometimes|in:sale,asset',
-            'stock' => 'sometimes|integer|min:0', // Use adjust-stock for logic based updates
+            'stock' => 'sometimes|integer|min:0',
             'price' => 'nullable|numeric|min:0',
             'unit' => 'nullable|string',
             'minimum_stock' => 'nullable|integer|min:0',
             'category' => 'sometimes|string',
             'condition' => 'sometimes|string',
+            'age' => 'sometimes|string|max:50',
             'status' => 'sometimes|in:aktif,nonaktif',
         ]);
 
@@ -123,7 +129,7 @@ class InventoryController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Data Barang berhasil diperbarui',
-            'data' => new SparepartResource($sparepart)
+            'data' => new SparepartResource($sparepart),
         ]);
     }
 
@@ -137,41 +143,52 @@ class InventoryController extends Controller
     {
         $sparepart = Sparepart::find($id);
 
-        if (!$sparepart) {
+        if (! $sparepart) {
             return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
         }
+
+        $this->authorize('delete', $sparepart);
 
         $sparepart->delete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Data Barang berhasil dihapus secara soft-delete'
+            'message' => 'Data Barang berhasil dihapus secara soft-delete',
         ]);
     }
 
     /**
      * Menyesuaikan stok (tambah/kurang) untuk penjualan atau pasokan.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function adjustStock(Request $request, $id)
     {
-        $request->validate([
-            'type' => 'required|in:increment,decrement',
-            'quantity' => 'required|integer|min:1',
-            'description' => 'nullable|string', // e.g. "Order #123"
-        ]);
-
         $sparepart = Sparepart::find($id);
 
-        if (!$sparepart) {
+        if (! $sparepart) {
             return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
         }
 
+        $this->authorize('update', $sparepart);
+
+        $request->validate([
+            'type' => 'required|in:increment,decrement',
+            'quantity' => 'required|integer|min:1',
+            'description' => 'nullable|string',
+        ]);
+
         if ($request->type === 'decrement' && $sparepart->stock < $request->quantity) {
             return response()->json(['status' => 'error', 'message' => 'Insufficient stock'], 400);
+        }
+
+        // PENTING: Gunakan $request->user() bukan auth() karena
+        // auth() bisa resolve ke guard 'web' (null) saat pakai Sanctum token.
+        $apiUser = $request->user();
+
+        if (! $apiUser) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthenticated'], 401);
         }
 
         // Update Stock
@@ -182,17 +199,28 @@ class InventoryController extends Controller
         }
 
         // Log the change
-        // Assuming you have a StockLog model or similar. If not, we skip logging or just use activity log.
-        // For now, allow basic Logging if model exists.
-        if (class_exists(\App\Models\StockLog::class)) {
-            \App\Models\StockLog::create([
-                'sparepart_id' => $sparepart->id,
-                'user_id' => null, // Sytem/API
-                'type' => $request->type === 'increment' ? 'in' : 'out',
-                'quantity' => $request->quantity,
-                'description' => 'API Adjustment: ' . ($request->description ?? 'No description'),
-                'date' => now(),
-            ]);
+        StockLog::create([
+            'sparepart_id' => $sparepart->id,
+            'user_id' => $apiUser->id, // FIX: pakai $request->user() bukan auth()->id()
+            'type' => $request->type === 'increment' ? 'masuk' : 'keluar',
+            'quantity' => $request->quantity,
+            'reason' => 'API Adjustment: '.($request->description ?? 'No description'),
+            'status' => 'approved',
+            'approved_by' => $apiUser->id,
+            'approved_at' => now(),
+        ]);
+
+        // 1. Broadcast update ke semua user.
+        broadcast(new \App\Events\InventoryUpdatedEvent(
+            $sparepart->fresh(),
+            'updated',
+            $apiUser->name  // FIX: pakai $apiUser bukan auth()->user()
+        ))->toOthers();
+
+        // 2. Broadcast critical stock alert jika <= minimum.
+        if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
+            $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
+            broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
         }
 
         return response()->json([
@@ -202,8 +230,8 @@ class InventoryController extends Controller
                 'current_stock' => $sparepart->stock,
                 'minimum_stock' => $sparepart->minimum_stock,
                 'is_low_stock' => $sparepart->stock <= $sparepart->minimum_stock,
-                'part_number' => $sparepart->part_number
-            ]
+                'part_number' => $sparepart->part_number,
+            ],
         ]);
     }
 }

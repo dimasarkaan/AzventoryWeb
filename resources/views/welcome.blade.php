@@ -11,6 +11,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" href="{{ asset('logo.svg') }}?v=2" type="image/svg+xml">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Azventory">
+    <link rel="apple-touch-icon" href="/img/icons/pwa-192x192.png">
+    <link rel="manifest" href="/build/manifest.webmanifest">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

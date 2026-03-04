@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-use App\Traits\ActivityLogger;
-
 class ChangePasswordController extends Controller
 {
     use ActivityLogger;
+
     /**
      * Menampilkan halaman ganti password.
      */
@@ -36,13 +36,13 @@ class ChangePasswordController extends Controller
         ];
 
         // If NOT first login, require current password for security
-        if (!is_null($user->password_changed_at)) {
+        if (! is_null($user->password_changed_at)) {
             $rules['current_password'] = ['required', 'current_password'];
         }
 
         // Only validate username if it's the first login (password_changed_at is null)
         if (is_null($user->password_changed_at)) {
-            $rules['username'] = ['required', 'string', 'max:255', 'unique:users,username,' . $user->id];
+            $rules['username'] = ['required', 'string', 'max:255', 'unique:users,username,'.$user->id];
         }
 
         $request->validate($rules);
@@ -59,7 +59,7 @@ class ChangePasswordController extends Controller
 
         $user->update($updateData);
 
-        $this->logActivity('Ganti Password', "User mengubah password mereka.");
+        $this->logActivity('Ganti Password', 'User mengubah password mereka.');
 
         // Redirect based on role after successful password change
         $redirectPath = match ($user->role) {

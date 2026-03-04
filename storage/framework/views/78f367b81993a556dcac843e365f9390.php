@@ -519,8 +519,22 @@
                 $resInactiveClass = "border-transparent text-secondary-600 hover:text-secondary-800 hover:bg-secondary-50 hover:border-secondary-300 focus:outline-none focus:text-secondary-800 focus:bg-secondary-50 focus:border-secondary-300";
             ?>
 
-            <?php if (app(\Illuminate\Contracts\Auth\Access\Gate::class)->check('viewAny', \App\Models\User::class)): ?>
+            <?php if(Auth::user()->role === \App\Enums\UserRole::SUPERADMIN): ?>
                 <a href="<?php echo e(route('dashboard.superadmin')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('dashboard.superadmin') ? $resActiveClass : $resInactiveClass); ?>">
+                    <?php echo e(__('ui.dashboard')); ?>
+
+                </a>
+            <?php endif; ?>
+
+            <?php if(Auth::user()->role === \App\Enums\UserRole::ADMIN): ?>
+                <a href="<?php echo e(route('dashboard.admin')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('dashboard.admin') ? $resActiveClass : $resInactiveClass); ?>">
+                    <?php echo e(__('ui.dashboard')); ?>
+
+                </a>
+            <?php endif; ?>
+
+            <?php if(Auth::user()->role === \App\Enums\UserRole::OPERATOR): ?>
+                <a href="<?php echo e(route('dashboard.operator')); ?>" class="<?php echo e($resNavClass); ?> <?php echo e(request()->routeIs('dashboard.operator') ? $resActiveClass : $resInactiveClass); ?>">
                     <?php echo e(__('ui.dashboard')); ?>
 
                 </a>

@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Event untuk broadcast perubahan status peminjaman.
- * 
+ *
  * Di-trigger saat peminjaman di-approve, di-reject, atau barang dikembalikan.
  * Broadcast ke public channel 'inventory-updates'.
  */
@@ -19,8 +19,11 @@ class BorrowingStatusChangedEvent implements ShouldBroadcast
     use InteractsWithSockets, SerializesModels;
 
     public $borrowing;
+
     public $oldStatus;
+
     public $newStatus;
+
     public $adminName;
 
     public function __construct(
@@ -66,8 +69,8 @@ class BorrowingStatusChangedEvent implements ShouldBroadcast
     {
         $borrower = $this->borrowing->user->name ?? 'User';
         $item = $this->borrowing->sparepart->name ?? 'Barang';
-        
-        return match($this->newStatus) {
+
+        return match ($this->newStatus) {
             'approved' => "{$this->adminName} menyetujui peminjaman {$item} oleh {$borrower}",
             'rejected' => "{$this->adminName} menolak peminjaman {$item} oleh {$borrower}",
             'returned' => "{$borrower} mengembalikan {$item}",

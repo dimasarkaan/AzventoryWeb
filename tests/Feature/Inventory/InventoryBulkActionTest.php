@@ -12,7 +12,9 @@ class InventoryBulkActionTest extends TestCase
     use RefreshDatabase;
 
     protected $superadmin;
+
     protected $admin;
+
     protected $operator;
 
     protected function setUp(): void
@@ -23,7 +25,7 @@ class InventoryBulkActionTest extends TestCase
         $this->operator = User::factory()->create(['role' => 'operator']);
     }
 
-    public function test_superadmin_can_bulk_restore_items()
+    public function test_superadmin_dapat_memulihkan_item_secara_massal()
     {
         $items = Sparepart::factory()->count(3)->create();
         foreach ($items as $item) {
@@ -36,7 +38,7 @@ class InventoryBulkActionTest extends TestCase
             ->post(route('inventory.bulk-restore'), ['ids' => $ids]);
 
         $response->assertRedirect();
-        
+
         foreach ($items as $item) {
             $this->assertDatabaseHas('spareparts', [
                 'id' => $item->id,
@@ -45,7 +47,7 @@ class InventoryBulkActionTest extends TestCase
         }
     }
 
-    public function test_superadmin_can_bulk_force_delete_items()
+    public function test_superadmin_dapat_menghapus_permanen_item_secara_massal()
     {
         $items = Sparepart::factory()->count(3)->create();
         foreach ($items as $item) {
@@ -64,7 +66,7 @@ class InventoryBulkActionTest extends TestCase
         }
     }
 
-    public function test_operator_cannot_bulk_restore()
+    public function test_operator_tidak_dapat_memulihkan_secara_massal()
     {
         $items = Sparepart::factory()->count(3)->create();
         foreach ($items as $item) {
@@ -79,7 +81,7 @@ class InventoryBulkActionTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_operator_cannot_bulk_force_delete()
+    public function test_operator_tidak_dapat_menghapus_permanen_secara_massal()
     {
         $items = Sparepart::factory()->count(3)->create();
         foreach ($items as $item) {

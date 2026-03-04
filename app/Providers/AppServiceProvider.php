@@ -2,11 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-
-use Illuminate\Support\Facades\Gate;
 use App\Models\Sparepart;
 use App\Policies\SparepartPolicy;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,13 +32,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app['translator']->addJsonPath(lang_path());
 
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
-        
+
         // Environment validation untuk production
         if (app()->environment('production')) {
             $this->validateCriticalEnvVariables();
         }
     }
-    
+
     /**
      * Validasi environment variables kritis untuk production.
      */
@@ -49,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
             'APP_KEY' => 'Application encryption key',
             'DB_CONNECTION' => 'Database connection',
         ];
-        
+
         foreach ($required as $env => $description) {
             if (empty(env($env))) {
                 throw new \RuntimeException("Missing critical environment variable: {$env} ({$description})");

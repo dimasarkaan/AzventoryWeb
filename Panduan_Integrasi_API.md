@@ -71,10 +71,10 @@ Berguna saat pelanggan e-commerce melihat halaman detail spesifik sebuah produk.
 ### C. Menyesuaikan Stok (PENTING UNTUK E-COMMERCE!)
 Ini adalah endpoint yang **paling penting** untuk melakukan *Sinkronisasi*. Endpoint ini akan menambah atau memotong stok secara otomatis ketika ada transaksi di luar aplikasi.
 
-*   **Endpoint:** `POST /inventory/{id}/adjust-stock`
+*   **Endpoint:** `PUT /inventory/{id}/adjust-stock`
 *   **Contoh Kasus 1: Mengurangi Stok (Ada pembeli di web/toko)**
     ```bash
-    curl -X POST "http://localhost:8000/api/v1/inventory/1/adjust-stock" \
+    curl -X PUT "http://localhost:8000/api/v1/inventory/1/adjust-stock" \
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <TOKEN_ANDA>" \
@@ -87,7 +87,7 @@ Ini adalah endpoint yang **paling penting** untuk melakukan *Sinkronisasi*. Endp
 
 *   **Contoh Kasus 2: Menambah Stok (Return barang / Kiriman baru)**
     ```bash
-    curl -X POST "http://localhost:8000/api/v1/inventory/1/adjust-stock" \
+    curl -X PUT "http://localhost:8000/api/v1/inventory/1/adjust-stock" \
       -H "Accept: application/json" \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <TOKEN_ANDA>" \

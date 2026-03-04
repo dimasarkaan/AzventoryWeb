@@ -27,13 +27,13 @@ class CleanupOldActivityLogs extends Command
     {
         $months = (int) $this->option('months');
         $cutoffDate = now()->subMonths($months);
-        
+
         $this->info("Menghapus activity logs lebih tua dari {$months} bulan (sebelum {$cutoffDate->format('Y-m-d')})...");
-        
+
         $count = \App\Models\ActivityLog::where('created_at', '<', $cutoffDate)->delete();
-        
+
         $this->info("✅ Berhasil menghapus {$count} activity logs.");
-        
+
         return Command::SUCCESS;
     }
 }

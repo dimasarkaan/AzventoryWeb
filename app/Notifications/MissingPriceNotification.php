@@ -18,7 +18,7 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
     use Queueable;
 
     /**
-     * Buat instance notifikasi baru.
+     * Inisialisasi notifikasi peringatan harga kosong untuk barang bertipe 'sale'.
      */
     public function __construct(
         public Sparepart $sparepart,
@@ -26,7 +26,7 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
     ) {}
 
     /**
-     * Tentukan channel pengiriman notifikasi.
+     * Channel pengiriman: Database dan Real-time Broadcast.
      */
     public function via(object $notifiable): array
     {
@@ -34,33 +34,33 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
     }
 
     /**
-     * Representasi array dari notifikasi (disimpan ke tabel notifications).
+     * Data persistensi notifikasi dalam database.
      */
     public function toArray(object $notifiable): array
     {
         return [
-            'message'      => __('ui.notification_missing_price', [
-                'name'  => $this->sparepart->name,
+            'message' => __('ui.notification_missing_price', [
+                'name' => $this->sparepart->name,
                 'admin' => $this->addedBy->name,
             ]),
-            'url'          => route('inventory.edit', $this->sparepart->id),
+            'url' => route('inventory.edit', $this->sparepart->id),
             'sparepart_id' => $this->sparepart->id,
-            'added_by'     => $this->addedBy->name,
+            'added_by' => $this->addedBy->name,
         ];
     }
 
     /**
-     * Representasi broadcast dari notifikasi (dikirim via Reverb WebSocket).
+     * Pesan siaran real-time.
      */
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([
-            'title'       => __('ui.missing_price_alert'),
-            'message'     => __('ui.notification_missing_price', [
-                'name'  => $this->sparepart->name,
+            'title' => __('ui.missing_price_alert'),
+            'message' => __('ui.notification_missing_price', [
+                'name' => $this->sparepart->name,
                 'admin' => $this->addedBy->name,
             ]),
-            'url'         => route('inventory.edit', $this->sparepart->id),
+            'url' => route('inventory.edit', $this->sparepart->id),
             'unread_count' => $notifiable->unreadNotifications()->count() + 1,
         ]);
     }

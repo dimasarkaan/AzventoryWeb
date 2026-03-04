@@ -2,19 +2,19 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\UserRole;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class PolicyTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function superadmin_can_access_all_inventory_actions()
+    #[Test]
+    public function superadmin_dapat_mengakses_semua_aksi_inventaris()
     {
         $superadmin = User::factory()->create(['role' => UserRole::SUPERADMIN]);
         $inventory = Sparepart::factory()->create();
@@ -35,7 +35,7 @@ class PolicyTest extends TestCase
 
         // Delete
         $this->delete(route('inventory.destroy', $inventory))->assertRedirect();
-        
+
         // Restore
         $inventory->delete();
         $this->patch(route('inventory.restore', $inventory))->assertRedirect();
@@ -45,8 +45,8 @@ class PolicyTest extends TestCase
         $this->delete(route('inventory.force-delete', $inventory))->assertRedirect();
     }
 
-    /** @test */
-    public function admin_can_access_most_actions_except_restore_and_force_delete()
+    #[Test]
+    public function admin_dapat_mengakses_sebagian_besar_aksi_kecuali_pemulihan_dan_hapus_permanen()
     {
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
         $inventory = Sparepart::factory()->create();
@@ -55,7 +55,7 @@ class PolicyTest extends TestCase
 
         // View - OK
         $this->get(route('inventory.index'))->assertOk();
-        
+
         // Create - OK
         $this->get(route('inventory.create'))->assertOk();
         $this->post(route('inventory.store'), Sparepart::factory()->raw())->assertRedirect();
@@ -66,7 +66,7 @@ class PolicyTest extends TestCase
 
         // Delete - OK (Soft Delete)
         $this->delete(route('inventory.destroy', $inventory))->assertRedirect();
-        
+
         // Restore - FORBIDDEN
         $inventory->delete();
         $this->patch(route('inventory.restore', $inventory))->assertForbidden();
@@ -75,8 +75,8 @@ class PolicyTest extends TestCase
         $this->delete(route('inventory.force-delete', $inventory))->assertForbidden();
     }
 
-    /** @test */
-    public function operator_can_only_view()
+    #[Test]
+    public function operator_hanya_dapat_melihat()
     {
         $operator = User::factory()->create(['role' => UserRole::OPERATOR]);
         $inventory = Sparepart::factory()->create();
@@ -97,7 +97,7 @@ class PolicyTest extends TestCase
 
         // Delete - FORBIDDEN
         $this->delete(route('inventory.destroy', $inventory))->assertForbidden();
-        
+
         // Restore - FORBIDDEN
         $inventory->delete();
         $this->patch(route('inventory.restore', $inventory))->assertForbidden();

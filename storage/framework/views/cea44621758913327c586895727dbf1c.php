@@ -7,6 +7,15 @@
 
         <title><?php echo e(config('app.name', 'Laravel')); ?></title>
 
+        <!-- PWA Meta Tags -->
+        <meta name="theme-color" content="#2563eb">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="Azventory">
+        <link rel="apple-touch-icon" href="/logo.svg">
+        <link rel="manifest" href="/build/manifest.webmanifest">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +24,7 @@
 
         <!-- Skrip -->
         <?php echo app('Illuminate\Foundation\Vite')(['resources/css/app.css', 'resources/js/app.js']); ?>
-
+        <?php echo $__env->yieldPushContent('styles'); ?>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 transition-opacity duration-300 opacity-0"

@@ -10,6 +10,7 @@ class Button extends Component
 {
     // Variabel publik (props).
     public string $variant;
+
     public string $type;
 
     // Inisialisasi komponen dengan varian dan tipe.

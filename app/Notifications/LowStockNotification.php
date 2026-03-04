@@ -9,25 +9,31 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class LowStockNotification extends Notification implements ShouldQueue, ShouldBroadcast
+class LowStockNotification extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
     public $sparepart;
 
-    // Buat instance notifikasi baru.
+    /**
+     * Inisialisasi notifikasi peringatan stok menipis.
+     */
     public function __construct(Sparepart $sparepart)
     {
         $this->sparepart = $sparepart;
     }
 
-    // Tentukan channel pengiriman notifikasi.
+    /**
+     * Channel pengiriman: Database dan Real-time Broadcast.
+     */
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    // Representasi array dari notifikasi.
+    /**
+     * Data persistensi notifikasi dalam database.
+     */
     public function toArray(object $notifiable): array
     {
         return [
@@ -37,7 +43,9 @@ class LowStockNotification extends Notification implements ShouldQueue, ShouldBr
         ];
     }
 
-    // Representasi broadcast dari notifikasi.
+    /**
+     * Pesan siaran real-time.
+     */
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

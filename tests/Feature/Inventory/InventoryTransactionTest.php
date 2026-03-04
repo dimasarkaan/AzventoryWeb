@@ -2,14 +2,10 @@
 
 namespace Tests\Feature\Inventory;
 
-use App\Models\Action;
-use App\Models\ActivityLog;
 use App\Models\Sparepart;
-use App\Models\StockLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class InventoryTransactionTest extends TestCase
@@ -21,7 +17,7 @@ class InventoryTransactionTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         \Illuminate\Support\Facades\Storage::fake('public');
         \Illuminate\Support\Facades\Notification::fake();
 
@@ -43,8 +39,8 @@ class InventoryTransactionTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_creates_sparepart_creates_stock_log_and_activity_log_atomically()
+    #[Test]
+    public function membuat_sparepart_membuat_log_stok_dan_log_aktivitas_secara_atomik()
     {
         $data = [
             'name' => 'Test Item Transaction',
@@ -93,8 +89,8 @@ class InventoryTransactionTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_updates_sparepart_and_logs_activity()
+    #[Test]
+    public function memperbarui_sparepart_dan_mencatat_aktivitas()
     {
         $sparepart = Sparepart::factory()->create([
             'stock' => 10,
@@ -135,8 +131,8 @@ class InventoryTransactionTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_soft_deletes_sparepart_and_logs_activity()
+    #[Test]
+    public function menghapus_lunak_sparepart_dan_mencatat_aktivitas()
     {
         $sparepart = Sparepart::factory()->create();
 
@@ -158,8 +154,8 @@ class InventoryTransactionTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_restores_sparepart_and_logs_activity()
+    #[Test]
+    public function memulihkan_sparepart_dan_mencatat_aktivitas()
     {
         $sparepart = Sparepart::factory()->create();
         $sparepart->delete(); // Soft delete first
@@ -167,7 +163,7 @@ class InventoryTransactionTest extends TestCase
         $response = $this->actingAs($this->user)
             ->patch(route('inventory.restore', $sparepart->id));
 
-        $response->assertRedirect(route('inventory.index') . '?trash=true');
+        $response->assertRedirect(route('inventory.index').'?trash=true');
         $response->assertSessionHas('success');
 
         // Periksa Pemulihan
@@ -182,8 +178,8 @@ class InventoryTransactionTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_force_deletes_sparepart_and_logs_activity()
+    #[Test]
+    public function menghapus_permanen_sparepart_dan_mencatat_aktivitas()
     {
         $sparepart = Sparepart::factory()->create();
         $sparepart->delete(); // Soft delete first
@@ -191,7 +187,7 @@ class InventoryTransactionTest extends TestCase
         $response = $this->actingAs($this->user)
             ->delete(route('inventory.force-delete', $sparepart->id));
 
-        $response->assertRedirect(route('inventory.index') . '?trash=true');
+        $response->assertRedirect(route('inventory.index').'?trash=true');
         $response->assertSessionHas('success');
 
         // Periksa Hapus Permanen
@@ -206,8 +202,8 @@ class InventoryTransactionTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function it_handles_duplicate_entry_merging_correctly()
+    #[Test]
+    public function menangani_penggabungan_entri_duplikat_dengan_benar()
     {
         // 1. Buat Item Awal
         $sparepart = Sparepart::factory()->create([
@@ -244,7 +240,7 @@ class InventoryTransactionTest extends TestCase
 
         $response = $this->actingAs($this->user)
             ->post(route('inventory.store'), $data);
-            
+
         $response->assertSessionHas('success'); // Seharusnya sukses (digabungkan)
 
         // 3. Verifikasi Stok Digabung

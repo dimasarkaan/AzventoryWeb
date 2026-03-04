@@ -4,110 +4,109 @@ namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
-use Illuminate\Http\Request;
 use App\Traits\ActivityLogger;
+use Illuminate\Http\Request;
 
+/**
+ * ActivityLogController mengelola tampilan dan penyaringan riwayat aktivitas sistem.
+ */
 class ActivityLogController extends Controller
 {
     use ActivityLogger;
 
     /**
-     * Menampilkan daftar aktivitas sistem (Log).
+     * Menampilkan daftar log aktivitas dengan fitur filter berdasarkan role, user, aksi, dan rentang tanggal.
      */
     public function index(Request $request)
     {
         $query = ActivityLog::with('user');
 
         $currentUser = $request->user();
+
+        // Implementasi Hierarki Privasi:
+        // Operator hanya melihat aktivitasnya sendiri.
+        // Admin dapat melihat aktivitas Admin lain & Operator (bukan Superadmin).
         if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
-            // Operator hanya bisa melihat aktivitas dirinya sendiri
             $query->where('user_id', $currentUser->id);
         } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
-            // Admin tidak bisa melihat aktivitas Superadmin
             $query->whereHas('user', function ($q) {
                 $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
             });
         }
 
-        // Filter by Role
         if ($request->has('role') && $request->role && $request->role !== 'Semua Role') {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('role', $request->role);
             });
         }
 
-        // Filter by User
         if ($request->has('user_id') && $request->user_id) {
             $query->where('user_id', $request->user_id);
         }
 
-        // Filter by Action
         if ($request->has('action') && $request->action) {
             $query->where('action', $request->action);
         }
 
-        // Search (Description or Action)
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%");
+                    ->orWhere('action', 'like', "%{$search}%");
             });
         }
 
-        // Filter by Date Range
-        if ($request->has('start_date') && $request->start_date) {
+        if ($request->start_date) {
             $query->whereDate('created_at', '>=', $request->start_date);
         }
 
-        if ($request->has('end_date') && $request->end_date) {
+        if ($request->end_date) {
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
-        // Filter by Subject Type (Derived)
+        // Pengelompokan tipe subjek secara virtual untuk mempermudah pencarian tematik
         if ($request->has('subject_type') && $request->subject_type && $request->subject_type !== 'Semua Tipe') {
             switch ($request->subject_type) {
                 case 'inventory':
-                    $query->where(function($q) {
+                    $query->where(function ($q) {
                         $q->where('action', 'like', '%inventory%')
-                          ->orWhere('action', 'like', '%stock%')
-                          ->orWhere('action', 'like', '%item%')
-                          ->orWhere('action', 'like', '%barang%');
+                            ->orWhere('action', 'like', '%stock%')
+                            ->orWhere('action', 'like', '%item%')
+                            ->orWhere('action', 'like', '%barang%');
                     });
                     break;
                 case 'user':
-                    $query->where(function($q) {
+                    $query->where(function ($q) {
                         $q->where('action', 'like', '%user%')
-                          ->orWhere('action', 'like', '%profile%')
-                          ->orWhere('action', 'like', '%password%')
-                          ->orWhere('action', 'like', '%role%');
+                            ->orWhere('action', 'like', '%profile%')
+                            ->orWhere('action', 'like', '%password%')
+                            ->orWhere('action', 'like', '%role%');
                     });
                     break;
                 case 'auth':
-                    $query->where(function($q) {
+                    $query->where(function ($q) {
                         $q->where('action', 'like', '%login%')
-                          ->orWhere('action', 'like', '%logout%');
+                            ->orWhere('action', 'like', '%logout%');
                     });
                     break;
-                 case 'report':
-                    $query->where(function($q) {
+                case 'report':
+                    $query->where(function ($q) {
                         $q->where('action', 'like', '%report%')
-                          ->orWhere('action', 'like', '%export%')
-                          ->orWhere('action', 'like', '%download%');
+                            ->orWhere('action', 'like', '%export%')
+                            ->orWhere('action', 'like', '%download%');
                     });
                     break;
             }
         }
 
         $activityLogs = $query->latest()->paginate(10);
-        
+
         $usersQuery = \App\Models\User::orderBy('name');
         if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
             $usersQuery->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
         }
         $users = $usersQuery->get();
 
-        // Get unique actions for filter
         $actionsQuery = ActivityLog::select('action')->distinct()->orderBy('action');
         if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
             $actionsQuery->whereHas('user', function ($q) {
@@ -120,7 +119,7 @@ class ActivityLogController extends Controller
     }
 
     /**
-     * Mengexport log aktivitas ke PDF atau Excel.
+     * Memproses permintaan export log ke dalam format PDF (melalui simulasi background) atau Excel.
      */
     public function export(Request $request)
     {
@@ -128,47 +127,40 @@ class ActivityLogController extends Controller
 
         $currentUser = $request->user();
         if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
-            // Operator hanya bisa melihat/export aktivitas dirinya sendiri
             $query->where('user_id', $currentUser->id);
         } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
-            // Admin tidak bisa melihat/export aktivitas Superadmin
             $query->whereHas('user', function ($q) {
                 $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
             });
         }
 
-        // Filter by Role
         if ($request->has('role') && $request->role && $request->role !== 'Semua Role') {
             $query->whereHas('user', function ($q) use ($request) {
                 $q->where('role', $request->role);
             });
         }
 
-        // Filter by User
         if ($request->has('user_id') && $request->user_id) {
             $query->where('user_id', $request->user_id);
         }
 
-        // Filter by Action
         if ($request->has('action') && $request->action) {
             $query->where('action', $request->action);
         }
 
-        // Search (Description or Action)
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('description', 'like', "%{$search}%")
-                  ->orWhere('action', 'like', "%{$search}%");
+                    ->orWhere('action', 'like', "%{$search}%");
             });
         }
 
-        // Filter by Date Range
-        if ($request->has('start_date') && $request->start_date) {
+        if ($request->start_date) {
             $query->whereDate('created_at', '>=', $request->start_date);
         }
 
-        if ($request->has('end_date') && $request->end_date) {
+        if ($request->end_date) {
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
@@ -176,17 +168,16 @@ class ActivityLogController extends Controller
         $format = $request->input('format', 'pdf');
 
         if ($format === 'pdf') {
-            \App\Jobs\ExportActivityLogJob::dispatch($request->user(), $request->all());
-            
-            $this->logActivity('Export Log Aktivitas', "Meminta export log aktivitas.");
-            
+            // PDF diproses via Queue Job untuk mencegah timeout saat data berjumlah besar
+            \App\Jobs\ExportActivityLogJob::dispatch($request->user(), $request->all(), $logs);
+
+            $this->logActivity('Export Log Aktivitas', 'Meminta antrean export log aktivitas (PDF).');
+
             return back()->with('success', 'Export log sedang memproses. Anda akan menerima notifikasi saat file siap diunduh.');
         } else {
-            $this->logActivity('Export Log Aktivitas', "Mengunduh log aktivitas format Excel.");
-            
-            // Generate Filename
+            $this->logActivity('Export Log Aktivitas', 'Mengunduh file log aktivitas (Excel).');
+
             if ($request->start_date && $request->end_date) {
-                // Format: LogAktivitas_01-01-2026sd15-01-2026
                 $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
                 $end = \Carbon\Carbon::parse($request->end_date)->format('d-m-Y');
                 $filename = "LogAktivitas_{$start}sd{$end}";
@@ -194,11 +185,11 @@ class ActivityLogController extends Controller
                 $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
                 $filename = "LogAktivitas_Sejak{$start}";
             } else {
-                // Format: LogAktivitasSemuaRiwayat_30-01-2026
-                $filename = 'LogAktivitasSemuaRiwayat_' . now()->format('d-m-Y');
+                $filename = 'LogAktivitasSemuaRiwayat_'.now()->format('d-m-Y');
             }
-            
-            $excelService = new \App\Services\ExcelExportService();
+
+            $excelService = new \App\Services\ExcelExportService;
+
             return $excelService->exportActivityLogs($logs, $filename);
         }
     }

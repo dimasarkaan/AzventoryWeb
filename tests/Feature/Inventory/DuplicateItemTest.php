@@ -2,10 +2,9 @@
 
 namespace Tests\Feature\Inventory;
 
-use App\Models\Sparepart;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class DuplicateItemTest extends TestCase
@@ -17,14 +16,14 @@ class DuplicateItemTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->user = User::factory()->create([
             'role' => \App\Enums\UserRole::SUPERADMIN,
         ]);
     }
 
-    /** @test */
-    public function it_merges_stock_when_exact_duplicate_is_added()
+    #[Test]
+    public function stok_digabungkan_ketika_duplikat_persis_ditambahkan()
     {
         // 1. Buat item awal
         $data = [
@@ -55,23 +54,23 @@ class DuplicateItemTest extends TestCase
             ->post(route('inventory.store'), $duplicateData);
 
         $response2->assertRedirect();
-        
+
         // Pastikan sesi memiliki pesan sukses tentang penggabungan
         $response2->assertSessionHas('success');
-        
+
         // Pastikan stok digabungkan (10 + 5 = 15) dan TIDAK ada baris baru dibuat
         $this->assertDatabaseCount('spareparts', 1);
         $this->assertDatabaseHas('spareparts', [
             'part_number' => 'K120-LOGI',
-            'stock' => 15
+            'stock' => 15,
         ]);
-        
+
         // Pastikan Log Stok dibuat untuk penambahan
         $this->assertDatabaseCount('stock_logs', 2); // 1 initial + 1 merge
     }
 
-    /** @test */
-    public function it_creates_new_item_if_one_attribute_differs()
+    #[Test]
+    public function membuat_item_baru_jika_salah_satu_atribut_berbeda()
     {
         // 1. Buat item awal
         $data = [

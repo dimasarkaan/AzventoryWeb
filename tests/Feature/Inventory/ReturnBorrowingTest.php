@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\UserRole;
 use App\Models\Borrowing;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,10 +15,10 @@ class ReturnBorrowingTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_return_item_validation_good_condition_needs_photo()
+    public function test_validasi_pengembalian_item_kondisi_baik_membutuhkan_foto()
     {
         Storage::fake('public');
-        
+
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
         $sparepart = Sparepart::factory()->create(['stock' => 10]);
         $borrowing = Borrowing::create([
@@ -37,22 +37,22 @@ class ReturnBorrowingTest extends TestCase
         $response = $this->postJson(route('inventory.borrow.return', $borrowing), [
             'return_quantity' => 1,
             'return_condition' => 'good',
-            'return_photos' => null, 
+            'return_photos' => null,
         ]);
 
         // If my theory about closure skipping is correct, this might PASS or fail on min:1?
         // But if it fails, it returns 422.
         // Let's see.
-        
+
         // Actually, logic is: user sees 422. So something IS failing.
         // If it requires photo and none sent, it fails.
         // If we verify this fails 422, then the frontend issue is confirmed (photo not sent).
-        
+
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['return_photos']);
+            ->assertJsonValidationErrors(['return_photos']);
     }
 
-    public function test_return_item_validation_max_quantity()
+    public function test_validasi_pengembalian_item_kuantitas_maksimal()
     {
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
         $sparepart = Sparepart::factory()->create(['stock' => 10]);
@@ -73,10 +73,10 @@ class ReturnBorrowingTest extends TestCase
         ]);
 
         $response->assertStatus(422)
-                 ->assertJsonValidationErrors(['return_quantity']);
+            ->assertJsonValidationErrors(['return_quantity']);
     }
 
-    public function test_return_item_success_with_photos()
+    public function test_pengembalian_item_berhasil_dengan_foto()
     {
         Storage::fake('public');
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
@@ -96,20 +96,20 @@ class ReturnBorrowingTest extends TestCase
             'return_quantity' => 1,
             'return_condition' => 'good',
             'return_photos' => [
-                UploadedFile::fake()->image('evidence.jpg')
-            ]
+                UploadedFile::fake()->image('evidence.jpg'),
+            ],
         ]);
 
         $response->assertStatus(200); // Json success
     }
 
-    public function test_return_item_with_damaged_condition_updates_inventory()
+    public function test_pengembalian_item_dengan_kondisi_rusak_memperbarui_inventaris()
     {
         Storage::fake('public');
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
         $sparepart = Sparepart::factory()->create([
             'stock' => 8, // Stock became 8 after borrowing 2
-            'condition' => 'Baik'
+            'condition' => 'Baik',
         ]);
         $borrowing = Borrowing::create([
             'sparepart_id' => $sparepart->id,
@@ -127,8 +127,8 @@ class ReturnBorrowingTest extends TestCase
             'return_condition' => 'bad', // Rusak
             'return_notes' => 'Ternyata rusak pas dipakai',
             'return_photos' => [
-                UploadedFile::fake()->image('broken_evidence.jpg')
-            ]
+                UploadedFile::fake()->image('broken_evidence.jpg'),
+            ],
         ]);
 
         $response->assertStatus(200);
@@ -136,13 +136,13 @@ class ReturnBorrowingTest extends TestCase
         // Verify borrowing is updated (status only)
         $this->assertDatabaseHas('borrowings', [
             'id' => $borrowing->id,
-            'status' => 'returned'
+            'status' => 'returned',
         ]);
-        
+
         // Verify borrowing_returns receives the 'bad' condition
         $this->assertDatabaseHas('borrowing_returns', [
             'borrowing_id' => $borrowing->id,
-            'condition' => 'bad'
+            'condition' => 'bad',
         ]);
 
         // Verify that a new sparepart record for 'Rusak' is created or the general stock logic handles it
@@ -150,14 +150,14 @@ class ReturnBorrowingTest extends TestCase
         $this->assertDatabaseHas('spareparts', [
             'name' => $sparepart->name,
             'condition' => 'Rusak',
-            'stock' => 2
+            'stock' => 2,
         ]);
-        
+
         // And the original 'Baik' item's stock remains reduced by the borrowed amount (10 - 2 = 8)
         $this->assertDatabaseHas('spareparts', [
             'id' => $sparepart->id,
             'stock' => 8,
-            'condition' => 'Baik'
+            'condition' => 'Baik',
         ]);
     }
 }

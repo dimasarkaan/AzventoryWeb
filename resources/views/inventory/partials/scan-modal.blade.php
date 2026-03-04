@@ -29,12 +29,7 @@
                                 Scan Part Number
                             </h3>
                             <div class="flex items-center gap-2">
-                                <!-- Debug hidden -->
-                                <label class="hidden items-center cursor-pointer">
-                                    <input type="checkbox" x-model="debugMode" class="sr-only peer">
-                                    <div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
-                                    <span class="ms-2 text-xs font-medium text-gray-900">Debug</span>
-                                </label>
+
                                 <button type="button" @click="closeScanModal()" class="text-gray-400 hover:text-gray-500">
                                     <span class="sr-only">Close</span>
                                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -86,6 +81,17 @@
 
                         <div x-show="scanErrorMsg" class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative text-sm">
                             <span class="block sm:inline" x-text="scanErrorMsg"></span>
+                        </div>
+                        <div x-show="scanSuccessMsg" class="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative text-sm">
+                            <span class="block sm:inline" x-text="scanSuccessMsg"></span>
+                        </div>
+                        <div x-show="debugMode && debugLog" class="mb-4 bg-gray-900 border border-gray-700 text-green-400 p-3 rounded relative text-[10px] font-mono h-32 overflow-y-auto">
+                            <span class="font-bold block mb-1 text-gray-500">Diagnostic Log:</span>
+                            <span class="block whitespace-pre-wrap" x-text="debugLog"></span>
+                        </div>
+                        <div x-show="debugMode && scanRawText" class="mb-4 bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded relative text-[10px] font-mono max-h-32 overflow-y-auto">
+                            <span class="font-bold block mb-1">Raw Text:</span>
+                            <span class="block whitespace-pre-wrap" x-text="scanRawText"></span>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

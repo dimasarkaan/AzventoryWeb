@@ -368,32 +368,67 @@ window.confirmInventoryForceDelete = function (event) {
     });
 };
 
+/**
+ * confirmDelete — Soft-delete dengan undo countdown 5 detik.
+ * Item baris disembunyikan langsung, lalu toast tampil dengan tombol "Batalkan".
+ * Jika dibatalkan → baris muncul kembali, form TIDAK dikirim.
+ * Jika 5 detik berlalu → form di-submit ke server (soft-delete).
+ */
 window.confirmDelete = function (event) {
     event.preventDefault();
     const form = event.target.closest('form');
-    Swal.fire({
-        title: 'Apakah Anda yakin?',
-        text: "Data yang dihapus tidak akan bisa dikembalikan!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, Hapus!',
-        cancelButtonText: 'Batal',
-        reverseButtons: true,
-        customClass: {
-            popup: '!rounded-2xl !font-sans',
-            title: '!text-secondary-900 !text-xl !font-bold',
-            htmlContainer: '!text-secondary-500 !text-sm',
-            confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
-            cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+    if (!form) return;
+
+    // Sembunyikan baris tabel secara optimistis
+    const row = form.closest('tr') || form.closest('[data-row]');
+    if (row) {
+        row.style.transition = 'opacity 0.3s ease';
+        row.style.opacity = '0.3';
+    }
+
+    let undoClicked = false;
+    let submitTimer = null;
+    const seconds = 5;
+
+    // Fungsi countdown toast
+    const UndoToast = Swal.mixin({
+        toast: true,
+        position: 'bottom-end',
+        showConfirmButton: true,
+        confirmButtonText: 'Batalkan',
+        showCancelButton: false,
+        timer: seconds * 1000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.querySelector('.swal2-confirm').style.cssText =
+                'background: #1e40af; color: white; border-radius: 6px; padding: 4px 14px; font-size: 13px; margin-left: 10px; cursor: pointer; border: none;';
+            toast.addEventListener('mouseenter', Swal.stopTimer);
+            toast.addEventListener('mouseleave', Swal.resumeTimer);
         },
-        buttonsStyling: false,
-        width: '24em',
-        iconColor: '#ef4444',
-        padding: '2em',
-        backdrop: `rgba(0,0,0,0.4)`
+        willClose: () => {
+            if (!undoClicked) {
+                // Timer habis tanpa dibatalkan → submit form
+                submitTimer = setTimeout(() => form.submit(), 50);
+            }
+        }
+    });
+
+    UndoToast.fire({
+        icon: 'warning',
+        title: 'Item dipindahkan ke Trash',
+        html: `<span style="font-size:13px;color:#6b7280">Akan dihapus dalam ${seconds} detik...</span>`,
     }).then((result) => {
         if (result.isConfirmed) {
-            form.submit();
+            // Tombol "Batalkan" diklik
+            undoClicked = true;
+            clearTimeout(submitTimer);
+            // Kembalikan baris
+            if (row) {
+                row.style.opacity = '1';
+            }
+            if (window.showToast) {
+                window.showToast('success', 'Penghapusan dibatalkan.');
+            }
         }
     });
 };

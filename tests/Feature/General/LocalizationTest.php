@@ -4,14 +4,15 @@ namespace Tests\Feature\General;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class LocalizationTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function guest_views_are_localized()
+    #[Test]
+    public function tampilan_guest_terlokalisasi()
     {
         // Login Page (Landing page redirects here via dashboard)
         $response = $this->get('/login');
@@ -20,8 +21,8 @@ class LocalizationTest extends TestCase
         $response->assertSee('Username atau Email'); // ui.auth_label_login
     }
 
-    /** @test */
-    public function superadmin_views_are_localized()
+    #[Test]
+    public function tampilan_superadmin_terlokalisasi()
     {
         $user = User::factory()->create(['role' => 'superadmin']);
 

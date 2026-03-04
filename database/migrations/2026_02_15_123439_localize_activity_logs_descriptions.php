@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -36,7 +34,7 @@ return new class extends Migration
         DB::table('activity_logs')
             ->where('description', 'like', '%(Kondisi: Baik)%')
             ->update(['description' => DB::raw("REPLACE(description, '(Kondisi: Baik)', '(good)')")]);
-            
+
         DB::table('activity_logs')
             ->where('description', 'like', '%(Kondisi: Rusak)%')
             ->update(['description' => DB::raw("REPLACE(description, '(Kondisi: Rusak)', '(bad)')")]);

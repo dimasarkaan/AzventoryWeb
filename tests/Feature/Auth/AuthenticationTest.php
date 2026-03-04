@@ -4,20 +4,19 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_login_screen_can_be_rendered()
+    public function test_halaman_login_dapat_tampil()
     {
         $response = $this->get('/login');
         $response->assertStatus(200);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen()
+    public function test_user_dapat_otentikasi_menggunakan_halaman_login()
     {
         $user = User::factory()->create([
             'role' => 'superadmin',
@@ -32,10 +31,10 @@ class AuthenticationTest extends TestCase
 
         $this->assertAuthenticated();
         // Rute dashboard mengarahkan superadmin ke superadmin.dashboard
-        $response->assertRedirect(route('dashboard.superadmin')); 
+        $response->assertRedirect(route('dashboard.superadmin'));
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password()
+    public function test_user_tidak_dapat_otentikasi_dengan_password_salah()
     {
         $user = User::factory()->create();
 

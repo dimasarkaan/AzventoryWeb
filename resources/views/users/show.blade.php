@@ -28,8 +28,12 @@
                 <div class="space-y-4">
                     <div class="card p-6 flex flex-col items-center text-center">
                         <div class="relative mb-4">
-                            <div class="h-32 w-32 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                                <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="h-full w-full object-cover">
+                            <div class="h-32 w-32 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 overflow-hidden border-4 border-white shadow-lg">
+                                @if($user->avatar)
+                                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" class="h-full w-full object-cover">
+                                @else
+                                    <span class="font-bold text-4xl">{{ substr($user->name, 0, 1) }}</span>
+                                @endif
                             </div>
                             <div class="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-sm">
                                 @if($user->status === 'active')

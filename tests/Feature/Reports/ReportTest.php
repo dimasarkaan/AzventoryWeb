@@ -2,10 +2,11 @@
 
 namespace Tests\Feature\Reports;
 
-use App\Models\User;
 use App\Models\Sparepart;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ReportTest extends TestCase
@@ -21,8 +22,8 @@ class ReportTest extends TestCase
         Sparepart::factory()->count(5)->create();
     }
 
-    /** @test */
-    public function superadmin_can_download_pdf_report_via_queue()
+    #[Test]
+    public function superadmin_dapat_mengunduh_laporan_pdf_melalui_antrean()
     {
         Queue::fake();
 
@@ -39,8 +40,8 @@ class ReportTest extends TestCase
         Queue::assertPushed(\App\Jobs\GenerateReportJob::class);
     }
 
-    /** @test */
-    public function superadmin_can_download_excel_report_directly()
+    #[Test]
+    public function superadmin_dapat_mengunduh_laporan_excel_secara_langsung()
     {
         $response = $this->actingAs($this->superAdmin)
             ->get(route('reports.download', [
@@ -51,20 +52,21 @@ class ReportTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
-    /** @test */
-    public function superadmin_can_access_reports_page()
+
+    #[Test]
+    public function superadmin_dapat_mengakses_halaman_laporan()
     {
         $response = $this->actingAs($this->superAdmin)->get(route('reports.index'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function superadmin_can_access_qr_scan_page()
+    #[Test]
+    public function superadmin_dapat_mengakses_halaman_scan_qr()
     {
         // Asumsi rute ada berdasarkan verifikasi sebelumnya
         if (\Illuminate\Support\Facades\Route::has('inventory.scan-qr')) {
-             $response = $this->actingAs($this->superAdmin)->get(route('inventory.scan-qr'));
-             $response->assertStatus(200);
+            $response = $this->actingAs($this->superAdmin)->get(route('inventory.scan-qr'));
+            $response->assertStatus(200);
         }
     }
 }

@@ -16,11 +16,26 @@
         const STORAGE_KEY = 'admin_dashboard_period';
         const params = new URLSearchParams(window.location.search);
 
-        if (!params.has('period')) {
+        if (!params.has('period') || params.get('period') === 'today') {
             const saved = sessionStorage.getItem(STORAGE_KEY);
-            if (saved && saved !== 'today') {
-                params.set('period', saved);
+            const isInitialLanding = !sessionStorage.getItem('dashboard_upgraded');
+
+            // Jika tidak ada param period, ATAU mendarat di 'today' (default lama)
+            // Kita paksa ke 'this_month' pada kunjungan pertama sesi ini.
+            if (isInitialLanding && (!params.has('period') || params.get('period') === 'today')) {
+                sessionStorage.setItem(STORAGE_KEY, 'this_month');
+                sessionStorage.setItem('dashboard_upgraded', 'true');
+                params.set('period', 'this_month');
                 window.location.replace(window.location.pathname + '?' + params.toString());
+                return;
+            }
+
+            if (!params.has('period')) {
+                if (saved && saved !== 'this_month') {
+                    params.set('period', saved);
+                    window.location.replace(window.location.pathname + '?' + params.toString());
+                    return;
+                }
             }
         } else {
             sessionStorage.setItem(STORAGE_KEY, params.get('period'));
@@ -52,84 +67,8 @@
                     </div>
 
                     <div class="flex items-center gap-2 flex-shrink-0">
-                        {{-- Tombol Pengaturan Widget --}}
-                        <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" @click.away="open = false"
-                                    class="btn btn-secondary flex items-center gap-2 text-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                <span class="hidden sm:inline">{{ __('ui.display_settings') }}</span>
-                            </button>
-                            <div x-show="open" x-transition
-                                 class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-1 z-50 border border-secondary-100 max-h-[80vh] overflow-y-auto">
-                                <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">{{ __('ui.active_widgets') }}</div>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showStats" @change="toggle('showStats')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_main_stats') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showCharts" @change="toggle('showCharts')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_distribution_location') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showLowStock" @change="toggle('showLowStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_stock_alerts') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showBorrowings" @change="toggle('showBorrowings')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_active_borrowings') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_overdue') }}</span>
-                                </label>
-                                <div class="border-t border-secondary-100 my-1"></div>
-                                <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">{{ __('ui.widget_analytics') }}</div>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showMovement" @change="toggle('showMovement')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_stock_movement') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showTopItems" @change="toggle('showTopItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_popular_items') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showDeadStock" @change="toggle('showDeadStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_dead_stock') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showLeaderboard" @change="toggle('showLeaderboard')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_top_contributors') }}</span>
-                                </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showRecent" @change="toggle('showRecent')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_recent_activity') }}</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        {{-- Tombol Ekspor --}}
-                        <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" @click.away="open = false"
-                                    class="btn btn-secondary flex items-center gap-2 text-sm">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                </svg>
-                                <span class="hidden sm:inline">Ekspor</span>
-                            </button>
-                            <div x-show="open" x-transition
-                                 class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl py-1 z-50 border border-secondary-100">
-                                <button onclick="exportDashboardPDF()" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                                    Cetak / PDF
-                                </button>
-                                <button onclick="exportDashboardPNG()" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                    Simpan sebagai PNG
-                                </button>
-                            </div>
-                        </div>
-
                         {{-- Tombol Approvals --}}
+
                         <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-primary flex items-center gap-2 relative">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                             <span class="hidden sm:inline">{{ __('ui.approvals') }}</span>
@@ -147,7 +86,7 @@
                      Tab Filter Periode Global
                      ================================================================ --}}
                 @php
-                    $activePeriod = $period ?? 'today';
+                    $activePeriod = $period ?? 'this_month';
                     $tabDefs = [
                         'today'      => 'Hari Ini',
                         'this_week'  => 'Minggu Ini',
@@ -285,18 +224,15 @@
             {{-- ================================================================
                  STAT CARDS — Skeleton Loading
                  ================================================================ --}}
-            <div x-show="showStats && isLoading" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6 animate-pulse">
+            <div x-show="showStats && isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-8 animate-pulse">
                 @for($i = 0; $i < 5; $i++)
-                    <div class="card p-6 flex flex-col justify-between h-40">
-                        <div class="flex justify-between items-start">
-                            <div class="h-4 bg-gray-200 rounded w-24"></div>
-                            <div class="h-10 w-10 bg-gray-200 rounded-bl-full -mr-6 -mt-6"></div>
+                    <div class="card h-28 flex items-center justify-between p-5 bg-white border-none shadow-xl rounded-2xl">
+                        <div class="space-y-3">
+                            <div class="h-3 bg-gray-100 rounded w-16"></div>
+                            <div class="h-8 bg-gray-100 rounded w-28"></div>
+                            <div class="h-3 bg-gray-50 rounded w-20"></div>
                         </div>
-                        <div class="mt-2 text-3xl font-bold text-gray-200">000</div>
-                        <div class="mt-4 flex items-center">
-                            <div class="p-2 bg-gray-100 rounded-lg w-9 h-9"></div>
-                            <div class="ml-2 h-4 bg-gray-100 rounded w-16"></div>
-                        </div>
+                        <div class="w-16 h-16 bg-gray-50 rounded-2xl flex-shrink-0"></div>
                     </div>
                 @endfor
             </div>
@@ -309,80 +245,85 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 transform scale-100"
                  x-transition:leave-end="opacity-0 transform scale-95"
-                 class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-6">
+                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
 
                 {{-- Card 1: Total Barang --}}
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-primary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative">{{ __('ui.total_items') }}</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalSpareparts">{{ $totalSpareparts }}</h3>
+                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-primary-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
+                    <div class="pl-4">
+                        <p class="text-[11px] font-extrabold text-primary-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.total_items') }}</p>
+                        <h3 class="text-4xl font-black text-secondary-900 leading-none" x-text="totalSpareparts">{{ $totalSpareparts }}</h3>
+                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.sku_items') }}</p>
                     </div>
-                    <div class="mt-4 flex items-center text-primary-600 z-10 relative">
-                        <div class="p-2 bg-primary-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.inventory class="w-5 h-5" />
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-primary-500/10 rounded-3xl blur-xl group-hover:bg-primary-500/20 transition-all"></div>
+                        <div class="relative p-4 bg-primary-50 text-primary-600 rounded-3xl group-hover:scale-110 transition-transform">
+                            <x-icon.inventory class="w-10 h-10" />
                         </div>
-                        <span class="ml-2 text-xs font-semibold bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full">{{ __('ui.sku_items') }}</span>
                     </div>
                 </div>
 
                 {{-- Card 2: Total Stok Fisik --}}
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-success-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-success-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative">{{ __('ui.total_physical_stock') }}</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalStock">{{ $totalStock }}</h3>
+                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-success-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
+                    <div class="pl-4">
+                        <p class="text-[11px] font-extrabold text-success-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.total_physical_stock') }}</p>
+                        <h3 class="text-4xl font-black text-secondary-900 leading-none" x-text="totalStock">{{ $totalStock }}</h3>
+                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.units') }}</p>
                     </div>
-                    <div class="mt-4 flex items-center text-success-600 z-10 relative">
-                        <div class="p-2 bg-success-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.package class="w-5 h-5" />
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-success-500/10 rounded-3xl blur-xl group-hover:bg-success-500/20 transition-all"></div>
+                        <div class="relative p-4 bg-success-50 text-success-600 rounded-3xl group-hover:scale-110 transition-transform">
+                            <x-icon.package class="w-10 h-10" />
                         </div>
-                        <span class="ml-2 text-xs font-semibold bg-success-50 text-success-700 px-2 py-0.5 rounded-full">{{ __('ui.units') }}</span>
                     </div>
                 </div>
 
                 {{-- Card 3: Kategori --}}
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-warning-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-warning-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative">{{ __('ui.categories') }}</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative">{{ $totalCategories }}</h3>
+                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-warning-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
+                    <div class="pl-4">
+                        <p class="text-[11px] font-extrabold text-warning-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.categories') }}</p>
+                        <h3 class="text-4xl font-black text-secondary-900 leading-none">{{ $totalCategories }}</h3>
+                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.item_types') }}</p>
                     </div>
-                    <div class="mt-4 flex items-center text-warning-600 z-10 relative">
-                        <div class="p-2 bg-warning-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.category class="w-5 h-5" />
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-warning-500/10 rounded-3xl blur-xl group-hover:bg-warning-500/20 transition-all"></div>
+                        <div class="relative p-4 bg-warning-50 text-warning-600 rounded-3xl group-hover:scale-110 transition-transform">
+                            <x-icon.category class="w-10 h-10" />
                         </div>
-                        <span class="ml-2 text-xs font-semibold bg-warning-50 text-warning-700 px-2 py-0.5 rounded-full">{{ __('ui.item_types') }}</span>
                     </div>
                 </div>
 
                 {{-- Card 4: Sedang Dipinjam --}}
-                <div x-show="showBorrowings" class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-indigo-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-indigo-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative">{{ __('ui.currently_borrowed') }}</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative">{{ $activeBorrowingsCount }}</h3>
+                <div x-show="showBorrowings" class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-indigo-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
+                    <div class="pl-4">
+                        <p class="text-[11px] font-extrabold text-indigo-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.currently_borrowed') }}</p>
+                        <h3 class="text-4xl font-black text-secondary-900 leading-none">{{ $activeBorrowingsCount }}</h3>
+                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.units_out') }}</p>
                     </div>
-                    <div class="mt-4 flex items-center text-indigo-600 z-10 relative">
-                        <div class="p-2 bg-indigo-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.borrow-user class="w-5 h-5" />
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-indigo-500/10 rounded-3xl blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
+                        <div class="relative p-4 bg-indigo-50 text-indigo-600 rounded-3xl group-hover:scale-110 transition-transform">
+                            <x-icon.borrow-user class="w-10 h-10" />
                         </div>
-                        <span class="ml-2 text-xs font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full">{{ __('ui.units_out') }}</span>
                     </div>
                 </div>
 
                 {{-- Card 5: Lokasi Penyimpanan --}}
-                <div class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-transform duration-300">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-secondary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-secondary-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative">{{ __('ui.storage_locations') }}</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative">{{ $totalLocations }}</h3>
+                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-secondary-400 rounded-r-full group-hover:w-[16px] transition-all"></div>
+                    <div class="pl-4">
+                        <p class="text-[11px] font-extrabold text-secondary-600 mb-1 uppercase tracking-[0.15em]">{{ __('ui.storage_locations') }}</p>
+                        <h3 class="text-4xl font-black text-secondary-900 leading-none">{{ $totalLocations }}</h3>
+                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.warehouse_racks') }}</p>
                     </div>
-                    <div class="mt-4 flex items-center text-secondary-600 z-10 relative">
-                        <div class="p-2 bg-secondary-200 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.location class="w-5 h-5" />
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-secondary-400/10 rounded-3xl blur-xl group-hover:bg-secondary-400/20 transition-all"></div>
+                        <div class="relative p-4 bg-secondary-50 text-secondary-600 rounded-3xl group-hover:scale-110 transition-transform">
+                            <x-icon.location class="w-10 h-10" />
                         </div>
-                        <span class="ml-2 text-xs font-semibold bg-secondary-100 text-secondary-700 px-2 py-0.5 rounded-full">{{ __('ui.warehouse_racks') }}</span>
                     </div>
                 </div>
             </div>
@@ -515,11 +456,14 @@
                         {{-- Quick-filter Periode Widget --}}
                         <div class="flex items-center gap-1 bg-secondary-100 rounded-lg p-0.5" id="movement-range-btns">
                             <button onclick="fetchMovementData(7)" id="mov-btn-7"
-                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all bg-white shadow-sm text-primary-700">7 Hari</button>
+                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all
+                                           {{ in_array($activePeriod, ['today', 'this_week']) ? 'bg-white shadow-sm text-primary-700' : 'text-secondary-600 hover:bg-white/70' }}">7 Hari</button>
                             <button onclick="fetchMovementData(30)" id="mov-btn-30"
-                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-secondary-600 hover:bg-white/70">30 Hari</button>
+                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all
+                                           {{ $activePeriod === 'this_month' ? 'bg-white shadow-sm text-primary-700' : 'text-secondary-600 hover:bg-white/70' }}">30 Hari</button>
                             <button onclick="fetchMovementData(90)" id="mov-btn-90"
-                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all text-secondary-600 hover:bg-white/70">3 Bulan</button>
+                                    class="mov-range-btn px-2.5 py-1 rounded-md text-xs font-medium transition-all
+                                           {{ in_array($activePeriod, ['this_year', 'custom', 'custom_year']) ? 'bg-white shadow-sm text-primary-700' : 'text-secondary-600 hover:bg-white/70' }}">3 Bulan</button>
                         </div>
                     </div>
                 </div>
@@ -1093,28 +1037,28 @@
                 labels: movLabels,
                 datasets: [
                     {
-                        label: '📦 Barang Masuk',
+                        label: 'Barang Masuk',
                         data: movMasuk,
                         backgroundColor: gradMasuk,
                         borderColor: '#10b981',
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,
-                        pointRadius: 0,
+                        pointRadius: 4,
                         pointHoverRadius: 6,
                         pointBackgroundColor: '#10b981',
                         pointBorderColor: '#fff',
                         pointBorderWidth: 2,
                     },
                     {
-                        label: '📤 Barang Keluar',
+                        label: 'Barang Keluar',
                         data: movKeluar,
                         backgroundColor: gradKeluar,
                         borderColor: '#ef4444',
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,
-                        pointRadius: 0,
+                        pointRadius: 4,
                         pointHoverRadius: 6,
                         pointBackgroundColor: '#ef4444',
                         pointBorderColor: '#fff',
@@ -1140,14 +1084,14 @@
                         padding: 12,
                         cornerRadius: 8,
                         callbacks: {
-                            title(ctx) { return '🗓 ' + ctx[0].label; },
+                            title(ctx) { return ctx[0].label; },
                             label(ctx) { return `  ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('id-ID')} unit`; },
                             afterBody(ctx) {
                                 if (ctx.length < 2) return '';
                                 const masuk  = ctx.find(c => c.datasetIndex === 0)?.parsed.y ?? 0;
                                 const keluar = ctx.find(c => c.datasetIndex === 1)?.parsed.y ?? 0;
                                 const net = masuk - keluar;
-                                return [`  ─────────────────`, `  🔄 Net Stok: ${net >= 0 ? '+' : ''}${net.toLocaleString('id-ID')} unit`];
+                                return [`  ─────────────────`, `  Net Stok: ${net >= 0 ? '+' : ''}${net.toLocaleString('id-ID')} unit`];
                             }
                         }
                     }
@@ -1264,7 +1208,7 @@
                         borderWidth: 1,
                         padding: 12,
                         cornerRadius: 8,
-                        callbacks: { label(ctx) { return `  📦 Stok: ${ctx.parsed.y.toLocaleString('id-ID')} unit`; } }
+                        callbacks: { label(ctx) { return `  Stok: ${ctx.parsed.y.toLocaleString('id-ID')} unit`; } }
                     }
                 },
                 scales: {
@@ -1303,16 +1247,17 @@
         function dashboardData() {
             return {
                 // Widget visibility — persisted di localStorage
-                showStats:       (localStorage.getItem('admin_dashboard_showStats')       ?? 'true')  !== 'false',
-                showCharts:      (localStorage.getItem('admin_dashboard_showCharts')      ?? 'true')  !== 'false',
-                showMovement:    (localStorage.getItem('admin_dashboard_showMovement')    ?? 'true')  !== 'false',
-                showTopItems:    (localStorage.getItem('admin_dashboard_showTopItems')    ?? 'false') === 'true',
-                showLowStock:    (localStorage.getItem('admin_dashboard_showLowStock')    ?? 'true')  !== 'false',
-                showRecent:      (localStorage.getItem('admin_dashboard_showRecent')      ?? 'true')  !== 'false',
-                showDeadStock:   (localStorage.getItem('admin_dashboard_showDeadStock')   ?? 'false') === 'true',
-                showLeaderboard: (localStorage.getItem('admin_dashboard_showLeaderboard') ?? 'false') === 'true',
-                showBorrowings:  (localStorage.getItem('admin_dashboard_showBorrowings')  ?? 'true')  !== 'false',
-                showOverdue:     (localStorage.getItem('admin_dashboard_showOverdue')     ?? 'true')  !== 'false',
+                // Widget visibility — dipaksa tampil semua untuk Admin (tidak bisa diubah)
+                showStats:       true,
+                showCharts:      true,
+                showMovement:    true,
+                showTopItems:    false,
+                showLowStock:    true,
+                showRecent:      true,
+                showDeadStock:   false,
+                showLeaderboard: false,
+                showBorrowings:  true,
+                showOverdue:     true,
 
                 isLoading: true,
 
@@ -1398,14 +1343,14 @@
         // =====================================================================
         function globalPeriodFilter() {
             return {
-                showCustom: {{ in_array($period ?? 'today', ['custom','custom_year']) ? 'true' : 'false' }},
+                showCustom: {{ in_array($period ?? 'this_month', ['custom','custom_year']) ? 'true' : 'false' }},
             };
         }
 
         // =====================================================================
         // Quick-filter per-widget Pergerakan Stok
         // =====================================================================
-        let movementActiveRange = 7;
+        let movementActiveRange = {{ ($activePeriod ?? 'this_month') === 'this_month' ? '30' : '7' }};
 
         async function fetchMovementData(range) {
             movementActiveRange = range;
@@ -1447,6 +1392,14 @@
                 if (canvas) canvas.style.opacity = '1';
             }
         }
+
+        // Auto-fetch movement data on load to ensure chart is populated
+        document.addEventListener('DOMContentLoaded', () => {
+             // Delay sedikit agar Chart.js instance siap
+             setTimeout(() => {
+                 fetchMovementData(movementActiveRange);
+             }, 300);
+        });
     </script>
     @endpush
 

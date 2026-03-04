@@ -79,7 +79,7 @@
                 {
                     "name": "Update Stok (Pengurangan Transaksi)",
                     "request": {
-                        "method": "POST",
+                        "method": "PUT",
                         "header": [
                             {
                                 "key": "Accept",
@@ -118,7 +118,7 @@
                 {
                     "name": "Update Stok (Penambahan / Restock)",
                     "request": {
-                        "method": "POST",
+                        "method": "PUT",
                         "header": [
                             {
                                 "key": "Accept",

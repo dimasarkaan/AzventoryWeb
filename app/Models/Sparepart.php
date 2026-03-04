@@ -7,62 +7,54 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Model Sparepart merepresentasikan barang inventory (Suku Cadang & Aset).
+ * Model Sparepart merepresentasikan barang inventaris (Unit Sparepart, Aset, atau Barang Jual).
  */
 class Sparepart extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'type',
-        'name',
-        'part_number',
-        'brand',
-        'category',
-        'location',
-        'age',
-        'condition',
-        'color',
-        'price', // nullable
-        'stock',
-        'minimum_stock',
-        'unit',
-        'status',
-        'image',
-        'qr_code_path',
+        'type', 'name', 'part_number', 'brand', 'category', 'location',
+        'age', 'condition', 'color', 'price', 'minimum_stock',
+        'stock', 'unit', 'status', 'image', 'qr_code_path',
     ];
 
-    // Relasi ke log stok.
+    /**
+     * Relasi ke riwayat perubahan stok (StockLog).
+     */
     public function stockLogs()
     {
         return $this->hasMany(StockLog::class);
     }
 
-    // Relasi ke data peminjaman.
+    /**
+     * Relasi ke data transaksi peminjaman.
+     */
     public function borrowings()
     {
         return $this->hasMany(Borrowing::class);
     }
 
-    // Cek apakah item adalah aset.
+    /**
+     * Predikat untuk mengecek apakah barang masuk kategori aset perusahaan.
+     */
     public function isAsset()
     {
         return $this->type === 'asset';
     }
 
-    // Cek apakah item adalah barang jual.
+    /**
+     * Predikat untuk mengecek apakah barang tersebut diperjualbelikan.
+     */
     public function isSaleable()
     {
         return $this->type === 'sale';
     }
 
     /**
-     * Mengecek apakah barang dapat dipinjam.
-     * 
-     * Validasi berdasarkan kondisi barang dan ketersediaan stok.
-     * 
-     * @param int $quantity Jumlah yang ingin dipinjam
-     * @return bool|string True jika bisa, string error jika tidak
+     * Validasi kelayakan barang untuk dipinjam berdasarkan kondisi dan ketersediaan stok fisik.
+     *
+     * @return bool|string True jika layak, pesan error jika tidak memenuhi kriteria.
      */
     public function canBeBorrowed(int $quantity)
     {
@@ -71,7 +63,7 @@ class Sparepart extends Model
         }
 
         if ($this->stock < $quantity) {
-             return 'Stok tidak mencukupi untuk peminjaman ini.';
+            return 'Stok tidak mencukupi untuk peminjaman ini.';
         }
 
         return true;

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class BorrowingTest extends TestCase
@@ -19,9 +20,9 @@ class BorrowingTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->superAdmin = User::factory()->create(['role' => 'superadmin']);
-        
+
         // Mock Storage untuk foto
         Storage::fake('public');
 
@@ -31,8 +32,8 @@ class BorrowingTest extends TestCase
         });
     }
 
-    /** @test */
-    public function superadmin_can_borrow_item()
+    #[Test]
+    public function superadmin_dapat_meminjam_item()
     {
         $item = Sparepart::factory()->create([
             'stock' => 10,
@@ -64,8 +65,8 @@ class BorrowingTest extends TestCase
         ]);
     }
 
-    /** @test */
-    public function superadmin_cannot_borrow_more_than_stock()
+    #[Test]
+    public function superadmin_tidak_dapat_meminjam_lebih_dari_stok()
     {
         $item = Sparepart::factory()->create(['stock' => 5]);
 
@@ -78,11 +79,11 @@ class BorrowingTest extends TestCase
         $response->assertSessionHasErrors(['borrow_error']);
     }
 
-    /** @test */
-    public function superadmin_can_return_borrowed_item_good_condition()
+    #[Test]
+    public function superadmin_dapat_mengembalikan_item_pinjaman_dengan_kondisi_baik()
     {
         $item = Sparepart::factory()->create(['stock' => 8]);
-        
+
         $borrowing = Borrowing::create([
             'sparepart_id' => $item->id,
             'user_id' => $this->superAdmin->id,

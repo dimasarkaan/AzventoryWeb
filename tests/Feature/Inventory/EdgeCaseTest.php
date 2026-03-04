@@ -2,10 +2,11 @@
 
 namespace Tests\Feature\Inventory;
 
-use App\Models\User;
-use App\Models\Sparepart;
 use App\Models\Borrowing;
+use App\Models\Sparepart;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class EdgeCaseTest extends TestCase
@@ -20,8 +21,8 @@ class EdgeCaseTest extends TestCase
         $this->superAdmin = User::factory()->create(['role' => 'superadmin']);
     }
 
-    /** @test */
-    public function system_prevents_negative_stock_input_on_create()
+    #[Test]
+    public function sistem_mencegah_input_stok_negatif_saat_pembuatan()
     {
         // Aksi: Coba buat sparepart dengan stok negatif
         $response = $this->actingAs($this->superAdmin)->post(route('inventory.store'), [
@@ -34,7 +35,7 @@ class EdgeCaseTest extends TestCase
             'type' => 'sale',
             'condition' => 'Baru',
             'location' => 'Rack A',
-            'status' => 'aktif'
+            'status' => 'aktif',
         ]);
 
         // Assert
@@ -42,8 +43,8 @@ class EdgeCaseTest extends TestCase
         $this->assertDatabaseMissing('spareparts', ['part_number' => 'NEG-001']);
     }
 
-    /** @test */
-    public function system_prevents_negative_stock_through_borrowing()
+    #[Test]
+    public function sistem_mencegah_stok_negatif_melalui_peminjaman()
     {
         // Persiapan: Item dengan 5 stok
         $item = Sparepart::factory()->create(['stock' => 5]);
@@ -55,7 +56,7 @@ class EdgeCaseTest extends TestCase
             'quantity' => 10, // Exceeds stock
             'borrower_name' => $user->name,
             'borrowed_at' => now(),
-            'notes' => 'Overdraft test'
+            'notes' => 'Overdraft test',
         ]);
 
         // Assert
@@ -63,20 +64,20 @@ class EdgeCaseTest extends TestCase
         $this->assertEquals(5, $item->fresh()->stock); // Stock should remain unchanged
     }
 
-    /** @test */
-    public function cannot_delete_item_with_active_borrowing()
+    #[Test]
+    public function tidak_dapat_menghapus_item_dengan_peminjaman_aktif()
     {
         // Persiapan: Item dengan peminjaman aktif
         $item = Sparepart::factory()->create(['stock' => 10]);
         $user = User::factory()->create();
-        
+
         Borrowing::create([
             'sparepart_id' => $item->id,
             'user_id' => $user->id,
             'borrower_name' => $user->name,
             'quantity' => 1,
             'borrowed_at' => now(),
-            'status' => 'borrowed'
+            'status' => 'borrowed',
         ]);
 
         // Aksi: Coba SOFT DELETE
@@ -88,8 +89,8 @@ class EdgeCaseTest extends TestCase
         $this->assertDatabaseHas('spareparts', ['id' => $item->id]);
     }
 
-    /** @test */
-    public function merges_stock_if_duplicate_part_number_exists()
+    #[Test]
+    public function menggabungkan_stok_jika_nomor_part_duplikat_ada()
     {
         // Arrange
         $existing = Sparepart::factory()->create([
@@ -105,7 +106,7 @@ class EdgeCaseTest extends TestCase
             'type' => 'sale',
             'unit' => 'Pcs',
             'price' => '10000.00',
-            'color' => 'Hitam'
+            'color' => 'Hitam',
         ]);
 
         // Act
@@ -123,19 +124,19 @@ class EdgeCaseTest extends TestCase
             'status' => 'aktif',
             'unit' => 'Pcs',
             'price' => '10000.00',
-            'color' => 'Hitam'
+            'color' => 'Hitam',
         ]);
 
         // Assert
         $response->assertRedirect();
         $response->assertSessionHas('success'); // Seharusnya sukses (digabungkan)
-        
+
         $this->assertDatabaseCount('spareparts', 1); // Masih 1 item
         $this->assertEquals(15, $existing->fresh()->stock); // 10 + 5
     }
 
-    /** @test */
-    public function system_prevents_bypassing_status_validation()
+    #[Test]
+    public function sistem_mencegah_bypass_validasi_status()
     {
         $sparepart = Sparepart::factory()->create(['status' => 'aktif']);
 
@@ -150,15 +151,15 @@ class EdgeCaseTest extends TestCase
             'type' => 'sale',
             'condition' => 'Baru',
             'location' => 'Rack A',
-            'status' => 'status_palsu_bypass' // Invalid status
+            'status' => 'status_palsu_bypass', // Invalid status
         ]);
 
         $response->assertSessionHasErrors(['status']);
         $this->assertEquals('aktif', $sparepart->fresh()->status);
     }
 
-    /** @test */
-    public function system_prevents_condition_exceeding_max_validation()
+    #[Test]
+    public function sistem_mencegah_kondisi_melebihi_validasi_maksimal()
     {
         $sparepart = Sparepart::factory()->create(['condition' => 'Baik']);
 
@@ -174,15 +175,15 @@ class EdgeCaseTest extends TestCase
             'type' => 'sale',
             'condition' => $longCondition, // Invalid > 255 char
             'location' => 'Rack A',
-            'status' => 'aktif'
+            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors(['condition']);
         $this->assertEquals('Baik', $sparepart->fresh()->condition);
     }
-    
-    /** @test */
-    public function system_prevents_incorrect_datatype_on_stock()
+
+    #[Test]
+    public function sistem_mencegah_tipe_data_salah_pada_stok()
     {
         $response = $this->actingAs($this->superAdmin)->post(route('inventory.store'), [
             'name' => 'Test Item',
@@ -194,15 +195,15 @@ class EdgeCaseTest extends TestCase
             'type' => 'sale',
             'condition' => 'Baru',
             'location' => 'Rack A',
-            'status' => 'aktif'
+            'status' => 'aktif',
         ]);
 
         $response->assertSessionHasErrors(['stock']);
         $this->assertDatabaseMissing('spareparts', ['part_number' => 'TEST-001']);
     }
 
-    /** @test */
-    public function user_cannot_borrow_out_of_stock_item()
+    #[Test]
+    public function user_tidak_dapat_meminjam_item_yang_habis_stoknya()
     {
         $item = Sparepart::factory()->create(['stock' => 0]);
         $user = User::factory()->create();
@@ -213,18 +214,18 @@ class EdgeCaseTest extends TestCase
             'borrower_name' => $user->name,
             'borrowed_at' => now(),
             'expected_return_at' => now()->addDays(2),
-            'notes' => 'Testing validation'
+            'notes' => 'Testing validation',
         ]);
 
         $response->assertSessionHasErrors();
         $this->assertDatabaseMissing('borrowings', [
             'sparepart_id' => $item->id,
-            'user_id' => $user->id
+            'user_id' => $user->id,
         ]);
     }
 
-    /** @test */
-    public function operator_can_only_view_own_borrowings()
+    #[Test]
+    public function operator_hanya_dapat_melihat_peminjaman_sendiri()
     {
         $operator = User::factory()->create(['role' => 'operator']);
         $otherOperator = User::factory()->create(['role' => 'operator']);
@@ -237,7 +238,7 @@ class EdgeCaseTest extends TestCase
             'borrower_name' => $operator->name,
             'quantity' => 1,
             'borrowed_at' => now(),
-            'status' => 'borrowed'
+            'status' => 'borrowed',
         ]);
 
         $otherBorrowing = Borrowing::create([
@@ -246,11 +247,11 @@ class EdgeCaseTest extends TestCase
             'borrower_name' => $otherOperator->name,
             'quantity' => 1,
             'borrowed_at' => now(),
-            'status' => 'borrowed'
+            'status' => 'borrowed',
         ]);
 
         $response = $this->actingAs($operator)->get(route('inventory.index'));
-        
+
         // Asumsi page sukses dirender (Operator allowed inventory index)
         $response->assertStatus(200);
     }

@@ -6,21 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Model StockLog untuk mencatat riwayat perubahan stok barang.
+ * Model StockLog mencatat audit trail setiap perubahan stok (Masuk/Keluar/Penyesuaian).
  */
 class StockLog extends Model
 {
     use HasFactory;
 
-    protected $guarded = ['id'];
+    protected $fillable = [
+        'sparepart_id', 'user_id', 'type', 'quantity', 'reason', 'status', 'approved_by',
+    ];
 
-    // Relasi ke user yang melakukan perubahan stok.
+    /**
+     * Relasi ke user yang melakukan atau mengajukan perubahan stok.
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke barang yang stoknya berubah.
+    /**
+     * Relasi ke data sparepart/aset yang mengalami perubahan stok.
+     */
     public function sparepart()
     {
         return $this->belongsTo(Sparepart::class);

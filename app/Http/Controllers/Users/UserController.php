@@ -3,15 +3,15 @@
 namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use App\Traits\ActivityLogger;
 use App\Http\Requests\Users\StoreUserRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
+use App\Traits\ActivityLogger;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
     use ActivityLogger;
+
     /**
      * Menampilkan daftar pengguna (User).
      */
@@ -27,10 +27,10 @@ class UserController extends Controller
 
         // Search Scope
         $query->when($request->search, function ($q) use ($request) {
-            $q->where(function($sub) use ($request) {
-                $sub->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('email', 'like', '%' . $request->search . '%')
-                    ->orWhere('username', 'like', '%' . $request->search . '%');
+            $q->where(function ($sub) use ($request) {
+                $sub->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('email', 'like', '%'.$request->search.'%')
+                    ->orWhere('username', 'like', '%'.$request->search.'%');
             });
         });
 
@@ -48,7 +48,7 @@ class UserController extends Controller
         $query->where('id', '!=', auth()->id());
 
         $users = $query->latest()->paginate(10)->withQueryString();
-        
+
         return view('users.index', compact('users'));
     }
 
@@ -58,6 +58,7 @@ class UserController extends Controller
     public function create()
     {
         $this->authorize('create', \App\Models\User::class);
+
         return view('users.create');
     }
 
@@ -68,10 +69,10 @@ class UserController extends Controller
     {
         $this->authorize('create', \App\Models\User::class);
         // Auto-generate temporary username based on email
-        $username = explode('@', $request->email)[0] . rand(100, 999);
+        $username = explode('@', $request->email)[0].rand(100, 999);
         // Ensure uniqueness (simple check, collision rare for low volume)
-        while(\App\Models\User::where('username', $username)->exists()){
-            $username = explode('@', $request->email)[0] . rand(100, 999);
+        while (\App\Models\User::where('username', $username)->exists()) {
+            $username = explode('@', $request->email)[0].rand(100, 999);
         }
 
         $password = 'password123'; // Default password
@@ -100,7 +101,7 @@ class UserController extends Controller
     {
         $this->authorize('view', $user);
         $user->load(['borrowings.sparepart']);
-        
+
         return view('users.show', compact('user'));
     }
 
@@ -110,6 +111,7 @@ class UserController extends Controller
     public function edit(\App\Models\User $user)
     {
         $this->authorize('update', $user);
+
         return view('users.edit', compact('user'));
     }
 
@@ -154,9 +156,14 @@ class UserController extends Controller
     public function destroy(\App\Models\User $user)
     {
         $this->authorize('delete', $user);
-         // Prevent deleting own account
-         if (auth()->id() === $user->id) {
+        // Prevent deleting own account
+        if (auth()->id() === $user->id) {
             return back()->with('error', __('messages.cannot_delete_self'));
+        }
+
+        // Prevent deleting user with active borrowings
+        if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+            return back()->with('error', 'Tidak dapat menghapus pengguna karena masih memiliki pinjaman barang aktif.');
         }
 
         $this->logActivity('User Dihapus', __('messages.log_user_deleted_soft', ['name' => $user->name]));
@@ -189,19 +196,24 @@ class UserController extends Controller
     {
         $user = \App\Models\User::withTrashed()->findOrFail($id);
         $this->authorize('forceDelete', $user);
-        
+
         // Final check to prevent self-deletion even if force
         if (auth()->id() === $user->id) {
             return back()->with('error', __('messages.cannot_delete_self'));
         }
 
+        // Prevent force deleting user with active borrowings
+        if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+            return back()->with('error', 'Tidak dapat menghapus permanen pengguna karena masih memiliki pinjaman barang aktif.');
+        }
+
         // Delete avatar if exists
         if ($user->avatar) {
-             \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
         }
 
         $this->logActivity('User Dihapus Permanen', __('messages.log_user_deleted_force', ['name' => $user->name]));
-        
+
         $user->forceDelete();
 
         return redirect()->route('users.index', ['trash' => 'true'])
@@ -226,8 +238,8 @@ class UserController extends Controller
      */
     public function bulkForceDelete(Request $request)
     {
-         $this->authorize('forceDelete', \App\Models\User::class);
-         $request->validate([
+        $this->authorize('forceDelete', \App\Models\User::class);
+        $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:users,id',
         ]);
@@ -240,12 +252,22 @@ class UserController extends Controller
         }
 
         $count = 0;
+        $skipped = 0;
         foreach ($users as $user) {
             // Prevent self-deletion just in case
-            if ($user->id === auth()->id()) continue;
+            if ($user->id === auth()->id()) {
+                continue;
+            }
 
-             if ($user->avatar) {
-                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            // Skip users with active borrowings
+            if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+                $skipped++;
+
+                continue;
+            }
+
+            if ($user->avatar) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
             $user->forceDelete();
             $count++;
@@ -253,6 +275,11 @@ class UserController extends Controller
 
         $this->logActivity('Bulk Force Delete User', __('messages.log_bulk_user_deleted_force', ['count' => $count]));
 
-        return redirect()->back()->with('success', __('messages.bulk_user_force_deleted', ['count' => $count]));
+        $message = __('messages.bulk_user_force_deleted', ['count' => $count]);
+        if ($skipped > 0) {
+            $message .= " ($skipped pengguna dilewati karena memiliki pinjaman aktif).";
+        }
+
+        return redirect()->back()->with('success', $message);
     }
 }

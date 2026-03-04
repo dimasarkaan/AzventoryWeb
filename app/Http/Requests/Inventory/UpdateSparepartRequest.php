@@ -41,7 +41,7 @@ class UpdateSparepartRequest extends FormRequest
 
         // Admin cannot update price
         if ($this->user()->role === \App\Enums\UserRole::ADMIN) {
-             unset($rules['price']);
+            unset($rules['price']);
         }
 
         return $rules;
@@ -80,6 +80,9 @@ class UpdateSparepartRequest extends FormRequest
             'age.required' => 'Kolom Status Pemakaian wajib diisi.',
             'age.in' => 'Status Pemakaian harus berisi "Baru" atau "Pernah Dipakai (Bekas)".',
             'price.required_if' => 'Kolom Harga Satuan wajib diisi.',
+            'image.image' => 'Kolom Gambar harus berupa file gambar.',
+            'image.mimes' => 'Format file Gambar harus berupa jpeg, png, jpg, atau webp.',
+            'image.max' => 'Ukuran file Gambar maksimal 5MB.',
         ];
     }
 }

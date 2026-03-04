@@ -26,7 +26,7 @@ class SparepartFactory extends Factory
             'stock' => $this->faker->numberBetween(0, 100),
             'minimum_stock' => 5,
             'unit' => 'Unit',
-             // Add default values for other fields if needed, like status
+            // Add default values for other fields if needed, like status
             'status' => 'aktif',
         ];
     }

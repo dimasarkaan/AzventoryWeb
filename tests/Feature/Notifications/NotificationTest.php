@@ -4,7 +4,7 @@ namespace Tests\Feature\Notifications;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Notifications\DatabaseNotification;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class NotificationTest extends TestCase
@@ -19,8 +19,8 @@ class NotificationTest extends TestCase
         $this->superAdmin = User::factory()->create(['role' => 'superadmin']);
     }
 
-    /** @test */
-    public function superadmin_can_view_notifications()
+    #[Test]
+    public function superadmin_dapat_melihat_notifikasi()
     {
         // Seed Notifikasi
         $notification = $this->superAdmin->notifications()->create([
@@ -39,15 +39,15 @@ class NotificationTest extends TestCase
         $response->assertSee('Test Notification');
     }
 
-    /** @test */
-    public function superadmin_can_mark_notification_as_read()
+    #[Test]
+    public function superadmin_dapat_menandai_notifikasi_sebagai_dibaca()
     {
         $notification = $this->superAdmin->notifications()->create([
             'id' => \Illuminate\Support\Str::uuid()->toString(),
             'type' => 'App\Notifications\StockRequestNotification',
             'data' => [
                 'message' => 'Test Notification',
-                'url' => '/dashboard', 
+                'url' => '/dashboard',
             ],
             'read_at' => null,
         ]);
@@ -56,11 +56,12 @@ class NotificationTest extends TestCase
             ->patch(route('notifications.read', $notification->id));
 
         $response->assertRedirect('/dashboard');
-        
+
         $this->assertNotNull($notification->fresh()->read_at);
     }
-    /** @test */
-    public function test_low_stock_notification_can_be_triggered()
+
+    #[Test]
+    public function test_notifikasi_stok_rendah_dapat_dipicu()
     {
         \Illuminate\Support\Facades\Notification::fake();
 
@@ -68,7 +69,7 @@ class NotificationTest extends TestCase
         $sparepart = \App\Models\Sparepart::factory()->make([
             'name' => 'Low Stock Item',
             'stock' => 1,
-            'minimum_stock' => 5
+            'minimum_stock' => 5,
         ]);
 
         // Picu notifikasi secara manual (simulasi logika Controller)

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timestamp('password_changed_at')->nullable();
             $table->boolean('is_username_changed')->default(false);
             $table->string('jabatan')->nullable();
-            $table->string('status')->default('active'); // active, inactive
+            $table->string('status')->default('aktif'); // aktif, nonaktif
             $table->string('avatar')->nullable();
             $table->string('phone')->nullable();
             $table->text('address')->nullable();

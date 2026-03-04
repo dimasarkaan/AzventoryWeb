@@ -52,6 +52,16 @@ class LoginRequest extends FormRequest
             'password' => $password,
         ];
 
+        // Cari user berdasarkan email/username untuk cek status
+        $user = \App\Models\User::where($fieldType, $login)->first();
+
+        if ($user && $user->status !== 'aktif') {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'login' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
+            ]);
+        }
+
         if (! Auth::attempt($credentials, $remember)) {
             RateLimiter::hit($this->throttleKey());
 

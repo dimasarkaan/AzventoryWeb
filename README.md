@@ -28,9 +28,11 @@ Aplikasi ini sudah melalui proses pengujian (*Automated Testing*) ekstensif, mem
   - **Superadmin:** Kontrol mutlak (Kelola seluruh barang, hapus paksa/pulihkan data dari tong sampah, kelola seluruh pengguna, dan akses pembuatan `Token API`).
   - **Admin:** Pengawas harian (Kelola persediaan barang reguler, lihat log laporan bawahan, kelola peminjaman).
   - **Operator:** Pekerja gudang (Hanya dapat melihat stok, meminjam, dan mencatat pergerakan tanpa hak merusak/menghapus data).
-- 📊 **Smart Dashboard:** Analitik yang ditenagai oleh caching bawaan. Memuat metrik seperti pergerakan barang (Sering Masuk & Sering Keluar), aset kedaluwarsa, peminjam yang belum kembali, dan nilai finansial gudang secara instan.
-- 📦 **Advance Inventory System:** Mendukung multi-kategori, multi-lokasi, indikator stok menipis darurat, dan pencetakan massal *Barcode/Label QR* (.svg).
-- 🧾 **Export & Reports:** Logika pencetakan file (Excel & PDF) Laporan Mutasi Stok, Laporan Peminjaman, dan Riwayat Aktifitas yang disajikan secara korporat lengkap dengan Header (Kop Surat) dan nama file otomatis.
+- 📊 **Smart Dashboard:** Analitik yang ditenagai oleh caching bawaan. Memuat metrik seperti pergerakan barang (Sering Masuk & Sering Keluar), aset kedaluwarsa, peminjam yang belum kembali, dan nilai finansial gudang secara instan. Dioptimalkan untuk menangani **10.000+ data log** tanpa penurunan performa.
+- 📱 **Full PWA (Progressive Web App):** Aplikasi dapat dinstal di Home Screen (Android/iOS) dengan dukungan *Offline Fallback*, *App Shortcuts*, dan *Instant Loading* berkat Service Worker.
+- 📦 **Advance Inventory System:** Mendukung multi-kategori, multi-lokasi, indikator stok menipis darurat, penyesuaian stok massal (*Bulk Approval*), dan pencetakan massal *Barcode/Label QR* (.svg).
+- 🔐 **Hardened Security:** Proteksi terhadap *Mass Assignment* di level Model, penutupan celah IDOR, dan audit otomatis pergerakan stok untuk integritas data maksimal.
+- 🧾 **Export & Reports:** Logika pencetakan file (Excel & PDF) Laporan Mutasi Stok, Laporan Peminjaman, dan Riwayat Aktifitas yang disajikan secara korporat lengkap dengan Header (Kop Surat).
 - 🔗 **REST API Standardized:** Endpoints (JSON) siap pakai untuk diintegrasikan dengan Front-End React/Vue/Mobile App, diamankan dengan Laravel Sanctum via *Bearer Tokens*.
 
 ---

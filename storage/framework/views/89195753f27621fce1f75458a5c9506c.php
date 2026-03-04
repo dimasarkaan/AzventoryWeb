@@ -29,6 +29,9 @@ foreach ($attributes->all() as $__key => $__value) {
 unset($__defined_vars, $__key, $__value); ?>
 
 <tr class="group hover:bg-secondary-50/60 transition-colors border-b border-secondary-50 last:border-b-0">
+    <td class="px-4 py-3 w-10">
+        <input type="checkbox" name="ids[]" value="<?php echo e($approval->id); ?>" class="row-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500">
+    </td>
     <td class="px-4 py-3">
         <div class="flex items-center gap-3">
             <div class="h-10 w-10 rounded-lg bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0 relative overflow-hidden group-hover:border-primary-200 transition-colors border border-transparent">
@@ -71,7 +74,7 @@ unset($__defined_vars, $__key, $__value); ?>
                 <?php echo csrf_field(); ?>
                 <?php echo method_field('PATCH'); ?>
                 <input type="hidden" name="status" value="approved">
-                <button type="submit" class="btn btn-success flex items-center gap-1.5 text-xs py-1.5 px-3 transform hover:scale-105 transition-transform" title="<?php echo e(__('ui.btn_approve')); ?>">
+                <button type="submit" class="btn btn-success flex items-center gap-1.5 text-xs py-1.5 px-3 transform hover:scale-105 transition-transform" onclick="confirmApprove(event)" title="<?php echo e(__('ui.btn_approve')); ?>">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                     <span class="hidden sm:inline"><?php echo e(__('ui.btn_approve')); ?></span>
                 </button>

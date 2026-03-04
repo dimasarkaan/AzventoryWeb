@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Roles;
 
-use App\Models\User;
 use App\Models\Sparepart;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class AdminRoleTest extends TestCase
@@ -20,12 +21,12 @@ class AdminRoleTest extends TestCase
         $this->admin = User::factory()->create([
             'role' => 'admin',
         ]);
-        
+
         // Ensure email is verified and password is changed
         $this->admin->email_verified_at = now();
         $this->admin->password_changed_at = now();
         $this->admin->save();
-        
+
         // MOCK image creation and qr code
         \Illuminate\Support\Facades\Storage::fake('public');
         $this->mock(\App\Services\ImageOptimizationService::class, function ($mock) {
@@ -38,64 +39,64 @@ class AdminRoleTest extends TestCase
         });
     }
 
-    /** @test */
-    public function admin_can_access_admin_dashboard()
+    #[Test]
+    public function admin_dapat_mengakses_dashboard_admin()
     {
         $response = $this->actingAs($this->admin)->get(route('dashboard.admin'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_cannot_access_superadmin_dashboard()
+    #[Test]
+    public function admin_tidak_dapat_mengakses_dashboard_superadmin()
     {
         $response = $this->actingAs($this->admin)->get(route('dashboard.superadmin'));
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function admin_can_access_operator_dashboard()
+    #[Test]
+    public function admin_dapat_mengakses_dashboard_operator()
     {
         $response = $this->actingAs($this->admin)->get(route('dashboard.operator'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_inventory_index()
+    #[Test]
+    public function admin_dapat_mengakses_daftar_inventaris()
     {
         $response = $this->actingAs($this->admin)->get(route('inventory.index'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_stock_approvals()
+    #[Test]
+    public function admin_dapat_mengakses_persetujuan_stok()
     {
         $response = $this->actingAs($this->admin)->get(route('inventory.stock-approvals.index'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_reports()
+    #[Test]
+    public function admin_dapat_mengakses_laporan()
     {
         $response = $this->actingAs($this->admin)->get(route('reports.index'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_activity_logs()
+    #[Test]
+    public function admin_dapat_mengakses_log_aktivitas()
     {
         $response = $this->actingAs($this->admin)->get(route('reports.activity-logs.index'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_cannot_access_user_management()
+    #[Test]
+    public function admin_tidak_dapat_mengakses_manajemen_user()
     {
         $response = $this->actingAs($this->admin)->get(route('users.index'));
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function admin_can_create_inventory()
+    #[Test]
+    public function admin_dapat_membuat_inventaris()
     {
         $data = [
             'name' => 'Barang Baru Admin',
@@ -110,20 +111,20 @@ class AdminRoleTest extends TestCase
             'unit' => 'Pcs',
             'type' => 'asset',
             'price' => 10000,
-            'status' => 'aktif'
+            'status' => 'aktif',
         ];
 
         $response = $this->actingAs($this->admin)->post(route('inventory.store'), $data);
-        
+
         $response->assertRedirect(route('inventory.index'));
         $this->assertDatabaseHas('spareparts', [
             'name' => 'Barang Baru Admin',
-            'part_number' => 'PN-ADMIN-123'
+            'part_number' => 'PN-ADMIN-123',
         ]);
     }
 
-    /** @test */
-    public function admin_can_update_inventory()
+    #[Test]
+    public function admin_dapat_memperbarui_inventaris()
     {
         $sparepart = Sparepart::factory()->create();
 
@@ -144,26 +145,27 @@ class AdminRoleTest extends TestCase
         ];
 
         $response = $this->actingAs($this->admin)->put(route('inventory.update', $sparepart->id), $data);
-        
+
         $response->assertRedirect(route('inventory.index'));
         $this->assertDatabaseHas('spareparts', [
             'id' => $sparepart->id,
-            'name' => 'Barang Update Admin'
+            'name' => 'Barang Update Admin',
         ]);
     }
 
-    /** @test */
-    public function admin_can_soft_delete_inventory()
+    #[Test]
+    public function admin_dapat_menghapus_lunak_inventaris()
     {
         $sparepart = Sparepart::factory()->create();
 
         $response = $this->actingAs($this->admin)->delete(route('inventory.destroy', $sparepart->id));
-        
+
         $response->assertRedirect(route('inventory.index'));
         $this->assertSoftDeleted('spareparts', ['id' => $sparepart->id]);
     }
-    /** @test */
-    public function admin_cannot_restore_inventory()
+
+    #[Test]
+    public function admin_tidak_dapat_memulihkan_inventaris()
     {
         $sparepart = Sparepart::factory()->create();
         $sparepart->delete();
@@ -172,8 +174,8 @@ class AdminRoleTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function admin_cannot_force_delete_inventory()
+    #[Test]
+    public function admin_tidak_dapat_menghapus_permanen_inventaris()
     {
         $sparepart = Sparepart::factory()->create();
         $sparepart->delete();
@@ -182,8 +184,8 @@ class AdminRoleTest extends TestCase
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function admin_cannot_bulk_restore_inventory()
+    #[Test]
+    public function admin_tidak_dapat_memulihkan_inventaris_secara_massal()
     {
         $sparepart1 = Sparepart::factory()->create();
         $sparepart1->delete();
@@ -191,14 +193,14 @@ class AdminRoleTest extends TestCase
         $sparepart2->delete();
 
         $response = $this->actingAs($this->admin)->post(route('inventory.bulk-restore'), [
-            'ids' => [$sparepart1->id, $sparepart2->id]
+            'ids' => [$sparepart1->id, $sparepart2->id],
         ]);
-        
+
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function admin_cannot_bulk_force_delete_inventory()
+    #[Test]
+    public function admin_tidak_dapat_menghapus_permanen_inventaris_secara_massal()
     {
         $sparepart1 = Sparepart::factory()->create();
         $sparepart1->delete();
@@ -206,21 +208,21 @@ class AdminRoleTest extends TestCase
         $sparepart2->delete();
 
         $response = $this->actingAs($this->admin)->delete(route('inventory.bulk-force-delete'), [
-            'ids' => [$sparepart1->id, $sparepart2->id]
+            'ids' => [$sparepart1->id, $sparepart2->id],
         ]);
-        
+
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function admin_can_request_stock()
+    #[Test]
+    public function admin_dapat_meminta_stok()
     {
         $sparepart = Sparepart::factory()->create(['stock' => 5]);
 
         $response = $this->actingAs($this->admin)->post(route('inventory.stock.request.store', $sparepart->id), [
             'type' => 'masuk',
             'quantity' => 10,
-            'reason' => 'Perlu tambahan restock'
+            'reason' => 'Perlu tambahan restock',
         ]);
 
         $response->assertSessionHas('success');
@@ -228,19 +230,19 @@ class AdminRoleTest extends TestCase
             'sparepart_id' => $sparepart->id,
             'user_id' => $this->admin->id,
             'quantity' => 10,
-            'status' => 'approved'
+            'status' => 'approved',
         ]);
     }
 
-    /** @test */
-    public function admin_can_borrow_item()
+    #[Test]
+    public function admin_dapat_meminjam_item()
     {
         $sparepart = Sparepart::factory()->create(['stock' => 15, 'condition' => 'Baik']);
 
         $response = $this->actingAs($this->admin)->post(route('inventory.borrow.store', $sparepart->id), [
             'quantity' => 2,
             'notes' => 'Untuk event',
-            'expected_return_at' => now()->addDays(2)->format('Y-m-d')
+            'expected_return_at' => now()->addDays(2)->format('Y-m-d'),
         ]);
 
         $response->assertSessionHas('success');
@@ -248,12 +250,12 @@ class AdminRoleTest extends TestCase
             'sparepart_id' => $sparepart->id,
             'user_id' => $this->admin->id,
             'quantity' => 2,
-            'status' => 'borrowed'
+            'status' => 'borrowed',
         ]);
     }
 
-    /** @test */
-    public function admin_can_access_profile_and_notifications()
+    #[Test]
+    public function admin_dapat_mengakses_profil_dan_notifikasi()
     {
         $response = $this->actingAs($this->admin)->get(route('profile.edit'));
         $response->assertStatus(200);
@@ -262,38 +264,38 @@ class AdminRoleTest extends TestCase
         $response2->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_inventory_create()
+    #[Test]
+    public function admin_dapat_mengakses_tambah_inventaris()
     {
         $response = $this->actingAs($this->admin)->get(route('inventory.create'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_inventory_show()
+    #[Test]
+    public function admin_dapat_mengakses_detail_inventaris()
     {
         $sparepart = Sparepart::factory()->create();
         $response = $this->actingAs($this->admin)->get(route('inventory.show', $sparepart->id));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_inventory_edit()
+    #[Test]
+    public function admin_dapat_mengakses_edit_inventaris()
     {
         $sparepart = Sparepart::factory()->create();
         $response = $this->actingAs($this->admin)->get(route('inventory.edit', $sparepart->id));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_scan_qr()
+    #[Test]
+    public function admin_dapat_mengakses_scan_qr()
     {
         $response = $this->actingAs($this->admin)->get(route('inventory.scan-qr'));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_check_part_number()
+    #[Test]
+    public function admin_dapat_memeriksa_nomor_part()
     {
         $sparepart = Sparepart::factory()->create(['part_number' => 'PN-TEST-123']);
         $response = $this->actingAs($this->admin)->get(route('inventory.check-part-number', ['part_number' => 'PN-TEST-123']));
@@ -301,24 +303,24 @@ class AdminRoleTest extends TestCase
         $response->assertJson(['exists' => true]);
     }
 
-    /** @test */
-    public function admin_can_download_qr_code()
+    #[Test]
+    public function admin_dapat_mengunduh_qr_code()
     {
         $sparepart = Sparepart::factory()->create();
         $response = $this->actingAs($this->admin)->get(route('inventory.qr.download', $sparepart->id));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_print_qr_code()
+    #[Test]
+    public function admin_dapat_mencetak_qr_code()
     {
         $sparepart = Sparepart::factory()->create(['qr_code_path' => 'dummy/qrcode.svg']);
         $response = $this->actingAs($this->admin)->get(route('inventory.qr.print', $sparepart->id));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_borrow_history()
+    #[Test]
+    public function admin_dapat_mengakses_riwayat_peminjaman()
     {
         $sparepart = Sparepart::factory()->create();
         $borrowing = \App\Models\Borrowing::create([
@@ -328,14 +330,14 @@ class AdminRoleTest extends TestCase
             'quantity' => 1,
             'status' => 'borrowed',
             'borrowed_at' => now(),
-            'expected_return_at' => now()->addDays(2)
+            'expected_return_at' => now()->addDays(2),
         ]);
         $response = $this->actingAs($this->admin)->get(route('inventory.borrow.history', $borrowing->id));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_access_borrow_show()
+    #[Test]
+    public function admin_dapat_mengakses_detail_peminjaman()
     {
         $sparepart = Sparepart::factory()->create();
         $borrowing = \App\Models\Borrowing::create([
@@ -345,14 +347,14 @@ class AdminRoleTest extends TestCase
             'quantity' => 1,
             'status' => 'borrowed',
             'borrowed_at' => now(),
-            'expected_return_at' => now()->addDays(2)
+            'expected_return_at' => now()->addDays(2),
         ]);
         $response = $this->actingAs($this->admin)->get(route('inventory.borrow.show', $borrowing->id));
         $response->assertStatus(200);
     }
 
-    /** @test */
-    public function admin_can_return_borrowed_item()
+    #[Test]
+    public function admin_dapat_mengembalikan_item_pinjaman()
     {
         $sparepart = Sparepart::factory()->create(['stock' => 5]);
         $borrowing = clone \App\Models\Borrowing::create([
@@ -362,7 +364,7 @@ class AdminRoleTest extends TestCase
             'quantity' => 2,
             'status' => 'borrowed',
             'borrowed_at' => now(),
-            'expected_return_at' => now()->addDays(2)
+            'expected_return_at' => now()->addDays(2),
         ]);
 
         $file = \Illuminate\Http\UploadedFile::fake()->image('bukti_pengembalian.jpg');
@@ -371,25 +373,25 @@ class AdminRoleTest extends TestCase
             'return_condition' => 'good',
             'return_notes' => 'Dikembalikan dengan aman',
             'return_quantity' => 2,
-            'return_photos' => [$file]
+            'return_photos' => [$file],
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('borrowings', [
             'id' => $borrowing->id,
-            'status' => 'returned'
+            'status' => 'returned',
         ]);
     }
 
-    /** @test */
-    public function admin_can_download_reports()
+    #[Test]
+    public function admin_dapat_mengunduh_laporan()
     {
         $response = $this->actingAs($this->admin)->get(route('reports.download'));
         $response->assertRedirect();
     }
 
-    /** @test */
-    public function admin_can_access_movement_data()
+    #[Test]
+    public function admin_dapat_mengakses_data_pergerakan()
     {
         $response = $this->actingAs($this->admin)->get(route('dashboard.admin.movement-data', ['period' => 7]));
         $response->assertStatus(200);

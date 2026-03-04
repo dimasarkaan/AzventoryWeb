@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Sparepart;
 use Illuminate\Console\Command;
-use chillerlan\QRCode\QRCode;
 use Illuminate\Support\Facades\Storage;
 
 class GenerateQrCodes extends Command
@@ -32,10 +31,11 @@ class GenerateQrCodes extends Command
 
         if ($spareparts->isEmpty()) {
             $this->info('Semua sparepart sudah memiliki kode QR.');
+
             return;
         }
 
-        $this->info('Membuat Kode QR untuk ' . $spareparts->count() . ' sparepart...');
+        $this->info('Membuat Kode QR untuk '.$spareparts->count().' sparepart...');
 
         $bar = $this->output->createProgressBar($spareparts->count());
         $bar->start();
@@ -45,9 +45,9 @@ class GenerateQrCodes extends Command
         ]);
 
         foreach ($spareparts as $sparepart) {
-            $qrCodeUrl = route('superadmin.inventory.show', $sparepart);
+            $qrCodeUrl = route('inventory.show', $sparepart);
             $qrCodeOutput = (new \chillerlan\QRCode\QRCode($options))->render($qrCodeUrl);
-            $qrCodePath = 'qrcodes/' . $sparepart->part_number . '_' . $sparepart->id . '.svg';
+            $qrCodePath = 'qrcodes/'.$sparepart->part_number.'_'.$sparepart->id.'.svg';
             Storage::disk('public')->put($qrCodePath, $qrCodeOutput);
 
             $sparepart->update(['qr_code_path' => $qrCodePath]);

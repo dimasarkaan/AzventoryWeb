@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Notifications;
 
-use App\Models\User;
+use App\Enums\UserRole;
 use App\Models\Sparepart;
+use App\Models\User;
 use App\Notifications\LowStockNotification;
 use App\Notifications\MissingPriceNotification;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
@@ -20,18 +20,18 @@ class NotificationLogicTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->superadmin = User::factory()->create([
             'role' => UserRole::SUPERADMIN,
         ]);
-        
+
         // Ensure email is verified and password is changed
         $this->superadmin->email_verified_at = now();
         $this->superadmin->password_changed_at = now();
         $this->superadmin->save();
     }
 
-    public function test_low_stock_notification_triggered_on_borrow()
+    public function test_notifikasi_stok_rendah_dipicu_saat_peminjaman()
     {
         Notification::fake();
 
@@ -67,7 +67,7 @@ class NotificationLogicTest extends TestCase
         );
     }
 
-    public function test_missing_price_notification_triggered_on_create()
+    public function test_notifikasi_harga_kosong_dipicu_saat_pembuatan()
     {
         Notification::fake();
 
@@ -86,7 +86,7 @@ class NotificationLogicTest extends TestCase
             'unit' => 'Pcs',
             'type' => 'sale',
             'price' => 0, // Admin inputs 0 to bypass validation but triggers notification
-            'status' => 'aktif'
+            'status' => 'aktif',
         ];
 
         $response = $this->actingAs($admin)->post(route('inventory.store'), $data);

@@ -123,12 +123,8 @@
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold"><?php echo e(__('ui.unit_price')); ?></span>
                                 <div class="mt-1 text-secondary-900 font-bold text-lg">
-                                    <?php if(auth()->user()->role === \App\Enums\UserRole::OPERATOR): ?>
-                                        -
-                                    <?php else: ?>
-                                        Rp <?php echo e(number_format($sparepart->price, 0, ',', '.')); ?>
+                                    Rp <?php echo e(number_format($sparepart->price, 0, ',', '.')); ?>
 
-                                    <?php endif; ?>
                                 </div>
                             </div>
                             <?php endif; ?>
@@ -143,9 +139,8 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold"><?php echo e(__('ui.available_stock')); ?></span>
-                                <div class="mt-1 text-4xl font-extrabold text-secondary-900">
-                                    <?php echo e($sparepart->stock); ?>
-
+                                <div class="mt-1 text-4xl font-extrabold text-secondary-900 transition-all duration-300" :class="{'text-primary-600 scale-105': liveUpdateShow}">
+                                    <span x-text="liveStock"><?php echo e($sparepart->stock); ?></span>
                                     <span class="text-base font-medium text-secondary-500"><?php echo e($sparepart->unit ?? 'Pcs'); ?></span>
                                 </div>
                             </div>
@@ -154,20 +149,21 @@
                             </div>
                         </div>
                         
-                        <?php if($sparepart->stock <= $sparepart->minimum_stock): ?>
-                        <div class="mt-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-100">
-                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                             <div>
-                                 <span class="font-bold block"><?php echo e(__('ui.low_stock_alert')); ?></span>
-                                 <?php echo e(__('ui.low_stock_desc')); ?> (<?php echo e($sparepart->minimum_stock); ?> <?php echo e($sparepart->unit ?? 'Pcs'); ?>).
-                             </div>
-                        </div>
-                        <?php else: ?>
-                         <div class="mt-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-center gap-2 border border-success-100">
-                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                             <span><?php echo e(__('ui.stock_safe')); ?> (Min: <?php echo e($sparepart->minimum_stock); ?> <?php echo e($sparepart->unit ?? 'Pcs'); ?>)</span>
-                        </div>
-                        <?php endif; ?>
+                        <template x-if="liveStock <= <?php echo e($sparepart->minimum_stock ?? 0); ?>">
+                            <div class="mt-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-100">
+                                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                 <div>
+                                     <span class="font-bold block"><?php echo e(__('ui.low_stock_alert')); ?></span>
+                                     <?php echo e(__('ui.low_stock_desc')); ?> (<?php echo e($sparepart->minimum_stock); ?> <?php echo e($sparepart->unit ?? 'Pcs'); ?>).
+                                 </div>
+                            </div>
+                        </template>
+                        <template x-if="liveStock > <?php echo e($sparepart->minimum_stock ?? 0); ?>">
+                             <div class="mt-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-center gap-2 border border-success-100">
+                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                 <span><?php echo e(__('ui.stock_safe')); ?> (Min: <?php echo e($sparepart->minimum_stock); ?> <?php echo e($sparepart->unit ?? 'Pcs'); ?>)</span>
+                            </div>
+                        </template>
 
                         <!-- Actions Wrapper -->
                         <div>
@@ -218,7 +214,7 @@
                                             type: 'masuk', 
                                             quantity: '', 
                                             reason: '', 
-                                            currentStock: <?php echo e($sparepart->stock); ?>,
+                                            get currentStock() { return liveStock; },
                                             get isValid() {
                                                 return this.quantity > 0 && 
                                                        this.reason.trim() !== '' && 
@@ -244,7 +240,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-t border-gray-100">
+                                                
+                                                <!-- Real-time Warning Banner -->
+                                                <div x-show="liveUpdateShow" x-transition class="mb-4 bg-warning-50 border-l-4 border-warning-400 p-3 rounded shadow-sm flex items-start">
+                                                    <svg class="w-5 h-5 text-warning-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    <span class="text-warning-800 text-sm font-medium" x-text="liveUpdateMessage"></span>
+                                                </div>
+
                                                 <div class="space-y-4">
                                                             <div>
                                                                 <label class="block text-sm font-medium text-gray-700"><?php echo e(__('ui.change_type')); ?> <span class="text-danger-500">*</span></label>
@@ -273,7 +276,7 @@
                                                                 </div>
                                                                 <p x-show="isStockError" x-transition class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
                                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                                    <?php echo e(__('ui.quantity_exceeds_stock')); ?> (<?php echo e($sparepart->stock); ?>).
+                                                                    <?php echo e(__('ui.quantity_exceeds_stock')); ?> (<span x-text="currentStock"></span>).
                                                                 </p>
                                                             </div>
 
@@ -314,7 +317,7 @@
                                          x-data="{
                                             quantity: '',
                                             dueDate: '',
-                                            maxStock: <?php echo e($sparepart->stock); ?>,
+                                            get maxStock() { return liveStock; },
                                             get isValid() { return this.quantity > 0 && this.quantity <= this.maxStock && this.dueDate; },
                                             get isQuantityError() { return this.quantity !== '' && this.quantity > this.maxStock; }
                                          }"
@@ -334,7 +337,14 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-t border-gray-100">
+
+                                                <!-- Real-time Warning Banner -->
+                                                <div x-show="liveUpdateShow" x-transition class="mb-4 bg-warning-50 border-l-4 border-warning-400 p-3 rounded shadow-sm flex items-start">
+                                                    <svg class="w-5 h-5 text-warning-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    <span class="text-warning-800 text-sm font-medium" x-text="liveUpdateMessage"></span>
+                                                </div>
+
                                                 <div class="space-y-4">
                                                             <div>
                                                                 <label class="block text-sm font-medium text-gray-700"><?php echo e(__('ui.borrower_name')); ?></label>
@@ -350,10 +360,10 @@
                                                                 <!-- Custom Error Message -->
                                                                 <p x-show="isQuantityError" style="display: none;" class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
                                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                                                    <?php echo e(__('ui.quantity_exceeds_stock')); ?> (<?php echo e($sparepart->stock); ?>).
+                                                                    <?php echo e(__('ui.quantity_exceeds_stock')); ?> (<span x-text="maxStock"></span>).
                                                                 </p>
                                                                 <p x-show="!isQuantityError" class="text-secondary-400 text-xs mt-1">
-                                                                    <?php echo e(__('ui.stock_available')); ?>: <?php echo e($sparepart->stock); ?> <?php echo e($sparepart->unit ?? 'Pcs'); ?>
+                                                                    <?php echo e(__('ui.stock_available')); ?>: <span x-text="maxStock"></span> <?php echo e($sparepart->unit ?? 'Pcs'); ?>
 
                                                                 </p>
                                                             </div>
