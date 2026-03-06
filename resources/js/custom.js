@@ -3,7 +3,7 @@ import Swal from 'sweetalert2';
 // Solid Premium Toast Config
 window.Toast = Swal.mixin({
     toast: true,
-    position: 'top-end', // Moved to top-right for standard feel
+    position: 'top-end',
     showConfirmButton: false,
     timer: 4000,
     timerProgressBar: true,
@@ -11,10 +11,18 @@ window.Toast = Swal.mixin({
         popup: 'solid-toast-popup',
     },
     didOpen: (toast) => {
-        toast.addEventListener('mouseenter', Swal.stopTimer)
-        toast.addEventListener('mouseleave', Swal.resumeTimer)
+        // Pastikan toast selalu di atas modal (z-[100] = 100)
+        const container = toast.closest('.swal2-container');
+        if (container) container.style.zIndex = '99999';
+        toast.addEventListener('mouseenter', Swal.stopTimer);
+        toast.addEventListener('mouseleave', Swal.resumeTimer);
     }
 });
+
+// Global helper agar bisa dipanggil dari mana saja (tidak hanya dari Alpine this.showToast)
+window.showToast = (type, message) => {
+    window.Toast.fire({ icon: type, title: message });
+};
 
 // Global Delete Confirmation
 window.confirmDelete = function (event) {

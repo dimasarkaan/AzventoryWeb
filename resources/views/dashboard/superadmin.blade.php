@@ -410,6 +410,7 @@
             confirmDeleteId: null,
             confirmDeleteName: '',
             isDeleting: false,
+            deleteLocationError: '',
 
             // Category Management
             showCategoryModal: false,
@@ -420,6 +421,7 @@
             catConfirmDeleteId: null,
             catConfirmDeleteName: '',
             isDeletingCat: false,
+            deleteCategoryError: '',
 
             // Brand Management
             showBrandModal: false,
@@ -430,6 +432,7 @@
             brandConfirmDeleteId: null,
             brandConfirmDeleteName: '',
             isDeletingBrand: false,
+            deleteBrandError: '',
             newBrandName: '',
             isAddingBrand: false,
 
@@ -506,6 +509,7 @@
                 this.confirmDeleteId = null;
                 this.confirmDeleteName = '';
                 this.isDeleting = false;
+                this.deleteLocationError = '';
             },
 
             // Category Methods
@@ -612,6 +616,7 @@
                 this.catConfirmDeleteId = null;
                 this.catConfirmDeleteName = '';
                 this.isDeletingCat = false;
+                this.deleteCategoryError = '';
             },
 
             // Brand Methods
@@ -712,11 +717,13 @@
                 this.brandConfirmDeleteId = null;
                 this.brandConfirmDeleteName = '';
                 this.isDeletingBrand = false;
+                this.deleteBrandError = '';
             },
 
             async deleteBrand(id) {
                 if (this.isDeletingBrand) return;
                 this.isDeletingBrand = true;
+                this.deleteBrandError = '';
                 try {
                     const response = await fetch(`/brands/${id}`, {
                         method: 'DELETE',
@@ -731,11 +738,11 @@
                         this.fetchBrands();
                         this.cancelBrandDelete();
                     } else {
-                        if (window.showToast) window.showToast('warning', data.message);
+                        this.deleteBrandError = data.message || 'Tidak dapat menghapus merk ini.';
                     }
                 } catch (e) {
                     console.error('Delete failed:', e);
-                    if (window.showToast) window.showToast('error', 'Terjadi kesalahan saat menghapus merk.');
+                    this.deleteBrandError = 'Terjadi kesalahan. Silakan coba lagi.';
                 } finally {
                     this.isDeletingBrand = false;
                 }
@@ -765,6 +772,7 @@
             async deleteCategory(id) {
                 if (this.isDeletingCat) return;
                 this.isDeletingCat = true;
+                this.deleteCategoryError = '';
                 try {
                     const response = await fetch(`/categories/${id}`, {
                         method: 'DELETE',
@@ -779,11 +787,11 @@
                         this.fetchCategories();
                         this.cancelCatDelete();
                     } else {
-                        this.showToast('warning', data.message);
+                        this.deleteCategoryError = data.message || 'Tidak dapat menghapus kategori ini.';
                     }
                 } catch (e) {
                     console.error('Delete failed:', e);
-                    this.showToast('error', 'Terjadi kesalahan saat menghapus kategori.');
+                    this.deleteCategoryError = 'Terjadi kesalahan. Silakan coba lagi.';
                 } finally {
                     this.isDeletingCat = false;
                 }
@@ -829,6 +837,7 @@
             async deleteLocation(id) {
                 if (this.isDeleting) return;
                 this.isDeleting = true;
+                this.deleteLocationError = '';
                 try {
                     const response = await fetch(`/locations/${id}`, {
                         method: 'DELETE',
@@ -844,11 +853,11 @@
                         this.totalLocations--;
                         this.cancelDelete();
                     } else {
-                        this.showToast('warning', data.message);
+                        this.deleteLocationError = data.message || 'Tidak dapat menghapus lokasi ini.';
                     }
                 } catch (e) {
                     console.error('Delete failed:', e);
-                    this.showToast('error', 'Terjadi kesalahan saat menghapus lokasi.');
+                    this.deleteLocationError = 'Terjadi kesalahan. Silakan coba lagi.';
                 } finally {
                     this.isDeleting = false;
                 }

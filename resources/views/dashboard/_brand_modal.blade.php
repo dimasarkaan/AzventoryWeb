@@ -150,14 +150,20 @@
                          x-transition:leave-end="opacity-0"
                          class="absolute inset-x-0 -inset-y-4 bg-white/95 backdrop-blur-[2px] z-[20] flex items-center justify-center p-6 text-center"
                          x-cloak>
-                        <div>
+                        <div class="w-full max-w-sm">
                             <div class="w-16 h-16 bg-danger-50 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-danger-100">
                                 <x-icon.trash class="w-8 h-8" />
                             </div>
                             <h4 class="text-secondary-900 font-bold text-lg mb-1">Hapus Merk?</h4>
-                            <p class="text-sm text-secondary-500 mb-6">
+                            <p class="text-sm text-secondary-500 mb-4">
                                 Anda yakin ingin menghapus merk <span class="font-bold text-secondary-900" x-text="brandConfirmDeleteName"></span>? Tindakan ini tidak dapat dibatalkan.
                             </p>
+                            {{-- Inline error message saat hapus gagal --}}
+                            <div x-show="deleteBrandError" x-cloak
+                                 class="mb-4 flex items-start gap-2 bg-danger-50 border border-danger-200 text-danger-700 rounded-xl px-4 py-3 text-sm font-medium text-left">
+                                <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span x-text="deleteBrandError"></span>
+                            </div>
                             <div class="flex items-center justify-center gap-3">
                                 <button @click="cancelBrandDelete()" 
                                         :disabled="isDeletingBrand"
