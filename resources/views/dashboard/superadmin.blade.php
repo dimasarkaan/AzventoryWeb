@@ -1352,7 +1352,7 @@
                     <div class="absolute right-0 top-0 h-24 w-24 bg-fuchsia-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-fuchsia-200"></div>
                     <div>
                         <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Sedang<br>Dipinjam</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative">{{ $activeBorrowingsCount }}</h3>
+                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="activeBorrowingsCount">{{ $activeBorrowingsCount }}</h3>
                     </div>
                     <div class="mt-4 flex items-center text-fuchsia-600 z-10 relative">
                         <div class="p-2 bg-fuchsia-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
@@ -1368,7 +1368,7 @@
                     <div class="absolute right-0 top-0 h-24 w-24 bg-warning-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-warning-200"></div>
                      <div>
                         <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Kategori<br>Barang</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative">{{ $totalCategories }}</h3>
+                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalCategories">{{ $totalCategories }}</h3>
                     </div>
                     <div class="mt-4 flex items-center text-warning-600 z-10 relative">
                         <div class="p-2 bg-warning-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">

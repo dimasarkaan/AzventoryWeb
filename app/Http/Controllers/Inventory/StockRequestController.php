@@ -63,7 +63,11 @@ class StockRequestController extends Controller
 
                 // Clear Dashboard Cache & Broadcast Update
                 $this->inventoryService->clearCache();
-                $this->inventoryService->broadcastUpdate($sparepart, 'updated');
+                
+                $actionType = $request->type === 'masuk' ? 'success' : 'warning';
+                $actionText = $request->type === 'masuk' ? 'menambah stok' : 'mengurangi stok';
+                $customMessage = "{$user->name} {$actionText} sebanyak {$request->quantity} {$sparepart->unit} pada barang: {$sparepart->name}";
+                $this->inventoryService->broadcastUpdate($sparepart, $actionType, $customMessage);
             }
 
             // Create Log

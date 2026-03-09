@@ -68,4 +68,43 @@ class Sparepart extends Model
 
         return true;
     }
+
+    /**
+     * Mendapatkan kronologi kejadian untuk barang bermasalah (Rusak/Hilang)
+     */
+    public function getProblemChronologyAttribute()
+    {
+        if (!in_array($this->condition, ['Rusak', 'Hilang'])) {
+            return null;
+        }
+
+        $conditionMap = ['Rusak' => 'bad', 'Hilang' => 'lost'];
+        $returnCondition = $conditionMap[$this->condition] ?? null;
+
+        if ($returnCondition) {
+            // Cari riwayat return terakhir untuk part_number ini yang kondisinya bad/lost
+            $latestReturn = \App\Models\BorrowingReturn::where('condition', $returnCondition)
+                ->whereHas('borrowing.sparepart', function ($q) {
+                    $q->where('part_number', $this->part_number);
+                })
+                ->latest()
+                ->first();
+
+            if ($latestReturn) {
+                $userName = $latestReturn->borrowing->borrower_name ?? 'Seseorang';
+                $date = $latestReturn->created_at->format('d M Y');
+                $note = $latestReturn->notes ? " - Catatan: {$latestReturn->notes}" : "";
+                return "Dikembalikan oleh {$userName} pada {$date}{$note}";
+            }
+        }
+
+        // Fallback: check latest stock log
+        $latestLog = $this->stockLogs()->latest()->first();
+        if ($latestLog && $latestLog->reason) {
+            $date = $latestLog->created_at->format('d M Y');
+            return "Update log pada {$date} - {$latestLog->reason}";
+        }
+
+        return "Tidak ada riwayat catatan.";
+    }
 }

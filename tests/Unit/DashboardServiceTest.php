@@ -45,11 +45,23 @@ class DashboardServiceTest extends TestCase
     public function mengembalikan_snapshot_stok_dengan_benar()
     {
         Sparepart::factory()->count(3)->create(['stock' => 10]);
+        \App\Models\Brand::insert([
+            ['name' => 'Brand A'],
+            ['name' => 'Brand B']
+        ]);
+        \App\Models\Category::insert([
+            ['name' => 'Cat A'],
+            ['name' => 'Cat B'],
+            ['name' => 'Cat C'],
+            ['name' => 'Cat D']
+        ]);
 
         $snapshots = $this->service->getStockSnapshots();
 
         $this->assertEquals(3, $snapshots['totalSpareparts']);
         $this->assertEquals(30, $snapshots['totalStock']);
+        $this->assertEquals(2, $snapshots['totalBrands']);
+        $this->assertEquals(4, $snapshots['totalCategories']);
     }
 
     // Menguji pengambilan data pergerakan stok.

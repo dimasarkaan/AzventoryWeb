@@ -145,6 +145,29 @@
             <div class="mb-4 card p-4 overflow-visible" x-data="{ showFilters: false }">
                     <form id="inventory-filter-form" method="GET" action="{{ route('inventory.index') }}">
                     <input type="hidden" name="trash" value="{{ request('trash') }}">
+                    <input type="hidden" name="filter" value="{{ request('filter') }}">
+
+                    <!-- Navigation Tabs -->
+                    @if(!request('trash'))
+                    <div class="mb-5 border-b border-secondary-200">
+                        <nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
+                            <a href="{{ route('inventory.index', array_merge(request()->except(['filter', 'page']), ['filter' => null])) }}" 
+                               class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {{ request('filter') != 'problematic' ? 'border-primary-500 text-primary-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }}">
+                                Semua Inventaris
+                            </a>
+                            @if(in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
+                                <a href="{{ route('inventory.index', array_merge(request()->except(['filter', 'page']), ['filter' => 'problematic'])) }}" 
+                                   class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center gap-2 {{ request('filter') == 'problematic' ? 'border-danger-500 text-danger-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }}">
+                                    Aset Bermasalah
+                                    @if(request('filter') == 'problematic')
+                                        <span class="bg-danger-100 text-danger-600 py-0.5 px-2 rounded-full text-xs font-bold">{{ $spareparts->total() }}</span>
+                                    @endif
+                                </a>
+                            @endif
+                        </nav>
+                    </div>
+                    @endif
+
                     <!-- Top: Search Bar & Filter Toggle -->
                     <div class="mb-4 flex gap-2">
                         <div class="relative w-full">

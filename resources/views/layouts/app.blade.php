@@ -48,6 +48,7 @@
         </div>
         
         <x-spotlight-search />
+        <x-toast />
 
         @stack('scripts')
         <script>
@@ -62,6 +63,11 @@
                 @if(session('warning'))
                     warning: "{{ session('warning') }}",
                 @endif
+            };
+
+            // Informasi User saat ini untuk filter realtime
+            window.currentUser = {
+                name: "{{ auth()->check() ? auth()->user()->name : '' }}"
             };
         </script>
     </body>

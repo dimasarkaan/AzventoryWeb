@@ -99,6 +99,6 @@ return [
     'insufficient_stock' => 'Stok tidak mencukupi untuk peminjaman ini.',
     'log_borrowing' => 'Peminjaman barang oleh :user',
     'log_return_good' => 'Pengembalian barang (Kondisi Baik) oleh :user',
-    'realtime_borrowed' => ':user baru saja meminjam :qty :name',
-    'realtime_returned' => ':user baru saja mengembalikan :qty :name',
+    'realtime_borrowed' => ':user telah meminjam :qty unit :name.',
+    'realtime_returned' => ':user telah mengembalikan :qty unit :name.',
 ];

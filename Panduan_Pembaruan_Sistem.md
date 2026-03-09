@@ -111,7 +111,35 @@ php artisan config:clear
 
 ---
 
-## Langkah 7 — Verifikasi
+## Langkah 7 — Mengatur Cron Job di cPanel (Pembersihan Otomatis)
+
+> **PENTING**: Azventory memiliki fitur `activitylog:clean` (menghapus log yang lebih tua dari 1 bulan) dan `image:clean` (menghapus foto barang *orphan* yang tidak ada di *database*). Kedua fitur ini berjalan secara otomatis jika **Cron Job** pada cPanel diaktifkan.
+
+1. Masuk ke **cPanel** akun hosting Anda.
+2. Cari dan klik menu **Cron Jobs** di bagian "Advanced".
+3. Pada bagian **Add New Cron Job**:
+   - **Common Settings**: Pilih `Once Per Minute (* * * * *)` (Atau atur sesuai standar server IT Anda).
+   - **Command**: Masukkan _script_ pemanggilan artisan schedule Laravel:
+     ```bash
+     cd /path/to/folder/azventory && php artisan schedule:run >> /dev/null 2>&1
+     ```
+     *(Ganti `/path/to/folder/azventory` dengan *absolute path* asli lokasi Anda menaruh web aplikasi ini di server, misalnya `/home/username/public_html/azventory`)*
+4. Klik **Add New Cron Job**. 
+*(Cron job hanya perlu di-_setting_ satu kali selamanya, dan sistem akan mengurus semua jadwal pembersihan data dan log secara mandiri di belakang layar).*
+
+---
+
+## Langkah 8 — Panduan "One-Off" / Sinkronisasi Khusus 
+
+Jika developer memberikan instruksi untuk **Sinkronisasi Otomatis Master Data (Kategori/Merk)** pada pembaruan spesifik, jalankan satu kali perintah berikut via SSH sebelum masuk web:
+
+```bash
+php artisan tinker sync_data.php
+```
+
+---
+
+## Langkah 9 — Verifikasi
 
 - Buka URL aplikasi Azventory di browser
 - Pastikan tidak ada halaman Error 500

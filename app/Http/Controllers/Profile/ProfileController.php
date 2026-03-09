@@ -123,7 +123,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
         $activeBorrowings = $user->borrowings()->whereNull('returned_at')->with('sparepart')->latest()->get();
-        $historyBorrowings = $user->borrowings()->whereNotNull('returned_at')->with('sparepart')->latest('returned_at')->get();
+        $historyBorrowings = $user->borrowings()->whereNotNull('returned_at')->with(['sparepart', 'returns'])->latest('returned_at')->get();
 
         return view('profile.my_inventory', compact('user', 'activeBorrowings', 'historyBorrowings'));
     }

@@ -8,12 +8,18 @@
                             <input type="checkbox" id="select-all" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                         </th>
                     @endif
-                    <th class="px-4 py-3 text-left text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[20%]">{{ __('ui.name') }}</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.brand') }}</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.category') }}</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.condition') }}</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[10%]">{{ __('ui.color') }}</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.location') }}</th>
+                    @if(request('filter') == 'problematic')
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[25%]">{{ __('ui.name') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.condition') }}</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[39%]">Kronologi / Catatan</th>
+                    @else
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[20%]">{{ __('ui.name') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.brand') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.category') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.condition') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[10%]">{{ __('ui.color') }}</th>
+                        <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.location') }}</th>
+                    @endif
                     <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[10%]">{{ __('ui.stock') }}</th>
                     <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">{{ __('ui.actions') }}</th>
                 </tr>
@@ -88,25 +94,32 @@
                                 </div>
                             </div>
                         </td>
-                        <!-- Brand -->
-                        <td class="px-4 py-4 text-center">
-                            <div class="h-4 w-20 bg-secondary-50 rounded animate-pulse mx-auto"></div>
-                        </td>
-                        <!-- Category -->
-                        <td class="px-4 py-4 text-center">
-                            <div class="h-5 w-24 bg-secondary-100 rounded-full animate-pulse mx-auto"></div>
-                        </td>
-                        <!-- Color -->
-                        <td class="px-4 py-4 text-center">
-                                <div class="h-4 w-16 bg-secondary-50 rounded animate-pulse mx-auto"></div>
-                        </td>
-                        <!-- Location -->
-                        <td class="px-4 py-4 text-center">
-                            <div class="flex items-center justify-center gap-1.5">
-                                    <div class="h-4 w-4 bg-secondary-100 rounded-full animate-pulse"></div>
-                                    <div class="h-4 w-16 bg-secondary-50 rounded animate-pulse"></div>
-                            </div>
-                        </td>
+                        @if(request('filter') == 'problematic')
+                            <td class="px-4 py-4 text-left">
+                                <div class="h-4 w-48 bg-secondary-100 rounded animate-pulse"></div>
+                                <div class="h-3 w-32 bg-secondary-50 rounded animate-pulse mt-1"></div>
+                            </td>
+                        @else
+                            <!-- Brand -->
+                            <td class="px-4 py-4 text-center">
+                                <div class="h-4 w-20 bg-secondary-50 rounded animate-pulse mx-auto"></div>
+                            </td>
+                            <!-- Category -->
+                            <td class="px-4 py-4 text-center">
+                                <div class="h-5 w-24 bg-secondary-100 rounded-full animate-pulse mx-auto"></div>
+                            </td>
+                            <!-- Color -->
+                            <td class="px-4 py-4 text-center">
+                                    <div class="h-4 w-16 bg-secondary-50 rounded animate-pulse mx-auto"></div>
+                            </td>
+                            <!-- Location -->
+                            <td class="px-4 py-4 text-center">
+                                <div class="flex items-center justify-center gap-1.5">
+                                        <div class="h-4 w-4 bg-secondary-100 rounded-full animate-pulse"></div>
+                                        <div class="h-4 w-16 bg-secondary-50 rounded animate-pulse"></div>
+                                </div>
+                            </td>
+                        @endif
                         <!-- Stock -->
                         <td class="px-4 py-4 text-center">
                             <div class="flex items-baseline justify-center gap-1">

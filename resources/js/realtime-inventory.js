@@ -69,6 +69,13 @@ document.addEventListener('DOMContentLoaded', function () {
         .listen('.InventoryUpdated', (e) => {
             console.log('📦 Inventory Updated:', e);
 
+            // Filter out self-notifications to prevent double-toast
+            if (window.currentUser && window.currentUser.name && e.user_name === window.currentUser.name) {
+                console.log('🚫 Mengabaikan notifikasi realtime dari aksi sendiri (InventoryUpdated).');
+                refreshDashboardData();
+                return;
+            }
+
             // Show toast notification ke semua user.
             showInventoryToast(e.message, e.action);
 
@@ -86,6 +93,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // Event: BorrowingStatusChanged (peminjaman di-approve/reject/return)
         .listen('.BorrowingStatusChanged', (e) => {
             console.log('🔄 Borrowing Status Changed:', e);
+
+            // Tentukan siapa aktornya berdasarkan status (jika return, aktornya borrower, selain itu admin)
+            const actorName = e.new_status === 'returned' ? e.borrower_name : e.admin_name;
+            if (window.currentUser && window.currentUser.name && actorName === window.currentUser.name) {
+                console.log('🚫 Mengabaikan notifikasi realtime dari aksi sendiri (BorrowingStatusChanged).');
+                refreshDashboardData();
+                return;
+            }
 
             showInventoryToast(e.message, 'borrowing');
 
@@ -146,33 +161,15 @@ document.addEventListener('DOMContentLoaded', function () {
  * @param {string} action - Tipe action (created/updated/deleted/borrowing)
  */
 function showInventoryToast(message, action) {
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'top-end',
-        showConfirmButton: false,
-        timer: 4000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer);
-            toast.addEventListener('mouseleave', Swal.resumeTimer);
-        }
-    });
-
-    // Tentukan icon berdasarkan action.
-    const getIcon = (action) => {
-        switch (action) {
-            case 'created': return 'success';
-            case 'updated': return 'info';
-            case 'deleted': return 'warning';
-            case 'borrowing': return 'info';
-            default: return 'info';
-        }
-    };
-
-    Toast.fire({
-        icon: getIcon(action),
-        title: message
-    });
+    // Gunakan Native Alpine Toast dari global helper di custom.js
+    if (typeof window.showToast === 'function') {
+        window.showToast(action, message);
+    } else {
+        // Fallback native event
+        window.dispatchEvent(new CustomEvent('notify', {
+            detail: { type: action, message: message }
+        }));
+    }
 }
 
 /**

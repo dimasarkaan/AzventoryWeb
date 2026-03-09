@@ -77,6 +77,13 @@ class InventoryService
             $query->where(function ($q) {
                 $q->whereNull('price')->orWhere('price', '<=', 0);
             });
+        } elseif (($filters['filter'] ?? '') === 'problematic') {
+            // Filter barang yang rusak atau hilang (Hanya Superadmin & Admin)
+            if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
+                $query->whereIn('condition', ['Rusak', 'Hilang']);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
         }
 
         $this->applySorting($query, $filters['sort'] ?? null);
@@ -417,7 +424,7 @@ class InventoryService
 
     public function syncCategories(string $categoryName): void
     {
-        if (auth()->check() && auth()->user()->role === \App\Enums\UserRole::SUPERADMIN) {
+        if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
             \App\Models\Category::firstOrCreate(['name' => $categoryName]);
             $this->clearCache();
         }
@@ -425,7 +432,7 @@ class InventoryService
 
     public function syncBrands(string $brandName): void
     {
-        if (auth()->check() && auth()->user()->role === \App\Enums\UserRole::SUPERADMIN) {
+        if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
             \App\Models\Brand::firstOrCreate(['name' => $brandName]);
             $this->clearCache();
         }
@@ -633,7 +640,7 @@ class InventoryService
 
             $this->logActivity('Peminjaman Barang', "Meminjam {$data['quantity']} {$sparepart->unit} '{$sparepart->name}'.");
             $this->clearCache();
-            $this->broadcastUpdate($sparepart, 'updated', __('messages.realtime_borrowed', ['user' => auth()->user()->name, 'qty' => $data['quantity'], 'name' => $sparepart->name]));
+            $this->broadcastUpdate($sparepart, 'borrowing', __('messages.realtime_borrowed', ['user' => auth()->user()->name, 'qty' => $data['quantity'], 'name' => $sparepart->name]));
 
             return ['status' => 'created', 'borrowing' => $borrowing];
         });
@@ -701,7 +708,7 @@ class InventoryService
             }
 
             $this->clearCache();
-            $this->broadcastUpdate($originalSparepart, 'updated', __('messages.realtime_returned', ['user' => auth()->user()->name, 'qty' => $qty, 'name' => $originalSparepart->name]));
+            $this->broadcastUpdate($originalSparepart, 'returned', __('messages.realtime_returned', ['user' => auth()->user()->name, 'qty' => $qty, 'name' => $originalSparepart->name]));
 
             return ['status' => 'success'];
         });
@@ -731,7 +738,11 @@ class InventoryService
                 $sparepart->save();
 
                 $this->clearCache();
-                $this->broadcastUpdate($sparepart, 'updated');
+                $actionType = $stockLog->type === 'masuk' ? 'success' : 'warning';
+                $actionText = $stockLog->type === 'masuk' ? 'menambah stok' : 'mengurangi stok';
+                $adminName = auth()->user() ? auth()->user()->name : 'System';
+                $customMessage = "{$adminName} menyetujui {$actionText} sebanyak {$stockLog->quantity} {$sparepart->unit} pada barang: {$sparepart->name}";
+                $this->broadcastUpdate($sparepart, $actionType, $customMessage);
 
                 if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
                     $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();

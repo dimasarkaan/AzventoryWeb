@@ -240,4 +240,42 @@ class InventoryValidationTest extends TestCase
         $response->assertSessionHas('error');
         $this->assertNotSoftDeleted('spareparts', ['id' => $sparepart->id]);
     }
+
+    // ── Problematic Items Tracking Role Restriction ──────────────
+
+    #[Test]
+    public function operator_tidak_bisa_menggunakan_filter_barang_bermasalah()
+    {
+        $sparepart = Sparepart::factory()->create(['condition' => 'Rusak']);
+
+        $response = $this->actingAs($this->operator)
+            ->get(route('inventory.index', ['filter' => 'problematic']));
+
+        $response->assertOk();
+        
+        // Tab Aset Bermasalah tidak boleh dirender
+        $response->assertDontSee('Aset Bermasalah');
+        
+        // Data harus kosong karena difilter menjadi 1 = 0 di InventoryService
+        $returnedSpareparts = $response->original->gatherData()['spareparts'];
+        $this->assertEquals(0, $returnedSpareparts->total());
+    }
+
+    #[Test]
+    public function superadmin_dan_admin_bisa_menggunakan_filter_barang_bermasalah()
+    {
+        $sparepart = Sparepart::factory()->create(['condition' => 'Rusak', 'name' => 'Barang Hancur Test']);
+
+        foreach ([$this->superadmin, $this->admin] as $user) {
+            $response = $this->actingAs($user)
+                ->get(route('inventory.index', ['filter' => 'problematic']));
+
+            $response->assertOk();
+            $response->assertSee('Aset Bermasalah');
+            $response->assertSee('Barang Hancur Test');
+            
+            $returnedSpareparts = $response->original->gatherData()['spareparts'];
+            $this->assertEquals(1, $returnedSpareparts->total());
+        }
+    }
 }

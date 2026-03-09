@@ -249,7 +249,7 @@
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('ui.quantity') }}</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('ui.borrow_date') }}</th>
                                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('ui.return_date') }}</th>
-                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{{ __('ui.status') }}</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi (Kembali)</th>
                                         </tr>
                                     </thead>
                                     <tbody class="bg-white divide-y divide-gray-200">
@@ -270,10 +270,29 @@
                                                             <div class="text-sm font-medium text-gray-900">{{ $borrowing->sparepart->name }}</div>
                                                             <div class="text-xs text-gray-500">{{ $borrowing->sparepart->part_number }}</div>
                                                              <!-- Mobile only meta -->
-                                                             <div class="sm:hidden mt-2 flex items-center gap-2 text-xs text-gray-500">
-                                                                <span>{{ $borrowing->returned_at->format('d M Y') }}</span>
-                                                                <span>&bull;</span>
-                                                                <span class="text-success-600 font-medium">{{ __('ui.status_returned_badge') }}</span>
+                                                             <div class="sm:hidden mt-2 flex flex-col gap-1 text-xs text-gray-500">
+                                                                <div>{{ $borrowing->returned_at->format('d M Y') }}</div>
+                                                                <div>
+                                                                    @php
+                                                                        $latestReturn = $borrowing->returns->sortByDesc('created_at')->first();
+                                                                        $condition = $latestReturn ? strtolower($latestReturn->condition) : 'good';
+                                                                        $badgeClass = match($condition) {
+                                                                            'good' => 'bg-success-100 text-success-800',
+                                                                            'bad' => 'bg-danger-100 text-danger-800',
+                                                                            'lost' => 'bg-secondary-200 text-secondary-800',
+                                                                            default => 'bg-success-100 text-success-800',
+                                                                        };
+                                                                        $conditionText = match($condition) {
+                                                                            'good' => 'Dikembalikan (Baik)',
+                                                                            'bad' => 'Dikembalikan (Rusak)',
+                                                                            'lost' => 'Dikembalikan (Hilang)',
+                                                                            default => 'Dikembalikan',
+                                                                        };
+                                                                    @endphp
+                                                                    <span class="px-2 py-0.5 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-full {{ $badgeClass }}">
+                                                                        {{ $conditionText }}
+                                                                    </span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -282,8 +301,24 @@
                                                 <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $borrowing->borrowed_at->format('d M Y') }}</td>
                                                 <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $borrowing->returned_at->format('d M Y') }}</td>
                                                 <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
-                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-success-100 text-success-800">
-                                                        {{ __('ui.status_returned_badge') }}
+                                                    @php
+                                                        $latestReturn = $borrowing->returns->sortByDesc('created_at')->first();
+                                                        $condition = $latestReturn ? strtolower($latestReturn->condition) : 'good';
+                                                        $badgeClass = match($condition) {
+                                                            'good' => 'bg-success-100 text-success-800 border border-success-200',
+                                                            'bad' => 'bg-danger-100 text-danger-800 border border-danger-200',
+                                                            'lost' => 'bg-secondary-200 text-secondary-800 border border-secondary-300',
+                                                            default => 'bg-success-100 text-success-800 border border-success-200',
+                                                        };
+                                                        $conditionText = match($condition) {
+                                                            'good' => 'Dikembalikan (Baik)',
+                                                            'bad' => 'Dikembalikan (Rusak)',
+                                                            'lost' => 'Dikembalikan (Hilang)',
+                                                            default => 'Dikembalikan',
+                                                        };
+                                                    @endphp
+                                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $badgeClass }}">
+                                                        {{ $conditionText }}
                                                     </span>
                                                 </td>
                                             </tr>

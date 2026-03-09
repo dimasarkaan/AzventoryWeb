@@ -47,13 +47,26 @@
 
             <!-- Info Grid -->
             <div class="grid grid-cols-2 gap-y-3 gap-x-4 text-sm mb-4 border-t border-b border-secondary-100 py-3">
-                <!-- Brand & Category -->
-                <div class="col-span-2 flex items-center justify-between">
-                    <span class="text-secondary-500">{{ __('ui.brand') }} / {{ __('ui.category') }}</span>
-                    <span class="font-medium text-secondary-900 text-right truncate pl-2">
-                        {{ $sparepart->brand ?? '-' }} <span class="text-secondary-300 mx-1">|</span> {{ $sparepart->category }}
-                    </span>
-                </div>
+                @if(request('filter') == 'problematic')
+                    <!-- Problem Chronology -->
+                    <div class="col-span-2 flex flex-col mb-1">
+                        <span class="text-xs text-secondary-500 mb-1 flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Kronologi / Catatan
+                        </span>
+                        <div class="bg-danger-50 border border-danger-100 text-danger-800 p-2 rounded text-xs leading-relaxed">
+                            {{ $sparepart->problem_chronology }}
+                        </div>
+                    </div>
+                @else
+                    <!-- Brand & Category -->
+                    <div class="col-span-2 flex items-center justify-between">
+                        <span class="text-secondary-500">{{ __('ui.brand') }} / {{ __('ui.category') }}</span>
+                        <span class="font-medium text-secondary-900 text-right truncate pl-2">
+                            {{ $sparepart->brand ?? '-' }} <span class="text-secondary-300 mx-1">|</span> {{ $sparepart->category }}
+                        </span>
+                    </div>
+                @endif
 
                 <!-- Condition -->
                 <div class="flex flex-col">

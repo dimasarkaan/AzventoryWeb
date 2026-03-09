@@ -248,81 +248,91 @@
                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
 
                 {{-- Card 1: Total Barang --}}
-                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-primary-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
-                    <div class="pl-4">
-                        <p class="text-[11px] font-extrabold text-primary-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.total_items') }}</p>
-                        <h3 class="text-4xl font-black text-secondary-900 leading-none" x-text="totalSpareparts">{{ $totalSpareparts }}</h3>
-                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.sku_items') }}</p>
-                    </div>
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-primary-500/10 rounded-3xl blur-xl group-hover:bg-primary-500/20 transition-all"></div>
-                        <div class="relative p-4 bg-primary-50 text-primary-600 rounded-3xl group-hover:scale-110 transition-transform">
-                            <x-icon.inventory class="w-10 h-10" />
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-primary-900/5 transition-all duration-500 relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 w-32 h-32 bg-gradient-to-br from-primary-100 to-primary-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{{ __('ui.total_items') }}</p>
+                            <h3 class="text-5xl font-black text-gray-800 tracking-tight" x-text="totalSpareparts">{{ $totalSpareparts }}</h3>
+                            <p class="text-sm font-medium text-primary-600 mt-2 flex items-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-primary-500 mr-2"></span>
+                                {{ __('ui.sku_items') }}
+                            </p>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-white shadow-lg shadow-primary-500/20 flex items-center justify-center text-primary-500 transform group-hover:-translate-y-1 group-hover:scale-110 transition-all duration-300 border border-primary-50">
+                            <x-icon.inventory class="w-7 h-7" />
                         </div>
                     </div>
                 </div>
 
                 {{-- Card 2: Total Stok Fisik --}}
-                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-success-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
-                    <div class="pl-4">
-                        <p class="text-[11px] font-extrabold text-success-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.total_physical_stock') }}</p>
-                        <h3 class="text-4xl font-black text-secondary-900 leading-none" x-text="totalStock">{{ $totalStock }}</h3>
-                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.units') }}</p>
-                    </div>
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-success-500/10 rounded-3xl blur-xl group-hover:bg-success-500/20 transition-all"></div>
-                        <div class="relative p-4 bg-success-50 text-success-600 rounded-3xl group-hover:scale-110 transition-transform">
-                            <x-icon.package class="w-10 h-10" />
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-success-900/5 transition-all duration-500 relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 w-32 h-32 bg-gradient-to-br from-success-100 to-success-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{{ __('ui.total_physical_stock') }}</p>
+                            <h3 class="text-5xl font-black text-gray-800 tracking-tight" x-text="totalStock">{{ $totalStock }}</h3>
+                            <p class="text-sm font-medium text-success-600 mt-2 flex items-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-success-500 mr-2"></span>
+                                {{ __('ui.units') }}
+                            </p>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-white shadow-lg shadow-success-500/20 flex items-center justify-center text-success-500 transform group-hover:-translate-y-1 group-hover:scale-110 transition-all duration-300 border border-success-50">
+                            <x-icon.package class="w-7 h-7" />
                         </div>
                     </div>
                 </div>
 
                 {{-- Card 3: Kategori --}}
-                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-warning-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
-                    <div class="pl-4">
-                        <p class="text-[11px] font-extrabold text-warning-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.categories') }}</p>
-                        <h3 class="text-4xl font-black text-secondary-900 leading-none">{{ $totalCategories }}</h3>
-                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.item_types') }}</p>
-                    </div>
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-warning-500/10 rounded-3xl blur-xl group-hover:bg-warning-500/20 transition-all"></div>
-                        <div class="relative p-4 bg-warning-50 text-warning-600 rounded-3xl group-hover:scale-110 transition-transform">
-                            <x-icon.category class="w-10 h-10" />
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-warning-900/5 transition-all duration-500 relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 w-32 h-32 bg-gradient-to-br from-warning-100 to-warning-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{{ __('ui.categories') }}</p>
+                            <h3 class="text-5xl font-black text-gray-800 tracking-tight" x-text="totalCategories">{{ $totalCategories }}</h3>
+                            <p class="text-sm font-medium text-warning-600 mt-2 flex items-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-warning-500 mr-2"></span>
+                                {{ __('ui.item_types') }}
+                            </p>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-white shadow-lg shadow-warning-500/20 flex items-center justify-center text-warning-500 transform group-hover:-translate-y-1 group-hover:scale-110 transition-all duration-300 border border-warning-50">
+                            <x-icon.category class="w-7 h-7" />
                         </div>
                     </div>
                 </div>
 
                 {{-- Card 4: Sedang Dipinjam --}}
-                <div x-show="showBorrowings" class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-indigo-500 rounded-r-full group-hover:w-[16px] transition-all"></div>
-                    <div class="pl-4">
-                        <p class="text-[11px] font-extrabold text-indigo-500 mb-1 uppercase tracking-[0.15em]">{{ __('ui.currently_borrowed') }}</p>
-                        <h3 class="text-4xl font-black text-secondary-900 leading-none">{{ $activeBorrowingsCount }}</h3>
-                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.units_out') }}</p>
-                    </div>
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-indigo-500/10 rounded-3xl blur-xl group-hover:bg-indigo-500/20 transition-all"></div>
-                        <div class="relative p-4 bg-indigo-50 text-indigo-600 rounded-3xl group-hover:scale-110 transition-transform">
-                            <x-icon.borrow-user class="w-10 h-10" />
+                <div x-show="showBorrowings" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-indigo-900/5 transition-all duration-500 relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 w-32 h-32 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">{{ __('ui.currently_borrowed') }}</p>
+                            <h3 class="text-5xl font-black text-gray-800 tracking-tight" x-text="activeBorrowingsCount">{{ $activeBorrowingsCount }}</h3>
+                            <p class="text-sm font-medium text-indigo-600 mt-2 flex items-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-indigo-500 mr-2"></span>
+                                {{ __('ui.units_out') }}
+                            </p>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-white shadow-lg shadow-indigo-500/20 flex items-center justify-center text-indigo-500 transform group-hover:-translate-y-1 group-hover:scale-110 transition-all duration-300 border border-indigo-50">
+                            <x-icon.borrow-user class="w-7 h-7" />
                         </div>
                     </div>
                 </div>
 
-                {{-- Card 5: Lokasi Penyimpanan --}}
-                <div class="card p-6 flex items-center justify-between bg-white border-none shadow-xl shadow-secondary-900/10 rounded-2xl relative overflow-hidden group hover:-translate-y-1 transition-all duration-300">
-                    <div class="absolute left-0 top-0 bottom-0 w-[12px] bg-secondary-400 rounded-r-full group-hover:w-[16px] transition-all"></div>
-                    <div class="pl-4">
-                        <p class="text-[11px] font-extrabold text-secondary-600 mb-1 uppercase tracking-[0.15em]">{{ __('ui.storage_locations') }}</p>
-                        <h3 class="text-4xl font-black text-secondary-900 leading-none">{{ $totalLocations }}</h3>
-                        <p class="text-[10px] font-bold text-secondary-400 mt-2 uppercase tracking-wider">{{ __('ui.warehouse_racks') }}</p>
-                    </div>
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-secondary-400/10 rounded-3xl blur-xl group-hover:bg-secondary-400/20 transition-all"></div>
-                        <div class="relative p-4 bg-secondary-50 text-secondary-600 rounded-3xl group-hover:scale-110 transition-transform">
-                            <x-icon.location class="w-10 h-10" />
+                {{-- Card 5: Total Merk (Menggantikan Lokasi) --}}
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-pink-900/5 transition-all duration-500 relative overflow-hidden group">
+                    <div class="absolute -right-6 -top-6 w-32 h-32 bg-gradient-to-br from-pink-100 to-pink-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
+                    <div class="relative z-10 flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Total Merk</p>
+                            <h3 class="text-5xl font-black text-gray-800 tracking-tight" x-text="totalBrands">{{ $totalBrands }}</h3>
+                            <p class="text-sm font-medium text-pink-600 mt-2 flex items-center">
+                                <span class="w-1.5 h-1.5 rounded-full bg-pink-500 mr-2"></span>
+                                Daftar Merk Barang
+                            </p>
+                        </div>
+                        <div class="w-14 h-14 rounded-2xl bg-white shadow-lg shadow-pink-500/20 flex items-center justify-center text-pink-500 transform group-hover:-translate-y-1 group-hover:scale-110 transition-all duration-300 border border-pink-50">
+                            <x-icon.tag class="w-7 h-7" />
                         </div>
                     </div>
                 </div>
@@ -1265,6 +1275,7 @@
                 totalSpareparts: @json($totalSpareparts),
                 totalStock:      @json($totalStock),
                 totalCategories: @json($totalCategories),
+                totalBrands:     @json($totalBrands),
                 totalLocations:  @json($totalLocations),
                 pendingApprovalsCount: @json($pendingApprovalsCount),
                 activeBorrowingsCount: @json($activeBorrowingsCount),
@@ -1287,14 +1298,7 @@
                 init() {
                     setTimeout(() => { this.isLoading = false; }, 800);
 
-                    // Real-time listener (jika Echo tersedia)
-                    if (window.Echo) {
-                        window.Echo.channel('inventory-updates')
-                            .listen('.InventoryUpdated', (e) => {
-                                this.refreshData();
-                                if (window.showToast) window.showToast('info', e.message);
-                            });
-                    }
+                    // Real-time listener handled globally by realtime-inventory.js
                 },
 
                 async refreshData() {
