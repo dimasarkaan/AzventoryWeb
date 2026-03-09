@@ -23,7 +23,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'required|string|email|max:255|unique:users',
             'role' => 'required|in:superadmin,admin,operator',
             'jabatan' => 'required|string|max:255',
-            'status' => 'required|in:active,inactive',
+            'status' => 'required|in:aktif,nonaktif',
         ];
     }
 

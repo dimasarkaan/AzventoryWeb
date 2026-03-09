@@ -36,7 +36,7 @@ class UserManagementTest extends TestCase
             'email' => 'newadmin@example.com',
             'role' => 'admin',
             'jabatan' => 'Kepala Gudang',
-            'status' => 'active',
+            'status' => 'aktif',
         ]);
 
         $response->assertRedirect(route('users.index'));
@@ -53,7 +53,7 @@ class UserManagementTest extends TestCase
             'email' => 'newoperator@example.com',
             'role' => 'operator',
             'jabatan' => 'Staff Gudang',
-            'status' => 'active',
+            'status' => 'aktif',
         ]);
 
         $response->assertRedirect(route('users.index'));

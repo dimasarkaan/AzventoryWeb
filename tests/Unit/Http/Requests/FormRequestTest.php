@@ -179,7 +179,7 @@ class FormRequestTest extends TestCase
             'email' => 'existing@test.com',
             'role' => 'admin',
             'jabatan' => 'Manager',
-            'status' => 'active',
+            'status' => 'aktif',
         ];
 
         $validator = Validator::make($data, $rules);
@@ -196,7 +196,7 @@ class FormRequestTest extends TestCase
             'email' => 'new@test.com',
             'role' => 'manager', // role tidak valid
             'jabatan' => 'Manager',
-            'status' => 'active',
+            'status' => 'aktif',
         ];
 
         $validator = Validator::make($data, $rules);
@@ -213,7 +213,7 @@ class FormRequestTest extends TestCase
             'email' => 'newuser@test.com',
             'role' => 'operator',
             'jabatan' => 'Teknisi',
-            'status' => 'active',
+            'status' => 'aktif',
         ];
 
         $validator = Validator::make($data, $rules);

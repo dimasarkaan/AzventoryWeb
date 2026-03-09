@@ -35,11 +35,11 @@
                                 <label for="status" class="input-label">{{ __('ui.account_status') }}</label>
                                 @php
                                     $statusOptions = [
-                                        'active' => __('ui.active'),
-                                        'inactive' => __('ui.inactive'),
+                                        'aktif' => __('ui.active'),
+                                        'nonaktif' => __('ui.inactive'),
                                     ];
                                 @endphp
-                                <x-select name="status" :options="$statusOptions" :selected="old('status', 'active')" placeholder="{{ __('ui.select_status') }}" width="w-full" />
+                                <x-select name="status" :options="$statusOptions" :selected="old('status', 'aktif')" placeholder="{{ __('ui.select_status') }}" width="w-full" />
                             </div>
                         </div>
 

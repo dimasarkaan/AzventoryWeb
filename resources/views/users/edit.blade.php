@@ -71,8 +71,8 @@
                                         <label for="status" class="input-label">{{ __('ui.account_status') }}</label>
                                         @php
                                             $statusOptions = [
-                                                'active' => __('ui.active'),
-                                                'inactive' => __('ui.inactive'),
+                                                'aktif' => __('ui.active'),
+                                                'nonaktif' => __('ui.inactive'),
                                             ];
                                         @endphp
                                         <x-select name="status" :options="$statusOptions" :selected="old('status', $user->status)" placeholder="{{ __('ui.select_status') }}" width="w-full" />
