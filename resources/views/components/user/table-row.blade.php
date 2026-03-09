@@ -44,7 +44,7 @@
         </span>
     </td>
     <td class="px-4 py-3">
-        @if($user->status === 'active')
+        @if($user->status === 'aktif')
             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-success-100 text-success-700 tracking-wide uppercase">{{ __('ui.active') }}</span>
         @else
             <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary-100 text-secondary-600 tracking-wide uppercase">{{ __('ui.inactive') }}</span>
