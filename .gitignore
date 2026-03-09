@@ -23,3 +23,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Dev-only package configs (tidak dibutuhkan di production)
+/config/scribe.php
