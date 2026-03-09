@@ -1,7 +1,7 @@
 @props(['variant' => 'primary', 'type' => 'submit', 'href' => null])
 
 @php
-$baseClasses = 'inline-flex items-center border rounded-md font-semibold transition ease-in-out duration-150 focus:outline-none focus:ring-4 focus:ring-offset-2 active:scale-95';
+$baseClasses = 'inline-flex items-center px-4 py-2 text-sm border rounded-md font-semibold transition ease-in-out duration-150 focus:outline-none focus:ring-4 focus:ring-offset-2 active:scale-95';
 
 $variantClasses = [
     'primary' => 'bg-primary-600 text-white border-transparent hover:bg-primary-800 focus:bg-primary-700 active:bg-primary-900 focus:ring-primary-500 shadow-md hover:shadow-lg',
