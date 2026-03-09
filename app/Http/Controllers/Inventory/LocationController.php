@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Models\Sparepart;
+use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 class LocationController extends Controller
 {
+    use ActivityLogger;
+
     /**
      * Display a listing of the resource.
      */
@@ -36,6 +39,8 @@ class LocationController extends Controller
 
         $location = Location::create(['name' => $request->name]);
         Cache::forget('inventory_locations');
+
+        $this->logActivity('Lokasi Dibuat', "Lokasi baru '{$location->name}' ditambahkan.");
 
         return response()->json([
             'message' => 'Lokasi baru berhasil ditambahkan.',
@@ -65,6 +70,8 @@ class LocationController extends Controller
 
         Cache::forget('inventory_locations');
 
+        $this->logActivity('Lokasi Diperbarui', "Nama lokasi diubah dari '{$oldName}' menjadi '{$newName}'.");
+
         return response()->json([
             'message' => 'Lokasi berhasil diperbarui.',
             'location' => $location
@@ -86,6 +93,8 @@ class LocationController extends Controller
 
         $location->delete();
         Cache::forget('inventory_locations');
+
+        $this->logActivity('Lokasi Dihapus', "Lokasi '{$location->name}' dihapus.");
 
         return response()->json([
             'message' => 'Lokasi berhasil dihapus.'

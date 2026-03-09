@@ -8,9 +8,12 @@ use App\Models\Sparepart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use App\Traits\ActivityLogger;
 
 class BrandController extends Controller
 {
+    use ActivityLogger;
+
     /**
      * Display a listing of the resource.
      */
@@ -35,6 +38,8 @@ class BrandController extends Controller
 
         $brand = Brand::create(['name' => $request->name]);
         Cache::forget('inventory_brands');
+
+        $this->logActivity('Merk Dibuat', "Merk baru '{$brand->name}' ditambahkan.");
 
         return response()->json([
             'message' => 'Merk baru berhasil ditambahkan.',
@@ -64,6 +69,8 @@ class BrandController extends Controller
 
         Cache::forget('inventory_brands');
 
+        $this->logActivity('Merk Diperbarui', "Nama merk diubah dari '{$oldName}' menjadi '{$newName}'.");
+
         return response()->json([
             'message' => 'Merk berhasil diperbarui.',
             'brand' => $brand
@@ -85,6 +92,8 @@ class BrandController extends Controller
 
         $brand->delete();
         Cache::forget('inventory_brands');
+
+        $this->logActivity('Merk Dihapus', "Merk '{$brand->name}' dihapus.");
 
         return response()->json([
             'message' => 'Merk berhasil dihapus.'

@@ -678,6 +678,8 @@ class InventoryService
                     'approved_by' => auth()->id(),
                 ]);
 
+                $this->logActivity('Pengembalian Barang (Baik)', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi Baik.");
+
             } else {
                 // Alur penanganan aset yang dikembalikan dalam kondisi Rusak/Hilang
                 $translatedCondition = ($condition === 'bad') ? 'Rusak' : 'Hilang';

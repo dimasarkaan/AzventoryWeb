@@ -8,9 +8,12 @@ use App\Models\Sparepart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use App\Traits\ActivityLogger;
 
 class CategoryController extends Controller
 {
+    use ActivityLogger;
+
     public function index()
     {
         $categories = Category::all()->map(function ($cat) {
@@ -32,6 +35,8 @@ class CategoryController extends Controller
 
         $category = Category::create(['name' => $request->name]);
         Cache::forget('inventory_categories');
+
+        $this->logActivity('Kategori Dibuat', "Kategori baru '{$category->name}' ditambahkan.");
 
         return response()->json([
             'message' => 'Kategori baru berhasil ditambahkan.',
@@ -58,6 +63,8 @@ class CategoryController extends Controller
 
         Cache::forget('inventory_categories');
 
+        $this->logActivity('Kategori Diperbarui', "Nama kategori diubah dari '{$oldName}' menjadi '{$newName}'.");
+
         return response()->json(['message' => 'Kategori berhasil diperbarui.']);
     }
 
@@ -76,6 +83,8 @@ class CategoryController extends Controller
 
         $category->delete();
         Cache::forget('inventory_categories');
+
+        $this->logActivity('Kategori Dihapus', "Kategori '{$category->name}' dihapus.");
 
         return response()->json(['message' => 'Kategori berhasil dihapus.']);
     }
