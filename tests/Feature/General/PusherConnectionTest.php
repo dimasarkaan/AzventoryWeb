@@ -46,8 +46,8 @@ class PusherConnectionTest extends TestCase
     #[Test]
     public function test_memancarkan_event_inventory_updated_saat_diperbarui()
     {
-        // Event::fake() also handles ShouldBroadcast events
-        Event::fake([InventoryUpdatedEvent::class]);
+        // Fake all events to prevent real Pusher connection (including ActivityLogged)
+        Event::fake();
 
         $user = User::factory()->create(['role' => \App\Enums\UserRole::SUPERADMIN]);
         $sparepart = Sparepart::factory()->create(['name' => 'Original Name']);
