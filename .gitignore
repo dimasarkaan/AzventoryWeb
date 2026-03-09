@@ -26,3 +26,4 @@ Thumbs.db
 
 # Dev-only package configs (tidak dibutuhkan di production)
 /config/scribe.php
+/config/telescope.php
