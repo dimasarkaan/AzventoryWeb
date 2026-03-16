@@ -4,7 +4,21 @@ Ikuti langkah-langkah berikut secara berurutan melalui **SSH Terminal di cPanel*
 
 ---
 
-## Langkah 1 — Ambil Kode Terbaru
+## Langkah 0 — Persiapan Lokal (WAJIB jika server tidak punya Node/NPM)
+
+Karena server produksi (cPanel) tidak bisa menjalankan perintah `npm`, Anda harus membangun file aset di **komputer lokal (Laptop)** sebelum melakukan push ke Git.
+
+1. Di terminal laptop Anda, jalankan:
+   ```bash
+   npm install
+   npm run build
+   ```
+2. Pastikan folder `public/build` sudah terupdate.
+3. Commit dan Push perubahan tersebut ke repository (GitHub/GitLab).
+
+---
+
+## Langkah 1 — Ambil Kode Terbaru (Di Server)
 
 ```bash
 git pull origin main
@@ -26,7 +40,7 @@ composer install --optimize-autoloader --no-dev
 php artisan migrate --force
 ```
 
-> Perintah ini aman. Data yang sudah ada tidak akan terhapus.
+> **Catatan Iterasi 4**: Langkah ini akan otomatis membuat tabel baru untuk `locations`, `categories`, dan `brands` serta menambahkan kolom alasan penolakan pada log stok. Data lama tetap aman.
 
 ---
 
