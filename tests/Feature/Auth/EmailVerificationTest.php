@@ -55,4 +55,17 @@ class EmailVerificationTest extends TestCase
 
         $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
+
+    public function test_notifikasi_verifikasi_email_dapat_dikirim_ulang(): void
+    {
+        $user = User::factory()->unverified()->create();
+
+        \Illuminate\Support\Facades\Notification::fake();
+
+        $response = $this->actingAs($user)->post('/email/verification-notification');
+
+        $response->assertRedirect();
+        $response->assertSessionHas('status', 'verification-link-sent');
+        \Illuminate\Support\Facades\Notification::assertSentTo($user, \Illuminate\Auth\Notifications\VerifyEmail::class);
+    }
 }

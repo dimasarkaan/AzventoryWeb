@@ -225,17 +225,17 @@
 
                                                 <div class="space-y-4">
                                                             <div>
-                                                                <label class="block text-sm font-medium text-gray-700">{{ __('ui.change_type') }} <span class="text-danger-500">*</span></label>
+                                                                <span class="block text-sm font-medium text-gray-700">{{ __('ui.change_type') }} <span class="text-danger-500">*</span></span>
                                                                 <div class="mt-2 grid grid-cols-2 gap-3">
-                                                                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
-                                                                        <input type="radio" name="type" value="masuk" x-model="type" class="peer sr-only">
+                                                                    <label for="type_masuk" class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
+                                                                        <input type="radio" name="type" id="type_masuk" value="masuk" x-model="type" class="peer sr-only">
                                                                         <div class="w-full text-center peer-checked:text-primary-600 font-medium text-gray-500">
                                                                             <span class="block text-sm">{{ __('ui.stock_in') }}</span>
                                                                         </div>
                                                                         <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-primary-500 pointer-events-none transition-all"></div>
                                                                     </label>
-                                                                    <label class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
-                                                                        <input type="radio" name="type" value="keluar" x-model="type" class="peer sr-only">
+                                                                    <label for="type_keluar" class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
+                                                                        <input type="radio" name="type" id="type_keluar" value="keluar" x-model="type" class="peer sr-only">
                                                                          <div class="w-full text-center peer-checked:text-danger-600 font-medium text-gray-500">
                                                                             <span class="block text-sm">{{ __('ui.stock_out') }}</span>
                                                                         </div>
@@ -319,7 +319,7 @@
 
                                                 <div class="space-y-4">
                                                             <div>
-                                                                <label class="block text-sm font-medium text-gray-700">{{ __('ui.borrower_name') }}</label>
+                                                                <span class="block text-sm font-medium text-gray-700">{{ __('ui.borrower_name') }}</span>
                                                                 <div class="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700 sm:text-sm">
                                                                     {{ Auth::user()->name }}
                                                                 </div>
@@ -344,8 +344,8 @@
                                                             </div>
 
                                                             <div>
-                                                                <label for="notes" class="block text-sm font-medium text-gray-700">{{ __('ui.notes') }} <span class="text-secondary-400 font-normal">(Opsional)</span></label>
-                                                                <textarea name="notes" id="notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keperluan..."></textarea>
+                                                                <label for="borrow_notes" class="block text-sm font-medium text-gray-700">{{ __('ui.notes') }} <span class="text-secondary-400 font-normal">(Opsional)</span></label>
+                                                                <textarea name="notes" id="borrow_notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keperluan..."></textarea>
                                                             </div>
                                             </div>
                                             </div>
@@ -854,9 +854,9 @@
 
                                 <!-- Condition (Custom Dropdown) -->
                                 <div @click.outside="dropdownOpen = false" class="relative z-50">
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
+                                    <label for="return_condition_btn" class="block text-sm font-medium text-gray-700 mb-1">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
-                                        <button type="button" @click="dropdownOpen = !dropdownOpen"
+                                        <button id="return_condition_btn" type="button" @click="dropdownOpen = !dropdownOpen"
                                                 class="input-field w-full text-left flex justify-between items-center rounded-xl py-2.5 px-4 text-sm cursor-pointer border border-gray-300 hover:border-primary-400 focus:ring-2 ring-primary-500 bg-white transition-all shadow-sm">
                                             <span x-text="conditionLabel" :class="{'text-gray-900': returnCondition, 'text-gray-500': !returnCondition}" class="truncate mr-2"></span>
                                             <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': dropdownOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -966,11 +966,11 @@
                                         $refs.galleryInput.click();
                                     }
                                 }">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Bukti Foto <span class="text-danger-500">*</span></label>
+                                    <span class="block text-sm font-medium text-gray-700 mb-2">Bukti Foto <span class="text-danger-500">*</span></span>
                                     
                                     <!-- Split Buttons (Pill/Chip Style - Full Width) -->
                                     <div class="grid grid-cols-2 gap-3 mb-4">
-                                        <button type="button" @click="startCamera" 
+                                        <button id="return_photos_input" type="button" @click="startCamera" 
                                                 class="w-full inline-flex justify-center items-center px-4 py-2 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition-colors duration-200 border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -1031,8 +1031,8 @@
 
                                 <!-- Notes -->
                                 <div>
-                                    <label for="notes" class="block text-sm font-medium text-gray-700">Catatan <span class="text-secondary-400 font-normal text-xs">(Opsional)</span></label>
-                                    <textarea name="return_notes" id="notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keterangan tambahan..."></textarea>
+                                    <label for="return_notes" class="block text-sm font-medium text-gray-700">Catatan <span class="text-secondary-400 font-normal text-xs">(Opsional)</span></label>
+                                    <textarea name="return_notes" id="return_notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keterangan tambahan..."></textarea>
                                 </div>
                             </div>
 

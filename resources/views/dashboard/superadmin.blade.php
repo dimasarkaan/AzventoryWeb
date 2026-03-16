@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     @push('styles')
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" crossorigin="anonymous">
         <style>
@@ -1076,58 +1076,61 @@
                         {{-- Tombol Pengaturan Widget --}}
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" @click.away="open = false"
-                                    class="btn btn-secondary flex items-center gap-2 text-sm">
+                                    class="btn btn-secondary flex items-center gap-2 text-sm"
+                                    aria-label="{{ __('ui.display_settings') }}"
+                                    aria-expanded="false"
+                                    :aria-expanded="open.toString()">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                                 <span class="hidden sm:inline">{{ __('ui.display_settings') }}</span>
                             </button>
                             <div x-show="open" x-transition
                                  class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-1 z-50 border border-secondary-100 max-h-[80vh] overflow-y-auto">
                                 <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">{{ __('ui.active_widgets') }}</div>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showStats" @change="toggle('showStats')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showStats" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showStats" name="showStats" :checked="showStats" @change="toggle('showStats')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_main_stats') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showCharts" @change="toggle('showCharts')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showCharts" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showCharts" name="showCharts" :checked="showCharts" @change="toggle('showCharts')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_distribution_location') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showLowStock" @change="toggle('showLowStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showLowStock" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showLowStock" name="showLowStock" :checked="showLowStock" @change="toggle('showLowStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_stock_alerts') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showBorrowings" @change="toggle('showBorrowings')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showBorrowings" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showBorrowings" name="showBorrowings" :checked="showBorrowings" @change="toggle('showBorrowings')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_active_borrowings') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showOverdue" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showOverdue" name="showOverdue" :checked="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_overdue') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showNoPriceItems" @change="toggle('showNoPriceItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showNoPriceItems" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showNoPriceItems" name="showNoPriceItems" :checked="showNoPriceItems" @change="toggle('showNoPriceItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_missing_price') }}</span>
                                 </label>
                                 <div class="border-t border-secondary-100 my-1"></div>
                                 <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">{{ __('ui.widget_analytics') }}</div>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showMovement" @change="toggle('showMovement')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showMovement" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showMovement" name="showMovement" :checked="showMovement" @change="toggle('showMovement')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_stock_movement') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showTopItems" @change="toggle('showTopItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showTopItems" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showTopItems" name="showTopItems" :checked="showTopItems" @change="toggle('showTopItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_popular_items') }}</span>
                                 </label>
 
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showDeadStock" @change="toggle('showDeadStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showDeadStock" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showDeadStock" name="showDeadStock" :checked="showDeadStock" @change="toggle('showDeadStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_dead_stock') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showLeaderboard" @change="toggle('showLeaderboard')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showLeaderboard" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showLeaderboard" name="showLeaderboard" :checked="showLeaderboard" @change="toggle('showLeaderboard')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_top_contributors') }}</span>
                                 </label>
-                                <label class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" :checked="showRecent" @change="toggle('showRecent')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                <label for="setting_showRecent" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
+                                    <input type="checkbox" id="setting_showRecent" name="showRecent" :checked="showRecent" @change="toggle('showRecent')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_recent_activity') }}</span>
                                 </label>
                                 {{-- Tombol Reset ke Default --}}
@@ -1143,7 +1146,10 @@
                         {{-- Tombol Ekspor --}}
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" @click.away="open = false"
-                                    class="btn btn-secondary flex items-center gap-2 text-sm">
+                                    class="btn btn-secondary flex items-center gap-2 text-sm"
+                                    aria-label="Ekspor Laporan"
+                                    aria-expanded="false"
+                                    :aria-expanded="open.toString()">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                 </svg>
@@ -1238,12 +1244,12 @@
                          class="mt-4">
                         <form method="GET" action="{{ route('dashboard.superadmin') }}"
                               class="bg-white border border-secondary-100 rounded-[24px] p-5 shadow-xl shadow-secondary-900/5 flex flex-col md:flex-row items-stretch md:items-end gap-6 transition-all">
-                            <input type="hidden" name="period" value="custom">
+                            <input type="hidden" name="period" id="superadmin_period_input" value="custom">
 
                             {{-- Form Group: Date Range --}}
                             <div class="flex-grow space-y-3">
                                 <div class="flex items-center justify-between px-1">
-                                    <label class="text-[11px] font-extrabold text-secondary-400 uppercase tracking-[0.1em]">Rentang Tanggal</label>
+                                    <label for="date_range_picker" class="text-[11px] font-extrabold text-secondary-400 uppercase tracking-[0.1em]">Rentang Tanggal</label>
                                     <div class="flex items-center gap-3">
                                         <button type="button" onclick="setPickerRange(0)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">HARI INI</button>
                                         <button type="button" onclick="setPickerRange(7)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">7 HARI TERAKHIR</button>
@@ -1252,7 +1258,7 @@
                                 </div>
                                 
                                 <div class="relative group">
-                                    <input type="text" id="date_range_picker" 
+                                    <input type="text" id="date_range_picker_hidden" name="date_range"
                                            class="w-full pl-12 pr-4 py-3 text-sm bg-secondary-50/50 border-secondary-200 rounded-2xl text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer font-semibold placeholder:text-secondary-400"
                                            placeholder="Pilih rentang tanggal...">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-secondary-400 group-focus-within:text-primary-500 transition-colors">
@@ -1315,6 +1321,10 @@
                 
                 <!-- 1. Total Sparepart (Interactive) -->
                 <div @click="window.location.href='{{ route('inventory.index') }}'" 
+                     role="button"
+                     tabindex="0"
+                     @keydown.enter="window.location.href='{{ route('inventory.index') }}'"
+                     aria-label="Klik untuk melihat daftar semua barang"
                      class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-primary-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-primary-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-primary-200"></div>
                     <div>
@@ -1331,6 +1341,10 @@
 
                 <!-- 2. Total Stok (Interactive) -->
                 <div @click="document.getElementById('stockByCategoryChart').scrollIntoView({behavior: 'smooth', block: 'center'})" 
+                     role="button"
+                     tabindex="0"
+                     @keydown.enter="document.getElementById('stockByCategoryChart').scrollIntoView({behavior: 'smooth', block: 'center'})"
+                     aria-label="Klik untuk melihat grafik distribusi stok"
                      class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-success-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-success-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-success-200"></div>
                     <div>
@@ -1348,6 +1362,10 @@
                 <!-- 3. Widget Peminjaman Aktif (Interactive) -->
                 <div @click="window.location.href='{{ route('inventory.index', ['filter' => 'borrowed']) }}'" 
                      x-show="showBorrowings" 
+                     role="button"
+                     tabindex="0"
+                     @keydown.enter="window.location.href='{{ route('inventory.index', ['filter' => 'borrowed']) }}'"
+                     aria-label="Klik untuk melihat daftar barang yang sedang dipinjam"
                      class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-fuchsia-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-fuchsia-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-fuchsia-200"></div>
                     <div>
@@ -1364,6 +1382,10 @@
 
                 <!-- 4. Total Kategori (Interactive - Trigger Modal) -->
                 <div @click="openCategoryModal()" 
+                     role="button"
+                     tabindex="0"
+                     @keydown.enter="openCategoryModal()"
+                     aria-label="Klik untuk manajemen kategori barang"
                      class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-warning-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-warning-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-warning-200"></div>
                      <div>
@@ -1380,6 +1402,10 @@
 
                 <!-- 5. Total Merk (Interactive - Trigger Modal) -->
                 <div @click="openBrandModal()" 
+                     role="button"
+                     tabindex="0"
+                     @keydown.enter="openBrandModal()"
+                     aria-label="Klik untuk manajemen merk barang"
                      class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-pink-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-pink-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-pink-200"></div>
                      <div>
@@ -1396,6 +1422,10 @@
 
                 <!-- 6. Total Lokasi (Interactive - Trigger Modal) -->
                 <div @click="openLocationModal()" 
+                     role="button"
+                     tabindex="0"
+                     @keydown.enter="openLocationModal()"
+                     aria-label="Klik untuk manajemen lokasi penyimpanan"
                      class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-cyan-100">
                     <div class="absolute right-0 top-0 h-24 w-24 bg-cyan-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-cyan-200"></div>
                      <div>
@@ -2685,10 +2715,10 @@
             document.addEventListener('DOMContentLoaded', function() {
                 const startInput = document.getElementById('start_date');
                 const endInput = document.getElementById('end_date');
-                const pickerInput = document.getElementById('date_range_picker');
+                const pickerInput = document.getElementById('date_range_picker_hidden');
                 
                 if (pickerInput) {
-                    const picker = flatpickr("#date_range_picker", {
+                    const picker = flatpickr("#date_range_picker_hidden", {
                         locale: {
                             rangeSeparator: " - ",
                             weekdays: {
@@ -2718,25 +2748,31 @@
                             instance.jumpToDate(new Date());
                         },
                         onReady: function(selectedDates, dateStr, instance) {
+                            // Accessibility Fix: Label 'for="date_range_picker"' must point to the visible input
+                            if (instance.altInput) {
+                                instance.altInput.id = 'date_range_picker';
+                                instance.altInput.name = 'date_range_display';
+                            }
+
                             const injectCustomUI = () => {
                                 const container = instance.calendarContainer.querySelector('.flatpickr-current-month');
                                 if (!container) return;
 
                                 container.innerHTML = `
-                                    <div class="custom-month-selector" id="custom-month-btn">
+                                    <div class="custom-month-selector" id="custom-month-btn" role="button" tabindex="0" aria-label="Pilih Bulan" aria-haspopup="listbox">
                                         <span class="month-name">
                                             <span class="hidden sm:inline">${instance.l10n.months.longhand[instance.currentMonth]}</span>
                                             <span class="sm:hidden font-extrabold text-lg">${instance.currentMonth + 1}</span>
                                         </span>
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'></path></svg>
-                                        <div class="custom-month-list" id="custom-month-panel">
+                                        <div class="custom-month-list" id="custom-month-panel" role="listbox" aria-label="Daftar Bulan">
                                             ${instance.l10n.months.longhand.map((m, i) => `
-                                                <div class="${i === instance.currentMonth ? 'active' : ''}" data-index="${i}">${m}</div>
+                                                <div class="${i === instance.currentMonth ? 'active' : ''}" data-index="${i}" role="option" aria-selected="${i === instance.currentMonth ? 'true' : 'false'}">${m}</div>
                                             `).join('')}
                                         </div>
                                     </div>
                                     <div class="numInputWrapper">
-                                        <input class="numInput cur-year" type="text" inputmode="numeric" value="${instance.currentYear}">
+                                        <input id="flatpickr_year_input" name="flatpickr_year" class="numInput cur-year" type="text" inputmode="numeric" value="${instance.currentYear}" aria-label="Input Tahun">
                                     </div>
                                 `;
 

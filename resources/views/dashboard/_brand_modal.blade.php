@@ -1,4 +1,7 @@
 <div x-show="showBrandModal" 
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="brand-modal-title"
      class="fixed inset-0 z-[100] overflow-y-auto" 
      x-cloak
      x-transition:enter="transition ease-out duration-300"
@@ -9,7 +12,7 @@
      x-transition:leave-end="opacity-0">
     
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showBrandModal = false"></div>
+        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showBrandModal = false" aria-hidden="true"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -28,11 +31,13 @@
                         <x-icon.tag class="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-secondary-900">Manajemen Merk</h3>
+                        <h3 id="brand-modal-title" class="text-xl font-bold text-secondary-900">Manajemen Merk</h3>
                         <p class="text-xs text-secondary-500">Kelola master data merk inventaris</p>
                     </div>
                 </div>
-                <button @click="showBrandModal = false" class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-colors">
+                <button @click="showBrandModal = false" 
+                        aria-label="Tutup Modal"
+                        class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-colors">
                     <x-icon.close class="w-6 h-6" />
                 </button>
             </div>
@@ -47,7 +52,10 @@
                     </h4>
                     <div class="flex gap-2">
                         <div class="relative flex-grow">
+                            <label for="new_brand_name" class="sr-only">Nama Merk Baru</label>
                             <input type="text" 
+                                   id="new_brand_name"
+                                   name="brand_name"
                                    x-model="newBrandName"
                                    @keydown.enter="addBrand()"
                                    placeholder="Masukkan Nama Merk Di Sini" 
@@ -94,10 +102,11 @@
                                         </p>
                                     </div>
 
-                                    {{-- Mode Edit --}}
                                     <div x-show="brandEditingId === brand.id" x-cloak>
+                                        <label :for="'brand-edit-input-' + brand.id" class="sr-only">Ubah Nama Merk</label>
                                         <input type="text" 
                                                :id="'brand-edit-input-' + brand.id"
+                                               name="edit_brand_name"
                                                x-model="brandEditingName" 
                                                @keydown.enter="saveBrandEdit(brand.id)"
                                                @keydown.escape="cancelBrandEdit()"

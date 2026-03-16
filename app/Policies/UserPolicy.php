@@ -34,7 +34,7 @@ class UserPolicy
     /**
      * Tentukan apakah user bisa mengubah data pengguna.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user, ?User $model = null): bool
     {
         return $user->role === UserRole::SUPERADMIN;
     }
@@ -42,16 +42,21 @@ class UserPolicy
     /**
      * Tentukan apakah user bisa menghapus pengguna.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user, ?User $model = null): bool
     {
-        // Mencegah penghapusan diri sendiri, juga ditangani di controller tetapi kebijakan ini lebih aman.
+        // Jika model null (misal: cek otoritas umum), izinkan jika superadmin
+        if (!$model) {
+            return $user->role === UserRole::SUPERADMIN;
+        }
+
+        // Mencegah penghapusan diri sendiri
         return $user->role === UserRole::SUPERADMIN && $user->id !== $model->id;
     }
 
     /**
      * Tentukan apakah user bisa memulihkan pengguna (restore).
      */
-    public function restore(User $user, User $model): bool
+    public function restore(User $user, ?User $model = null): bool
     {
         return $user->role === UserRole::SUPERADMIN;
     }
@@ -59,8 +64,11 @@ class UserPolicy
     /**
      * Tentukan apakah user bisa menghapus permanen pengguna.
      */
-    public function forceDelete(User $user, User $model): bool
+    public function forceDelete(User $user, ?User $model = null): bool
     {
+        if (!$model) {
+            return $user->role === UserRole::SUPERADMIN;
+        }
         return $user->role === UserRole::SUPERADMIN && $user->id !== $model->id;
     }
 }

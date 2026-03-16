@@ -11,7 +11,7 @@
             <!-- Field Login -->
             <div>
                 <label for="login" class="input-label">{{ __('ui.auth_label_login') }}</label>
-                <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autofocus tabindex="1">
+                <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autocomplete="username" autofocus tabindex="1">
                 <x-input-error :messages="$errors->get('login')" class="mt-2" />
             </div>
 

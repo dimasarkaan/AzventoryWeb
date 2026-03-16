@@ -26,7 +26,7 @@
                             <!-- Email -->
                             <div>
                                 <label for="email" class="input-label">{{ __('ui.email_address') }} <span class="text-danger-500">*</span></label>
-                                <input id="email" class="input-field" type="email" name="email" value="{{ old('email') }}" placeholder="contoh@gmail.com" autofocus />
+                                <input id="email" class="input-field" type="email" name="email" value="{{ old('email') }}" placeholder="contoh@gmail.com" autocomplete="email" autofocus />
                                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
                             </div>
 
@@ -39,7 +39,7 @@
                                         'nonaktif' => __('ui.inactive'),
                                     ];
                                 @endphp
-                                <x-select name="status" :options="$statusOptions" :selected="old('status', 'aktif')" placeholder="{{ __('ui.select_status') }}" width="w-full" />
+                                <x-select name="status" id="status" :options="$statusOptions" :selected="old('status', 'aktif')" placeholder="{{ __('ui.select_status') }}" width="w-full" />
                             </div>
                         </div>
 
@@ -57,14 +57,14 @@
                                         \App\Enums\UserRole::SUPERADMIN->value => __('ui.role_superadmin_desc'),
                                     ];
                                 @endphp
-                                <x-select name="role" :options="$roleOptions" :selected="old('role')" placeholder="{{ __('ui.select_role') }}" width="w-full" />
+                                <x-select name="role" id="role" :options="$roleOptions" :selected="old('role')" placeholder="{{ __('ui.select_role') }}" width="w-full" />
                                 <x-input-error :messages="$errors->get('role')" class="mt-2" />
                             </div>
 
                             <!-- Jabatan -->
                             <div>
                                 <label for="jabatan" class="input-label">{{ __('ui.job_position') }} <span class="text-danger-500">*</span></label>
-                                <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan') }}" placeholder="{{ __('ui.placeholder_job') }}" />
+                                <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan') }}" placeholder="{{ __('ui.placeholder_job') }}" autocomplete="organization-title" />
                                 <x-input-error :messages="$errors->get('jabatan')" class="mt-2" />
                             </div>
 

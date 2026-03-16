@@ -2,7 +2,7 @@
 
 return [
     // General
-    'dashboard' => 'Dasbor',
+    'dashboard' => 'Dashboard',
     'search' => 'Cari...',
     'actions' => 'Aksi',
     'save' => 'Simpan',
@@ -166,7 +166,6 @@ return [
     'no_similar_items' => 'Tidak ada varian atau item serupa lainnya.',
 
     // Return Modal
-    'return_item_title' => 'Kembalikan Barang',
     'return_evidence' => 'Bukti Pengembalian',
     'evidence' => 'Bukti',
     'save_failed' => 'Gagal Menyimpan!',
@@ -184,7 +183,6 @@ return [
     // QR Print
     'print_qr' => 'Cetak QR',
     'print_label' => 'Cetak Label',
-    'close' => 'Tutup',
 
     // Inventory placeholders & alerts
     'placeholder_pn' => 'Contoh: KBD-LOGI-GPRO-X',
@@ -232,9 +230,7 @@ return [
     'user_management' => 'Pengguna',
     'add_user' => 'Tambah Pengguna',
     'role' => 'Peran',
-    'back' => 'Kembali',
     'no_image' => 'Tidak ada gambar',
-    'unit_price' => 'Harga Satuan',
     'status_active' => 'Aktif',
     'status_inactive' => 'Non-Aktif', // Used for badges
     'active' => 'Aktif', // Used for select options
@@ -245,7 +241,6 @@ return [
     'search_user_placeholder' => 'Cari nama, email, atau username...',
     'all_roles' => 'Semua Role',
     'all_statuses' => 'Semua Status',
-    'profile' => 'Profil',
     'email_contact' => 'Email / Kontak',
     'job_title' => 'Jabatan',
     'users_empty' => 'Belum ada pengguna',
@@ -264,7 +259,6 @@ return [
     'account_info' => 'Informasi Akun',
     'email_address' => 'Alamat Email',
     'account_status' => 'Status Akun',
-    'select_status' => 'Pilih Status',
     'access_job' => 'Akses & Jabatan',
     'access_role' => 'Role Akses',
     'select_role' => 'Pilih Role',
@@ -281,8 +275,6 @@ return [
     'edit_user_desc' => 'Perbarui informasi akses dan jabatan untuk',
     'username' => 'Username',
     'email_immutable' => 'Email tidak dapat diubah untuk menjaga integritas login.',
-    'save_changes' => 'Simpan Perubahan',
-    'reset_password' => 'Reset Password',
     'reset_password_desc' => 'Jika pengguna lupa password, Anda dapat meresetnya ke default',
     'reset_password_title' => 'Reset Password?',
     'reset_password_confirm' => 'Password akan dikembalikan ke default: password123',
@@ -304,7 +296,6 @@ return [
     'due_date' => 'Tenggat',
     'item_deleted' => 'Item Terhapus',
     'status_overdue' => 'Terlambat',
-    'status_returned_badge' => 'Dikembalikan',
     'borrowing_history_empty' => 'Belum ada riwayat peminjaman.',
 
     // Scan QR
@@ -337,7 +328,6 @@ return [
     'camera_error_default' => 'Terjadi kesalahan saat mengakses kamera.',
 
     // Dashboard
-    'dashboard' => 'Dashboard',
     'dashboard_desc' => 'Overview Status Inventaris (Terkini)',
     'display_settings' => 'Atur Tampilan',
     'active_widgets' => 'Widget Aktif',
@@ -370,7 +360,6 @@ return [
     'warehouse_racks' => 'Lokasi',
     'attention_overdue' => 'Perhatian: Barang Terlambat Kembali',
     'showing_top_5_overdue' => 'Menampilkan 5 teratas. Cek detail per item di Inventaris.',
-    'borrower' => 'Peminjam',
     'due_date_short' => 'Jatuh Tempo',
     'late' => 'Telat',
     'stock_movement' => 'Pergerakan Stok',
@@ -378,7 +367,6 @@ return [
     'top_exiting_items' => 'Barang Sering Keluar (Top 5)',
     'top_entering_items' => 'Barang Sering Masuk (Top 5)',
     'qty' => 'Qty',
-    'no_data' => 'Belum ada data',
     'stock_distribution_category' => 'Distribusi Stok per Kategori',
     'stock_location' => 'Stok per Lokasi',
     'warning_low_stock' => 'Peringatan: Stok Menipis',
@@ -411,7 +399,6 @@ return [
     'borrowing_history_report' => 'Riwayat Peminjaman',
     'borrowing_history_desc' => 'Log peminjaman user',
     'low_stock_report' => 'Stok Menipis',
-    'low_stock_desc' => 'Barang perlu restock',
     'filter_configuration' => 'Konfigurasi Filter',
     'time_period' => 'Periode Waktu',
     'this_month' => 'Bulan Ini',
@@ -422,7 +409,6 @@ return [
     'start_date' => 'Mulai',
     'end_date' => 'Sampai',
     'warehouse_location' => 'Lokasi Gudang / Rak',
-    'all_locations' => 'Semua Lokasi',
     'location_placeholder_desc' => 'Pilih lokasi spesifik atau biarkan "Semua Lokasi".',
     'format_label' => 'Format:',
     'pdf_document' => 'Dokumen PDF',
@@ -456,15 +442,11 @@ return [
     'user_column' => 'User',
     'report_footer_printed_by' => 'Dicetak oleh :name pada :date',
     'late_days' => 'Telat :days hari',
-    'status_borrowed' => 'Sedang Dipinjam',
     'status_returned' => 'Dikembalikan',
     'status_lost' => 'Hilang',
-    'condition_good' => 'Baik',
     'condition_broken' => 'Rusak',
-    'condition_lost' => 'Hilang',
 
     'stock_low' => 'Menipis',
-    'stock_safe' => 'Aman',
     'type_in' => 'MASUK',
     'type_out' => 'KELUAR',
     'current_period' => 'Saat Ini',
@@ -480,7 +462,6 @@ return [
     'filter_search' => 'Filter & Pencarian',
     'search_keyword' => 'Cari Kata Kunci',
     'role_filter' => 'Role',
-    'all_roles' => 'Semua Role',
     'action_type' => 'Jenis Aksi',
     'all_actions' => 'Semua Aksi',
     'user_filter' => 'Pengguna',
@@ -488,9 +469,7 @@ return [
     'from_date' => 'Dari Tanggal',
     'to_date' => 'Sampai Tanggal',
     'subject_type' => 'Tipe Objek',
-    'all_types' => 'Semua Tipe',
     'apply_filter' => 'Terapkan',
-    'reset_filter' => 'Reset Filter',
     'user_header' => 'Pengguna',
     'action_header' => 'Aksi',
     'description_header' => 'Deskripsi',
@@ -519,11 +498,38 @@ return [
     'btn_reject' => 'Tolak',
     'no_pending_approvals' => 'Tidak ada pengajuan pending saat ini.',
     'no_pending' => 'Tidak ada pengajuan pending.',
+    'no_pending_in' => 'Tidak ada pengajuan stok masuk yang menunggu persetujuan.',
+    'no_pending_out' => 'Tidak ada pengajuan stok keluar yang menunggu persetujuan.',
     'by_user' => 'oleh :name',
     'reason_label' => 'Alasan',
-    'confirm_reject_title' => 'Tolak Pengajuan?',
-    'confirm_reject_text' => 'Stok tidak akan ditambahkan ke inventaris.',
-    'btn_yes_reject' => 'Ya, Tolak!',
+    'rejection_reason' => 'Alasan Tolak',
+    'processed_by' => 'Diproses Oleh',
+    'all_processed' => 'Semua pengajuan stok telah diproses.',
+    'all_processed_in' => 'Semua pengajuan stok masuk telah diproses.',
+    'all_processed_out' => 'Semua pengajuan stok keluar telah diproses.',
+    'no_data_found' => 'Data tidak ditemukan',
+    'no_data_criteria' => 'Tidak ada pengajuan dengan kriteria status atau pencarian ini.',
+    'no_data_in_approved' => 'Tidak ada pengajuan stok masuk yang telah disetujui.',
+    'no_data_out_approved' => 'Tidak ada pengajuan stok keluar yang telah disetujui.',
+    'no_data_in_rejected' => 'Tidak ada pengajuan stok masuk yang ditolak.',
+    'no_data_out_rejected' => 'Tidak ada pengajuan stok keluar yang ditolak.',
+    'status_all' => 'Semua Status',
+    'approvals_search_placeholder' => 'Cari nama barang, part number, atau pengaju...',
+    'status_pending_label' => 'Antrean (Pending)',
+    'status_approved_label' => 'Disetujui',
+    'status_rejected_label' => 'Ditolak',
+    'type_all' => 'Semua Jenis',
+    'type_in_label' => 'Stok Masuk',
+    'type_out_label' => 'Stok Keluar',
+    'confirm_reject_title' => 'Konfirmasi Penolakan',
+    'confirm_reject_text' => 'Apakah Anda yakin ingin menolak pengajuan stok ini?',
+    'confirm_approve_title' => 'Konfirmasi Persetujuan',
+    'confirm_approve_text' => 'Apakah Anda yakin ingin menyetujui pengajuan stok ini?',
+    'btn_yes_approve' => 'Ya, Setujui',
+    'btn_yes_reject' => 'Ya, Tolak',
+    'btn_yes_process' => 'Ya, Lanjutkan',
+    'bulk_title' => 'Konfirmasi Massal',
+    'required' => 'wajib diisi',
     'btn_cancel' => 'Batal',
     'unit_pcs' => 'Pcs',
 
@@ -531,7 +537,6 @@ return [
     'role_operator_desc' => 'Operator',
     'role_admin_desc' => 'Admin',
     'role_superadmin_desc' => 'Super Admin',
-    'cancel' => 'Batal', // Generic Cancel
 
     // Navigation
     'scan_qr' => 'Scan QR',
@@ -542,7 +547,6 @@ return [
     'no_new_notifications' => 'Tidak ada notifikasi baru.',
     'my_account' => 'Akun Saya',
     'my_profile' => 'Profil Saya',
-    'profile' => 'Profil',
 
     // Global Search
     'search_placeholder' => 'Cari menu, inventaris, atau user...',
@@ -626,7 +630,6 @@ return [
     'stats_status' => 'Status Akun',
 
     // My Inventory
-    'my_inventory_title' => 'Inventaris Saya',
     'my_inventory_desc' => 'Daftar barang yang sedang dipinjam dan riwayat peminjaman Anda.',
     'back_to_profile' => 'Kembali ke Profil',
     'tab_active_borrowings' => 'Sedang Dipinjam',
@@ -636,31 +639,7 @@ return [
     'no_history_borrowings' => 'Belum ada riwayat',
     'no_history_borrowings_desc' => 'Anda belum pernah meminjam barang sebelumnya.',
 
-    // User Management
-    'user_management' => 'Pengguna',
-    'user_management_desc' => 'Kelola data pengguna, peran, dan status akun.',
-    'add_user' => 'Tambah Pengguna',
-    'search_user_placeholder' => 'Cari nama, email, atau username...',
-    'all_roles' => 'Semua Peran',
-    'all_statuses' => 'Semua Status',
-    'active' => 'Aktif',
-    'inactive' => 'Tidak Aktif',
-    'email_contact' => 'Email & Kontak',
-    'job_title' => 'Jabatan',
-    'role' => 'Peran',
-    'status_active' => 'Aktif',
-    'status_inactive' => 'Nonaktif',
-    'delete_soft_tooltip' => 'Hapus Sementara',
-    'users_empty' => 'Tidak ada pengguna',
-    'users_empty_desc' => 'Belum ada data pengguna yang sesuai dengan kriteria.',
-
     // User Actions (SweetAlert)
-    'restore_user_title' => 'Pulihkan Pengguna?',
-    'restore_user_confirm' => 'Pengguna ini akan dikembalikan ke daftar aktif.',
-    'yes_restore' => 'Ya, Pulihkan!',
-    'delete_user_title' => 'Hapus Permanen?',
-    'delete_permanent_confirm' => 'Data pengguna ini akan dihapus selamanya dan tidak bisa dikembalikan.',
-    'yes_delete' => 'Ya, Hapus Permanen!',
     'profile_placeholder_phone' => 'Contoh: 08123456789',
     'profile_label_address' => 'Alamat',
     'profile_btn_edit' => 'Ubah Profil',

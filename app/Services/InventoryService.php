@@ -21,6 +21,7 @@ class InventoryService
 {
     use ActivityLogger;
 
+    protected $imageOptimizer;
     protected $qrCodeService;
 
     public function __construct(ImageOptimizationService $imageOptimizer, QrCodeService $qrCodeService)
@@ -238,7 +239,10 @@ class InventoryService
                 Notification::send($admins, new LowStockNotification($sparepart));
 
                 $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
-                broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                try {
+                    broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                } catch (\Throwable $e) {
+                }
 
             } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5) && $sparepart->wasChanged('stock')) {
                 // Notifikasi approaching: stok menuju minimum (antara 100%-150% dari minimum)
@@ -631,7 +635,10 @@ class InventoryService
                 Notification::send($admins, new LowStockNotification($sparepart));
 
                 $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
-                broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                try {
+                    broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                } catch (\Throwable $e) {
+                }
 
             } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
                 $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
@@ -717,13 +724,13 @@ class InventoryService
     /**
      * Menyetujui atau menolak permohonan penyesuaian stok (Approval Flow).
      */
-    public function approveStockRequest(StockLog $stockLog, string $status)
+    public function approveStockRequest(StockLog $stockLog, string $status, ?string $rejectionReason = null)
     {
         if ($stockLog->status !== 'pending') {
             throw new \Exception('Pengajuan ini sudah diproses sebelumnya.');
         }
 
-        return DB::transaction(function () use ($stockLog, $status) {
+        return DB::transaction(function () use ($stockLog, $status, $rejectionReason) {
             if ($status === 'approved') {
                 $sparepart = Sparepart::where('id', $stockLog->sparepart_id)->lockForUpdate()->first();
 
@@ -749,18 +756,24 @@ class InventoryService
                     Notification::send($admins, new LowStockNotification($sparepart));
 
                     $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
-                    broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
-
+                    try {
+                        broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                    } catch (\Throwable $e) {
+                    }
                 } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
                     $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                     Notification::send($admins, new ApproachingStockNotification($sparepart));
                 }
             }
 
-            $stockLog->update([
-                'status' => $status,
+            $updateData = [
+                'status'      => $status,
                 'approved_by' => auth()->id(),
-            ]);
+            ];
+            if ($status === 'rejected' && $rejectionReason) {
+                $updateData['rejection_reason'] = $rejectionReason;
+            }
+            $stockLog->update($updateData);
 
             $statusText = $status === 'approved' ? 'disetujui' : 'ditolak';
             $this->logActivity(
@@ -769,14 +782,17 @@ class InventoryService
             );
 
             // Broadcast real-time stock approval processing (remove from list)
-            broadcast(new \App\Events\StockApprovalUpdatedEvent($stockLog->fresh(), 'processed'))->toOthers();
+            try {
+                broadcast(new \App\Events\StockApprovalUpdatedEvent($stockLog->fresh(), 'processed'))->toOthers();
+            } catch (\Throwable $e) {
+            }
 
             // Notifikasi balik ke pemohon (Operator/Admin) mengenai hasil approval
             $requester = $stockLog->user;
             if ($requester) {
                 $message = __('ui.notification_stock_request_body', [
-                    'type' => $stockLog->type,
-                    'name' => $stockLog->sparepart->name,
+                    'type'   => $stockLog->type,
+                    'name'   => $stockLog->sparepart->name,
                     'status' => $statusText,
                 ]);
                 Notification::send($requester, new StockRequestNotification($stockLog, $message));
@@ -791,11 +807,14 @@ class InventoryService
      */
     public function broadcastUpdate(Sparepart $sparepart, string $action, ?string $customMessage = null)
     {
-        broadcast(new \App\Events\InventoryUpdatedEvent(
-            $sparepart->fresh(),
-            $action,
-            auth()->user()?->name ?? 'System',
-            $customMessage
-        ))->toOthers();
+        try {
+            broadcast(new \App\Events\InventoryUpdatedEvent(
+                $sparepart->fresh(),
+                $action,
+                auth()->user()?->name ?? 'System',
+                $customMessage
+            ))->toOthers();
+        } catch (\Throwable $e) {
+        }
     }
 }

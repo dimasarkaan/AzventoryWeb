@@ -23,6 +23,11 @@ trait ActivityLogger
             'properties' => $properties,
         ]);
 
-        broadcast(new ActivityLogged($log));
+        try {
+            broadcast(new ActivityLogged($log));
+        } catch (\Throwable $e) {
+            // Silently fail if broadcasting fails (e.g., offline/pusher error)
+            // Logic continues so core functionality is not broken
+        }
     }
 }

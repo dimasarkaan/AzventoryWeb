@@ -82,7 +82,7 @@
                                 $roleOptions[\App\Enums\UserRole::ADMIN->value] = \App\Enums\UserRole::ADMIN->label();
                                 $roleOptions[\App\Enums\UserRole::OPERATOR->value] = \App\Enums\UserRole::OPERATOR->label();
                             @endphp
-                            <x-select name="role" :options="$roleOptions" :selected="request('role')" placeholder="{{ __('ui.all_roles') }}" width="w-full" />
+                            <x-select name="role" id="role" :options="$roleOptions" :selected="request('role')" placeholder="{{ __('ui.all_roles') }}" width="w-full" />
                         </div>
                         @endif
 
@@ -92,7 +92,7 @@
                             @php
                                 $actionOptions = $actions->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             @endphp
-                            <x-select name="action" :options="$actionOptions" :selected="request('action')" placeholder="{{ __('ui.all_actions') }}" width="w-full" />
+                            <x-select name="action" id="action" :options="$actionOptions" :selected="request('action')" placeholder="{{ __('ui.all_actions') }}" width="w-full" />
                         </div>
 
                         <!-- User Filter -->
@@ -102,7 +102,7 @@
                             @php
                                 $userOptions = $users->pluck('name', 'id')->toArray();
                             @endphp
-                            <x-select name="user_id" :options="$userOptions" :selected="request('user_id')" placeholder="{{ __('ui.all_users') }}" width="w-full" />
+                            <x-select name="user_id" id="user_id" :options="$userOptions" :selected="request('user_id')" placeholder="{{ __('ui.all_users') }}" width="w-full" />
                         </div>
                         @endif
 
@@ -142,7 +142,7 @@
                                     'report' => __('ui.subject_report'),
                                 ];
                             @endphp
-                            <x-select name="subject_type" :options="$subjectOptions" :selected="request('subject_type')" placeholder="{{ __('ui.all_types') }}" width="w-full" />
+                            <x-select name="subject_type" id="subject_type" :options="$subjectOptions" :selected="request('subject_type')" placeholder="{{ __('ui.all_types') }}" width="w-full" />
                         </div>
                         @endif
 

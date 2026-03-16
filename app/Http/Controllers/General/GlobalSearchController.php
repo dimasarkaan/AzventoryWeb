@@ -35,27 +35,32 @@ class GlobalSearchController extends Controller
         })->values();
 
         // 2. Cari Inventaris (Spareparts)
-        $spareparts = Sparepart::where('name', 'like', "%{$query}%")
-            ->orWhere('part_number', 'like', "%{$query}%")
-            ->orWhere('brand', 'like', "%{$query}%")
-            ->limit(5)
-            ->get()
-            ->map(function ($item) {
-                // Tentukan rute berdasarkan role
-                $routePrefix = 'inventory.show';
+        $spareparts = [];
+        if ($user->can('viewAny', Sparepart::class)) {
+            $spareparts = Sparepart::where('name', 'like', "%{$query}%")
+                ->orWhere('part_number', 'like', "%{$query}%")
+                ->orWhere('brand', 'like', "%{$query}%")
+                ->orWhere('category', 'like', "%{$query}%")
+                ->orWhere('location', 'like', "%{$query}%")
+                ->limit(5)
+                ->get()
+                ->map(function ($item) {
+                    // Tentukan rute berdasarkan role
+                    $routePrefix = 'inventory.show';
 
-                // Fallback jika rute tidak ada untuk role tersebut
-                $url = Route::has($routePrefix) ? route($routePrefix, $item) : '#';
+                    // Fallback jika rute tidak ada untuk role tersebut
+                    $url = Route::has($routePrefix) ? route($routePrefix, $item) : '#';
 
-                return [
-                    'id' => $item->id,
-                    'title' => $item->name,
-                    'subtitle' => $item->part_number.' • Stok: '.$item->stock,
-                    'image' => $item->image ? asset('storage/'.$item->image) : null,
-                    'url' => $url,
-                    'type' => 'Inventaris',
-                ];
-            });
+                    return [
+                        'id' => $item->id,
+                        'title' => $item->name,
+                        'subtitle' => $item->part_number.' • '.$item->location.' • Stok: '.$item->stock,
+                        'image' => $item->image ? asset('storage/'.$item->image) : null,
+                        'url' => $url,
+                        'type' => 'Inventaris',
+                    ];
+                });
+        }
 
         // 3. Cari User (Hanya Superadmin)
         $users = [];

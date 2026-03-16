@@ -1,4 +1,7 @@
 <div x-show="showLocationModal" 
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="location-modal-title"
      class="fixed inset-0 z-[100] overflow-y-auto" 
      x-cloak
      x-transition:enter="transition ease-out duration-300"
@@ -9,7 +12,7 @@
      x-transition:leave-end="opacity-0">
     
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showLocationModal = false"></div>
+        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showLocationModal = false" aria-hidden="true"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -28,11 +31,13 @@
                         <x-icon.location class="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 class="text-xl font-bold text-secondary-900">Manajemen Lokasi</h3>
+                        <h3 id="location-modal-title" class="text-xl font-bold text-secondary-900">Manajemen Lokasi</h3>
                         <p class="text-xs text-secondary-500">Kelola master data lokasi penyimpanan barang</p>
                     </div>
                 </div>
-                <button @click="showLocationModal = false" class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-colors">
+                <button @click="showLocationModal = false" 
+                        aria-label="Tutup Modal"
+                        class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-colors">
                     <x-icon.close class="w-6 h-6" />
                 </button>
             </div>
@@ -47,7 +52,10 @@
                     </h4>
                     <div class="flex gap-2">
                         <div class="relative flex-grow">
+                            <label for="new_location_name" class="sr-only">Nama Lokasi Baru</label>
                             <input type="text" 
+                                   id="new_location_name"
+                                   name="location_name"
                                    x-model="newLocationName"
                                    @keydown.enter="addLocation()"
                                    placeholder="Ketik Cabang Baru Di Sini" 
@@ -97,10 +105,11 @@
                                         </p>
                                     </div>
 
-                                    {{-- Mode Edit --}}
                                     <div x-show="editingId === loc.id" x-cloak>
+                                        <label :for="'edit-input-' + loc.id" class="sr-only">Ubah Nama Lokasi</label>
                                         <input type="text" 
                                                :id="'edit-input-' + loc.id"
+                                               name="edit_location_name"
                                                x-model="editingName" 
                                                @keydown.enter="saveEdit(loc.id)"
                                                @keydown.escape="cancelEdit()"

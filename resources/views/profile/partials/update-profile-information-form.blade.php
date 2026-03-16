@@ -62,6 +62,7 @@
                     <input type="text" name="username" id="username" 
                            class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" 
                            value="{{ old('username', $user->username) }}" 
+                           autocomplete="username"
                            :disabled="!isEditing" required>
                     <p x-show="isEditing" x-transition class="mt-1 text-xs text-amber-600 font-medium">
                         Perhatian: Username hanya dapat diubah 1 kali. 
@@ -69,7 +70,7 @@
                     <x-input-error class="mt-2" :messages="$errors->get('username')" />
                 @else
                     <div class="relative">
-                        <input type="text" id="username" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->username }}" disabled>
+                        <input type="text" id="username" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->username }}" autocomplete="username" disabled>
                         <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
@@ -82,11 +83,11 @@
             <div class="sm:col-span-3">
                  <label for="email" class="input-label">{{ __('ui.profile_label_email') }}</label>
                 @can('update', $user)
-                    <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('email', $user->email) }}" :disabled="!isEditing" required>
+                    <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('email', $user->email) }}" autocomplete="email" :disabled="!isEditing" required>
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
                 @else
                      <div class="relative">
-                        <input type="email" name="email" id="email" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->email }}" readonly>
+                        <input type="email" name="email" id="email" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->email }}" autocomplete="email" readonly>
                          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                             <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
@@ -98,21 +99,21 @@
              <!-- Name -->
              <div class="sm:col-span-3">
                 <label for="name" class="input-label">{{ __('ui.profile_label_name') }}</label>
-                <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('name', $user->name) }}" :disabled="!isEditing" required>
+                <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('name', $user->name) }}" autocomplete="name" :disabled="!isEditing" required>
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
             </div>
 
              <!-- Phone -->
              <div class="sm:col-span-3">
                 <label for="phone" class="input-label">{{ __('ui.profile_label_phone') }}</label>
-                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('phone', $user->phone) }}" placeholder="{{ __('ui.profile_placeholder_phone') }}" :disabled="!isEditing">
+                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" value="{{ old('phone', $user->phone) }}" placeholder="{{ __('ui.profile_placeholder_phone') }}" autocomplete="tel" :disabled="!isEditing">
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
             </div>
 
             <!-- Address -->
             <div class="sm:col-span-6">
                  <label for="address" class="input-label">{{ __('ui.profile_label_address') }}</label>
-                 <textarea id="address" name="address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" :disabled="!isEditing">{{ old('address', $user->address) }}</textarea>
+                 <textarea id="address" name="address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500" autocomplete="street-address" :disabled="!isEditing">{{ old('address', $user->address) }}</textarea>
                  <x-input-error class="mt-2" :messages="$errors->get('address')" />
             </div>
         </div>

@@ -16,8 +16,8 @@
                     
                     <!-- Report Categories -->
                     <div class="mb-8">
-                        <label class="block text-sm font-bold text-secondary-900 mb-4">{{ __('ui.choose_report_type') }}</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <span id="report_category_label" class="block text-sm font-bold text-secondary-900 mb-4">{{ __('ui.choose_report_type') }}</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="radiogroup" aria-labelledby="report_category_label">
                             <!-- Inventaris -->
                             <label class="cursor-pointer relative group">
                                 <input type="radio" name="report_type" value="inventory_list" x-model="reportType" class="peer sr-only">
@@ -78,7 +78,7 @@
                         
                         <!-- Date Period (Hidden for Inventory/Low Stock snapshot) -->
                         <div class="mb-4 relative" x-show="['stock_mutation', 'borrowing_history'].includes(reportType)" x-transition>
-                            <label class="block text-sm font-medium text-secondary-700 mb-2">{{ __('ui.time_period') }}</label>
+                            <span id="period_label" class="block text-sm font-medium text-secondary-700 mb-2">{{ __('ui.time_period') }}</span>
                             <input type="hidden" name="period" :value="period">
                             
                             <div x-data="{ 
@@ -92,42 +92,49 @@
                                 }
                             }">
                                 <button type="button" @click="open = !open" @click.away="open = false" 
+                                        aria-labelledby="period_label"
+                                        aria-haspopup="listbox"
+                                        :aria-expanded="open"
                                         class="input-field w-full text-left flex justify-between items-center rounded-xl py-3 px-4 text-base cursor-pointer hover:border-primary-400 focus:ring-2 ring-primary-500 bg-white">
                                     <span x-text="labels[period]"></span>
                                     <svg class="w-5 h-5 text-secondary-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </button>
 
-                                <div x-show="open" 
-                                        x-transition:enter="transition ease-out duration-100"
-                                        x-transition:enter-start="transform opacity-0 scale-95"
-                                        x-transition:enter-end="transform opacity-100 scale-100"
-                                        x-transition:leave="transition ease-in duration-75"
-                                        x-transition:leave-start="transform opacity-100 scale-100"
-                                        x-transition:leave-end="transform opacity-0 scale-95"
-                                        class="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-secondary-100 overflow-hidden" 
-                                        style="display: none;">
-                                    <div class="p-2 space-y-1">
-                                        <template x-for="(label, key) in labels" :key="key">
-                                            <div @click="period = key; open = false" 
-                                                    class="px-4 py-2 rounded-lg cursor-pointer transition-colors"
-                                                    :class="{'bg-primary-50 text-primary-700 font-medium': period === key, 'text-secondary-700 hover:bg-primary-50 hover:text-primary-700': period !== key}"
-                                                    x-text="label">
+                                        <div x-show="open" 
+                                                role="listbox"
+                                                aria-labelledby="period_label"
+                                                x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="transform opacity-100 scale-100"
+                                                x-transition:leave-end="transform opacity-0 scale-95"
+                                                class="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-secondary-100 overflow-hidden" 
+                                                style="display: none;">
+                                            <div class="p-2 space-y-1">
+                                                <template x-for="(label, key) in labels" :key="key">
+                                                    <div @click="period = key; open = false" 
+                                                            role="option"
+                                                            :aria-selected="period === key"
+                                                            class="px-4 py-2 rounded-lg cursor-pointer transition-colors"
+                                                            :class="{'bg-primary-50 text-primary-700 font-medium': period === key, 'text-secondary-700 hover:bg-primary-50 hover:text-primary-700': period !== key}"
+                                                            x-text="label">
+                                                    </div>
+                                                </template>
                                             </div>
-                                        </template>
-                                    </div>
-                                </div>
+                                        </div>
                             </div>
                         </div>
 
                         <!-- Custom Date Range -->
                         <div class="grid grid-cols-2 gap-4 mb-4" x-show="period === 'custom' && ['stock_mutation', 'borrowing_history'].includes(reportType)" x-transition>
                             <div>
-                                <label class="block text-xs text-secondary-500 mb-1">{{ __('ui.start_date') }}</label>
-                                <input type="date" name="start_date" class="input-field w-full">
+                                <label for="start_date_input" class="block text-xs text-secondary-500 mb-1">{{ __('ui.start_date') }}</label>
+                                <input type="date" id="start_date_input" name="start_date" class="input-field w-full">
                             </div>
                             <div>
-                                <label class="block text-xs text-secondary-500 mb-1">{{ __('ui.end_date') }}</label>
-                                <input type="date" name="end_date" class="input-field w-full">
+                                <label for="end_date_input" class="block text-xs text-secondary-500 mb-1">{{ __('ui.end_date') }}</label>
+                                <input type="date" id="end_date_input" name="end_date" class="input-field w-full">
                             </div>
                         </div>
 
@@ -142,12 +149,15 @@
                                 this.open = false;
                             }
                         }">
-                            <label class="block text-sm font-medium text-secondary-700 mb-2">{{ __('ui.warehouse_location') }}</label>
+                            <span id="location_label" class="block text-sm font-medium text-secondary-700 mb-2">{{ __('ui.warehouse_location') }}</span>
                             <input type="hidden" name="location" :value="selected">
                             
                             <div class="relative">
                                 <!-- Trigger Button -->
                                 <button type="button" @click="open = !open" @click.away="open = false" 
+                                        aria-labelledby="location_label"
+                                        aria-haspopup="listbox"
+                                        :aria-expanded="open"
                                         class="input-field w-full text-left flex justify-between items-center rounded-xl py-3 px-4 text-base cursor-pointer hover:border-primary-400 focus:ring-2 ring-primary-500 bg-white">
                                     <span x-text="selectedLabel" :class="{'text-secondary-900': selected, 'text-secondary-500': !selected}"></span>
                                     <svg class="w-5 h-5 text-secondary-400 transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -155,6 +165,8 @@
 
                                 <!-- Custom Dropdown Menu -->
                                 <div x-show="open" 
+                                        role="listbox"
+                                        aria-labelledby="location_label"
                                         x-transition:enter="transition ease-out duration-100"
                                         x-transition:enter-start="transform opacity-0 scale-95"
                                         x-transition:enter-end="transform opacity-100 scale-100"
@@ -166,6 +178,8 @@
                                     <div class="max-h-60 overflow-y-auto p-2 space-y-1">
                                         <!-- Default Option -->
                                         <div @click="select('', '{{ __('ui.all_locations') }}')" 
+                                                role="option"
+                                                :aria-selected="selected === ''"
                                                 class="px-4 py-2 rounded-lg cursor-pointer hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                                 :class="{'bg-primary-50 text-primary-700 font-medium': selected === ''}">
                                             {{ __('ui.all_locations') }}
@@ -173,6 +187,8 @@
                                         
                                         @foreach($locations as $loc)
                                             <div @click="select('{{ $loc }}', '{{ $loc }}')" 
+                                                    role="option"
+                                                    :aria-selected="selected === '{{ $loc }}'"
                                                     class="px-4 py-2 rounded-lg cursor-pointer text-secondary-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                                     :class="{'bg-primary-50 text-primary-700 font-medium': selected === '{{ $loc }}'}">
                                                 {{ $loc }}
@@ -190,11 +206,11 @@
                         <div class="flex items-center space-x-6">
                             <span class="text-sm font-medium text-secondary-700">{{ __('ui.format_label') }}</span>
                                 <label class="inline-flex items-center cursor-pointer">
-                                <input type="radio" name="export_format" value="pdf" checked class="text-primary-600 focus:ring-primary-500 h-4 w-4 border-gray-300">
+                                <input type="radio" name="export_format" value="pdf" checked id="format_pdf" class="text-primary-600 focus:ring-primary-500 h-4 w-4 border-gray-300">
                                 <span class="ml-2 text-sm text-secondary-700 font-medium">{{ __('ui.pdf_document') }}</span>
                             </label>
                             <label class="inline-flex items-center cursor-pointer">
-                                <input type="radio" name="export_format" value="excel" class="text-success-600 focus:ring-success-500 h-4 w-4 border-gray-300">
+                                <input type="radio" name="export_format" value="excel" id="format_excel" class="text-success-600 focus:ring-success-500 h-4 w-4 border-gray-300">
                                 <span class="ml-2 text-sm text-secondary-700 font-medium">{{ __('ui.excel_document') }}</span>
                             </label>
                         </div>

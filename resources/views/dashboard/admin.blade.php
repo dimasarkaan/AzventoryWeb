@@ -99,6 +99,7 @@
                         @foreach($tabDefs as $key => $label)
                             <a href="{{ route('dashboard.admin', ['period' => $key]) }}"
                                onclick="saveAdminPeriod('{{ $key }}')"
+                               aria-label="Filter periode: {{ $label }}"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap
                                       {{ $activePeriod === $key
                                           ? 'bg-white text-primary-700 shadow-sm font-semibold ring-1 ring-secondary-200'
@@ -108,6 +109,9 @@
                         @endforeach
 
                         <button @click="showCustom = !showCustom"
+                                aria-label="Tampilkan filter kustom"
+                                aria-expanded="false"
+                                :aria-expanded="showCustom.toString()"
                                 class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150 whitespace-nowrap
                                        {{ in_array($activePeriod, ['custom','custom_year'])
                                            ? 'bg-white text-primary-700 shadow-sm font-semibold ring-1 ring-secondary-200'
@@ -155,20 +159,25 @@
                                     selected: '{{ $year ?? now()->year }}',
                                     options: [{{ implode(',', range(now()->year, now()->year - 5)) }}]
                                 }" class="relative">
-                                <label class="block text-xs font-semibold text-secondary-600 mb-1">Tahun</label>
+                                <label for="admin_year_btn" class="block text-xs font-semibold text-secondary-600 mb-1">Tahun</label>
                                 <input type="hidden" name="year" :value="selected">
-                                <button type="button" @click="open = !open" @click.away="open = false"
-                                        class="flex items-center justify-between gap-2 w-28 px-3 py-2 text-sm bg-white border border-secondary-300 rounded-lg text-secondary-800 hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all">
+                                <button id="admin_year_btn" type="button" @click="open = !open" @click.away="open = false"
+                                        aria-haspopup="listbox" :aria-expanded="open.toString()"
+                                        aria-label="Pilih Tahun" class="flex items-center justify-between gap-2 w-28 px-3 py-2 text-sm bg-white border border-secondary-300 rounded-lg text-secondary-800 hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all">
                                     <span x-text="selected"></span>
                                     <svg class="w-4 h-4 text-secondary-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
                                 <div x-show="open" x-transition
+                                     role="listbox"
+                                     aria-label="Pilihan Tahun"
                                      class="absolute z-50 mt-1 w-28 bg-white border border-secondary-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
                                     <template x-for="opt in options" :key="opt">
                                         <button type="button"
                                                 @click="selected = opt; open = false"
+                                                role="option"
+                                                :aria-selected="selected == opt"
                                                 class="w-full text-left px-3 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                                 :class="selected == opt ? 'text-primary-700 bg-primary-50 font-semibold' : 'text-secondary-700'"
                                                 x-text="opt">
@@ -192,20 +201,25 @@
                                         { val: '11', label: 'November' }, { val: '12', label: 'Desember' },
                                     ]
                                 }" class="relative">
-                                <label class="block text-xs font-semibold text-secondary-600 mb-1">Bulan</label>
+                                <label for="admin_month_btn" class="block text-xs font-semibold text-secondary-600 mb-1">Bulan</label>
                                 <input type="hidden" name="month" :value="selectedVal">
-                                <button type="button" @click="open = !open" @click.away="open = false"
-                                        class="flex items-center justify-between gap-2 w-40 px-3 py-2 text-sm bg-white border border-secondary-300 rounded-lg text-secondary-800 hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all">
+                                <button id="admin_month_btn" type="button" @click="open = !open" @click.away="open = false"
+                                        aria-haspopup="listbox" :aria-expanded="open.toString()"
+                                        aria-label="Pilih Bulan" class="flex items-center justify-between gap-2 w-40 px-3 py-2 text-sm bg-white border border-secondary-300 rounded-lg text-secondary-800 hover:border-primary-400 focus:outline-none focus:ring-2 focus:ring-primary-200 transition-all">
                                     <span x-text="selectedLabel" class="truncate"></span>
                                     <svg class="w-4 h-4 text-secondary-400 transition-transform flex-shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                                     </svg>
                                 </button>
                                 <div x-show="open" x-transition
+                                     role="listbox"
+                                     aria-label="Pilihan Bulan"
                                      class="absolute z-50 mt-1 w-40 bg-white border border-secondary-200 rounded-lg shadow-lg py-1 max-h-60 overflow-y-auto">
                                     <template x-for="opt in options" :key="opt.val">
                                         <button type="button"
                                                 @click="selectedVal = opt.val; selectedLabel = opt.label; open = false"
+                                                role="option"
+                                                :aria-selected="selectedVal === opt.val"
                                                 class="w-full text-left px-3 py-2 text-sm hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                                 :class="selectedVal === opt.val ? 'text-primary-700 bg-primary-50 font-semibold' : 'text-secondary-700'"
                                                 x-text="opt.label">

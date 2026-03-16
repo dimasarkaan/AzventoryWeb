@@ -97,7 +97,10 @@ class StockRequestController extends Controller
                 $this->logActivity('Pengajuan Stok', "Pengajuan stok {$request->type} sebanyak {$request->quantity} untuk '{$sparepart->name}' dengan alasan '{$request->reason}'.");
 
                 // Broadcast real-time new stock request (add to list)
-                broadcast(new \App\Events\StockApprovalUpdatedEvent($stockLog->fresh(), 'created'))->toOthers();
+                try {
+                    broadcast(new \App\Events\StockApprovalUpdatedEvent($stockLog->fresh(), 'created'))->toOthers();
+                } catch (\Exception $e) {
+                }
 
                 // Notify admins
                 $admins = User::whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::SUPERADMIN])->get();

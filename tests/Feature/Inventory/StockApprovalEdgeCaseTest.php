@@ -54,24 +54,26 @@ class StockApprovalEdgeCaseTest extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id' => $this->operator->id,
-            'type' => 'masuk',
-            'quantity' => 10,
-            'reason' => 'Restock operator',
-            'status' => 'pending',
+            'user_id'      => $this->operator->id,
+            'type'         => 'masuk',
+            'quantity'     => 10,
+            'reason'       => 'Restock operator',
+            'status'       => 'pending',
         ]);
 
         $response = $this->actingAs($this->superadmin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status' => 'rejected',
+                'status'           => 'rejected',
+                'rejection_reason' => 'Stok masih aman, tidak perlu restock.',
             ]);
 
         $response->assertRedirect();
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('stock_logs', [
-            'id' => $log->id,
-            'status' => 'rejected',
+            'id'               => $log->id,
+            'status'           => 'rejected',
+            'rejection_reason' => 'Stok masih aman, tidak perlu restock.',
         ]);
         // Stok harus TIDAK berubah setelah rejected
         $this->assertEquals($initialStock, $this->sparepart->fresh()->stock);
@@ -84,16 +86,17 @@ class StockApprovalEdgeCaseTest extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id' => $this->operator->id,
-            'type' => 'keluar',
-            'quantity' => 5,
-            'reason' => 'Permintaan keluar',
-            'status' => 'pending',
+            'user_id'      => $this->operator->id,
+            'type'         => 'keluar',
+            'quantity'     => 5,
+            'reason'       => 'Permintaan keluar',
+            'status'       => 'pending',
         ]);
 
         $this->actingAs($this->admin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status' => 'rejected',
+                'status'           => 'rejected',
+                'rejection_reason' => 'Stok tidak mencukupi untuk permintaan ini.',
             ]);
 
         $this->assertEquals($initialStock, $this->sparepart->fresh()->stock);
@@ -106,11 +109,11 @@ class StockApprovalEdgeCaseTest extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id' => $this->operator->id,
-            'type' => 'masuk',
-            'quantity' => 15,
-            'reason' => 'Restock',
-            'status' => 'pending',
+            'user_id'      => $this->operator->id,
+            'type'         => 'masuk',
+            'quantity'     => 15,
+            'reason'       => 'Restock',
+            'status'       => 'pending',
         ]);
 
         $this->actingAs($this->superadmin)
@@ -128,11 +131,11 @@ class StockApprovalEdgeCaseTest extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id' => $this->operator->id,
-            'type' => 'keluar',
-            'quantity' => 5,
-            'reason' => 'Dipakai maintenance',
-            'status' => 'pending',
+            'user_id'      => $this->operator->id,
+            'type'         => 'keluar',
+            'quantity'     => 5,
+            'reason'       => 'Dipakai maintenance',
+            'status'       => 'pending',
         ]);
 
         $this->actingAs($this->superadmin)
@@ -151,11 +154,11 @@ class StockApprovalEdgeCaseTest extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id' => $this->operator->id,
-            'type' => 'keluar',
-            'quantity' => 10, // lebih dari stok
-            'reason' => 'Keluar melebihi stok',
-            'status' => 'pending',
+            'user_id'      => $this->operator->id,
+            'type'         => 'keluar',
+            'quantity'     => 10, // lebih dari stok
+            'reason'       => 'Keluar melebihi stok',
+            'status'       => 'pending',
         ]);
 
         $this->actingAs($this->superadmin)
@@ -172,21 +175,78 @@ class StockApprovalEdgeCaseTest extends TestCase
     {
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id' => $this->operator->id,
-            'type' => 'masuk',
-            'quantity' => 5,
-            'reason' => 'Restock',
-            'status' => 'approved', // sudah diproses!
-            'approved_by' => $this->superadmin->id,
+            'user_id'      => $this->operator->id,
+            'type'         => 'masuk',
+            'quantity'     => 5,
+            'reason'       => 'Restock',
+            'status'       => 'approved', // sudah diproses!
+            'approved_by'  => $this->superadmin->id,
         ]);
 
         $response = $this->actingAs($this->superadmin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status' => 'rejected',
+                'status'           => 'rejected',
+                'rejection_reason' => 'Dicoba proses ulang.',
             ]);
 
         // Harus mengembalikan error karena sudah diproses
         $response->assertRedirect();
         $response->assertSessionHas('error');
+    }
+
+    #[Test]
+    public function bulk_approve_memproses_semua_pending_yang_dipilih()
+    {
+        $log1 = StockLog::create(['sparepart_id' => $this->sparepart->id, 'user_id' => $this->operator->id, 'type' => 'masuk', 'quantity' => 5, 'reason' => 'A', 'status' => 'pending']);
+        $log2 = StockLog::create(['sparepart_id' => $this->sparepart->id, 'user_id' => $this->operator->id, 'type' => 'masuk', 'quantity' => 3, 'reason' => 'B', 'status' => 'pending']);
+
+        $response = $this->actingAs($this->superadmin)
+            ->post(route('inventory.stock-approvals.bulk-approve'), [
+                'ids'    => [$log1->id, $log2->id],
+                'status' => 'approved',
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('stock_logs', ['id' => $log1->id, 'status' => 'approved']);
+        $this->assertDatabaseHas('stock_logs', ['id' => $log2->id, 'status' => 'approved']);
+    }
+
+    #[Test]
+    public function bulk_reject_tanpa_alasan_gagal_validasi()
+    {
+        $log = StockLog::create(['sparepart_id' => $this->sparepart->id, 'user_id' => $this->operator->id, 'type' => 'masuk', 'quantity' => 5, 'reason' => 'A', 'status' => 'pending']);
+
+        $response = $this->actingAs($this->superadmin)
+            ->post(route('inventory.stock-approvals.bulk-approve'), [
+                'ids'              => [$log->id],
+                'status'           => 'rejected',
+                'rejection_reason' => '', // kosong — harus gagal
+            ]);
+
+        $response->assertSessionHasErrors('rejection_reason');
+    }
+
+    #[Test]
+    public function bulk_reject_dengan_alasan_berhasil_dan_tersimpan()
+    {
+        $log = StockLog::create(['sparepart_id' => $this->sparepart->id, 'user_id' => $this->operator->id, 'type' => 'masuk', 'quantity' => 5, 'reason' => 'A', 'status' => 'pending']);
+
+        $response = $this->actingAs($this->superadmin)
+            ->post(route('inventory.stock-approvals.bulk-approve'), [
+                'ids'              => [$log->id],
+                'status'           => 'rejected',
+                'rejection_reason' => 'Stok sudah cukup, tidak perlu penambahan.',
+            ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('stock_logs', [
+            'id'               => $log->id,
+            'status'           => 'rejected',
+            'rejection_reason' => 'Stok sudah cukup, tidak perlu penambahan.',
+        ]);
     }
 }

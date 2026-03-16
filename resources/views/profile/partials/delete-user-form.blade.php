@@ -44,6 +44,7 @@
                         type="password"
                         class="input-field w-3/4"
                         placeholder="{{ __('ui.profile_placeholder_password') }}"
+                        autocomplete="current-password"
                     />
                 </div>
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />

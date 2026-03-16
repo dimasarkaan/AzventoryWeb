@@ -34,9 +34,10 @@ class StockRequestNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'stock_log_id' => $this->stockLog->id,
-            'message' => $this->message,
-            'url' => route('inventory.stock-approvals.index'),
+            'stock_log_id'     => $this->stockLog->id,
+            'message'          => $this->message,
+            'url'              => route('inventory.stock-approvals.index'),
+            'rejection_reason' => $this->stockLog->rejection_reason,
         ];
     }
 

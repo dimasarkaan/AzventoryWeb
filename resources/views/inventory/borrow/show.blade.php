@@ -100,7 +100,7 @@
                             @if($borrowing->notes)
                                 <div>
                                     <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">Catatan</span>
-                                    <p class="text-sm text-secondary-600 mt-1">{{ $borrowing->notes }}</p>
+                                    <p class="text-sm text-secondary-600 mt-1 break-words whitespace-normal">{{ $borrowing->notes }}</p>
                                 </div>
                             @endif
                         </div>
@@ -178,7 +178,7 @@
                                             @if($return->notes)
                                                 <div class="mb-3">
                                                     <span class="text-xs text-secondary-500 font-semibold">Catatan</span>
-                                                    <p class="text-sm text-secondary-700 mt-1">{{ $return->notes }}</p>
+                                                    <p class="text-sm text-secondary-700 mt-1 break-words whitespace-normal">{{ $return->notes }}</p>
                                                 </div>
                                             @endif
 
@@ -301,11 +301,13 @@
 
                             <!-- Condition (Custom Dropdown) -->
                             <div @click.outside="dropdownOpen = false" class="relative z-50">
-                                <label class="block text-sm font-medium text-gray-700 mb-1">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
+                                <label for="condition-dropdown-btn" class="block text-sm font-medium text-gray-700 mb-1">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
                                 <div class="relative">
-                                    <button type="button" @click="dropdownOpen = !dropdownOpen"
+                                    <button type="button" 
+                                            id="condition-dropdown-btn"
+                                            @click="dropdownOpen = !dropdownOpen"
                                             class="input-field w-full text-left flex justify-between items-center rounded-xl py-2.5 px-4 text-sm cursor-pointer border border-gray-300 hover:border-primary-400 focus:ring-2 ring-primary-500 bg-white transition-all shadow-sm">
-                                        <span x-text="conditionLabel" :class="{'text-gray-900': returnCondition, 'text-gray-500': !returnCondition}" class="truncate mr-2"></span>
+                                        <span x-text="conditionLabel" :class="{'text-gray-900': returnCondition, 'text-gray-900': !returnCondition}" class="truncate mr-2"></span>
                                         <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': dropdownOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                     </button>
 
@@ -413,7 +415,7 @@
                                     $refs.galleryInput.click();
                                 }
                             }">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Bukti Foto <span class="text-danger-500">*</span></label>
+                                <span class="block text-sm font-medium text-gray-700 mb-2">Bukti Foto <span class="text-danger-500">*</span></span>
                                 
                                 <!-- Split Buttons (Pill/Chip Style - Full Width) -->
                                 <div class="grid grid-cols-2 gap-3 mb-4">
@@ -426,7 +428,9 @@
                                         <span class="text-sm font-semibold">Buka Kamera</span>
                                     </button>
 
-                                    <button type="button" @click="triggerGallery" 
+                                    <button type="button" 
+                                            id="photo-gallery-btn"
+                                            @click="triggerGallery" 
                                             class="w-full inline-flex justify-center items-center px-4 py-2 rounded-full bg-purple-50 text-purple-700 hover:bg-purple-100 hover:text-purple-800 transition-colors duration-200 border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -478,8 +482,8 @@
 
                             <!-- Notes -->
                             <div>
-                                <label for="notes" class="block text-sm font-medium text-gray-700">Catatan <span class="text-secondary-400 font-normal text-xs">(Opsional)</span></label>
-                                <textarea name="return_notes" id="notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keterangan tambahan..."></textarea>
+                                <label for="return_notes" class="block text-sm font-medium text-gray-700">Catatan <span class="text-secondary-400 font-normal text-xs">(Opsional)</span></label>
+                                <textarea name="return_notes" id="return_notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keterangan tambahan..."></textarea>
                             </div>
                         </div>
 

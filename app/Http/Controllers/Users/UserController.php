@@ -228,9 +228,21 @@ class UserController extends Controller
         $this->authorize('restore', \App\Models\User::class);
         $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'exists:users,id',
         ]);
-        // ...
+
+        $ids = $request->ids;
+        $count = 0;
+        
+        $users = \App\Models\User::onlyTrashed()->whereIn('id', $ids)->get();
+        
+        foreach ($users as $user) {
+            $user->restore();
+            $count++;
+        }
+
+        $this->logActivity('Bulk Restore User', __('messages.log_bulk_user_restored', ['count' => $count]));
+
+        return redirect()->back()->with('success', __('messages.bulk_user_restored', ['count' => $count]));
     }
 
     /**
@@ -241,7 +253,6 @@ class UserController extends Controller
         $this->authorize('forceDelete', \App\Models\User::class);
         $request->validate([
             'ids' => 'required|array',
-            'ids.*' => 'exists:users,id',
         ]);
 
         $ids = $request->ids;

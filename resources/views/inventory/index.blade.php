@@ -198,22 +198,28 @@
                                     'asset' => 'Inventaris (Asset)',
                                 ];
                             @endphp
-                            <x-select name="type" :options="$typeOptions" :selected="request('type')" placeholder="{{ __('ui.all_types') }}" :submitOnChange="true" width="w-full" />
+                            <label for="type-filter" class="sr-only">{{ __('ui.all_types') }}</label>
+                            <x-select name="type" id="type-filter" :options="$typeOptions" :selected="request('type')" placeholder="{{ __('ui.all_types') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <x-select name="category" :options="$categoryOptions" :selected="request('category')" placeholder="{{ __('ui.all_categories') }}" :submitOnChange="true" width="w-full" />
+                            <label for="category-filter" class="sr-only">{{ __('ui.all_categories') }}</label>
+                            <x-select name="category" id="category-filter" :options="$categoryOptions" :selected="request('category')" placeholder="{{ __('ui.all_categories') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <x-select name="brand" :options="$brandOptions" :selected="request('brand')" placeholder="{{ __('ui.all_brands') }}" :submitOnChange="true" width="w-full" />
+                            <label for="brand-filter" class="sr-only">{{ __('ui.all_brands') }}</label>
+                            <x-select name="brand" id="brand-filter" :options="$brandOptions" :selected="request('brand')" placeholder="{{ __('ui.all_brands') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <x-select name="location" :options="$locationOptions" :selected="request('location')" placeholder="{{ __('ui.all_locations') }}" :submitOnChange="true" width="w-full" />
+                            <label for="location-filter" class="sr-only">{{ __('ui.all_locations') }}</label>
+                            <x-select name="location" id="location-filter" :options="$locationOptions" :selected="request('location')" placeholder="{{ __('ui.all_locations') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <x-select name="color" :options="$colorOptions" :selected="request('color')" placeholder="{{ __('ui.all_colors') }}" :submitOnChange="true" width="w-full" />
+                            <label for="color-filter" class="sr-only">{{ __('ui.all_colors') }}</label>
+                            <x-select name="color" id="color-filter" :options="$colorOptions" :selected="request('color')" placeholder="{{ __('ui.all_colors') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <x-select name="condition" :options="$conditionOptions" :selected="request('condition')" placeholder="{{ __('ui.all_conditions') }}" :submitOnChange="true" width="w-full" />
+                            <label for="condition-filter" class="sr-only">{{ __('ui.all_conditions') }}</label>
+                            <x-select name="condition" id="condition-filter" :options="$conditionOptions" :selected="request('condition')" placeholder="{{ __('ui.all_conditions') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         <div class="flex-1 w-full sm:w-auto min-w-[150px]">
                             @php
@@ -228,7 +234,8 @@
                                     'price_desc' => __('ui.sort_price_desc'),
                                 ];
                             @endphp
-                            <x-select name="sort" :options="$sortOptions" :selected="request('sort', 'newest')" placeholder="{{ __('ui.sort') }}" :submitOnChange="true" width="w-full" />
+                            <label for="sort-filter" class="sr-only">{{ __('ui.sort') }}</label>
+                            <x-select name="sort" id="sort-filter" :options="$sortOptions" :selected="request('sort', 'newest')" placeholder="{{ __('ui.sort') }}" :submitOnChange="true" width="w-full" />
                         </div>
                         
                         <div class="flex items-end flex-shrink-0">

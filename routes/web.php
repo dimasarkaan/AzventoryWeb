@@ -88,7 +88,7 @@ Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
         Route::middleware('role:superadmin,admin')->group(function () {
             Route::post('stock-approvals-bulk', [StockApprovalController::class, 'bulkApprove'])->name('stock-approvals.bulk-approve');
             Route::resource('stock-approvals', StockApprovalController::class)
-                ->only(['index', 'update', 'destroy'])
+                ->only(['index', 'update'])
                 ->parameters(['stock-approvals' => 'stock_log']);
         });
 

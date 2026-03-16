@@ -211,16 +211,22 @@ class InventoryController extends Controller
         ]);
 
         // 1. Broadcast update ke semua user.
-        broadcast(new \App\Events\InventoryUpdatedEvent(
-            $sparepart->fresh(),
-            'updated',
-            $apiUser->name  // FIX: pakai $apiUser bukan auth()->user()
-        ))->toOthers();
+        try {
+            broadcast(new \App\Events\InventoryUpdatedEvent(
+                $sparepart->fresh(),
+                'updated',
+                $apiUser->name  // FIX: pakai $apiUser bukan auth()->user()
+            ))->toOthers();
+        } catch (\Exception $e) {
+        }
 
         // 2. Broadcast critical stock alert jika <= minimum.
         if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
             $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
-            broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+            try {
+                broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+            } catch (\Exception $e) {
+            }
         }
 
         return response()->json([

@@ -31,9 +31,9 @@
                                 <h3 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">{{ __('ui.account_info') }}</h3>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                     <!-- Read Only Info -->
+                                    <!-- Read Only Info -->
                                     <div>
-                                        <label class="input-label">{{ __('ui.username') }}</label>
+                                        <span class="input-label block mb-2">{{ __('ui.username') }}</span>
                                         <div class="input-field bg-secondary-50 text-secondary-500 cursor-not-allowed">
                                             {{ $user->username }}
                                         </div>
@@ -41,7 +41,7 @@
             
                                     <div>
                                         <label for="email" class="input-label">{{ __('ui.email_address') }} <span class="text-danger-500">*</span></label>
-                                        <input type="email" name="email" id="email" class="input-field w-full" value="{{ old('email', $user->email) }}" required>
+                                        <input type="email" name="email" id="email" class="input-field w-full" value="{{ old('email', $user->email) }}" autocomplete="email" required>
                                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                     </div>
                                 </div>
@@ -49,7 +49,7 @@
                                 <!-- Editable Fields -->
                                 <div>
                                     <label for="jabatan" class="input-label">{{ __('ui.job_position') }} <span class="text-danger-500">*</span></label>
-                                    <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" required />
+                                    <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" autocomplete="organization-title" required />
                                     <x-input-error :messages="$errors->get('jabatan')" class="mt-2" />
                                 </div>
         
@@ -63,7 +63,7 @@
                                                 \App\Enums\UserRole::SUPERADMIN->value => __('ui.role_superadmin_desc'),
                                             ];
                                         @endphp
-                                        <x-select name="role" :options="$roleOptions" :selected="old('role', $user->role->value)" placeholder="{{ __('ui.select_role') }}" width="w-full" />
+                                        <x-select name="role" id="role" :options="$roleOptions" :selected="old('role', $user->role->value)" placeholder="{{ __('ui.select_role') }}" width="w-full" />
                                         <x-input-error :messages="$errors->get('role')" class="mt-2" />
                                     </div>
             
@@ -75,7 +75,7 @@
                                                 'nonaktif' => __('ui.inactive'),
                                             ];
                                         @endphp
-                                        <x-select name="status" :options="$statusOptions" :selected="old('status', $user->status)" placeholder="{{ __('ui.select_status') }}" width="w-full" />
+                                        <x-select name="status" id="status" :options="$statusOptions" :selected="old('status', $user->status)" placeholder="{{ __('ui.select_status') }}" width="w-full" />
                                         <x-input-error :messages="$errors->get('status')" class="mt-2" />
                                     </div>
                                 </div>

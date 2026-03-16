@@ -9,11 +9,17 @@
             </div>
 
                 <!-- QR Scanner Modal Placeholder -->
-                <div id="qr-reader-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-secondary-900/60 backdrop-blur-sm">
+                <div id="qr-reader-modal" 
+                     role="dialog" 
+                     aria-modal="true" 
+                     aria-labelledby="qr-modal-title"
+                     class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-secondary-900/60 backdrop-blur-sm">
                     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
                         <div class="p-4 border-b border-secondary-100 flex items-center justify-between">
-                            <h3 class="font-bold text-secondary-900">Scan Barcode / QR Barang</h3>
-                            <button id="close-scan-btn" class="p-2 hover:bg-secondary-100 rounded-lg text-secondary-500 transition-colors">
+                            <h3 id="qr-modal-title" class="font-bold text-secondary-900">Scan Barcode / QR Barang</h3>
+                            <button id="close-scan-btn" 
+                                    aria-label="Tutup Scan"
+                                    class="p-2 hover:bg-secondary-100 rounded-lg text-secondary-500 transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
@@ -25,7 +31,9 @@
                             
                             <!-- Custom Controls -->
                             <div class="mt-4 flex flex-wrap justify-center gap-3 w-full">
-                                <button id="switch-camera-btn" class="hidden flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 font-semibold rounded-lg transition-colors">
+                                <button id="switch-camera-btn" 
+                                        aria-label="Putar Kamera"
+                                        class="hidden flex-1 sm:flex-none items-center justify-center gap-2 px-4 py-2 bg-secondary-100 hover:bg-secondary-200 text-secondary-700 font-semibold rounded-lg transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                     <span>Putar Kamera</span>
                                 </button>
@@ -34,7 +42,7 @@
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                                     <span>Upload Galeri</span>
                                 </label>
-                                <input type="file" id="qr-input-file" class="hidden" accept="image/*">
+                                <input type="file" id="qr-input-file" name="qr_file" class="hidden" accept="image/*">
                             </div>
 
                             <div id="qr-reader-results" class="mt-4 p-3 bg-primary-50 text-primary-700 text-sm rounded-lg hidden w-full text-center">
@@ -448,7 +456,9 @@
             </div>
 
             <!-- Floating Action Button (FAB) for Scan QR -->
-            <button id="start-scan-btn" class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex items-center justify-center gap-0 sm:gap-2 p-4 sm:px-6 sm:py-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-full shadow-2xl shadow-primary-500/40 transition-all duration-300 hover:scale-105 active:scale-95 group">
+            <button id="start-scan-btn" 
+                    aria-label="Mulai Scan QR"
+                    class="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-50 flex items-center justify-center gap-0 sm:gap-2 p-4 sm:px-6 sm:py-4 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-full shadow-2xl shadow-primary-500/40 transition-all duration-300 hover:scale-105 active:scale-95 group">
                 <x-icon.scan-qr class="w-6 h-6 sm:w-7 sm:h-7 group-hover:rotate-12 transition-transform duration-300" />
                 <span class="hidden sm:inline text-lg">Scan QR</span>
             </button>

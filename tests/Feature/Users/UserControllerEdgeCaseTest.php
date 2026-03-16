@@ -205,4 +205,45 @@ class UserControllerEdgeCaseTest extends TestCase
             ->get(route('users.create'));
         $response->assertOk();
     }
+
+    // ── bulk actions ─────────────────────────────────────────────
+
+    #[Test]
+    public function superadmin_dapat_memulihkan_user_secara_massal()
+    {
+        $users = User::factory()->count(3)->create(['role' => UserRole::OPERATOR]);
+        foreach ($users as $user) {
+            $user->delete();
+        }
+
+        $ids = $users->pluck('id')->toArray();
+
+        $this->withoutExceptionHandling();
+        $response = $this->actingAs($this->superadmin)
+            ->post(route('users.bulk-restore'), ['ids' => $ids]);
+
+        $response->assertRedirect();
+        foreach ($users as $user) {
+            $this->assertNotSoftDeleted('users', ['id' => $user->id]);
+        }
+    }
+
+    #[Test]
+    public function superadmin_dapat_menghapus_permanen_user_secara_massal()
+    {
+        $users = User::factory()->count(3)->create(['role' => UserRole::OPERATOR]);
+        foreach ($users as $user) {
+            $user->delete();
+        }
+
+        $ids = $users->pluck('id')->toArray();
+
+        $response = $this->actingAs($this->superadmin)
+            ->delete(route('users.bulk-force-delete'), ['ids' => $ids]);
+
+        $response->assertRedirect();
+        foreach ($users as $user) {
+            $this->assertDatabaseMissing('users', ['id' => $user->id]);
+        }
+    }
 }

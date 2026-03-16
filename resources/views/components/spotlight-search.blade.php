@@ -82,7 +82,7 @@
          @click="open = false"></div>
 
     <!-- Panel Modal -->
-    <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+    <div class="fixed inset-0 z-[150] overflow-y-auto p-4 sm:p-6 md:p-20">
         <div x-show="open" 
              x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 scale-95"
@@ -90,7 +90,7 @@
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100 scale-100"
              x-transition:leave-end="opacity-0 scale-95"
-             class="mx-auto max-w-2xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all">
+             class="mx-auto max-w-2xl transform divide-y divide-gray-100 overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition-all mt-20 lg:mt-0">
 
             <!-- Input Pencarian -->
             <div class="relative">
@@ -98,6 +98,8 @@
                     <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1114 0 7 7 0 01-14 0z" clip-rule="evenodd" />
                 </svg>
                 <input type="text" 
+                       id="global-search-input"
+                       name="global_search_query"
                        x-ref="searchInput"
                        x-model.debounce.300ms="query"
                        @keydown.arrow-down.prevent="goDown()"
@@ -108,8 +110,13 @@
                        role="combobox" 
                        aria-expanded="false" 
                        aria-controls="options">
-                <div class="absolute right-3 top-3.5 flex items-center gap-1">
+                <div class="absolute right-3 inset-y-0 flex items-center gap-1">
                     <span class="hidden sm:inline-block rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-500 border border-gray-200">ESC</span>
+                    <button @click="open = false" class="sm:hidden p-1 text-gray-400 hover:text-gray-600">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -254,7 +261,7 @@
             </div>
 
             <!-- Footer -->
-            <div class="flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-500">
+            <div class="hidden lg:flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-500">
                <span class="mx-1 font-medium text-gray-900">{{ __('ui.search_enter') }}</span>
                {{ __('ui.search_select') }}
                <span class="mx-1 ml-3 font-medium text-gray-900">↑↓</span>

@@ -20,7 +20,7 @@
                                     'keluar' => __('ui.stock_out_simple'),
                                 ];
                             @endphp
-                            <x-select name="type" :options="$typeOptions" :selected="old('type', 'masuk')" placeholder="{{ __('ui.select_transaction_type') }}" width="w-full" />
+                            <x-select name="type" id="type" :options="$typeOptions" :selected="old('type', 'masuk')" placeholder="{{ __('ui.select_transaction_type') }}" width="w-full" />
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
 

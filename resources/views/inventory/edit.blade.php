@@ -21,11 +21,11 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Tipe Barang -->
                             <div class="col-span-1 md:col-span-2">
-                                <label class="input-label mb-3 block">{{ __('ui.item_type') }} <span class="text-danger-500">*</span></label>
+                                <label for="type_sale" class="input-label mb-3 block">{{ __('ui.item_type') }} <span class="text-danger-500">*</span></label>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <label class="cursor-pointer border rounded-xl p-4 flex items-start gap-4 hover:bg-secondary-50 transition-all duration-200" :class="{ 'border-primary-500 bg-primary-50 ring-1 ring-primary-500': type === 'sale', 'border-secondary-200': type !== 'sale' }">
                                         <div class="mt-1">
-                                            <input type="radio" name="type" value="sale" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5">
+                                            <input type="radio" id="type_sale" name="type" value="sale" x-model="type" class="text-primary-600 focus:ring-primary-500 w-5 h-5">
                                         </div>
                                         <div>
                                             <span class="block font-semibold text-secondary-900 text-base">{{ __('ui.type_sale') }}</span>
@@ -421,10 +421,11 @@
                                         this.open = false;
                                     }
                                 }" @click.outside="open = false">
-                                    <label for="age" class="input-label">{{ __('ui.age') }} <span class="text-danger-500">*</span></label>
+                                    <label for="age-dropdown-btn" class="input-label">{{ __('ui.age') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
                                         <input type="hidden" name="age" x-model="selected">
                                         <button type="button" 
+                                                id="age-dropdown-btn"
                                                 @click="open = !open"
                                                 class="input-field w-full text-left pr-10"
                                                 :class="{'text-secondary-400': !selected, 'text-secondary-900': selected}">
@@ -460,10 +461,11 @@
                                         this.open = false;
                                     }
                                 }" @click.outside="open = false" x-effect="selected = selectedCondition">
-                                    <label for="condition" class="input-label">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
+                                    <label for="condition-dropdown-btn" class="input-label">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
                                         <input type="hidden" name="condition" x-model="selected">
                                         <button type="button" 
+                                                id="condition-dropdown-btn"
                                                 @click="open = !open"
                                                 class="input-field w-full text-left pr-10"
                                                 :class="{'text-secondary-400': !selected, 'text-secondary-900': selected}">

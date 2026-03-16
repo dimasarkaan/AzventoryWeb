@@ -13,7 +13,7 @@ class StockLog extends Model
     use HasFactory;
 
     protected $fillable = [
-        'sparepart_id', 'user_id', 'type', 'quantity', 'reason', 'status', 'approved_by',
+        'sparepart_id', 'user_id', 'type', 'quantity', 'reason', 'status', 'approved_by', 'rejection_reason',
     ];
 
     /**
@@ -30,5 +30,13 @@ class StockLog extends Model
     public function sparepart()
     {
         return $this->belongsTo(Sparepart::class);
+    }
+
+    /**
+     * Relasi ke user yang menyetujui pengajuan ini.
+     */
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

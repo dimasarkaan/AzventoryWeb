@@ -19,14 +19,47 @@ class StockApprovalController extends Controller
     }
 
     /**
-     * Menampilkan daftar persetujuan stok yang pending.
+     * Menampilkan daftar persetujuan stok yang pending (dengan search & filter).
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pendingApprovals = StockLog::with(['sparepart', 'user'])
-            ->where('status', 'pending')
-            ->latest()
-            ->paginate(10);
+        $query = StockLog::with(['sparepart', 'user', 'approver']);
+
+        // Filter Status
+        $status = $request->get('status', 'pending');
+        if ($status !== 'all' && $status !== '' && $status !== null) {
+            $query->where('status', $status);
+        }
+
+        // Search: Nama Barang, Part Number, atau Nama Pengaju
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('sparepart', function ($sq) use ($search) {
+                    $sq->where('name', 'like', '%'.$search.'%')
+                       ->orWhere('part_number', 'like', '%'.$search.'%');
+                })->orWhereHas('user', function ($uq) use ($search) {
+                    $uq->where('name', 'like', '%'.$search.'%')
+                       ->orWhere('username', 'like', '%'.$search.'%');
+                });
+            });
+        }
+
+        // Filter Jenis (Masuk/Keluar)
+        $filterType = $request->get('filter_type', 'all');
+        if ($filterType !== 'all' && $filterType !== '') {
+            $query->where('type', $filterType);
+        }
+
+        // Best Practice Sorting:
+        // 1. Pending First
+        // 2. Pending: Urutkan dari yang Terlama (agar tidak ada antrean basi)
+        // 3. Selesai (Approved/Rejected): Urutkan dari yang Terbaru
+        $pendingApprovals = $query->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END ASC")
+            ->orderByRaw("CASE WHEN status = 'pending' THEN created_at END ASC")
+            ->orderByRaw("CASE WHEN status != 'pending' THEN created_at END DESC")
+            ->paginate(10)
+            ->withQueryString();
 
         return view('inventory.approvals.index', compact('pendingApprovals'));
     }
@@ -38,14 +71,25 @@ class StockApprovalController extends Controller
     {
         $stock_log->load(['sparepart', 'user']);
         $request->validate([
-            'status' => 'required|in:approved,rejected',
+            'status'           => 'required|in:approved,rejected',
+            // Gap 1: wajib isi alasan jika menolak
+            'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
         ]);
 
         try {
-            $this->inventoryService->approveStockRequest($stock_log, $request->status);
+            $this->inventoryService->approveStockRequest(
+                $stock_log,
+                $request->status,
+                $request->rejection_reason
+            );
+
+            // Gap 4: Bedakan flash message approve vs reject
+            $message = $request->status === 'approved'
+                ? 'Pengajuan berhasil disetujui.'
+                : 'Pengajuan berhasil ditolak.';
 
             return redirect()->route('inventory.stock-approvals.index')
-                ->with('success', 'Status pengajuan berhasil diperbarui.');
+                ->with('success', $message);
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -57,9 +101,11 @@ class StockApprovalController extends Controller
     public function bulkApprove(Request $request)
     {
         $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:stock_logs,id',
-            'status' => 'required|in:approved,rejected',
+            'ids'              => 'required|array',
+            'ids.*'            => 'exists:stock_logs,id',
+            'status'           => 'required|in:approved,rejected',
+            // Gap 1: wajib isi alasan jika bulk reject
+            'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
         ]);
 
         $logs = StockLog::with(['sparepart', 'user'])->whereIn('id', $request->ids)
@@ -75,14 +121,21 @@ class StockApprovalController extends Controller
 
         foreach ($logs as $log) {
             try {
-                $this->inventoryService->approveStockRequest($log, $request->status);
+                $this->inventoryService->approveStockRequest(
+                    $log,
+                    $request->status,
+                    $request->rejection_reason
+                );
                 $successCount++;
             } catch (\Exception $e) {
                 $errors[] = "ID {$log->id}: ".$e->getMessage();
             }
         }
 
-        $message = "Berhasil memproses {$successCount} pengajuan.";
+        // Gap 4: Bedakan flash message bulk approve vs reject
+        $actionText = $request->status === 'approved' ? 'disetujui' : 'ditolak';
+        $message = "Berhasil {$actionText} {$successCount} pengajuan.";
+
         if (! empty($errors)) {
             $message .= ' Gagal pada '.count($errors).' pengajuan.';
 

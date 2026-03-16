@@ -1,5 +1,8 @@
 {{-- resources/views/dashboard/_activity_modal.blade.php --}}
 <div x-show="showActivityModal" 
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="activity-modal-title"
      class="fixed inset-0 z-[100] overflow-y-auto"
      x-cloak
      x-transition:enter="transition ease-out duration-300"
@@ -10,7 +13,7 @@
      x-transition:leave-end="opacity-0">
     
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showActivityModal = false"></div>
+        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showActivityModal = false" aria-hidden="true"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -21,8 +24,10 @@
             
             {{-- Header --}}
             <div class="px-6 py-4 border-b border-secondary-100 flex items-center justify-between bg-secondary-50/50">
-                <h3 class="text-base font-bold text-secondary-900">Detail Aktivitas</h3>
-                <button @click="showActivityModal = false" class="text-secondary-400 hover:text-secondary-600 transition-colors">
+                <h3 id="activity-modal-title" class="text-base font-bold text-secondary-900">Detail Aktivitas</h3>
+                <button @click="showActivityModal = false" 
+                        aria-label="Tutup Modal"
+                        class="text-secondary-400 hover:text-secondary-600 transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>

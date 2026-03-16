@@ -1,4 +1,7 @@
-@props(['name', 'options' => [], 'selected' => '', 'placeholder' => 'Pilih Opsi', 'submitOnChange' => false, 'width' => 'w-full md:w-auto'])
+@props(['name', 'id' => null, 'options' => [], 'selected' => '', 'placeholder' => 'Pilih Opsi', 'submitOnChange' => false, 'width' => 'w-full md:w-auto', 'allowClear' => true])
+@php
+    $id = $id ?? $name;
+@endphp
 
 <div x-data="{
     open: false,
@@ -40,7 +43,7 @@
 class="relative {{ $width }}">
     <input type="hidden" name="{{ $name }}" :value="selected">
     
-    <button type="button" @click="open = !open" @click.away="open = false"
+    <button type="button" id="{{ $id }}" @click="open = !open" @click.away="open = false"
             class="input-field w-full text-left flex justify-between items-center rounded-xl py-2.5 px-4 text-sm cursor-pointer hover:border-primary-400 focus:ring-2 ring-primary-500 bg-white transition-all shadow-sm">
         <span x-text="selectedLabel" :class="{'text-secondary-900': selected, 'text-secondary-500': !selected}" class="truncate mr-2"></span>
         <svg class="w-4 h-4 text-secondary-400 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -57,11 +60,13 @@ class="relative {{ $width }}">
          style="display: none;">
         <div class="max-h-60 overflow-y-auto p-1 space-y-0.5">
              <!-- Opsi Reset -->
+             @if($allowClear)
              <div @click="select('', placeholder)"
                   class="px-3 py-2 rounded-lg cursor-pointer hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"
                   :class="{'bg-primary-50 text-primary-700 font-medium': !selected}">
                  <span x-text="placeholder"></span>
              </div>
+             @endif
              
              <!-- Opsi -->
              <!-- Catatan: iterasi objek di Alpine x-for menggunakan sintaks (value, key) untuk array, tapi (val, key) untuk objek. -->
