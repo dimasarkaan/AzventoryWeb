@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Users;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\StoreUserRequest;
 use App\Http\Requests\Users\UpdateUserRequest;
+use App\Models\User;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 
@@ -17,8 +18,8 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $this->authorize('viewAny', \App\Models\User::class);
-        $query = \App\Models\User::query();
+        $this->authorize('viewAny', User::class);
+        $query = User::query();
 
         // Handle Trash View
         if ($request->has('trash') && $request->trash == 'true') {
@@ -57,7 +58,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', \App\Models\User::class);
+        $this->authorize('create', User::class);
 
         return view('users.create');
     }
@@ -67,17 +68,17 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request)
     {
-        $this->authorize('create', \App\Models\User::class);
+        $this->authorize('create', User::class);
         // Auto-generate temporary username based on email
         $username = explode('@', $request->email)[0].rand(100, 999);
         // Ensure uniqueness (simple check, collision rare for low volume)
-        while (\App\Models\User::where('username', $username)->exists()) {
+        while (User::where('username', $username)->exists()) {
             $username = explode('@', $request->email)[0].rand(100, 999);
         }
 
         $password = 'password123'; // Default password
 
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => $username, // Default name
             'username' => $username,
             'email' => $request->email,
@@ -97,7 +98,7 @@ class UserController extends Controller
     /**
      * Menampilkan detail pengguna.
      */
-    public function show(\App\Models\User $user)
+    public function show(User $user)
     {
         $this->authorize('view', $user);
         $user->load(['borrowings.sparepart']);
@@ -108,7 +109,7 @@ class UserController extends Controller
     /**
      * Menampilkan form untuk mengedit pengguna.
      */
-    public function edit(\App\Models\User $user)
+    public function edit(User $user)
     {
         $this->authorize('update', $user);
 
@@ -118,7 +119,7 @@ class UserController extends Controller
     /**
      * Memperbarui data pengguna.
      */
-    public function update(UpdateUserRequest $request, \App\Models\User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('update', $user);
         $user->update([
@@ -137,7 +138,7 @@ class UserController extends Controller
     /**
      * Mereset password pengguna ke default.
      */
-    public function resetPassword(\App\Models\User $user)
+    public function resetPassword(User $user)
     {
         $defaultPassword = 'password123';
         $user->update([
@@ -153,7 +154,7 @@ class UserController extends Controller
     /**
      * Menghapus pengguna (Soft Delete).
      */
-    public function destroy(\App\Models\User $user)
+    public function destroy(User $user)
     {
         $this->authorize('delete', $user);
         // Prevent deleting own account
@@ -179,7 +180,7 @@ class UserController extends Controller
      */
     public function restore($id)
     {
-        $user = \App\Models\User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()->findOrFail($id);
         $this->authorize('restore', $user);
         $user->restore();
 
@@ -194,7 +195,7 @@ class UserController extends Controller
      */
     public function forceDelete($id)
     {
-        $user = \App\Models\User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()->findOrFail($id);
         $this->authorize('forceDelete', $user);
 
         // Final check to prevent self-deletion even if force
@@ -225,7 +226,7 @@ class UserController extends Controller
      */
     public function bulkRestore(Request $request)
     {
-        $this->authorize('restore', \App\Models\User::class);
+        $this->authorize('restore', User::class);
         $request->validate([
             'ids' => 'required|array',
         ]);
@@ -233,9 +234,10 @@ class UserController extends Controller
         $ids = $request->ids;
         $count = 0;
         
-        $users = \App\Models\User::onlyTrashed()->whereIn('id', $ids)->get();
+        $users = User::onlyTrashed()->whereIn('id', $ids)->get();
         
         foreach ($users as $user) {
+            /** @var \App\Models\User $user */
             $user->restore();
             $count++;
         }
@@ -250,13 +252,13 @@ class UserController extends Controller
      */
     public function bulkForceDelete(Request $request)
     {
-        $this->authorize('forceDelete', \App\Models\User::class);
+        $this->authorize('forceDelete', User::class);
         $request->validate([
             'ids' => 'required|array',
         ]);
 
         $ids = $request->ids;
-        $users = \App\Models\User::onlyTrashed()->whereIn('id', $ids)->get();
+        $users = User::onlyTrashed()->whereIn('id', $ids)->get();
 
         if ($users->isEmpty()) {
             return redirect()->back()->with('error', __('messages.no_user_selected_delete'));
@@ -265,6 +267,7 @@ class UserController extends Controller
         $count = 0;
         $skipped = 0;
         foreach ($users as $user) {
+            /** @var \App\Models\User $user */
             // Prevent self-deletion just in case
             if ($user->id === auth()->id()) {
                 continue;
