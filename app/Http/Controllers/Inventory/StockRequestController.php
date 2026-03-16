@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Sparepart;
+use App\Models\StockLog;
 use App\Models\User;
 use App\Notifications\StockRequestNotification;
 use App\Traits\ActivityLogger;
@@ -27,6 +28,8 @@ class StockRequestController extends Controller
      */
     public function create(Sparepart $inventory)
     {
+        $this->authorize('create', StockLog::class);
+
         return view('inventory.stock_request', ['sparepart' => $inventory]);
     }
 
@@ -35,6 +38,8 @@ class StockRequestController extends Controller
      */
     public function store(Request $request, Sparepart $sparepart)
     {
+        $this->authorize('create', StockLog::class);
+
         $request->validate([
             'type' => 'required|in:masuk,keluar',
             'quantity' => 'required|integer|min:1',

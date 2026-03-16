@@ -99,7 +99,7 @@ class Sparepart extends Model
         }
 
         // Fallback: check latest stock log
-        $latestLog = $this->stockLogs()->latest()->first();
+        $latestLog = $this->stockLogs->first();
         if ($latestLog && $latestLog->reason) {
             $date = $latestLog->created_at->format('d M Y');
             return "Update log pada {$date} - {$latestLog->reason}";

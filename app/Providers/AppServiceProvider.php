@@ -14,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        if ($this->app->isLocal() && class_exists(\App\Providers\TelescopeServiceProvider::class)) {
+        if (app()->isLocal() && class_exists(\App\Providers\TelescopeServiceProvider::class)) {
             $this->app->register(\App\Providers\TelescopeServiceProvider::class);
         }
     }
@@ -27,6 +27,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Schema::defaultStringLength(191);
         Gate::policy(Sparepart::class, SparepartPolicy::class);
         Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
+        Gate::policy(\App\Models\StockLog::class, \App\Policies\StockLogPolicy::class);
+        Gate::policy(\App\Models\Borrowing::class, \App\Policies\BorrowingPolicy::class);
 
         config(['app.locale' => 'id']);
         \Carbon\Carbon::setLocale('id');

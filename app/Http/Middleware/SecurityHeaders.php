@@ -27,6 +27,7 @@ class SecurityHeaders
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-XSS-Protection', '1; mode=block');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->headers->set('Permissions-Policy', 'unload=(self)');
         $response->headers->set('Content-Security-Policy', "default-src 'self'{$viteDevSources}; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com{$viteDevSources}; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com{$viteDevSources}; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com{$viteDevSources};");
 
         return $response;

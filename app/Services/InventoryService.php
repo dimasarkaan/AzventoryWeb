@@ -81,7 +81,8 @@ class InventoryService
         } elseif (($filters['filter'] ?? '') === 'problematic') {
             // Filter barang yang rusak atau hilang (Hanya Superadmin & Admin)
             if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
-                $query->whereIn('condition', ['Rusak', 'Hilang']);
+                $query->whereIn('condition', ['Rusak', 'Hilang'])
+                    ->with(['stockLogs' => fn ($q) => $q->latest()]);
             } else {
                 $query->whereRaw('1 = 0');
             }
@@ -330,6 +331,7 @@ class InventoryService
                 return ['status' => 'empty', 'message' => __('messages.trash_empty')];
             }
 
+            /** @var \App\Models\Sparepart $sparepart */
             foreach ($spareparts as $sparepart) {
                 if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
                     Storage::disk('public')->delete($sparepart->qr_code_path);
@@ -378,6 +380,7 @@ class InventoryService
                 return ['status' => 'empty', 'message' => __('messages.no_item_selected')];
             }
 
+            /** @var \App\Models\Sparepart $sparepart */
             foreach ($spareparts as $sparepart) {
                 if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
                     Storage::disk('public')->delete($sparepart->qr_code_path);

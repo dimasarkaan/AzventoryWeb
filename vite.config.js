@@ -13,12 +13,30 @@ export default defineConfig({
         }),
         VitePWA({
             registerType: 'autoUpdate',
+            devOptions: {
+                enabled: true // Allow testing service worker in dev mode
+            },
             outDir: 'public/build', // Laravel specific: output manifest to public/build so it's accessible
+
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+                additionalManifestEntries: [
+                    { url: '/offline', revision: null }
+                ],
                 navigateFallback: '/offline',
-                navigateFallbackDenylist: [/^\/api/, /^\/admin/, /^\/superadmin/], // Avoid fallback for sensitive routes if necessary, or keep it broad
+                navigateFallbackDenylist: [/^\/api/, /^\/broadcasting/], // Only exclude API and Echo calls
                 runtimeCaching: [
+                    {
+                        urlPattern: /\/offline$/,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'offline-page-cache',
+                            expiration: {
+                                maxEntries: 1,
+                                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                            }
+                        }
+                    },
                     {
                         urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
                         handler: 'CacheFirst',

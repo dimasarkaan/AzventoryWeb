@@ -1,121 +1,111 @@
 <div align="center">
 
-# 📦 Azventory
-**Automated Inventory & Asset Management System**
+# Azventory
+**Sistem Informasi Manajemen Stok dan Inventaris**
 
-[![Laravel v11](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](#)
-[![PHP v8.3](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](#)
-[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#)
-[![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)](#)
+[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat-square&logo=php)](https://php.net)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](#)
 
-*Sistem Manajemen Persediaan Barang dan Peminjaman Inventaris Berbasis Web yang Sangat Andal, Dibekali dengan Sistem Keamanan Kuat (Role-Based Access Control) dan Fitur Dokumentasi API.*
+Sistem berbasis web untuk pencatatan pergudangan, manajemen aset, dan monitoring peminjaman barang. 
+Dikembangkan sebagai implementasi sistem informasi pada lingkungan gudang atau kantor.
 
-<br/>
-<br/>
 </div>
 
 ---
 
-## 🎯 Tentang Proyek Ini
+## Deskripsi Sistem
+Azventory dirancang untuk mendokumentasikan alur masuk dan keluar barang serta pengelolaan aset perusahaan secara terintegrasi. Sistem ini menggunakan arsitektur Role-Based Access Control (RBAC) untuk mengatur batasan akses data berdasarkan peran pengguna (Superadmin, Admin, dan Operator).
 
-**Azventory** bukan sekadar sistem pencatatan gudang biasa. Ini adalah sebuah platform produksi tingkat lanjut untuk manajemen inventaris. Dirancang khusus dengan UI/UX yang dinamis (menggunakan *Tailwind CSS* & *Alpine.js*), sistem ini mampu menangani **puluhan ribu data barang**, **pergerakan stok (*stock mutation*)**, hingga **peminjaman aset**. 
+## Fitur Tersedia
 
-Aplikasi ini sudah melalui proses pengujian (*Automated Testing*) ekstensif, memastikan keamanan dari *cyberattacks* seperti pergantian paksa URL (IDOR & Authorization Bypass) serta aman dari permasalahan performa seperti `N+1 Query Problem` saat melayani jutaan baris data secara bersamaan berkat penerapan **Composite Index DB**, **Caching**, dan **Eager Loading**.
+- **Manajemen Pengguna dan Hak Akses**: Pengaturan akses terbagi menjadi tiga level untuk menjaga akses data tetap sesuai dengan kewenangan masing-masing peran.
+- **Pencatatan Stok Barang**: Mendukung pendataan barang masuk dan keluar dengan pencatatan log aktivitas untuk setiap transaksi stok.
+- **Sistem Peminjaman**: Modul untuk mendata barang yang dipinjam oleh personil tertentu, lengkap dengan estimasi waktu pengembalian dan status kondisi barang.
+- **Monitoring Aset**: Fitur untuk melihat status barang di berbagai lokasi dan kategori, serta identifikasi barang dengan jumlah stok di bawah batas minimum.
+- **Dokumentasi API**: Menyediakan akses data melalui program pendukung untuk integrasi dengan sistem lain menggunakan standar REST API.
+- **Pelaporan**: Fasilitas ekspor data dalam format dokumen PDF dan file Excel untuk kebutuhan dokumentasi manual atau audit periodik.
 
-## ✨ Fitur Unggulan
+## Teknologi yang Digunakan
 
-- 🔐 **Super-RBAC (Role-Based Access Control):** 
-  - **Superadmin:** Kontrol mutlak (Kelola seluruh barang, hapus paksa/pulihkan data dari tong sampah, kelola seluruh pengguna, dan akses pembuatan `Token API`).
-  - **Admin:** Pengawas harian (Kelola persediaan barang reguler, lihat log laporan bawahan, kelola peminjaman).
-  - **Operator:** Pekerja gudang (Hanya dapat melihat stok, meminjam, dan mencatat pergerakan tanpa hak merusak/menghapus data).
-- 📊 **Smart Dashboard:** Analitik yang ditenagai oleh caching bawaan. Memuat metrik seperti pergerakan barang (Sering Masuk & Sering Keluar), aset kedaluwarsa, peminjam yang belum kembali, dan nilai finansial gudang secara instan. Dioptimalkan untuk menangani **10.000+ data log** tanpa penurunan performa.
-- 📱 **Full PWA (Progressive Web App):** Aplikasi dapat dinstal di Home Screen (Android/iOS) dengan dukungan *Offline Fallback*, *App Shortcuts*, dan *Instant Loading* berkat Service Worker.
-- 📦 **Advance Inventory System:** Mendukung multi-kategori, multi-lokasi, indikator stok menipis darurat, penyesuaian stok massal (*Bulk Approval*), dan pencetakan massal *Barcode/Label QR* (.svg).
-- 🔐 **Hardened Security:** Proteksi terhadap *Mass Assignment* di level Model, penutupan celah IDOR, dan audit otomatis pergerakan stok untuk integritas data maksimal.
-- 🧾 **Export & Reports:** Logika pencetakan file (Excel & PDF) Laporan Mutasi Stok, Laporan Peminjaman, dan Riwayat Aktifitas yang disajikan secara korporat lengkap dengan Header (Kop Surat).
-- 🔗 **REST API Standardized:** Endpoints (JSON) siap pakai untuk diintegrasikan dengan Front-End React/Vue/Mobile App, diamankan dengan Laravel Sanctum via *Bearer Tokens*.
+| Komponen | Teknologi |
+| --- | --- |
+| **Framework Utama** | [Laravel 11](https://laravel.com) |
+| **Bahasa Pemrograman** | [PHP 8.2+](https://php.net) |
+| **Frontend Styling** | [Tailwind CSS](https://tailwindcss.com) & [Alpine.js](https://alpinejs.dev) |
+| **Database** | MySQL / MariaDB |
+| **Autentikasi API** | Laravel Sanctum |
 
----
+## Panduan Instalasi Lokal
 
-## 🛠 Instalasi dan Konfigurasi
+Ikuti langkah-langkah di bawah ini untuk mengunduh dan menjalankan proyek ini:
 
-Ikuti langkah-langkah di bawah ini untuk menjalankan Azventory di komputer lokal Anda:
+### 1. Kebutuhan Sistem
+- Koneksi Internet (untuk instalasi dependensi)
+- PHP versi 8.2 ke atas
+- Composer
+- Node.js & NPM
+- Layanan database MySQL
 
-### 1. Kebutuhan Sistem (Prerequisites)
-- PHP >= 8.2
-- Composer Version 2+
-- Node.js & NPM (Untuk *Tailwind Build*)
-- MySQL Database
-
-### 2. Kloning dan Setup Dasar
-Buka Terminal/Git Bash di folder tujuan Anda lalu jalankan perintah berurutan:
-
+### 2. Pemasangan Kode
 ```bash
-# 1. Clone repository ini
-git clone https://github.com/UsernameAnda/AzventoryWeb.git
+# Salin repositori ke direktori lokal
+git clone https://github.com/Username-Anda/AzventoryWeb.git
 
-# 2. Masuk ke direktori
+# Masuk ke folder proyek
 cd AzventoryWeb
 
-# 3. Instal semua dependensi PHP & Backend
+# Instal dependensi backend
 composer install
 
-# 4. Instal dependensi Frontend & Lakukan Compile Desain 
+# Instal dependensi frontend dan kompilasi aset
 npm install
 npm run build
 ```
 
-### 3. Konfigurasi Lingkungan (Environment)
+### 3. Konfigurasi Database
+1. Gandakan file `.env.example` menjadi `.env`.
+2. Generate Application Key menggunakan perintah:
+   ```bash
+   php artisan key:generate
+   ```
+3. Sesuaikan parameter database berikut pada file `.env`:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=nama_database_anda
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+
+### 4. Setup Database dan Akun
+Jalankan migrasi untuk membuat tabel dan mengisi data awal:
 ```bash
-# Salin file environment bawaan
-cp .env.example .env
-
-# Jalankan perintah generate kunci keamanan Laravel
-php artisan key:generate
-```
-Edit file `.env` milik Anda. Sesuaikan bagian database (Penting!):
-```env
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=nama_database_anda
-DB_USERNAME=root
-DB_PASSWORD=
+php artisan migrate --force --seed
 ```
 
-### 4. Menyiapkan Database dan Seeder (Akun Bawaan)
-```bash
-# Menjalankan struktur tabel dan mengisi data palsu untuk demonstrasi
-php artisan migrate:fresh --seed
-```
-*Catatan: Pastikan Anda segera mengubah email/password bawaan setelah masuk.*
-
-### 5. Jalankan Aplikasi
+### 5. Menjalankan Aplikasi
+Jalankan server pengembangan:
 ```bash
 php artisan serve
 ```
-Buka browser dan akses terminal Anda di `http://127.0.0.1:8000`.
+Akses aplikasi melalui alamat `http://127.0.0.1:8000`.
 
 ---
 
-## 🔑 Akun Uji Coba (Demo Credentials)
-Gunakan email berikut jika Anda menggunakan perintah *seed* di atas:
-- **Hak Akses Superadmin:** `superadmin@azventory.com` (Sandi: `password`)
-- **Hak Akses Admin:** `admin@azventory.com` (Sandi: `password`)
-- **Hak Akses Operator:** `operator@azventory.com` (Sandi: `password`)
+## Akun Akses Default
+Jika menggunakan data *seed* awal, gunakan kredensial berikut untuk masuk:
+- **Superadmin**: superadmin@azventory.com (Password: password)
+- **Admin**: admin@azventory.com (Password: password)
+- **Operator**: operator@azventory.com (Password: password)
+
+## Dokumentasi Tambahan
+Untuk informasi operasional lebih lanjut, silakan merujuk ke dokumen berikut:
+- [Panduan Integrasi API](./Panduan_Integrasi_API.md)
+- [Panduan Pembaruan Sistem di cPanel](./Panduan_Pembaruan_Sistem.md)
+- [Checklist Kesiapan Produksi](./Production_Readiness.md)
 
 ---
-
-## 🔌 API dan Integrasi Eksternal
-Untuk panduan detail tentang pengiriman Request beserta Headers *Bearer Token* ke `http://127.0.0.1:8000/api/v1`, silakan lihat file panduan resmi di:
-👉 **[Panduan_Integrasi_API.md](./Panduan_Integrasi_API.md)**
-
-Anda juga dapat secara langsung meng-import Postman Collection yang sudah saya bagikan di repositori ini (`Azventory_API_Collection.postman_collection.json`) untuk segera mencoba tes respon JSON.
-
-<div align="center">
-<br/>
-
-**❤️ Dikembangkan dengan sepenuh hati sebagai Mahakarya Sistem Inventaris.**
-Terima kasih telah berkunjung, silakan beri 🌟 jika menurut Anda proyek ini bagus!
-
-</div>
+Dokumentasi ini disusun sebagai panduan teknis umum bagi pengembang dan administrator sistem.

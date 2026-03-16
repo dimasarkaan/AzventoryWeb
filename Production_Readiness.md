@@ -1,48 +1,59 @@
-# Panduan Kesiapan Produksi (Production Readiness)
+# Panduan Kesiapan Produksi
+Checklist persiapan akhir sebelum aplikasi diluncurkan ke server produksi.
 
-File ini berisi checklist kritikal untuk melakukan deployment Azventory Web ke server produksi (VPS/Shared Hosting).
+Dokumen ini berisi daftar langkah penting untuk memastikan sistem Azventory berjalan optimal dan aman di lingkungan produksi.
 
-## 1. Konfigurasi Lingkungan (`.env`)
-Pastikan variabel berikut diset dengan benar di server produksi:
-- `APP_ENV=production`
-- `APP_DEBUG=false`
-- `APP_URL=https://nama-domain-anda.com`
-- `LOG_CHANNEL=daily` (Agar file log tidak membengkak).
+---
 
-## 2. Optimasi Performa (WAJIB)
-Jalankan perintah ini di server setelah deploy kode terbaru:
+## Pengaturan Lingkungan (.env)
+Pastikan variabel lingkungan pada file `.env` di server sudah disesuaikan untuk mode produksi:
+
+- APP_ENV: production
+- APP_DEBUG: false
+- APP_URL: https://domain-anda.com
+- LOG_CHANNEL: daily
+- LOG_DAILY_DAYS: 180
+
+## Optimasi Performa
+Jalankan perintah berikut di server produksi untuk mempercepat pemrosesan permintaan:
+
 ```bash
-# Optimasi Route & Config
+# Melakukan cache pada konfigurasi dan routing
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-# Optimasi Autoloader Composer
+# Optimasi autoloader PHP
 composer install --optimize-autoloader --no-dev
 ```
 
-## 3. Keamanan & Database
-- **APP_KEY**: Pastikan sudah digenerate (`php artisan key:generate`).
-- **SSL/HTTPS**: Sangat disarankan menggunakan SSL (LetsEncrypt).
-- **Security Headers**: Middleware `SecurityHeaders` sudah aktif secara global.
-- **Queue Worker**: Karena laporan PDF menggunakan Queue, pastikan worker berjalan:
+## Keamanan dan Database
+- APP_KEY: Pastikan sudah digenerate menggunakan perintah `php artisan key:generate`.
+- Protokol HTTPS: Gunakan sertifikat SSL (seperti Let's Encrypt) untuk seluruh akses domain.
+- Security Headers: Pastikan middleware keamanan sudah terpasang untuk melindungi aplikasi dari serangan umum.
+- Antrean (Queue): Aktifkan queue worker jika terdapat proses berat seperti pembuatan laporan atau pengiriman email massal:
   ```bash
   php artisan queue:work --tries=3
   ```
 
-## 4. Kebersihan Data (Opsional)
-Jika ingin membersihkan data testing sebelum "Go Live":
+## Pembersihan Data Awal
+Jika diperlukan pembersihan data uji coba sebelum penggunaan resmi, gunakan perintah berikut:
+
 ```bash
 php artisan migrate:fresh --seed
 ```
-*Catatan: Pastikan seeder tidak berisi data sampah.*
+Peringatan: Perintah ini akan menghapus seluruh data yang ada. Pastikan seeder sudah dikonfigurasi hanya untuk data master yang diperlukan.
 
-## 5. Maintenance Mode
-Gunakan perintah ini saat melakukan update di server:
+## Mode Perbaikan (Maintenance)
+Saat melakukan pemeliharaan rutin di server, gunakan mode perbaikan untuk memberikan informasi kepada pengguna:
+
 ```bash
-php artisan down --secret="kode-rahasia"
+# Mengaktifkan mode perbaikan
+php artisan down
+
+# Mengaktifkan kembali aplikasi
 php artisan up
 ```
 
 ---
-Aplikasi telah melalui Deep Audit (Backend, Database, Security) dan siap digunakan secara profesional.
+Status: Seluruh komponen backend, database, dan modul keamanan telah melalui audit mendalam dan dinyatakan siap untuk penggunaan skala produksi.

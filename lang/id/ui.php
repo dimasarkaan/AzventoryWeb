@@ -737,4 +737,11 @@ return [
     'widget_missing_price' => 'Harga Belum Diisi',
     'no_missing_price' => 'Semua barang sudah memiliki harga.',
     'fill_price_now' => 'Isi Harga Sekarang',
+
+    // Offline Mode
+    'offline_title' => 'Anda Sedang Offline',
+    'offline_desc' => 'Maaf, sepertinya koneksi internet Anda terputus. Beberapa fitur mungkin tidak tersedia sampai Anda terhubung kembali.',
+    'offline_banner_text' => 'Mode Offline - Beberapa fitur mungkin terbatas',
+    'offline_retry' => 'Coba Lagi',
 ];
+

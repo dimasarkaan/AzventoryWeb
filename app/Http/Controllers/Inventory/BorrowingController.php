@@ -44,6 +44,8 @@ class BorrowingController extends Controller
      */
     public function store(StoreBorrowingRequest $request, Sparepart $sparepart)
     {
+        $this->authorize('create', Borrowing::class);
+
         try {
             $this->inventoryService->createBorrowing($sparepart, $request->validated());
 

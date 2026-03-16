@@ -82,7 +82,9 @@ Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
 
         // Inventaris Umum
         Route::view('/scan-qr', 'inventory.scan-qr')->name('scan-qr');
-        Route::get('/check-part-number', [InventoryController::class, 'checkPartNumber'])->name('check-part-number');
+        Route::get('/check-part-number', [InventoryController::class, 'checkPartNumber'])
+            ->middleware('throttle:10,1')
+            ->name('check-part-number');
 
         // Persetujuan Stok (Superadmin & Admin)
         Route::middleware('role:superadmin,admin')->group(function () {

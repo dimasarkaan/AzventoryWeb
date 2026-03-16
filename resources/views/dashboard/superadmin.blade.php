@@ -908,16 +908,6 @@
                 window.addEventListener('dashboard-refresh', (e) => {
                     this.updateState(e.detail);
                 });
-
-                // Offline/Online Listeners
-                window.addEventListener('online', () => {
-                    this.refreshData();
-                    if (window.showToast) window.showToast('success', 'Koneksi kembali online.');
-                });
-
-                window.addEventListener('offline', () => {
-                    if (window.showToast) window.showToast('error', 'Koneksi terputus.');
-                });
             },
 
             // Charts Data

@@ -26,7 +26,7 @@ class StockApprovalController extends Controller
         $query = StockLog::with(['sparepart', 'user', 'approver']);
 
         // Filter Status
-        $status = $request->get('status', 'pending');
+        $status = $request->input('status', 'pending');
         if ($status !== 'all' && $status !== '' && $status !== null) {
             $query->where('status', $status);
         }
@@ -46,7 +46,7 @@ class StockApprovalController extends Controller
         }
 
         // Filter Jenis (Masuk/Keluar)
-        $filterType = $request->get('filter_type', 'all');
+        $filterType = $request->input('filter_type', 'all');
         if ($filterType !== 'all' && $filterType !== '') {
             $query->where('type', $filterType);
         }
@@ -69,6 +69,8 @@ class StockApprovalController extends Controller
      */
     public function update(Request $request, StockLog $stock_log)
     {
+        $this->authorize('update', $stock_log);
+
         $stock_log->load(['sparepart', 'user']);
         $request->validate([
             'status'           => 'required|in:approved,rejected',
@@ -100,6 +102,8 @@ class StockApprovalController extends Controller
      */
     public function bulkApprove(Request $request)
     {
+        $this->authorize('update', new StockLog);
+
         $request->validate([
             'ids'              => 'required|array',
             'ids.*'            => 'exists:stock_logs,id',
@@ -119,6 +123,7 @@ class StockApprovalController extends Controller
         $successCount = 0;
         $errors = [];
 
+        /** @var \App\Models\StockLog $log */
         foreach ($logs as $log) {
             try {
                 $this->inventoryService->approveStockRequest(
