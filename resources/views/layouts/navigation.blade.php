@@ -60,7 +60,7 @@
                      @endif
 
                     {{-- Menu Bersama --}}
-                    <a href="{{ route('inventory.index') }}" class="{{ $navClass }} {{ request()->routeIs('inventory.*') ? $activeClass : $inactiveClass }}">
+                    <a href="{{ route('inventory.index') }}" class="{{ $navClass }} {{ (request()->routeIs('inventory.*') && !request()->routeIs('inventory.scan-qr') && !request()->routeIs('inventory.stock-approvals.*')) ? $activeClass : $inactiveClass }}">
                         <x-icon.inventory class="w-4 h-4" />
                         {{ __('ui.inventory_list') }}
                     </a>
@@ -341,7 +341,7 @@
             @endif
             
             {{-- Menu Bersama untuk Semua Peran --}}
-            <a href="{{ route('inventory.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('inventory.*') ? $resActiveClass : $resInactiveClass }}">
+            <a href="{{ route('inventory.index') }}" class="{{ $resNavClass }} {{ (request()->routeIs('inventory.*') && !request()->routeIs('inventory.scan-qr') && !request()->routeIs('inventory.stock-approvals.*')) ? $resActiveClass : $resInactiveClass }}">
                 {{ __('ui.inventory_list') }}
             </a>
 

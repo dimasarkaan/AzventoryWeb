@@ -1,111 +1,101 @@
 <div align="center">
 
-# Azventory
-**Sistem Informasi Manajemen Stok dan Inventaris**
+<!-- Banner Section -->
+<img src="./public/images/bannerazventory.png" alt="Azventory Banner" width="100%">
 
-[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=flat-square&logo=laravel)](https://laravel.com)
-[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat-square&logo=php)](https://php.net)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](#)
+# 📦 Azventory
+### (Azzahra Computer Inventory)
 
-Sistem berbasis web untuk pencatatan pergudangan, manajemen aset, dan monitoring peminjaman barang. 
-Dikembangkan sebagai implementasi sistem informasi pada lingkungan gudang atau kantor.
+[![Laravel](https://img.shields.io/badge/Laravel-11-FF2D20?style=for-the-badge&logo=laravel)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php)](https://php.net)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](#)
+
+Aplikasi manajemen stok dan inventaris yang dikembangkan khusus untuk **CV Azzahra Computer**. 
+Sistem ini dirancang sebagai implementasi **Tugas Akhir** dalam bidang sistem informasi.
 
 </div>
 
 ---
 
-## Deskripsi Sistem
-Azventory dirancang untuk mendokumentasikan alur masuk dan keluar barang serta pengelolaan aset perusahaan secara terintegrasi. Sistem ini menggunakan arsitektur Role-Based Access Control (RBAC) untuk mengatur batasan akses data berdasarkan peran pengguna (Superadmin, Admin, dan Operator).
+## 📋 Deskripsi Proyek
+**Azventory** merupakan sistem informasi yang berfungsi untuk mendokumentasikan alur masuk dan keluar barang, monitoring stok, serta pengelolaan peminjaman inventaris. Nama Azventory sendiri diambil dari akronim *Azzahra Computer Inventory*.
 
-## Fitur Tersedia
+Sistem ini ditujukan untuk mempermudah administrasi pergudangan dengan menerapkan metodologi pencatatan digital yang menggantikan proses manual.
 
-- **Manajemen Pengguna dan Hak Akses**: Pengaturan akses terbagi menjadi tiga level untuk menjaga akses data tetap sesuai dengan kewenangan masing-masing peran.
-- **Pencatatan Stok Barang**: Mendukung pendataan barang masuk dan keluar dengan pencatatan log aktivitas untuk setiap transaksi stok.
-- **Sistem Peminjaman**: Modul untuk mendata barang yang dipinjam oleh personil tertentu, lengkap dengan estimasi waktu pengembalian dan status kondisi barang.
-- **Monitoring Aset**: Fitur untuk melihat status barang di berbagai lokasi dan kategori, serta identifikasi barang dengan jumlah stok di bawah batas minimum.
-- **Dokumentasi API**: Menyediakan akses data melalui program pendukung untuk integrasi dengan sistem lain menggunakan standar REST API.
-- **Pelaporan**: Fasilitas ekspor data dalam format dokumen PDF dan file Excel untuk kebutuhan dokumentasi manual atau audit periodik.
+## 🚀 Fitur Utama
+Sistem ini mencakup berbagai modul fungsional yang saling terintegrasi:
 
-## Teknologi yang Digunakan
+- 🔐 **Manajemen Hak Akses (RBAC)**: Pembagian akses data berbasis peran (Superadmin, Admin, dan Operator).
+- 📦 **Pengelolaan Stok**: Pencatatan mutasi barang masuk dan keluar secara terorganisir.
+- 🤝 **Modul Peminjaman**: Pendataan barang yang dipinjam beserta riwayat pengembalian dan kondisi fisik barang.
+- 📊 **Monitoring Kritis**: Identifikasi otomatis untuk barang yang stoknya di bawah batas minimum (Threshold).
+- 🏷️ **Integrasi QR Code**: Sistem pendataan barang menggunakan kode QR untuk mempermudah identifikasi unit.
+- 📄 **Pelaporan Terpadu**: Fasilitas pembuatan laporan periodik dalam format PDF (Kop Surat) dan Excel.
+- 🔗 **API Gateway**: Kesiapan integrasi data dengan aplikasi pihak ketiga melalui RESTful API.
 
-| Komponen | Teknologi |
+## 🛠️ Arsitektur Teknologi
+Sistem dibangun di atas fondasi teknologi modern untuk memastikan kemudahan pemeliharaan:
+
+| Layer | Teknologi |
 | --- | --- |
-| **Framework Utama** | [Laravel 11](https://laravel.com) |
-| **Bahasa Pemrograman** | [PHP 8.2+](https://php.net) |
-| **Frontend Styling** | [Tailwind CSS](https://tailwindcss.com) & [Alpine.js](https://alpinejs.dev) |
+| **Backend** | [Laravel 11](https://laravel.com) (PHP 8.2+) |
+| **Frontend** | [Tailwind CSS](https://tailwindcss.com) & [Alpine.js](https://alpinejs.dev) |
 | **Database** | MySQL / MariaDB |
-| **Autentikasi API** | Laravel Sanctum |
+| **Keamanan** | Laravel Sanctum (API Tokens) & Spatie ActivityLog |
 
-## Panduan Instalasi Lokal
+## 💻 Panduan Instalasi Lokal
 
-Ikuti langkah-langkah di bawah ini untuk mengunduh dan menjalankan proyek ini:
-
-### 1. Kebutuhan Sistem
-- Koneksi Internet (untuk instalasi dependensi)
-- PHP versi 8.2 ke atas
+### 1. Prasyarat Sistem
+- PHP versi 8.2 atau lebih tinggi
 - Composer
 - Node.js & NPM
-- Layanan database MySQL
+- MySQL Database Engine
 
-### 2. Pemasangan Kode
+### 2. Langkah Instalasi
 ```bash
-# Salin repositori ke direktori lokal
+# Clone repositori
 git clone https://github.com/Username-Anda/AzventoryWeb.git
 
 # Masuk ke folder proyek
 cd AzventoryWeb
 
-# Instal dependensi backend
+# Pasang dependensi
 composer install
-
-# Instal dependensi frontend dan kompilasi aset
 npm install
+
+# Proses kompilasi aset frontend
 npm run build
 ```
 
-### 3. Konfigurasi Database
-1. Gandakan file `.env.example` menjadi `.env`.
-2. Generate Application Key menggunakan perintah:
+### 3. Konfigurasi Sistem
+1. Salin file `.env.example` menjadi `.env`.
+2. Generate kunci keamanan: `php artisan key:generate`.
+3. Atur parameter koneksi database pada file `.env`.
+4. Jalankan perintah migrasi dan input data awal:
    ```bash
-   php artisan key:generate
-   ```
-3. Sesuaikan parameter database berikut pada file `.env`:
-   ```env
-   DB_CONNECTION=mysql
-   DB_HOST=127.0.0.1
-   DB_PORT=3306
-   DB_DATABASE=nama_database_anda
-   DB_USERNAME=root
-   DB_PASSWORD=
+   php artisan migrate --force --seed
    ```
 
-### 4. Setup Database dan Akun
-Jalankan migrasi untuk membuat tabel dan mengisi data awal:
-```bash
-php artisan migrate --force --seed
-```
-
-### 5. Menjalankan Aplikasi
-Jalankan server pengembangan:
+### 4. Eksekusi
+Jalankan server lokal melalui perintah:
 ```bash
 php artisan serve
 ```
-Akses aplikasi melalui alamat `http://127.0.0.1:8000`.
+Akses sistem melelui browser di alamat `http://127.0.0.1:8000`.
 
 ---
 
-## Akun Akses Default
-Jika menggunakan data *seed* awal, gunakan kredensial berikut untuk masuk:
-- **Superadmin**: superadmin@azventory.com (Password: password)
-- **Admin**: admin@azventory.com (Password: password)
-- **Operator**: operator@azventory.com (Password: password)
+## 🔑 Akses Akun (Default Seeding)
+- **Superadmin**: superadmin@azventory.com (Password: `password`)
+- **Admin**: admin@azventory.com (Password: `password`)
+- **Operator**: operator@azventory.com (Password: `password`)
 
-## Dokumentasi Tambahan
-Untuk informasi operasional lebih lanjut, silakan merujuk ke dokumen berikut:
-- [Panduan Integrasi API](./Panduan_Integrasi_API.md)
-- [Panduan Pembaruan Sistem di cPanel](./Panduan_Pembaruan_Sistem.md)
+## 📚 Dokumentasi Teknis
+Tersedia panduan khusus untuk operasional dan pengembangan lanjutan:
+- [Tutorial Integrasi API](./Panduan_Integrasi_API.md)
+- [Instruksi Pembaruan Sistem di cPanel](./Panduan_Pembaruan_Sistem.md)
 - [Checklist Kesiapan Produksi](./Production_Readiness.md)
 
 ---
-Dokumentasi ini disusun sebagai panduan teknis umum bagi pengembang dan administrator sistem.
+*Proyek ini dikembangkan dalam rangka pemenuhan syarat Tugas Akhir Program Studi Sistem Informasi.*
