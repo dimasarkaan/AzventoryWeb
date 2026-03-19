@@ -37,6 +37,23 @@ class AppServiceProvider extends ServiceProvider
 
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
 
+        // Custom Reset Password Email (Indonesian)
+        \Illuminate\Auth\Notifications\ResetPassword::toMailUsing(function ($notifiable, $token) {
+            $resetUrl = url(config('app.url') . route('password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ], false));
+
+            return (new \Illuminate\Notifications\Messages\MailMessage)
+                ->subject('Atur Ulang Kata Sandi - ' . config('app.name'))
+                ->greeting('Halo!')
+                ->line('Anda menerima email ini karena kami menerima permintaan atur ulang kata sandi untuk akun Anda.')
+                ->action('Atur Ulang Kata Sandi', $resetUrl)
+                ->line('Link atur ulang kata sandi ini akan kedaluwarsa dalam 60 menit.')
+                ->line('Jika Anda tidak merasa melakukan permintaan ini, abaikan saja email ini.')
+                ->salutation('Salam,' . PHP_EOL . config('app.name'));
+        });
+
         // Environment validation untuk production
         if (app()->environment('production')) {
             $this->validateCriticalEnvVariables();
