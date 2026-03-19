@@ -245,11 +245,15 @@ img {
 
 .button-blue,
 .button-primary {
-    background-color: #0f172a;
-    border-bottom: 14px solid #0f172a;
-    border-left: 28px solid #0f172a;
-    border-right: 28px solid #0f172a;
-    border-top: 14px solid #0f172a;
+    background-color: #2563eb;
+    border-bottom: 14px solid #1d4ed8;
+    border-left: 28px solid #2563eb;
+    border-right: 28px solid #2563eb;
+    border-top: 14px solid #2563eb;
+}
+
+.button-primary:hover {
+    background-color: #1d4ed8;
 }
 
 .button-green,
@@ -278,10 +282,11 @@ img {
 }
 
 .panel-content {
-    background-color: #f8fafc;
+    background-color: #f1f5f9;
     color: #334155;
     padding: 24px;
     border-radius: 0 12px 12px 0;
+    font-style: italic;
 }
 
 .panel-content p {
