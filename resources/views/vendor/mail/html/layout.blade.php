@@ -10,6 +10,8 @@
 @media only screen and (max-width: 600px) {
 .inner-body {
 width: 100% !important;
+border-radius: 0 !important;
+border-top: 6px solid #2563eb !important;
 }
 
 .footer {
