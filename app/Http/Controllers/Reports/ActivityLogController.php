@@ -71,14 +71,18 @@ class ActivityLogController extends Controller
                     $query->where(function ($q) {
                         $q->where('action', 'like', '%inventory%')
                             ->orWhere('action', 'like', '%stock%')
+                            ->orWhere('action', 'like', '%stok%')
                             ->orWhere('action', 'like', '%item%')
-                            ->orWhere('action', 'like', '%barang%');
+                            ->orWhere('action', 'like', '%barang%')
+                            ->orWhere('action', 'like', '%sparepart%');
                     });
                     break;
                 case 'user':
                     $query->where(function ($q) {
                         $q->where('action', 'like', '%user%')
+                            ->orWhere('action', 'like', '%pengguna%')
                             ->orWhere('action', 'like', '%profile%')
+                            ->orWhere('action', 'like', '%profil%')
                             ->orWhere('action', 'like', '%password%')
                             ->orWhere('action', 'like', '%role%');
                     });

@@ -27,63 +27,76 @@
                             @csrf
                             @method('PUT')
         
-                            <div class="space-y-4">
-                                <h3 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">{{ __('ui.account_info') }}</h3>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <!-- Read Only Info -->
-                                    <div>
-                                        <span class="input-label block mb-2">{{ __('ui.username') }}</span>
-                                        <div class="input-field bg-secondary-50 text-secondary-500 cursor-not-allowed">
-                                            {{ $user->username }}
-                                        </div>
-                                    </div>
-            
-                                    <div>
-                                        <label for="email" class="input-label">{{ __('ui.email_address') }} <span class="text-danger-500">*</span></label>
-                                        <input type="email" name="email" id="email" class="input-field w-full" value="{{ old('email', $user->email) }}" autocomplete="email" required>
-                                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
-                                    </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                <!-- Area Informasi Akun -->
+                                <div class="md:col-span-2 border-b border-secondary-100 pb-2 mb-2">
+                                    <h3 class="text-lg font-bold text-secondary-900">{{ __('ui.account_info') }}</h3>
                                 </div>
 
-                                <!-- Editable Fields -->
-                                <div>
+                                <!-- Nama Lengkap -->
+                                <div class="space-y-2">
+                                    <label for="name" class="input-label">{{ __('ui.full_name') }} <span class="text-danger-500">*</span></label>
+                                    <input id="name" class="input-field" type="text" name="name" value="{{ old('name', $user->name) }}" autocomplete="name" required />
+                                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                                </div>
+
+                                <!-- Username (Read Only) -->
+                                <div class="space-y-2">
+                                    <label for="username_display" class="input-label">{{ __('ui.username') }}</label>
+                                    <input type="text" id="username_display" class="input-field bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->username }}" disabled />
+                                </div>
+        
+                                <!-- Email -->
+                                <div class="space-y-2">
+                                    <label for="email" class="input-label">{{ __('ui.email_address') }} <span class="text-danger-500">*</span></label>
+                                    <input type="email" name="email" id="email" class="input-field w-full" value="{{ old('email', $user->email) }}" autocomplete="email" required>
+                                    <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                                </div>
+
+                                <!-- Jabatan -->
+                                <div class="space-y-2">
                                     <label for="jabatan" class="input-label">{{ __('ui.job_position') }} <span class="text-danger-500">*</span></label>
                                     <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" autocomplete="organization-title" required />
                                     <x-input-error :messages="$errors->get('jabatan')" class="mt-2" />
                                 </div>
         
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="role" class="input-label">{{ __('ui.access_role') }} <span class="text-danger-500">*</span></label>
-                                        @php
-                                            $roleOptions = [
-                                                \App\Enums\UserRole::OPERATOR->value => __('ui.role_operator_desc'),
-                                                \App\Enums\UserRole::ADMIN->value => __('ui.role_admin_desc'),
-                                                \App\Enums\UserRole::SUPERADMIN->value => __('ui.role_superadmin_desc'),
-                                            ];
-                                        @endphp
-                                        <x-select name="role" id="role" :options="$roleOptions" :selected="old('role', $user->role->value)" placeholder="{{ __('ui.select_role') }}" width="w-full" />
-                                        <x-input-error :messages="$errors->get('role')" class="mt-2" />
-                                    </div>
-            
-                                    <div>
-                                        <label for="status" class="input-label">{{ __('ui.account_status') }}</label>
-                                        @php
-                                            $statusOptions = [
-                                                'aktif' => __('ui.active'),
-                                                'nonaktif' => __('ui.inactive'),
-                                            ];
-                                        @endphp
-                                        <x-select name="status" id="status" :options="$statusOptions" :selected="old('status', $user->status)" placeholder="{{ __('ui.select_status') }}" width="w-full" />
-                                        <x-input-error :messages="$errors->get('status')" class="mt-2" />
-                                    </div>
+                                <!-- Role -->
+                                <div class="space-y-2">
+                                    <label for="role" class="input-label">{{ __('ui.access_role') }} <span class="text-danger-500">*</span></label>
+                                    @php
+                                        $roleOptions = [
+                                            \App\Enums\UserRole::OPERATOR->value => __('ui.role_operator_desc'),
+                                            \App\Enums\UserRole::ADMIN->value => __('ui.role_admin_desc'),
+                                            \App\Enums\UserRole::SUPERADMIN->value => __('ui.role_superadmin_desc'),
+                                        ];
+                                    @endphp
+                                    <x-select name="role" id="role" :options="$roleOptions" :selected="old('role', $user->role->value)" placeholder="{{ __('ui.select_role') }}" width="w-full" />
+                                    <x-input-error :messages="$errors->get('role')" class="mt-2" />
+                                </div>
+        
+                                <!-- Status -->
+                                <div class="space-y-2">
+                                    <label for="status" class="input-label">{{ __('ui.account_status') }} <span class="text-danger-500">*</span></label>
+                                    @php
+                                        $statusOptions = [
+                                            'aktif' => __('ui.active'),
+                                            'nonaktif' => __('ui.inactive'),
+                                        ];
+                                    @endphp
+                                    <x-select name="status" id="status" :options="$statusOptions" :selected="old('status', $user->status)" placeholder="{{ __('ui.select_status') }}" width="w-full" />
+                                    <x-input-error :messages="$errors->get('status')" class="mt-2" />
                                 </div>
                             </div>
         
                             <div class="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-secondary-100">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('ui.save_changes') }}
+                                <button type="submit" id="submit-btn" class="btn btn-primary">
+                                    <span class="inline-flex items-center gap-2">
+                                        <svg id="btn-spinner" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>{{ __('ui.save_changes') }}</span>
+                                    </span>
                                 </button>
                             </div>
                         </form>
@@ -128,6 +141,17 @@
     </div>
     @push('scripts')
     <script>
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submit-btn');
+            const spinner = document.getElementById('btn-spinner');
+            
+            if (btn.disabled) return;
+            
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+            spinner.classList.remove('hidden');
+        });
+
         function confirmReset(event) {
             event.preventDefault();
             const form = event.target.closest('form');

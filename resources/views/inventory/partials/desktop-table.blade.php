@@ -21,7 +21,7 @@
                         <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.location') }}</th>
                     @endif
                     <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[10%]">{{ __('ui.stock') }}</th>
-                    <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[14%]">{{ __('ui.actions') }}</th>
+                    <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,26 +29,24 @@
                     <x-inventory.table-row :sparepart="$sparepart" :trash="request('trash')" />
                 @empty
                     <tr>
-                        <td colspan="{{ request('trash') ? '9' : '8' }}" class="px-6 py-12 text-center text-secondary-500">
-                            <div class="flex flex-col items-center justify-center w-full">
-                                @php
-                                    $isFiltered = request('search') || request('category') || request('brand') || request('location') || request('color');
-                                @endphp
-
-                                <div class="h-16 w-16 bg-secondary-100 text-secondary-400 rounded-full flex items-center justify-center mb-4 shadow-sm border border-secondary-200">
+                        <td colspan="{{ request('trash') ? '9' : '8' }}" class="py-24" style="text-align:center;">
+                            @php
+                                $isFiltered = request('search') || request('category') || request('brand') || request('location') || request('color') || request('type') || request('condition');
+                                $bgCircle = request('trash') ? 'bg-danger-50 text-danger-500' : ($isFiltered ? 'bg-primary-50 text-primary-500' : 'bg-secondary-50 text-secondary-400');
+                            @endphp
+                            <div style="display:inline-flex; flex-direction:column; align-items:center; max-width:360px; width:100%;">
+                                <div class="w-24 h-24 {{ $bgCircle }} rounded-full flex items-center justify-center mb-5 shadow-none border-0">
                                     @if(request('trash'))
-                                        {{-- Trash Icon --}}
-                                        <x-icon.trash class="w-8 h-8 text-danger-400" />
+                                        <x-icon.trash class="w-11 h-11" />
                                     @elseif($isFiltered)
-                                        {{-- Search/Filter Icon --}}
-                                        <x-icon.search class="w-8 h-8 text-secondary-400" />
+                                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                                        </svg>
                                     @else
-                                        {{-- Default Box Icon --}}
-                                        <x-icon.box class="w-8 h-8 text-secondary-400" />
+                                        <x-icon.box class="w-11 h-11" />
                                     @endif
                                 </div>
-
-                                <p class="text-lg font-bold text-secondary-900 tracking-tight">
+                                <p class="text-lg font-semibold text-secondary-900 mb-1.5" style="text-align:center;">
                                     @if(request('trash'))
                                         {{ __('ui.trash_empty') }}
                                     @elseif($isFiltered)
@@ -57,8 +55,7 @@
                                         {{ __('ui.inventory_empty') }}
                                     @endif
                                 </p>
-
-                                <p class="text-sm mt-1 max-w-sm mx-auto leading-relaxed text-center text-secondary-500">
+                                <p class="text-sm text-secondary-500 leading-relaxed" style="text-align:center;">
                                     @if(request('trash'))
                                         {{ __('ui.trash_empty_desc') }}
                                     @elseif($isFiltered)

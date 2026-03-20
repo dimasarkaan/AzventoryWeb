@@ -20,6 +20,7 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'role' => 'required|in:superadmin,admin,operator',
             'jabatan' => 'required|string|max:255',
@@ -33,6 +34,7 @@ class StoreUserRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'name' => 'Nama Lengkap',
             'email' => 'Alamat Email',
             'role' => 'Peran',
             'jabatan' => 'Jabatan',

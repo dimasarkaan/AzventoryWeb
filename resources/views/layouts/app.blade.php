@@ -178,6 +178,9 @@
                 @if(session('warning'))
                     warning: "{{ session('warning') }}",
                 @endif
+                @if(session('info'))
+                    info: "{{ session('info') }}",
+                @endif
             };
 
             // Informasi User saat ini untuk filter realtime

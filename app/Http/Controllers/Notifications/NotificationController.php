@@ -17,7 +17,13 @@ class NotificationController extends Controller
             return $request->user()->unreadNotifications()->latest()->take(5)->get();
         }
 
-        $notifications = $request->user()->notifications()->paginate(10);
+        $query = $request->user()->notifications();
+
+        if ($request->query('filter') === 'unread') {
+            $query = $request->user()->unreadNotifications();
+        }
+
+        $notifications = $query->latest()->paginate(10)->withQueryString();
 
         return view('notifications.index', compact('notifications'));
     }

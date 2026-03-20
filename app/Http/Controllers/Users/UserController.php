@@ -79,7 +79,7 @@ class UserController extends Controller
         $password = 'password123'; // Default password
 
         $user = User::create([
-            'name' => $username, // Default name
+            'name' => $request->name,
             'username' => $username,
             'email' => $request->email,
             'password' => \Illuminate\Support\Facades\Hash::make($password),
@@ -123,6 +123,7 @@ class UserController extends Controller
     {
         $this->authorize('update', $user);
         $user->update([
+            'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
             'jabatan' => $request->jabatan,

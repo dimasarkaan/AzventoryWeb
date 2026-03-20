@@ -16,6 +16,11 @@ return [
     'loading' => 'Memuat...',
     'no_data' => 'Tidak ada data tersedia',
     'confirm_delete' => 'Apakah Anda yakin ingin menghapus data ini?',
+    'all' => 'Semua',
+    'unread' => 'Belum Dibaca',
+    'today' => 'Hari Ini',
+    'yesterday' => 'Kemarin',
+    'older' => 'Terdahulu',
 
     // Auth
     'login' => 'Masuk',
@@ -256,6 +261,8 @@ return [
     // User Management - Create
     'add_new_user' => 'Tambah Pengguna Baru',
     'add_user_desc' => 'Buat akun untuk staff atau admin baru.',
+    'full_name' => 'Nama Lengkap',
+    'placeholder_full_name' => 'Contoh: Ahmad Subardjo',
     'account_info' => 'Informasi Akun',
     'email_address' => 'Alamat Email',
     'account_status' => 'Status Akun',
@@ -674,6 +681,10 @@ return [
     'notification_stock_request' => 'Permintaan Stok Baru',
     'notification_stock_request_body' => 'Pengajuan stok :type Anda untuk :name telah :status.',
     'notification_new_stock_request' => 'Pengajuan stok :type baru untuk :name oleh :user.',
+    'no_unread_notifications' => 'Tidak ada notifikasi yang belum dibaca.',
+    'confirm_mark_all_read' => 'Tandai Semua Dibaca?',
+    'confirm_mark_all_read_desc' => 'Tindakan ini akan menandai semua notifikasi Anda sebagai sudah dibaca secara permanen.',
+    'yes_mark_all' => 'Ya, Tandai Semua',
 
     // Legend / Keterangan Simbol
     'legend_title' => 'Keterangan Simbol',

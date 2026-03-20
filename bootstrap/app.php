@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
         $middleware->alias([
+            'user.active' => \App\Http\Middleware\EnsureUserIsActive::class,
             'password.changed' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);

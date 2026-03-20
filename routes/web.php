@@ -47,7 +47,7 @@ Route::get('/dashboard', DashboardRedirectController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::middleware(['auth', 'verified', 'password.changed'])->group(function () {
+Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->group(function () {
 
     // --- Fitur Dashboard ---
     Route::prefix('dashboard')->name('dashboard.')->group(function () {

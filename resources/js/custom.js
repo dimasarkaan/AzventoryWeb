@@ -71,5 +71,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.flashMessages.warning) {
             window.showToast('warning', window.flashMessages.warning);
         }
+
+        if (window.flashMessages.info) {
+            window.showToast('info', window.flashMessages.info);
+        }
     }
 });

@@ -61,13 +61,6 @@
                 </div>
             </div>
 
-            {{-- Footer --}}
-            <div class="px-6 py-4 bg-secondary-50/50 border-t border-secondary-100 flex justify-end">
-                <button @click="showActivityModal = false" 
-                        class="px-4 py-2 text-sm font-bold text-secondary-700 bg-white border border-secondary-300 rounded-lg hover:bg-secondary-50 transition-all">
-                    Tutup
-                </button>
-            </div>
         </div>
     </div>
 </div>

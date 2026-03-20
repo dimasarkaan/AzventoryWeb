@@ -114,15 +114,19 @@
                             <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
                                 <template x-if="notifications.length > 0">
                                     <template x-for="notification in notifications" :key="notification.id">
-                                        <div class="block px-4 py-3 hover:bg-secondary-50 border-b border-secondary-50 last:border-0 transition duration-150 group relative">
-                                            <div @click="markAsRead(notification.id, notification.data.url, notification.type)" class="cursor-pointer flex gap-3">
+                                        <div @click="markAsRead(notification.id, notification.data.url, notification.type)" 
+                                             class="block cursor-pointer border-b border-secondary-50 last:border-0 transition duration-150 group relative"
+                                             :class="notification.read_at ? 'hover:bg-secondary-50' : 'bg-primary-50/20 hover:bg-primary-50/40 border-l-4 border-l-primary-500'">
+                                            <div class="px-4 py-3 flex gap-3">
                                                 <div class="flex-shrink-0 mt-1">
-                                                     <div class="w-2 h-2 rounded-full" :class="notification.read_at ? 'bg-transparent' : 'bg-primary-500'"></div>
+                                                     <div x-html="getIcon(notification.type)" class="w-8 h-8 flex items-center justify-center"></div>
                                                 </div>
-                                                <div class="flex-1">
-                                                    <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors" x-text="notification.data.title || '{{ __('ui.new_notification') }}'"></p>
+                                                <div class="flex-1 min-w-0">
+                                                    <p class="text-sm font-medium text-secondary-900 group-hover:text-primary-600 transition-colors truncate" 
+                                                       :class="notification.read_at ? 'font-normal text-secondary-600' : 'font-semibold'"
+                                                       x-text="notification.data.title || '{{ __('ui.new_notification') }}'"></p>
                                                     <p class="text-xs text-secondary-500 line-clamp-2 mt-0.5" x-text="notification.data.message"></p>
-                                                    <p class="text-[10px] text-secondary-400 mt-1" x-text="timeAgo(notification.created_at) + ' • ' + new Date(notification.created_at).toLocaleString('id-ID')"></p>
+                                                    <p class="text-[10px] text-secondary-400 mt-1" x-text="timeAgo(notification.created_at)"></p>
                                                 </div>
                                             </div>
                                             <!-- Tombol Tandai Dibaca Manual -->
@@ -192,23 +196,10 @@
                                                 }
                                             });
 
-                                            // Tampilkan Toast
-                                            const Toast = Swal.mixin({
-                                                toast: true,
-                                                position: 'top-end',
-                                                showConfirmButton: false,
-                                                timer: 4000,
-                                                timerProgressBar: true,
-                                                customClass: { popup: 'solid-toast-popup' }
-                                            });
-
-                                            Toast.fire({
-                                                icon: 'info',
-                                                // String HTML aman tanpa konflik kutipan
-                                                iconHtml: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>`,
-                                                title: notification.title || '{{ __('ui.new_notification') }}',
-                                                text: notification.message
-                                            });
+                                            // Tampilkan Toast (Sistem Terpadu - Langsung Muncul)
+                                            if (typeof window.showToast === 'function') {
+                                                window.showToast(notification.type || 'success', notification.message || notification.title);
+                                            }
                                         });
                                 }
                             },
@@ -260,7 +251,22 @@
                                         }
                                     })
                                     .catch(error => console.error(error));
-                            }
+                            },
+                            getIcon(type) {
+                                if (type.includes('LowStock') || type.includes('ApproachingStock')) {
+                                    return '<div class="p-1.5 bg-warning-50 text-warning-600 rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>';
+                                }
+                                if (type.includes('StockRequest')) {
+                                    return '<div class="p-1.5 bg-primary-50 text-primary-600 rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>';
+                                }
+                                if (type.includes('OverdueBorrowing')) {
+                                    return '<div class="p-1.5 bg-danger-50 text-danger-600 rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>';
+                                }
+                                if (type.includes('ReportReady')) {
+                                    return '<div class="p-1.5 bg-success-50 text-success-600 rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>';
+                                }
+                                return '<div class="p-1.5 bg-secondary-50 text-secondary-600 rounded-lg"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg></div>';
+                            },
                         }
                     }
                 </script>

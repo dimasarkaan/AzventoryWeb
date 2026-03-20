@@ -39,6 +39,13 @@ class ReportController extends Controller
      */
     public function download(Request $request)
     {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ], [
+            'end_date.after_or_equal' => 'Tanggal akhir tidak boleh lebih awal dari tanggal mulai.',
+        ]);
+
         $type = $request->input('report_type', 'inventory');
         $period = $request->input('period', 'all');
         $format = $request->input('export_format', 'pdf');
@@ -60,14 +67,24 @@ class ReportController extends Controller
         }
 
         if ($format !== 'excel') {
-            // Snapshot data for PDF Queue (To ensure consistent data since it's processed later)
+            // Snapshot data for PDF Queue
             $reportData = $this->reportService->getReportData($type, $location, $startDate, $endDate);
 
             \App\Jobs\GenerateReportJob::dispatch($request->user(), $reportData, $startDate, $endDate, $location, $type);
 
             $this->logActivity('Laporan Diproses', "Meminta antrean laporan PDF tipe: {$type}");
 
-            return back()->with('success', 'Laporan sedang memproses. Anda akan menerima notifikasi saat laporan siap diunduh.');
+            $message = 'Laporan sedang diproses. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'type' => 'info'
+                ]);
+            }
+
+            return back()->with('info', $message);
         }
 
         // Jalur Export Excel (Response Langsung menggunakan Builder Streaming)
