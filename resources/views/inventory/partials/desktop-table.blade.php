@@ -3,7 +3,7 @@
         <table class="table-modern w-full table-fixed">
             <thead>
                 <tr>
-                    @if(request('trash'))
+                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN))
                         <th class="w-[5%] px-4 py-3 text-center">
                             <input type="checkbox" id="select-all" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
                         </th>
@@ -29,7 +29,7 @@
                     <x-inventory.table-row :sparepart="$sparepart" :trash="request('trash')" />
                 @empty
                     <tr>
-                        <td colspan="{{ request('trash') ? '9' : '8' }}" class="py-24" style="text-align:center;">
+                        <td colspan="{{ (auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN)) ? (request('filter') == 'problematic' ? '6' : '9') : (request('filter') == 'problematic' ? '5' : '8') }}" class="py-24" style="text-align:center;">
                             @php
                                 $isFiltered = request('search') || request('category') || request('brand') || request('location') || request('color') || request('type') || request('condition');
                                 $bgCircle = request('trash') ? 'bg-danger-50 text-danger-500' : ($isFiltered ? 'bg-primary-50 text-primary-500' : 'bg-secondary-50 text-secondary-400');
@@ -75,7 +75,7 @@
             <tbody id="skeleton-body" class="hidden divide-y divide-secondary-100 bg-white">
                 @for ($i = 0; $i < 5; $i++)
                     <tr>
-                        @if(request('trash'))
+                        @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN))
                             <td class="px-4 py-4 text-center">
                                 <div class="h-4 w-4 bg-secondary-100 rounded animate-pulse mx-auto"></div>
                             </td>
@@ -139,9 +139,11 @@
     </div>
 
     <!-- Pagination -->
-    @if($spareparts->hasPages())
-        <div class="bg-secondary-50 px-4 py-3 border-t border-secondary-200 sm:px-6">
-            {{ $spareparts->appends(request()->query())->links() }}
-        </div>
-    @endif
+    <div class="inventory-pagination-desktop">
+        @if($spareparts->hasPages())
+            <div class="bg-secondary-50 px-4 py-3 border-t border-secondary-200 sm:px-6">
+                {{ $spareparts->appends(request()->query())->links() }}
+            </div>
+        @endif
+    </div>
 </div>

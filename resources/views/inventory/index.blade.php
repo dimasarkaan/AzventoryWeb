@@ -66,7 +66,7 @@
                             </div>
                         </div>
                     </div>
-                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
+                    @if(in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
                      <!-- Trash Toggle Button -->
                      <a href="{{ request('trash') ? route('inventory.index') : route('inventory.index', ['trash' => 'true']) }}" 
                         class="btn flex items-center justify-center p-2.5 {{ request('trash') ? 'btn-danger' : 'btn-secondary' }}" 
@@ -92,8 +92,61 @@
                 </div>
             </div>
 
+            @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
+            <!-- Floating Bulk Action Bar (Styled like Users) -->
+            <div id="bulk-action-bar" 
+                 data-bulk-print-route="{{ route('inventory.qr.bulk-print') }}"
+                 data-bulk-destroy-route="{{ route('inventory.bulk-destroy') }}"
+                 class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl border border-secondary-200 px-6 py-3 flex items-center gap-6 z-50 transition-all duration-300 translate-y-24 opacity-0">
+                <div class="flex items-center gap-2 border-r border-secondary-200 pr-6">
+                    <span class="font-bold text-lg text-primary-600" id="selected-count">0</span>
+                    <span class="text-sm text-secondary-500 font-medium">{{ __('ui.selected') }}</span>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    @if(request('trash'))
+                        @if(in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
+                        <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST">
+                            @csrf
+                            <div id="bulk-restore-inputs"></div>
+                            <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
+                                <x-icon.restore class="w-5 h-5" />
+                                <span class="font-medium">{{ __('ui.restore') }}</span>
+                            </button>
+                        </form>
+                        @endif
+
+                        @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
+                        <form id="bulk-delete-form" action="{{ route('inventory.bulk-force-delete') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <div id="bulk-delete-inputs"></div>
+                            <button type="button" onclick="submitInventoryBulkDelete()" class="btn btn-danger flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all">
+                                <x-icon.trash class="w-4 h-4" />
+                                <span>{{ __('ui.force_delete') }}</span>
+                            </button>
+                        </form>
+                        @endif
+                    @else
+                        {{-- Normal Mode Bulk Actions --}}
+                        <div class="flex items-center gap-1">
+                            <button type="button" onclick="submitInventoryBulkPrint()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                <span class="font-medium">Cetak Label</span>
+                            </button>
+
+                            <button type="button" onclick="submitInventoryBulkDestroy()" class="btn btn-white text-danger-600 hover:text-danger-700 flex items-center gap-2 border-0 bg-transparent hover:bg-danger-50">
+                                <x-icon.trash class="w-5 h-5" />
+                                <span class="font-medium">Hapus Masal</span>
+                            </button>
+                        </div>
+                    @endif
+                </div>
+            </div>
+            @endif
+
             @if(request('trash'))
-                    <!-- Trash Mode Indicator & Bulk Actions -->
+                    <!-- Trash Mode Indicator -->
                     <div class="mb-4 relative">
                         <div class="rounded-lg bg-danger-50 p-4 border border-danger-100 flex flex-col sm:flex-row items-center justify-between gap-4">
                              <div class="flex items-center gap-3">
@@ -106,36 +159,6 @@
                                         {{ __('ui.trash_mode_desc') }}
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-
-                        <!-- Floating Bulk Action Bar -->
-                        <!-- Floating Bulk Action Bar (Styled like Users) -->
-                        <div id="bulk-action-bar" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl border border-secondary-200 px-6 py-3 flex items-center gap-6 z-50 transition-all duration-300 translate-y-24 opacity-0">
-                            <div class="flex items-center gap-2 border-r border-secondary-200 pr-6">
-                                <span class="font-bold text-lg text-primary-600" id="selected-count">0</span>
-                                <span class="text-sm text-secondary-500 font-medium">{{ __('ui.selected') }}</span>
-                            </div>
-                            
-                            <div class="flex items-center gap-3">
-                                <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST">
-                                    @csrf
-                                    <div id="bulk-restore-inputs"></div>
-                                    <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
-                                        <x-icon.restore class="w-5 h-5" />
-                                        <span class="font-medium">{{ __('ui.restore') }}</span>
-                                    </button>
-                                </form>
-
-                                <form id="bulk-delete-form" action="{{ route('inventory.bulk-force-delete') }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <div id="bulk-delete-inputs"></div>
-                                    <button type="button" onclick="submitInventoryBulkDelete()" class="btn btn-danger flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all">
-                                        <x-icon.trash class="w-4 h-4" />
-                                        <span>{{ __('ui.force_delete') }}</span>
-                                    </button>
-                                </form>
                             </div>
                         </div>
                     </div>

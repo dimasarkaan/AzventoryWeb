@@ -8,6 +8,7 @@ use App\Models\Sparepart;
 use App\Models\User;
 use App\Notifications\MissingPriceNotification;
 use App\Services\InventoryService;
+use App\Services\QrCodeService;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,7 @@ class InventoryController extends Controller
 
     protected $qrCodeService;
 
-    public function __construct(InventoryService $inventoryService, \App\Services\QrCodeService $qrCodeService)
+    public function __construct(InventoryService $inventoryService, QrCodeService $qrCodeService)
     {
         $this->inventoryService = $inventoryService;
         $this->qrCodeService = $qrCodeService;
@@ -31,6 +32,10 @@ class InventoryController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->has('trash') && auth()->user()->role !== \App\Enums\UserRole::SUPERADMIN) {
+            abort(403, __('Akses tong sampah dibatasi untuk Superadmin.'));
+        }
+
         $spareparts = $this->inventoryService->getFilteredSpareparts($request->all(), 10);
         $options = $this->inventoryService->getDropdownOptions();
 
@@ -202,11 +207,93 @@ class InventoryController extends Controller
      */
     public function printQrCode(Sparepart $inventory)
     {
-        if (! $inventory->qr_code_path) {
+        if (! $inventory->qr_code_path || ! Storage::disk('public')->exists($inventory->qr_code_path)) {
             abort(404, __('messages.qr_code_not_found'));
         }
 
         return view('inventory.print_label', ['sparepart' => $inventory]);
+    }
+
+    /**
+     * Menampilkan halaman khusus untuk pencetakan banyak label QR sekaligus.
+     */
+    public function bulkPrintQrCode(Request $request)
+    {
+        if (auth()->user()->role === UserRole::OPERATOR) {
+            abort(403, 'Operator tidak memiliki akses untuk cetak massal.');
+        }
+
+        $ids = $request->query('ids');
+
+        if (is_string($ids)) {
+            $ids = explode(',', $ids);
+        }
+
+        if (empty($ids)) {
+            return redirect()->route('inventory.index')->with('warning', 'Pilih minimal satu item untuk dicetak.');
+        }
+
+        if (count($ids) > 100) {
+            return redirect()->back()->with('error', 'Maksimal 100 item untuk satu sesi cetak (keamanan performa).');
+        }
+
+        $spareparts = Sparepart::whereIn('id', $ids)->get()->filter(function ($item) {
+            return $item->qr_code_path && Storage::disk('public')->exists($item->qr_code_path);
+        });
+
+        if ($spareparts->isEmpty()) {
+            abort(404, 'Item tidak ditemukan.');
+        }
+
+        return view('inventory.bulk_print_label', ['spareparts' => $spareparts]);
+    }
+
+    /**
+     * Menghapus banyak item sekaligus (Soft Delete).
+     */
+    public function bulkDestroy(Request $request)
+    {
+        if (auth()->user()->role === UserRole::OPERATOR) {
+            return response()->json(['message' => 'Operator tidak memiliki izin untuk menghapus barang.'], 403);
+        }
+
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json(['message' => 'Pilih minimal satu item.'], 400);
+        }
+
+        Sparepart::whereIn('id', $ids)->delete();
+
+        return response()->json(['message' => 'Berhasil menghapus ' . count($ids) . ' item.']);
+    }
+
+    /**
+     * Mencatat aktivitas pencetakan ke log.
+     */
+    public function logPrintActivity(Request $request)
+    {
+        $request->validate([
+            'ids' => 'required|array',
+            'counts' => 'required|array',
+            'total' => 'required|integer',
+        ]);
+
+        $ids = $request->input('ids');
+        $counts = $request->input('counts');
+        $total = $request->input('total');
+
+        $this->logActivity(
+            'Cetak Label',
+            "Mencetak total " . $total . " label untuk " . count($ids) . " item inventaris.",
+            [
+                'item_ids' => $ids,
+                'counts' => $counts,
+                'total_labels' => $total
+            ]
+        );
+
+        return response()->json(['status' => 'success']);
     }
 
     /**

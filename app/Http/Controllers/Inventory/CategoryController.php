@@ -16,10 +16,11 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::all()->map(function ($cat) {
+        $categories = Category::orderBy('name')->get()->map(function ($cat) {
             return [
                 'id' => $cat->id,
                 'name' => $cat->name,
+                'is_active' => (bool) $cat->is_active,
                 'items_count' => Sparepart::where('category', $cat->name)->count(),
             ];
         });
@@ -48,17 +49,24 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'is_active' => 'sometimes|boolean',
         ]);
 
         $category = Category::findOrFail($id);
         $oldName = $category->name;
         $newName = $request->name;
 
-        DB::transaction(function () use ($category, $oldName, $newName) {
-            $category->update(['name' => $newName]);
+        DB::transaction(function () use ($category, $oldName, $newName, $request) {
+            $updateData = ['name' => $newName];
+            if ($request->has('is_active')) {
+                $updateData['is_active'] = $request->is_active;
+            }
+            $category->update($updateData);
 
             // Update all spareparts that use this category string
-            Sparepart::where('category', $oldName)->update(['category' => $newName]);
+            if ($oldName !== $newName) {
+                Sparepart::where('category', $oldName)->update(['category' => $newName]);
+            }
         });
 
         Cache::forget('inventory_categories');

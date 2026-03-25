@@ -52,6 +52,7 @@ return [
         'username' => 'Username',
         'phone' => 'No. HP',
         'address' => 'Alamat',
+        'token_name' => 'Nama Perangkat / Integrasi',
     ],
 
 ];

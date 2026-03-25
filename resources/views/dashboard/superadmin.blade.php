@@ -607,6 +607,29 @@
                 }
             },
 
+            async toggleCategoryStatus(cat) {
+                try {
+                    const response = await fetch(`/categories/${cat.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ is_active: !cat.is_active, name: cat.name })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.showToast('success', data.message || 'Status kategori berhasil diperbarui.');
+                        this.fetchCategories();
+                    } else {
+                        this.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Toggle status failed:', e);
+                }
+            },
+
             askCatDelete(cat) {
                 this.catConfirmDeleteId = cat.id;
                 this.catConfirmDeleteName = cat.name;
@@ -705,6 +728,29 @@
                 } catch (e) {
                     console.error('Update failed:', e);
                     if (window.showToast) window.showToast('error', 'Terjadi kesalahan saat memperbarui merk.');
+                }
+            },
+
+            async toggleBrandStatus(brand) {
+                try {
+                    const response = await fetch(`/brands/${brand.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ is_active: !brand.is_active, name: brand.name })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        this.showToast('success', data.message || 'Status merk berhasil diperbarui.');
+                        this.fetchBrands();
+                    } else {
+                        this.showToast('warning', data.message);
+                    }
+                } catch (e) {
+                    console.error('Toggle status failed:', e);
                 }
             },
 
@@ -831,6 +877,29 @@
                     }
                 } catch (e) {
                     console.error('Update failed:', e);
+                }
+            },
+
+            async toggleLocationStatus(loc) {
+                try {
+                    const response = await fetch(`/locations/${loc.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ is_active: !loc.is_active, name: loc.name })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (window.showToast) window.showToast('success', data.message || 'Status lokasi berhasil diperbarui.');
+                        this.fetchLocations();
+                    } else {
+                        if (window.showToast) window.showToast('error', data.message);
+                    }
+                } catch (e) {
+                    console.error('Toggle status failed:', e);
                 }
             },
 

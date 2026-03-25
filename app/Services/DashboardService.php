@@ -81,18 +81,23 @@ class DashboardService
      */
     public function getStockSnapshots(): array
     {
-        return [
-            'totalSpareparts' => Sparepart::count(),
-            'totalStock' => Sparepart::sum('stock'),
-            'totalCategories' => Category::count(),
-            'totalBrands' => Brand::count(),
-            'totalLocations' => Location::count(),
-            'pendingApprovalsCount' => StockLog::where('status', 'pending')->count(),
-            'lowStockItems' => Sparepart::where('minimum_stock', '>', 0)
-                ->whereColumn('stock', '<=', 'minimum_stock')
-                ->where('condition', 'Baik')
-                ->take(5)->get(),
-        ];
+        $lastUpdate = Cache::get('inventory_last_updated', now()->timestamp);
+        $cacheKey = "stock_snapshots_{$lastUpdate}";
+
+        return Cache::remember($cacheKey, 3600, function () {
+            return [
+                'totalSpareparts' => Sparepart::count(),
+                'totalStock' => Sparepart::sum('stock'),
+                'totalCategories' => Category::count(),
+                'totalBrands' => Brand::count(),
+                'totalLocations' => Location::count(),
+                'pendingApprovalsCount' => StockLog::where('status', 'pending')->count(),
+                'lowStockItems' => Sparepart::where('minimum_stock', '>', 0)
+                    ->whereColumn('stock', '<=', 'minimum_stock')
+                    ->where('condition', 'Baik')
+                    ->take(5)->get(),
+            ];
+        });
     }
 
     /**

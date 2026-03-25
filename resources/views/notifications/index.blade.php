@@ -24,14 +24,16 @@
                         </a>
                     </div>
                 
-                    <form action="{{ route('notifications.markAllRead') }}" method="POST" id="mark-all-read-form" class="w-full sm:w-auto">
-                        @csrf
-                        @method('PATCH')
-                        <button type="button" onclick="confirmMarkAllRead()" class="btn btn-secondary text-[11px] whitespace-nowrap w-full sm:w-auto justify-center shadow-sm hover:shadow-md transition-all">
-                            <svg class="w-3.5 h-3.5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            {{ __('ui.notification_mark_all_read') }}
-                        </button>
-                    </form>
+                    @if(auth()->user()->unreadNotifications()->count() > 0)
+                        <form action="{{ route('notifications.markAllRead') }}" method="POST" id="mark-all-read-form" class="w-full sm:w-auto">
+                            @csrf
+                            @method('PATCH')
+                            <button type="button" onclick="confirmMarkAllRead()" class="btn btn-secondary text-[11px] whitespace-nowrap w-full sm:w-auto justify-center shadow-sm hover:shadow-md transition-all">
+                                <svg class="w-3.5 h-3.5 mr-2 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                {{ __('ui.notification_mark_all_read') }}
+                            </button>
+                        </form>
+                    @endif
                 </div>
                 @endif
             </div>

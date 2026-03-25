@@ -17,7 +17,16 @@ class PasswordController extends Controller
     {
         $validated = $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', Password::min(8)->max(16)->letters()->numbers(), 'confirmed'],
+            'password' => [
+                'required', 
+                Password::min(8)->max(16)->letters()->numbers(), 
+                'confirmed',
+                function ($attribute, $value, $fail) {
+                    if (Hash::check($value, auth()->user()->password)) {
+                        $fail('Password baru tidak boleh sama dengan password saat ini.');
+                    }
+                },
+            ],
         ]);
 
         $request->user()->update([

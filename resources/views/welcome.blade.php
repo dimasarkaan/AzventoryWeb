@@ -26,6 +26,37 @@
 </head>
 <body class="font-sans text-secondary-900 antialiased bg-white overflow-x-hidden selection:bg-primary-100 selection:text-primary-900" x-data="{ ...scrollReveal(), scrolled: false }" @scroll.window="scrolled = (window.pageYOffset > 20)">
     
+    <!-- Top Progress Bar (Loading Animation) -->
+    <div id="top-progress-bar" class="fixed top-0 left-0 h-1 bg-primary-600 z-[100] transition-all duration-300 ease-out" style="width: 0%; opacity: 0;"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const bar = document.getElementById('top-progress-bar');
+            bar.style.opacity = '1';
+            bar.style.width = '30%';
+            
+            window.addEventListener('load', function() {
+                bar.style.width = '100%';
+                setTimeout(() => {
+                    bar.style.opacity = '0';
+                    setTimeout(() => {
+                        bar.style.width = '0%';
+                    }, 300);
+                }, 200);
+            });
+        });
+
+        // Simulating progress for link clicks (SPA-like feel)
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.hostname === window.location.hostname && !this.hash && this.target !== '_blank') {
+                    const bar = document.getElementById('top-progress-bar');
+                    bar.style.opacity = '1';
+                    bar.style.width = '40%';
+                }
+            });
+        });
+    </script>
+    
     <!-- Navbar -->
     <nav class="fixed top-0 w-full z-50 transition-all duration-300"
          :class="{ 'bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm py-0': scrolled, 'bg-transparent py-2': !scrolled }">
@@ -54,13 +85,13 @@
         <div class="max-w-4xl mx-auto w-full relative z-10">
             <!-- Headline -->
             <h1 class="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-[1.15] sm:leading-[1.1] text-secondary-900 mb-6 reveal-on-scroll delay-100">
-                Solusi Manajemen Stok<br>
+                Sistem Manajemen Stok<br>
                 <span class="text-primary-600">Azzahra Computer</span>
             </h1>
 
             <!-- Subheadline -->
             <p class="text-lg lg:text-xl text-secondary-500 max-w-2xl mx-auto mb-10 leading-relaxed reveal-on-scroll delay-200">
-                Platform terintegrasi untuk mengelola stok komputer, laptop, spareparts di Azzahra Computer Tegal.
+                Digitalisasi pencatatan masuk, keluar, dan peminjaman stok di CV Azzahra Computer.
             </p>
             
             <!-- CTAs -->
@@ -108,11 +139,11 @@
 
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 mb-8 sm:mb-10 text-center mt-32 sm:mt-0">
             <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.15] sm:leading-[1.1] text-secondary-900 mb-3 sm:mb-4 reveal-on-scroll">
-                Mengapa Memilih <br class="hidden sm:block" />
+                Keunggulan Sistem <br class="hidden sm:block" />
                 <span class="text-primary-600">Azventory?</span>
             </h2>
             <p class="text-secondary-500 text-sm sm:text-base leading-relaxed reveal-on-scroll delay-100 max-w-xl mx-auto">
-                Desain modern yang dipadukan dengan performa handal untuk manajemen stok.
+                Fitur utama untuk pendataan stok gudang dan pengorganisiran informasi inventaris.
             </p>
         </div>
 
@@ -133,7 +164,7 @@
                         <x-icon.inventory class="w-8 h-8 opacity-90 group-hover:animate-bounce" />
                     </div>
                     <h3 class="text-xl font-bold mb-3 tracking-wide transition-colors duration-500">Manajemen Terpusat</h3>
-                    <p class="text-secondary-500 group-hover:text-primary-100 leading-relaxed text-sm transition-colors duration-500">Pantau ketersediaan barang di berbagai lokasi gudang secara real-time penuh.</p>
+                    <p class="text-secondary-500 group-hover:text-primary-100 leading-relaxed text-sm transition-colors duration-500">Pantau ketersediaan barang di berbagai lokasi gudang secara terpusat.</p>
                 </div>
 
                 <!-- Card 2 (Lowered) -->
@@ -142,7 +173,7 @@
                         <x-icon.scan-qr class="w-8 h-8 opacity-90 group-hover:animate-pulse relative z-10" />
                     </div>
                     <h3 class="text-xl font-bold mb-3 tracking-wide transition-colors duration-500">QR Code Scanner</h3>
-                    <p class="text-secondary-500 group-hover:text-primary-100 leading-relaxed text-sm transition-colors duration-500">Identifikasi aset instan dengan teknologi pemindaian pintar menggunakan QR Code.</p>
+                    <p class="text-secondary-500 group-hover:text-primary-100 leading-relaxed text-sm transition-colors duration-500">Identifikasi aset melalui teknologi pemindaian QR Code yang telah disesuaikan.</p>
                 </div>
 
                 <!-- Card 3 -->
@@ -151,7 +182,7 @@
                         <svg class="w-8 h-8 opacity-90 group-hover:animate-bounce transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                     </div>
                     <h3 class="text-xl font-bold mb-3 tracking-wide transition-colors duration-500">Monitoring Aktivitas</h3>
-                    <p class="text-secondary-500 group-hover:text-primary-100 leading-relaxed text-sm transition-colors duration-500">Rekam jejak digital lengkap untuk setiap pergerakan barang (masuk/keluar).</p>
+                    <p class="text-secondary-500 group-hover:text-primary-100 leading-relaxed text-sm transition-colors duration-500">Rekam jejak digital untuk setiap pergerakan barang (masuk/keluar).</p>
                 </div>
             </div>
         </div>

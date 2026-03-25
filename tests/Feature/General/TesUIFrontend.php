@@ -17,6 +17,8 @@ class TesUIFrontend extends TestCase
     protected $admin;
 
     protected $superAdmin;
+    
+    protected $item;
 
     protected function setUp(): void
     {
@@ -51,7 +53,7 @@ class TesUIFrontend extends TestCase
 
         $response = $this->actingAs($this->admin)->get(route('inventory.index', ['trash' => 'true']));
 
-        $response->assertStatus(200);
+        $response->assertStatus(403);
 
         // Memastikan Admin tidak bisa melihat tombol Hapus Permanen atau Pulihkan
         $response->assertDontSee(route('inventory.force-delete', $trashedItem->id));

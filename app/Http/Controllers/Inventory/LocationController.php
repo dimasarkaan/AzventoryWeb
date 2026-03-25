@@ -23,6 +23,7 @@ class LocationController extends Controller
             return [
                 'id' => $location->id,
                 'name' => $location->name,
+                'is_active' => (bool) $location->is_active,
                 'is_default' => $location->is_default,
                 'items_count' => Sparepart::where('location', $location->name)->count(),
             ];
@@ -55,17 +56,24 @@ class LocationController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:191|unique:locations,name,' . $location->id,
+            'is_active' => 'sometimes|boolean',
         ]);
 
         $oldName = $location->name;
         $newName = $request->name;
 
-        DB::transaction(function () use ($location, $oldName, $newName) {
+        DB::transaction(function () use ($location, $oldName, $newName, $request) {
             // Update master table
-            $location->update(['name' => $newName]);
+            $updateData = ['name' => $newName];
+            if ($request->has('is_active')) {
+                $updateData['is_active'] = $request->is_active;
+            }
+            $location->update($updateData);
 
             // Bulk update spareparts table (the actual string)
-            Sparepart::where('location', $oldName)->update(['location' => $newName]);
+            if ($oldName !== $newName) {
+                Sparepart::where('location', $oldName)->update(['location' => $newName]);
+            }
         });
 
         Cache::forget('inventory_locations');

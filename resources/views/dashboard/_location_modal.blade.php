@@ -99,6 +99,12 @@
                                             <template x-if="loc.is_default">
                                                 <span class="px-2 py-0.5 text-[10px] bg-primary-50 text-primary-600 font-bold rounded-full border border-primary-100 uppercase tracking-wider">Default</span>
                                             </template>
+                                            <template x-if="!loc.is_active">
+                                                <span class="px-2 py-0.5 text-[10px] bg-secondary-100 text-secondary-500 font-bold rounded-full border border-secondary-200 uppercase tracking-wider">Nonaktif</span>
+                                            </template>
+                                            <template x-if="loc.is_active">
+                                                <span class="px-2 py-0.5 text-[10px] bg-success-50 text-success-600 font-bold rounded-full border border-success-100 uppercase tracking-wider">Aktif</span>
+                                            </template>
                                         </div>
                                         <p class="text-xs text-secondary-500 flex items-center gap-1">
                                             <span class="font-bold text-secondary-900" x-text="loc.items_count"></span> Barang di lokasi ini
@@ -121,6 +127,14 @@
 
                                 {{-- Actions View --}}
                                 <div x-show="editingId !== loc.id" class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                    <button @click="toggleLocationStatus(loc)"
+                                            class="p-2 rounded-xl transition-all"
+                                            :class="loc.is_active ? 'text-secondary-400 hover:text-amber-600 hover:bg-amber-50' : 'text-secondary-400 hover:text-success-600 hover:bg-success-50'"
+                                            :title="loc.is_active ? 'Nonaktifkan' : 'Aktifkan'">
+                                        <svg x-show="loc.is_active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                        <svg x-show="!loc.is_active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </button>
+
                                     <button @click="startEdit(loc)"
                                             class="p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all"
                                             title="Ubah Nama">

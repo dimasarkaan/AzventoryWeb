@@ -9,6 +9,7 @@ Artisan::command('inspire', function () {
 })->purpose('Tampilkan kutipan inspiratif');
 
 Schedule::command('app:send-overdue-notifications')->dailyAt('08:00');
+Schedule::command('app:send-monthly-reports')->monthlyOn(1, '01:00');
 Schedule::command('model:prune', [
     '--model' => [App\Models\ActivityLog::class],
 ])->daily();

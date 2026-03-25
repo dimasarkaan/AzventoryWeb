@@ -11,7 +11,7 @@ return [
     'filter' => 'Saring',
     'choose_file' => 'Pilih file',
     'drag_drop' => 'atau seret dan lepas di sini',
-    'image_help' => 'Format: JPG, JPEG, PNG, WEBP. Maksimal ukuran 10MB. Gambar akan dioptimasi otomatis.',
+    'image_help' => 'Format: JPG, JPEG, PNG, WEBP. Maksimal ukuran 10MB. Gambar akan diproses oleh sistem.',
     'all_brands' => 'Semua Merk',
     'all_categories' => 'Semua Kategori',
     'all_locations' => 'Semua Lokasi',

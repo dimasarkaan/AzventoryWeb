@@ -5,7 +5,7 @@
             <p class="text-secondary-500 mt-2">{{ __('ui.auth_welcome_desc') }}</p>
         </div>
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-5">
+        <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ loading: false }" @submit="loading = true">
             @csrf
 
             <!-- Field Login -->
@@ -48,8 +48,18 @@
                 </label>
             </div>
 
-            <button type="submit" class="w-full btn btn-primary justify-center py-3 text-base shadow-lg shadow-primary-500/20" tabindex="3">
-                {{ __('ui.auth_btn_login') }}
+            <button type="submit" 
+                    class="w-full btn btn-primary justify-center py-3 text-base shadow-lg shadow-primary-500/20 disabled:opacity-70 disabled:cursor-not-allowed" 
+                    tabindex="3"
+                    :disabled="loading">
+                <span x-show="!loading">{{ __('ui.auth_btn_login') }}</span>
+                <span x-show="loading" class="flex items-center gap-2" x-cloak>
+                    <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    {{ __('ui.loading') }}
+                </span>
             </button>
 
             <div class="text-center mt-6">

@@ -6,7 +6,7 @@
             </x-slot>
 
             @if (session('warning'))
-                <div class="mb-4 font-medium text-sm text-yellow-600">
+                <div class="mb-4 font-medium text-sm text-warning-600">
                     {{ session('warning') }}
                 </div>
             @endif
@@ -18,9 +18,9 @@
                 @if(is_null(auth()->user()->password_changed_at))
                     <div class="mb-4">
                         <x-input-label for="username" :value="__('ui.auth_label_username_optional')" />
-                        <x-text-input id="username" class="block mt-1 w-full bg-gray-50" type="text" name="username" :value="old('username', auth()->user()->username)" required autocomplete="username" autofocus />
+                        <x-text-input id="username" class="block mt-1 w-full bg-secondary-50" type="text" name="username" :value="old('username', auth()->user()->username)" required autocomplete="username" autofocus />
                         <x-input-error :messages="$errors->get('username')" class="mt-2" />
-                        <p class="mt-1 text-xs text-gray-500">
+                        <p class="mt-1 text-xs text-secondary-500">
                             {{ __('ui.auth_username_hint') }}
                         </p>
                     </div>

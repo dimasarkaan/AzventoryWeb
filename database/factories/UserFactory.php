@@ -23,7 +23,7 @@ class UserFactory extends Factory
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => 'password',
+            'password' => \Illuminate\Support\Facades\Hash::make('password'),
             'role' => 'operator', // Default valid role
             'status' => 'aktif', // Required for RoleMiddleware
             'password_changed_at' => now(), // Bypass middleware

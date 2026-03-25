@@ -13,7 +13,7 @@ class TesHalamanUtama extends TestCase
         $response = $this->get('/');
 
         $response->assertStatus(200);
-        $response->assertSee('Solusi Manajemen Stok');
+        $response->assertSee('Sistem Manajemen Stok');
         $response->assertSee('Azzahra Computer');
     }
 

@@ -405,13 +405,13 @@ class InventoryService
     {
         return [
             'categories' => Cache::remember('inventory_categories', 3600, function () {
-                return \App\Models\Category::orderBy('name')->pluck('name');
+                return \App\Models\Category::where('is_active', true)->orderBy('name')->pluck('name');
             }),
             'brands' => Cache::remember('inventory_brands', 3600, function () {
-                return \App\Models\Brand::orderBy('name')->pluck('name');
+                return \App\Models\Brand::where('is_active', true)->orderBy('name')->pluck('name');
             }),
             'locations' => Cache::remember('inventory_locations', 3600, function () {
-                return \App\Models\Location::orderBy('name')->pluck('name');
+                return \App\Models\Location::where('is_active', true)->orderBy('name')->pluck('name');
             }),
             'colors' => Cache::remember('inventory_colors', 3600, fn () => Sparepart::whereNotNull('color')->select('color')->distinct()->pluck('color')),
             'units' => Cache::remember('inventory_units', 3600, fn () => Sparepart::whereNotNull('unit')->select('unit')->distinct()->pluck('unit')),

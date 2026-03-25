@@ -4,6 +4,7 @@ namespace Tests\Feature\Roles;
 
 use App\Models\Sparepart;
 use App\Models\User;
+use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -19,12 +20,12 @@ class TesRoleAdmin extends TestCase
         parent::setUp();
         // Buat user admin
         $this->admin = User::factory()->create([
-            'role' => 'admin',
+            'role' => UserRole::ADMIN,
         ]);
 
         // Ensure email is verified and password is changed
-        $this->admin->email_verified_at = now();
-        $this->admin->password_changed_at = now();
+        $this->admin->email_verified_at = \Illuminate\Support\Carbon::now();
+        $this->admin->password_changed_at = \Illuminate\Support\Carbon::now();
         $this->admin->save();
 
         // MOCK image creation and qr code
@@ -315,6 +316,7 @@ class TesRoleAdmin extends TestCase
     public function admin_dapat_mencetak_qr_code()
     {
         $sparepart = Sparepart::factory()->create(['qr_code_path' => 'dummy/qrcode.svg']);
+        \Illuminate\Support\Facades\Storage::disk('public')->put($sparepart->qr_code_path, 'dummy content');
         $response = $this->actingAs($this->admin)->get(route('inventory.qr.print', $sparepart->id));
         $response->assertStatus(200);
     }

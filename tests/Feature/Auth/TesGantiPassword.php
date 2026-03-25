@@ -40,6 +40,57 @@ class TesGantiPassword extends TestCase
     }
 
     #[Test]
+    public function username_otomatis_menjadi_lowercase_dan_tanpa_spasi()
+    {
+        $user = User::factory()->create([
+            'password_changed_at' => null,
+            'role' => UserRole::OPERATOR,
+        ]);
+
+        $response = $this->actingAs($user)
+            ->post(route('password.change.store'), [
+                'username' => 'User Name 123',
+                'password' => 'Password123',
+                'password_confirmation' => 'Password123',
+            ]);
+
+        $response->assertRedirect();
+        $this->assertEquals('username123', $user->fresh()->username);
+    }
+
+    #[Test]
+    public function username_harus_minimal_3_karakter()
+    {
+        $user = User::factory()->create(['password_changed_at' => null]);
+
+        $response = $this->actingAs($user)
+            ->post(route('password.change.store'), [
+                'username' => 'ab',
+                'password' => 'Password123',
+                'password_confirmation' => 'Password123',
+            ]);
+
+        $response->assertSessionHasErrors(['username']);
+        $this->assertEquals('Username harus minimal 3 karakter.', session('errors')->get('username')[0]);
+    }
+
+    #[Test]
+    public function username_tidak_boleh_menggunakan_karakter_khusus_selain_titik_dan_underscore()
+    {
+        $user = User::factory()->create(['password_changed_at' => null]);
+
+        $response = $this->actingAs($user)
+            ->post(route('password.change.store'), [
+                'username' => 'user@name!',
+                'password' => 'Password123',
+                'password_confirmation' => 'Password123',
+            ]);
+
+        $response->assertSessionHasErrors(['username']);
+        $this->assertStringContainsString('Format Username tidak valid', session('errors')->get('username')[0]);
+    }
+
+    #[Test]
     public function user_baru_gagal_ganti_password_jika_username_sudah_dipakai()
     {
         $existing = User::factory()->create(['username' => 'sudah_ada']);

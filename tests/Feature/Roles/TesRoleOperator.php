@@ -4,6 +4,7 @@ namespace Tests\Feature\Roles;
 
 use App\Models\Sparepart;
 use App\Models\User;
+use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -19,12 +20,12 @@ class TesRoleOperator extends TestCase
         parent::setUp();
         // Buat user operator
         $this->operator = User::factory()->create([
-            'role' => 'operator',
+            'role' => UserRole::OPERATOR,
         ]);
 
         // Ensure email is verified and password is changed
-        $this->operator->email_verified_at = now();
-        $this->operator->password_changed_at = now();
+        $this->operator->email_verified_at = \Illuminate\Support\Carbon::now();
+        $this->operator->password_changed_at = \Illuminate\Support\Carbon::now();
         $this->operator->save();
 
         // MOCK image creation and qr code
@@ -292,6 +293,7 @@ class TesRoleOperator extends TestCase
     public function operator_dapat_mencetak_qr_code()
     {
         $sparepart = Sparepart::factory()->create(['qr_code_path' => 'dummy/qrcode.svg']);
+        \Illuminate\Support\Facades\Storage::disk('public')->put($sparepart->qr_code_path, 'dummy content');
         $response = $this->actingAs($this->operator)->get(route('inventory.qr.print', $sparepart->id));
         $response->assertStatus(200);
     }

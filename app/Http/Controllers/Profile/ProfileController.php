@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Profile;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
 use App\Services\ImageOptimizationService;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
@@ -84,6 +86,14 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Mencegah Superadmin terakhir menghapus dirinya sendiri
+        if ($user->role === UserRole::SUPERADMIN) {
+            $superAdminCount = User::where('role', UserRole::SUPERADMIN->value)->count();
+            if ($superAdminCount <= 1) {
+                return back()->with('error', 'Anda tidak dapat menghapus akun karena Anda adalah satu-satunya Superadmin yang tersisa di sistem.');
+            }
+        }
+
         if ($user->borrowings()->where('status', 'borrowed')->exists()) {
             return back()->with('error', 'Anda tidak dapat menghapus akun karena masih memiliki pinjaman barang yang belum dikembalikan.');
         }
@@ -114,6 +124,29 @@ class ProfileController extends Controller
         $user->save();
 
         return response()->json(['status' => 'success', 'settings' => $user->settings]);
+    }
+
+    /**
+     * Menghapus foto profil (avatar) user.
+     */
+    public function deleteAvatar(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user->avatar) {
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($user->avatar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            }
+
+            $user->avatar = null;
+            $user->save();
+
+            $this->logActivity('Avatar Dihapus', 'User menghapus foto profil mereka.');
+
+            return back()->with('status', 'avatar-deleted');
+        }
+
+        return back();
     }
 
     /**

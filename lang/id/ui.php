@@ -14,6 +14,8 @@ return [
     'apply' => 'Terapkan',
     'close' => 'Tutup',
     'loading' => 'Memuat...',
+    'saving' => 'Menyimpan',
+    'saving_changes' => 'Menyimpan Perubahan',
     'no_data' => 'Tidak ada data tersedia',
     'confirm_delete' => 'Apakah Anda yakin ingin menghapus data ini?',
     'all' => 'Semua',
@@ -604,8 +606,8 @@ return [
     'auth_btn_confirm' => 'Konfirmasi',
 
     'auth_change_password_title' => 'Ganti Kata Sandi Anda',
-    'auth_label_username_optional' => 'Username (Ganti jika diperlukan)',
-    'auth_username_hint' => 'Username hanya bisa diubah 1 kali saat aktivasi akun.',
+    'auth_label_username_optional' => 'Username Baru',
+    'auth_username_hint' => 'Minimal 3 karakter, huruf kecil semua, tanpa spasi. Hanya boleh angka, titik (.), atau garis bawah (_).',
     'auth_label_current_password' => 'Kata Sandi Saat Ini',
     'auth_btn_save_password' => 'Simpan Kata Sandi Baru',
 
@@ -718,16 +720,16 @@ return [
     'role_operator' => 'Operator',
 
     // Landing Page (Welcome)
-    'landing_hero_title' => 'Solusi Manajemen Stok',
-    'landing_hero_desc' => 'Platform terintegrasi untuk mengelola inventaris sparepart di Azzahra Computer Tegal.',
+    'landing_hero_title' => 'Sistem Manajemen Stok',
+    'landing_hero_desc' => 'Sistem terpusat untuk pendataan inventaris sparepart di Azzahra Computer Tegal.',
     'landing_btn_login' => 'Masuk Aplikasi',
     'landing_btn_features' => 'Fitur Utama',
     'landing_feature_1_title' => 'Manajemen Stok Terpusat',
-    'landing_feature_1_desc' => 'Pantau ketersediaan barang di berbagai lokasi gudang secara terintegrasi dan terpantau.',
+    'landing_feature_1_desc' => 'Pantau ketersediaan barang di berbagai lokasi gudang secara terpusat.',
     'landing_feature_2_title' => 'QR Code Scanner',
     'landing_feature_2_desc' => 'Identifikasi aset dengan teknologi pemindaian QR Code yang telah disesuaikan.',
     'landing_feature_3_title' => 'Monitoring Aktivitas',
-    'landing_feature_3_desc' => 'Rekam jejak digital lengkap untuk setiap pergerakan barang (masuk/keluar) oleh pengguna.',
+    'landing_feature_3_desc' => 'Rekam jejak digital untuk setiap pergerakan barang (masuk/keluar) oleh pengguna.',
     'landing_footer_credit' => 'dibuat oleh',
 
     // Guest Layout

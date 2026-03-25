@@ -23,7 +23,7 @@
     </div>
 
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6">
+        <form method="post" action="{{ route('profile.destroy') }}" class="p-6" novalidate>
             @csrf
             @method('delete')
 
@@ -42,7 +42,7 @@
                         id="password"
                         name="password"
                         type="password"
-                        class="input-field w-3/4"
+                        class="input-field w-3/4 {{ $errors->userDeletion->has('password') ? '!border-red-500' : '' }}"
                         placeholder="{{ __('ui.profile_placeholder_password') }}"
                         autocomplete="current-password"
                     />

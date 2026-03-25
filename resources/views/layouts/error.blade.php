@@ -10,8 +10,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-secondary-900 antialiased bg-gray-50 flex items-center justify-center min-h-screen p-4">
-        <div class="relative w-full max-w-lg bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-100">
+    <body class="font-sans text-secondary-900 antialiased bg-secondary-50 flex items-center justify-center min-h-screen p-4">
+        <div class="relative w-full max-w-lg bg-white shadow-2xl rounded-3xl overflow-hidden border border-secondary-100">
             
             <!-- Top Pattern/Color Section -->
             <div class="relative h-40 bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center overflow-hidden">
@@ -39,22 +39,22 @@
                     @yield('code')
                 </h1>
                 
-                <h2 class="text-2xl font-bold text-gray-800 mb-3 px-4">
+                <h2 class="text-2xl font-bold text-secondary-800 mb-3 px-4">
                     @yield('message')
                 </h2>
                 
-                <p class="text-gray-500 mb-8 max-w-sm mx-auto leading-relaxed text-sm lg:text-base">
+                <p class="text-secondary-500 mb-8 max-w-sm mx-auto leading-relaxed text-sm lg:text-base">
                     @yield('description')
                 </p>
 
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full px-4">
-                    <a href="{{ url()->previous() }}" class="group relative inline-flex items-center justify-center px-6 py-3 text-base font-medium text-gray-700 transition-all duration-200 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 hover:text-gray-900 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-200 w-full sm:w-auto">
-                        <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-gray-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <a href="{{ url()->previous() }}" class="btn btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 text-base font-medium">
+                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         {{ __('ui.error_btn_back') }}
                     </a>
                     
-                    <a href="/" class="group relative inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white transition-all duration-200 bg-primary-600 border border-transparent rounded-xl hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 shadow-lg shadow-primary-600/30 hover:shadow-primary-600/50 w-full sm:w-auto">
-                        <svg class="w-5 h-5 mr-3 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    <a href="/" class="btn btn-primary w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 text-base font-medium shadow-lg shadow-primary-500/30">
+                        <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                         {{ __('ui.error_btn_home') }}
                     </a>
                 </div>

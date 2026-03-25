@@ -1,5 +1,5 @@
 <div class="block md:hidden space-y-4">
-    @if(request('trash') && $spareparts->count() > 0)
+    @if((auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN)) && $spareparts->count() > 0)
         <div class="flex items-center gap-3 p-3 bg-white rounded-lg border border-secondary-200 shadow-sm">
             <input type="checkbox" id="mobile-select-all" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5 transition-colors duration-200">
             <label for="mobile-select-all" class="text-sm font-semibold text-secondary-700 select-none cursor-pointer">{{ __('ui.select_all') }}</label>
@@ -9,7 +9,7 @@
         <div class="card p-4">
             <!-- Header: Image, Name, Status -->
             <div class="flex items-start gap-3 mb-4">
-                 @if(request('trash'))
+                 @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN))
                     <div class="flex items-center self-center">
                         <input type="checkbox" value="{{ $sparepart->id }}" class="bulk-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5">
                     </div>
@@ -179,7 +179,7 @@
     @endforelse
     
     <!-- Mobile Pagination -->
-    <div class="mt-4">
+    <div class="inventory-pagination-mobile mt-4">
         {{ $spareparts->links() }}
     </div>
 </div>

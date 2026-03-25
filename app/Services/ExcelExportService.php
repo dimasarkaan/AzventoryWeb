@@ -146,17 +146,30 @@ class ExcelExportService
     }
 
     /**
+     * Helper to save the spreadsheet to a temporary file
+     */
+    public function saveToFile($spreadsheet, $filename)
+    {
+        $writer = new Xlsx($spreadsheet);
+        $path = storage_path('app/public/reports/temp_' . uniqid() . '_' . $filename . '.xlsx');
+        
+        // Ensure directory exists
+        if (!file_exists(storage_path('app/public/reports'))) {
+            mkdir(storage_path('app/public/reports'), 0755, true);
+        }
+
+        $writer->save($path);
+        return $path;
+    }
+
+    /**
      * Helper to download the spreadsheet
      */
     protected function downloadResponse($spreadsheet, $filename)
     {
-        $writer = new Xlsx($spreadsheet);
+        $path = $this->saveToFile($spreadsheet, $filename);
 
-        // Output to a temp file with proper extension to avoid ZipArchive issues on some systems
-        $tempFile = storage_path('app/temp_'.uniqid().'.xlsx');
-        $writer->save($tempFile);
-
-        return response()->download($tempFile, $filename.'.xlsx', [
+        return response()->download($path, $filename.'.xlsx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ])->deleteFileAfterSend(true);
     }
@@ -165,6 +178,12 @@ class ExcelExportService
      * Generate Excel for Activity Logs
      */
     public function exportActivityLogs($logs, $filename)
+    {
+        $spreadsheet = $this->generateActivityLogsSpreadsheet($logs);
+        return $this->downloadResponse($spreadsheet, $filename);
+    }
+
+    protected function generateActivityLogsSpreadsheet($logs)
     {
         $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
@@ -202,13 +221,19 @@ class ExcelExportService
         $this->applyDataBorders($sheet, $headerRow, $lastColumn, $row - 1);
         $this->autoSizeColumns($sheet, $lastColumn);
 
-        return $this->downloadResponse($spreadsheet, $filename);
+        return $spreadsheet;
     }
 
     /**
      * Generate Excel for Inventory List
      */
     public function exportInventoryList($data, $filename)
+    {
+        $spreadsheet = $this->generateInventoryListSpreadsheet($data);
+        return $this->downloadResponse($spreadsheet, $filename);
+    }
+
+    protected function generateInventoryListSpreadsheet($data)
     {
         $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
@@ -239,15 +264,15 @@ class ExcelExportService
             $sheet->setCellValue("C{$row}", $item->category);
 
             // Status Logic: Handle both Enum object and string
-            $statusText = $item->status instanceof \BackedEnum ? $item->status->label() : (is_string($item->status) ? ucfirst($item->status) : $item->status);
+            $statusText = ($item->status instanceof \BackedEnum) ? $item->status->value : (is_string($item->status) ? ucfirst($item->status) : $item->status);
 
-            if ($item->stock <= 0 && ($item->status instanceof \BackedEnum ? $item->status === \App\Enums\SparepartStatus::ACTIVE : $item->status === 'aktif')) {
+            if ($item->stock <= 0 && (strtolower($item->status) === 'aktif')) {
                 $statusText = 'Habis';
             }
             $sheet->setCellValue("D{$row}", $statusText);
             
             // Status Color Coding
-            $color = match (strtolower($statusText)) {
+            $color = match (strtolower($statusText ?? '')) {
                 'aman', 'aktif' => 'FF059669', // Emerald-600
                 'menipis' => 'FFD97706', // Amber-600
                 'habis', 'rusak', 'nonaktif', 'hilang' => 'FFDC2626', // Red-600
@@ -279,13 +304,19 @@ class ExcelExportService
         $this->applyDataBorders($sheet, $headerRow, $lastColumn, $row - 1);
         $this->autoSizeColumns($sheet, $lastColumn);
 
-        return $this->downloadResponse($spreadsheet, $filename);
+        return $spreadsheet;
     }
 
     /**
      * Generate Excel for Stock Mutation
      */
     public function exportStockMutation($data, $filename)
+    {
+        $spreadsheet = $this->generateStockMutationSpreadsheet($data);
+        return $this->downloadResponse($spreadsheet, $filename);
+    }
+
+    protected function generateStockMutationSpreadsheet($data)
     {
         $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
@@ -341,13 +372,19 @@ class ExcelExportService
         $this->applyDataBorders($sheet, $headerRow, $lastColumn, $row - 1);
         $this->autoSizeColumns($sheet, $lastColumn);
 
-        return $this->downloadResponse($spreadsheet, $filename);
+        return $spreadsheet;
     }
 
     /**
      * Generate Excel for Borrowing History
      */
     public function exportBorrowingHistory($data, $filename)
+    {
+        $spreadsheet = $this->generateBorrowingHistorySpreadsheet($data);
+        return $this->downloadResponse($spreadsheet, $filename);
+    }
+
+    protected function generateBorrowingHistorySpreadsheet($data)
     {
         $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
@@ -386,11 +423,11 @@ class ExcelExportService
             $sheet->setCellValue("F{$row}", $returnedAt);
 
             // Handle Enum or String for Borrowing Status
-            $statusText = $borrowing->status instanceof \BackedEnum ? $borrowing->status->label() : (is_string($borrowing->status) ? ucfirst($borrowing->status) : $borrowing->status);
+            $statusText = ($borrowing->status instanceof \BackedEnum) ? $borrowing->status->value : (is_string($borrowing->status) ? ucfirst($borrowing->status) : $borrowing->status);
             $sheet->setCellValue("G{$row}", $statusText);
             
             // Status Color Coding
-            $color = match (strtolower($statusText)) {
+            $color = match (strtolower($statusText ?? '')) {
                 'dikembalikan', 'selesai', 'disetujui' => 'FF059669', // Emerald-600
                 'dipinjam', 'menunggu', 'pending' => 'FFD97706', // Amber-600
                 'terlambat', 'ditolak', 'hilang' => 'FFDC2626', // Red-600
@@ -422,13 +459,19 @@ class ExcelExportService
         $this->applyDataBorders($sheet, $headerRow, $lastColumn, $row - 1);
         $this->autoSizeColumns($sheet, $lastColumn);
 
-        return $this->downloadResponse($spreadsheet, $filename);
+        return $spreadsheet;
     }
 
     /**
      * Generate Excel for Low Stock
      */
     public function exportLowStock($data, $filename)
+    {
+        $spreadsheet = $this->generateLowStockSpreadsheet($data);
+        return $this->downloadResponse($spreadsheet, $filename);
+    }
+
+    protected function generateLowStockSpreadsheet($data)
     {
         $spreadsheet = new Spreadsheet;
         $sheet = $spreadsheet->getActiveSheet();
@@ -480,6 +523,6 @@ class ExcelExportService
         $this->applyDataBorders($sheet, $headerRow, $lastColumn, $row - 1);
         $this->autoSizeColumns($sheet, $lastColumn);
 
-        return $this->downloadResponse($spreadsheet, $filename);
+        return $spreadsheet;
     }
 }

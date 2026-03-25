@@ -95,6 +95,9 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         });
 
         // Kode QR
+        Route::get('/qr-code/bulk-print', [InventoryController::class, 'bulkPrintQrCode'])->name('qr.bulk-print');
+        Route::post('/qr-code/log', [InventoryController::class, 'logPrintActivity'])->name('qr.log');
+        Route::delete('/bulk-destroy', [InventoryController::class, 'bulkDestroy'])->name('bulk-destroy');
         Route::get('/{inventory}/qr-code/download', [InventoryController::class, 'downloadQrCode'])->name('qr.download');
         Route::get('/{inventory}/qr-code/print', [InventoryController::class, 'printQrCode'])->name('qr.print');
 
@@ -160,6 +163,7 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::patch('/profile/settings', [ProfileController::class, 'updateSettings'])->name('profile.settings.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
         Route::get('/my-inventory', [ProfileController::class, 'myInventory'])->name('profile.inventory');
 
         // API Tokens

@@ -1,7 +1,7 @@
 @props(['sparepart', 'trash' => false])
 
 <tr class="group hover:bg-secondary-50/60 transition-colors border-b border-secondary-50 last:border-b-0">
-    @if($trash)
+    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!$trash && auth()->user()->role === \App\Enums\UserRole::ADMIN))
         <td class="px-4 py-3 text-center">
             <input type="checkbox" name="ids[]" value="{{ $sparepart->id }}" class="bulk-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
         </td>

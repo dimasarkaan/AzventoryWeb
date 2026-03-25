@@ -23,6 +23,7 @@ class BrandController extends Controller
             return [
                 'id' => $brand->id,
                 'name' => $brand->name,
+                'is_active' => (bool) $brand->is_active,
                 'items_count' => Sparepart::where('brand', $brand->name)->count(),
             ];
         });
@@ -54,17 +55,24 @@ class BrandController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:191|unique:brands,name,' . $brand->id,
+            'is_active' => 'sometimes|boolean',
         ]);
 
         $oldName = $brand->name;
         $newName = $request->name;
 
-        DB::transaction(function () use ($brand, $oldName, $newName) {
+        DB::transaction(function () use ($brand, $oldName, $newName, $request) {
             // Update master table
-            $brand->update(['name' => $newName]);
+            $updateData = ['name' => $newName];
+            if ($request->has('is_active')) {
+                $updateData['is_active'] = $request->is_active;
+            }
+            $brand->update($updateData);
 
             // Bulk update spareparts table (the actual string)
-            Sparepart::where('brand', $oldName)->update(['brand' => $newName]);
+            if ($oldName !== $newName) {
+                Sparepart::where('brand', $oldName)->update(['brand' => $newName]);
+            }
         });
 
         Cache::forget('inventory_brands');

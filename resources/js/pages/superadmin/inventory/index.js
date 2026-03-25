@@ -3,8 +3,6 @@ window.Swal = Swal;
 
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('#inventory-filter-form');
-    const tableContainer = document.querySelector('.table-modern')?.parentNode; // The overflow-x-auto div
-    const paginationContainer = document.querySelector('.bg-secondary-50'); // Container for pagination
     const realBody = document.querySelector('tbody:not(#skeleton-body)');
     const skeletonBody = document.getElementById('skeleton-body');
 
@@ -98,18 +96,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // 7. Replace Pagination
-                const newPagination = doc.querySelector('.bg-secondary-50');
-                if (newPagination && paginationContainer) {
-                    paginationContainer.innerHTML = newPagination.innerHTML;
-                } else if (newPagination && !paginationContainer) {
-                    // If pagination didn't exist but now does
-                    // Ensure tableContainer exists
-                    if (tableContainer) {
-                        tableContainer.parentNode.insertAdjacentHTML('beforeend', newPagination.outerHTML);
-                    }
-                } else if (!newPagination && paginationContainer) {
-                    // If pagination existed but now doesn't
-                    paginationContainer.innerHTML = '';
+                const desktopPaginationContainer = document.querySelector('.inventory-pagination-desktop');
+                const newDesktopPaginationContainer = doc.querySelector('.inventory-pagination-desktop');
+                if (desktopPaginationContainer && newDesktopPaginationContainer) {
+                    desktopPaginationContainer.innerHTML = newDesktopPaginationContainer.innerHTML;
+                }
+
+                // Replace Mobile Pagination
+                const mobilePaginationContainer = document.querySelector('.inventory-pagination-mobile');
+                const newMobilePaginationContainer = doc.querySelector('.inventory-pagination-mobile');
+                if (mobilePaginationContainer && newMobilePaginationContainer) {
+                    mobilePaginationContainer.innerHTML = newMobilePaginationContainer.innerHTML;
                 }
 
                 // 8. Re-attach Pagination Listeners
@@ -143,7 +140,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to attach listeners to dynamic pagination links
     function attachPaginationListeners() {
-        const paginationLinks = document.querySelectorAll('.pagination a, .page-link, .bg-secondary-50 a');
+        const paginationLinks = document.querySelectorAll('.inventory-pagination-desktop a, .inventory-pagination-mobile a, .pagination a, .page-link');
         paginationLinks.forEach(link => {
             link.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -307,6 +304,106 @@ window.submitInventoryBulkDelete = function () {
     });
 };
 
+window.submitInventoryBulkPrint = function () {
+    const selected = document.querySelectorAll('.bulk-checkbox:checked');
+    if (selected.length === 0) return;
+
+    const bulkActionBar = document.getElementById('bulk-action-bar');
+    const route = bulkActionBar ? bulkActionBar.getAttribute('data-bulk-print-route') : '/inventory/qr-code/bulk-print';
+
+    const ids = Array.from(selected).map(cb => cb.value);
+    const url = new URL(route, window.location.origin);
+    
+    // Append IDs as query params
+    ids.forEach(id => url.searchParams.append('ids[]', id));
+
+    window.open(url.toString(), '_blank');
+};
+
+window.submitInventoryBulkDestroy = function () {
+    const selected = document.querySelectorAll('.bulk-checkbox:checked');
+    if (selected.length === 0) return;
+
+    const bulkActionBar = document.getElementById('bulk-action-bar');
+    const route = bulkActionBar ? bulkActionBar.getAttribute('data-bulk-destroy-route') : '/inventory/bulk-destroy';
+
+    Swal.fire({
+        title: 'Hapus Massal?',
+        text: `${selected.length} item akan dipindahkan ke tempat sampah.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true,
+        customClass: {
+            popup: '!rounded-2xl !font-sans',
+            title: '!text-secondary-900 !text-xl !font-bold',
+            htmlContainer: '!text-secondary-500 !text-sm',
+            confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
+            cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+        },
+        buttonsStyling: false,
+        width: '24em',
+        iconColor: '#ef4444',
+        padding: '2em',
+        backdrop: `rgba(0,0,0,0.4)`
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const ids = Array.from(selected).map(cb => cb.value);
+            
+            fetch(route, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ ids: ids })
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: data.message,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    customClass: {
+                        popup: '!rounded-2xl !font-sans',
+                        title: '!text-secondary-900 !text-xl !font-bold',
+                        htmlContainer: '!text-secondary-500 !text-sm',
+                    },
+                    width: '24em',
+                    padding: '2em',
+                    iconColor: '#10b981',
+                    backdrop: `rgba(0,0,0,0.4)`
+                }).then(() => {
+                    window.location.reload();
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan',
+                    text: 'Terjadi kesalahan saat menghapus data.',
+                    customClass: {
+                        popup: '!rounded-2xl !font-sans',
+                        title: '!text-secondary-900 !text-xl !font-bold',
+                        htmlContainer: '!text-secondary-500 !text-sm',
+                        confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
+                    },
+                    buttonsStyling: false,
+                    width: '24em',
+                    padding: '2em',
+                    iconColor: '#ef4444',
+                    backdrop: `rgba(0,0,0,0.4)`
+                });
+            });
+        }
+    });
+};
+
 // Single Row Action Handlers
 window.confirmInventoryRestore = function (event) {
     event.preventDefault();
@@ -379,35 +476,40 @@ window.confirmDelete = function (event) {
     const form = event.target.closest('form');
     if (!form) return;
 
-    // Sembunyikan baris tabel secara optimistis
+    // Optimistic hide row
     const row = form.closest('tr') || form.closest('[data-row]');
     if (row) {
-        row.style.transition = 'opacity 0.3s ease';
+        row.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
         row.style.opacity = '0.3';
+        row.style.filter = 'grayscale(100%) blur(1px)';
     }
 
     let undoClicked = false;
     let submitTimer = null;
     const seconds = 5;
 
-    // Fungsi countdown toast
     const UndoToast = Swal.mixin({
         toast: true,
         position: 'bottom-end',
         showConfirmButton: true,
-        confirmButtonText: 'Batalkan',
+        confirmButtonText: 'URUNGKAN',
         showCancelButton: false,
         timer: seconds * 1000,
         timerProgressBar: true,
+        customClass: {
+            popup: 'undo-toast-popup animated slideInRight',
+            title: 'undo-toast-title',
+            htmlContainer: 'undo-toast-content',
+            confirmButton: 'undo-toast-undo-btn',
+            timerProgressBar: 'undo-toast-progress-bar'
+        },
+        buttonsStyling: false,
         didOpen: (toast) => {
-            toast.querySelector('.swal2-confirm').style.cssText =
-                'background: #1e40af; color: white; border-radius: 6px; padding: 4px 14px; font-size: 13px; margin-left: 10px; cursor: pointer; border: none;';
             toast.addEventListener('mouseenter', Swal.stopTimer);
             toast.addEventListener('mouseleave', Swal.resumeTimer);
         },
         willClose: () => {
             if (!undoClicked) {
-                // Timer habis tanpa dibatalkan → submit form
                 submitTimer = setTimeout(() => form.submit(), 50);
             }
         }
@@ -415,16 +517,33 @@ window.confirmDelete = function (event) {
 
     UndoToast.fire({
         icon: 'warning',
-        title: 'Item dipindahkan ke Trash',
-        html: `<span style="font-size:13px;color:#6b7280">Akan dihapus dalam ${seconds} detik...</span>`,
+        html: `
+            <div style="display:flex; flex-direction:column; gap:1px;">
+                <span style="font-size:14px; font-weight:700; color:#0f172a;">Item Terhapus</span>
+                <span style="font-size:12px; color:#475569;">Urungkan dalam <b id="undo-countdown">${seconds}</b> detik?</span>
+            </div>
+        `,
+        didOpen: (toast) => {
+            const countdownEl = toast.querySelector('#undo-countdown');
+            let timeLeft = seconds;
+            const interval = setInterval(() => {
+                if (Swal.isPaused()) return;
+                timeLeft--;
+                if (countdownEl) countdownEl.textContent = timeLeft;
+                if (timeLeft <= 0) clearInterval(interval);
+            }, 1000);
+            
+            // Standard didOpen logic for timer
+            toast.addEventListener('mouseenter', () => Swal.stopTimer());
+            toast.addEventListener('mouseleave', () => Swal.resumeTimer());
+        }
     }).then((result) => {
         if (result.isConfirmed) {
-            // Tombol "Batalkan" diklik
             undoClicked = true;
             clearTimeout(submitTimer);
-            // Kembalikan baris
             if (row) {
                 row.style.opacity = '1';
+                row.style.filter = 'none';
             }
             if (window.showToast) {
                 window.showToast('success', 'Penghapusan dibatalkan.');

@@ -374,7 +374,7 @@
                                     <table class="min-w-full divide-y divide-secondary-200">
                                         <thead class="bg-secondary-50/50">
                                             <tr>
-                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest">Field</th>
+                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest">Kolom</th>
                                                 <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-red-50/30">Sebelum</th>
                                                 <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-green-50/30">Sesudah</th>
                                             </tr>
@@ -383,7 +383,7 @@
                                             <template x-if="selectedActivity && selectedActivity.properties">
                                                 <template x-for="(values, key) in selectedActivity.properties" :key="key">
                                                     <tr class="hover:bg-secondary-50/30 transition-colors">
-                                                        <td class="px-4 py-3 text-xs font-bold text-secondary-700 capitalize" x-text="key.replace(/_/g, ' ')"></td>
+                                                        <td class="px-4 py-3 text-xs font-bold text-secondary-700 capitalize" x-text="formatKey(key)"></td>
                                                         <td class="px-4 py-3 text-xs text-red-600 bg-red-50/10 break-all italic" x-text="formatValue(values.old)"></td>
                                                         <td class="px-4 py-3 text-xs text-green-700 bg-green-50/10 font-bold break-all" x-text="formatValue(values.new)"></td>
                                                     </tr>
@@ -535,6 +535,33 @@
                     if (val === null || val === undefined) return '-';
                     if (typeof val === 'boolean') return val ? 'Ya' : 'Tidak';
                     return val;
+                },
+
+                formatKey(key) {
+                    const translations = {
+                        'item_ids': 'ID Item',
+                        'counts': 'Jumlah Potongan',
+                        'total_labels': 'Total Label',
+                        'name': 'Nama',
+                        'brand': 'Merek',
+                        'category': 'Kategori',
+                        'stock': 'Stok',
+                        'price': 'Harga',
+                        'description': 'Deskripsi',
+                        'condition': 'Kondisi',
+                        'location': 'Lokasi',
+                        'color': 'Warna',
+                        'status': 'Status',
+                        'type': 'Tipe',
+                        'role': 'Peran',
+                        'email': 'Email',
+                        'password': 'Kata Sandi',
+                        'part_number': 'No. Identifikasi',
+                        'remarks': 'Catatan',
+                        'problem_chronology': 'Kronologi Masalah'
+                    };
+                    const lowerKey = key.toLowerCase();
+                    return translations[lowerKey] || key.replace(/_/g, ' ');
                 },
 
                 viewActivityDetails(id) {

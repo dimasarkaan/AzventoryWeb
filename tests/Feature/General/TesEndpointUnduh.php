@@ -5,6 +5,7 @@ namespace Tests\Feature\General;
 use App\Enums\UserRole;
 use App\Models\Sparepart;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -51,11 +52,15 @@ class TesEndpointUnduh extends TestCase
         // Sparepart biasa — tanpa QR code
         $this->sparepart = Sparepart::factory()->create(['stock' => 5]);
 
+        Storage::fake('public');
+        
         // Sparepart dengan qr_code_path — untuk test print label
         $this->sparepartWithQr = Sparepart::factory()->create([
             'stock'        => 5,
             'qr_code_path' => 'qr_codes/test_qr.svg',
         ]);
+        
+        Storage::disk('public')->put($this->sparepartWithQr->qr_code_path, 'dummy content');
     }
 
     // =========================================================================
