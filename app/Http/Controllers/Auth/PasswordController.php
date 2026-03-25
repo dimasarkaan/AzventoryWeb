@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
+use App\Traits\ActivityLogger;
+
 class PasswordController extends Controller
 {
+    use ActivityLogger;
     /**
      * Memperbarui password pengguna.
      */
@@ -32,6 +35,8 @@ class PasswordController extends Controller
         $request->user()->update([
             'password' => Hash::make($validated['password']),
         ]);
+
+        $this->logActivity('Ubah Password', 'User memperbarui kata sandi akun mereka.');
 
         return back()->with('status', 'password-updated');
     }

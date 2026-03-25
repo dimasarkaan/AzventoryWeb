@@ -71,7 +71,30 @@ class CategoryController extends Controller
 
         Cache::forget('inventory_categories');
 
-        $this->logActivity('Kategori Diperbarui', "Nama kategori diubah dari '{$oldName}' menjadi '{$newName}'.");
+        $hasChanged = ($oldName !== $newName) || ($request->has('is_active') && $category->is_active != $request->is_active);
+
+        if ($hasChanged) {
+            $changes = [];
+            if ($oldName !== $newName) {
+                $changes['name'] = ['old' => $oldName, 'new' => $newName];
+            }
+            if ($request->has('is_active') && $category->getOriginal('is_active') != $request->is_active) {
+                $changes['is_active'] = ['old' => (bool)$category->getOriginal('is_active'), 'new' => (bool)$request->is_active];
+            }
+
+            // Pesan lebih detail: sebutkan apa yang berubah
+            if ($oldName !== $newName && $request->has('is_active') && $category->getOriginal('is_active') != $request->is_active) {
+                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $logMessage = "Nama kategori diubah dari '{$oldName}' menjadi '{$newName}' dan status diubah menjadi {$statusText}.";
+            } elseif ($oldName !== $newName) {
+                $logMessage = "Nama kategori diubah dari '{$oldName}' menjadi '{$newName}'.";
+            } else {
+                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $logMessage = "Status kategori '{$newName}' diubah menjadi {$statusText}.";
+            }
+            
+            $this->logActivity('Kategori Diperbarui', $logMessage, $changes);
+        }
 
         return response()->json(['message' => 'Kategori berhasil diperbarui.']);
     }

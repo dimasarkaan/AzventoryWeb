@@ -78,7 +78,30 @@ class LocationController extends Controller
 
         Cache::forget('inventory_locations');
 
-        $this->logActivity('Lokasi Diperbarui', "Nama lokasi diubah dari '{$oldName}' menjadi '{$newName}'.");
+        $hasChanged = ($oldName !== $newName) || ($request->has('is_active') && $location->is_active != $request->is_active);
+
+        if ($hasChanged) {
+            $changes = [];
+            if ($oldName !== $newName) {
+                $changes['name'] = ['old' => $oldName, 'new' => $newName];
+            }
+            if ($request->has('is_active') && $location->is_active != $request->is_active) {
+                $changes['is_active'] = ['old' => (bool)$location->getOriginal('is_active'), 'new' => (bool)$request->is_active];
+            }
+
+            // Pesan lebih detail: sebutkan apa yang berubah
+            if ($oldName !== $newName && $request->has('is_active') && $location->getOriginal('is_active') != $request->is_active) {
+                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $logMessage = "Nama lokasi diubah dari '{$oldName}' menjadi '{$newName}' dan status diubah menjadi {$statusText}.";
+            } elseif ($oldName !== $newName) {
+                $logMessage = "Nama lokasi diubah dari '{$oldName}' menjadi '{$newName}'.";
+            } else {
+                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $logMessage = "Status lokasi '{$newName}' diubah menjadi {$statusText}.";
+            }
+            
+            $this->logActivity('Lokasi Diperbarui', $logMessage, $changes);
+        }
 
         return response()->json([
             'message' => 'Lokasi berhasil diperbarui.',

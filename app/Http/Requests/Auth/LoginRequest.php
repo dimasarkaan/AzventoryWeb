@@ -57,6 +57,17 @@ class LoginRequest extends FormRequest
 
         if ($user && $user->status !== 'aktif') {
             RateLimiter::hit($this->throttleKey());
+            
+            \App\Models\ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'Login Ditolak',
+                'description' => "Upaya login gagal karena akun sedang nonaktif (Status: {$user->status}).",
+                'properties' => [
+                    'ip' => $this->ip(),
+                    'user_agent' => $this->header('User-Agent'),
+                ]
+            ]);
+
             throw ValidationException::withMessages([
                 'login' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Administrator.',
             ]);

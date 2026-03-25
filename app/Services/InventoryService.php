@@ -122,7 +122,12 @@ class InventoryService
                         'approved_by' => auth()->id(),
                     ]);
 
-                    $this->logActivity('Stok Diupdate', $message);
+                    $this->logActivity('Stok Diupdate', $message, [
+                        'stock' => [
+                            'old' => $existingItem->stock - $data['stock'],
+                            'new' => $existingItem->stock
+                        ]
+                    ]);
                     $this->clearCache();
                     $this->broadcastUpdate($existingItem, 'updated');
 
@@ -564,7 +569,12 @@ class InventoryService
                 'stock' => $stockToAdd,
             ]);
 
-            $this->logActivity('Penggabungan Sparepart', $message);
+            $this->logActivity('Penggabungan Sparepart', $message, [
+                'stock' => [
+                    'old' => $target->stock - $stockToAdd,
+                    'new' => $target->stock
+                ]
+            ]);
             $this->clearCache();
             $this->broadcastUpdate($target, 'updated');
 
@@ -648,7 +658,12 @@ class InventoryService
                 Notification::send($admins, new ApproachingStockNotification($sparepart));
             }
 
-            $this->logActivity('Peminjaman Barang', "Meminjam {$data['quantity']} {$sparepart->unit} '{$sparepart->name}'.");
+            $this->logActivity('Peminjaman Barang', "Meminjam {$data['quantity']} {$sparepart->unit} '{$sparepart->name}'.", [
+                'stock' => [
+                    'old' => $sparepart->stock + $data['quantity'],
+                    'new' => $sparepart->stock
+                ]
+            ]);
             $this->clearCache();
             $this->broadcastUpdate($sparepart, 'borrowing', __('messages.realtime_borrowed', ['user' => auth()->user()->name, 'qty' => $data['quantity'], 'name' => $sparepart->name]));
 
@@ -695,7 +710,12 @@ class InventoryService
                     'approved_by' => auth()->id(),
                 ]);
 
-                $this->logActivity('Pengembalian Barang (Baik)', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi Baik.");
+                $this->logActivity('Pengembalian Barang (Baik)', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi Baik.", [
+                    'stock' => [
+                        'old' => $originalSparepart->stock - $qty,
+                        'new' => $originalSparepart->stock
+                    ]
+                ]);
 
             } else {
                 // Alur penanganan aset yang dikembalikan dalam kondisi Rusak/Hilang
@@ -714,7 +734,12 @@ class InventoryService
                     $this->qrCodeService->generate($targetItem);
                 }
 
-                $this->logActivity('Pengembalian Barang ('.$translatedCondition.')', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi {$translatedCondition}.");
+                $this->logActivity('Pengembalian Barang ('.$translatedCondition.')', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi {$translatedCondition}.", [
+                    'stock' => [
+                        'old' => $targetItem->stock - $qty,
+                        'new' => $targetItem->stock
+                    ]
+                ]);
             }
 
             $this->clearCache();
@@ -734,8 +759,10 @@ class InventoryService
         }
 
         return DB::transaction(function () use ($stockLog, $status, $rejectionReason) {
+            $oldStock = null;
             if ($status === 'approved') {
                 $sparepart = Sparepart::where('id', $stockLog->sparepart_id)->lockForUpdate()->first();
+                $oldStock = $sparepart->stock;
 
                 if ($stockLog->type === 'masuk') {
                     $sparepart->stock += $stockLog->quantity;
@@ -779,9 +806,23 @@ class InventoryService
             $stockLog->update($updateData);
 
             $statusText = $status === 'approved' ? 'disetujui' : 'ditolak';
+            $description = "Pengajuan stok {$stockLog->type} untuk '{$stockLog->sparepart->name}' sejumlah {$stockLog->quantity} telah {$statusText}.";
+            if ($status === 'rejected' && $rejectionReason) {
+                $description .= " Alasan: {$rejectionReason}";
+            }
+
+            $properties = [];
+            if ($status === 'approved' && isset($sparepart)) {
+                $properties['stock'] = [
+                    'old' => $oldStock,
+                    'new' => $sparepart->stock
+                ];
+            }
+
             $this->logActivity(
                 'Persetujuan Stok',
-                "Pengajuan stok {$stockLog->type} untuk '{$stockLog->sparepart->name}' sejumlah {$stockLog->quantity} telah {$statusText}."
+                $description,
+                $properties
             );
 
             // Broadcast real-time stock approval processing (remove from list)

@@ -119,6 +119,13 @@ class ActivityLogController extends Controller
         }
         $actions = $actionsQuery->pluck('action');
 
+        if ($request->wantsJson()) {
+            return response()->json([
+                'activityLogs' => $activityLogs,
+                'last_id' => $activityLogs->first()?->id
+            ]);
+        }
+
         return view('reports.activity_logs.index', compact('activityLogs', 'users', 'actions'));
     }
 

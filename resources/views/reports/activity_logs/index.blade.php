@@ -368,7 +368,7 @@
                             </div>
 
                             {{-- Properties Table (The Audit Core) --}}
-                            <div class="mb-6">
+                            <div class="mb-4" x-show="selectedActivity && hasVisibleProperties(selectedActivity.properties)">
                                 <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-widest mb-3">Detail Perubahan Data</h4>
                                 <div class="overflow-hidden border border-secondary-200 rounded-xl shadow-sm bg-white">
                                     <table class="min-w-full divide-y divide-secondary-200">
@@ -382,11 +382,13 @@
                                         <tbody class="divide-y divide-secondary-100">
                                             <template x-if="selectedActivity && selectedActivity.properties">
                                                 <template x-for="(values, key) in selectedActivity.properties" :key="key">
-                                                    <tr class="hover:bg-secondary-50/30 transition-colors">
-                                                        <td class="px-4 py-3 text-xs font-bold text-secondary-700 capitalize" x-text="formatKey(key)"></td>
-                                                        <td class="px-4 py-3 text-xs text-red-600 bg-red-50/10 break-all italic" x-text="formatValue(values.old)"></td>
-                                                        <td class="px-4 py-3 text-xs text-green-700 bg-green-50/10 font-bold break-all" x-text="formatValue(values.new)"></td>
-                                                    </tr>
+                                                    <template x-if="key !== 'ip' && key !== 'user_agent'">
+                                                        <tr class="hover:bg-secondary-50/30 transition-colors">
+                                                            <td class="px-4 py-3 text-xs font-bold text-secondary-700 capitalize" x-text="formatKey(key)"></td>
+                                                            <td class="px-4 py-3 text-xs text-red-600 bg-red-50/10 break-all italic" x-text="formatValue(values.old)"></td>
+                                                            <td class="px-4 py-3 text-xs text-green-700 bg-green-50/10 font-bold break-all" x-text="formatValue(values.new)"></td>
+                                                        </tr>
+                                                    </template>
                                                 </template>
                                             </template>
                                         </tbody>
@@ -395,14 +397,14 @@
                             </div>
 
                             {{-- Metadata Info --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-3 bg-secondary-50 rounded-xl border border-secondary-100">
-                                    <p class="text-[10px] font-bold text-secondary-400 uppercase tracking-widest mb-1">Pengguna</p>
-                                    <p class="text-sm font-bold text-secondary-900 truncate" x-text="selectedActivity?.user?.name || selectedActivity?.user_name || 'System'"></p>
-                                    <p class="text-[10px] text-secondary-500 font-mono" x-text="selectedActivity?.user?.email || selectedActivity?.user_email || ''"></p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div class="p-3 bg-white rounded-2xl border border-secondary-200 shadow-sm flex flex-col min-w-0">
+                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">Pengguna</p>
+                                    <p class="text-sm font-bold text-secondary-900 leading-tight break-all" x-text="selectedActivity?.user?.name || selectedActivity?.user_name || 'System'"></p>
+                                    <p class="text-[10px] text-secondary-500 font-mono mt-1 break-all" x-text="selectedActivity?.user?.email || selectedActivity?.user_email || ''"></p>
                                 </div>
-                                <div class="p-3 bg-secondary-50 rounded-xl border border-secondary-100">
-                                    <p class="text-[10px] font-bold text-secondary-400 uppercase tracking-widest mb-1">Waktu Presisi</p>
+                                <div class="p-3 bg-white rounded-2xl border border-secondary-200 shadow-sm flex flex-col min-w-0">
+                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">Waktu Presisi</p>
                                     <p class="text-sm font-bold text-secondary-900" 
                                        x-text="selectedActivity ? new Date(selectedActivity.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'medium' }) : '-'"></p>
                                 </div>
@@ -420,22 +422,84 @@
                 showActivityModal: false,
                 selectedActivity: null,
                 logs: @js($activityLogs->getCollection()->keyBy('id')),
+                lastId: {{ $activityLogs->first()?->id ?? 0 }},
+                isPolling: false,
 
                 init() {
                     console.log('[Alpine] Activity Log Initialized');
+                    
+                    // Polling Fallback (setiap 15 detik)
+                    setInterval(() => {
+                        this.fetchNewLogs();
+                    }, 15000);
+
                     if (window.Echo) {
                         console.log('[Alpine] Echo found, listening for activity-logs...');
                         window.Echo.channel('activity-logs')
                             .listen('ActivityLogged', (e) => {
                                 console.log('[Alpine] Event received:', e);
-                                const activity = e.activity;
-                                this.logs[activity.id] = activity;
-                                this.$nextTick(() => {
+                                
+                                // Mapping payload dari broadcastWith ke format log lokal
+                                const activity = {
+                                    id: e.id,
+                                    action: e.action,
+                                    description: e.description,
+                                    user_name: e.user_name,
+                                    user_email: e.user_email || '-',
+                                    created_at: e.created_at,
+                                    properties: e.properties || {}
+                                };
+                                
+                                if (!this.logs[activity.id]) {
+                                    this.logs[activity.id] = activity;
                                     this.appendLogToUI(activity);
-                                });
+                                }
                             });
                     }
-                },                appendLogToUI(activity) {
+                },
+
+                async fetchNewLogs() {
+                    if (this.isPolling) return;
+                    this.isPolling = true;
+
+                    try {
+                        // Hanya fetch jika sedang di halaman 1 atau tidak ada filter aktif yang rumit
+                        const params = new URLSearchParams(window.location.search);
+                        if (params.has('page') && params.get('page') !== '1') {
+                            this.isPolling = false;
+                            return;
+                        }
+
+                        const response = await fetch(`${window.location.pathname}?wantsJson=1&since_id=${this.lastId}`, {
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.activityLogs && data.activityLogs.data.length > 0) {
+                                const newLogs = data.activityLogs.data.filter(log => log.id > this.lastId);
+                                
+                                if (newLogs.length > 0) {
+                                    this.lastId = Math.max(this.lastId, ...newLogs.map(l => l.id));
+                                    newLogs.reverse().forEach(log => {
+                                        if (!this.logs[log.id]) {
+                                            this.logs[log.id] = log;
+                                            this.appendLogToUI(log);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error('[Polling] Error:', e);
+                    } finally {
+                        this.isPolling = false;
+                    }
+                },
+                appendLogToUI(activity) {
                     const desktopBody = document.getElementById('desktop-logs-body');
                     const mobileContainer = document.getElementById('mobile-logs-container');
                     
@@ -576,6 +640,11 @@
                     } else {
                         console.warn('[Alpine] Log not found for ID:', id);
                     }
+                },
+
+                hasVisibleProperties(properties) {
+                    if (!properties) return false;
+                    return Object.keys(properties).some(key => key !== 'ip' && key !== 'user_agent');
                 }
             };
         }

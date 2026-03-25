@@ -8,8 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\View\View;
 
+use App\Traits\ActivityLogger;
+
 class PasswordResetLinkController extends Controller
 {
+    use ActivityLogger;
     /**
      * Menampilkan halaman permintaan link reset password.
      */
@@ -36,9 +39,12 @@ class PasswordResetLinkController extends Controller
             $request->only('email')
         );
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
+        if ($status == Password::RESET_LINK_SENT) {
+            $this->logActivity('Request Reset Password', "Permintaan link reset password untuk email: {$request->email}");
+            return back()->with('status', __($status));
+        }
+
+        return back()->withInput($request->only('email'))
                         ->withErrors(['email' => __($status)]);
     }
 }

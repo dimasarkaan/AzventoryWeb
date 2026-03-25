@@ -121,16 +121,19 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, User $user)
     {
-        $this->authorize('update', $user);
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-            'jabatan' => $request->jabatan,
-            'status' => $request->status,
-        ]);
+        $changes = [];
+        foreach ($request->validated() as $key => $value) {
+            if ($user->{$key} != $value) {
+                $changes[$key] = [
+                    'old' => $user->{$key},
+                    'new' => $value
+                ];
+            }
+        }
 
-        $this->logActivity('User Diupdate', __('messages.log_user_updated', ['name' => $user->name]));
+        $user->update($request->validated());
+
+        $this->logActivity('User Diupdate', __('messages.log_user_updated', ['name' => $user->name]), $changes);
 
         return redirect()->route('users.index')
             ->with('success', __('messages.user_updated', ['name' => $user->name]));

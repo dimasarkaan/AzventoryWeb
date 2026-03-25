@@ -16,18 +16,32 @@ trait ActivityLogger
      */
     protected function logActivity(string $action, string $description, ?array $properties = null): void
     {
+        // Metadata dasar untuk audit keamanan
+        $metadata = [
+            'ip' => request()->header('X-Forwarded-For') 
+                    ? explode(',', request()->header('X-Forwarded-For'))[0] 
+                    : request()->ip(),
+            'user_agent' => request()->header('User-Agent'),
+        ];
+
         $log = ActivityLog::create([
             'user_id' => Auth::id(),
             'action' => $action,
             'description' => $description,
-            'properties' => $properties,
+            'properties' => array_merge($metadata, $properties ?? []),
         ]);
 
         try {
+            // Eager load user agar informasi nama tersedia di broadcast
+            if (!$log->relationLoaded('user')) {
+                $log->load('user');
+            }
             broadcast(new ActivityLogged($log));
+
+            // Dashboard Sync: Update global 'last_updated' timestamp to trigger cache refresh
+            \Illuminate\Support\Facades\Cache::forever('inventory_last_updated', now()->timestamp);
         } catch (\Throwable $e) {
             // Silently fail if broadcasting fails (e.g., offline/pusher error)
-            // Logic continues so core functionality is not broken
         }
     }
 }

@@ -37,10 +37,12 @@ class ActivityLogged implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
+            'id' => $this->log->id,
             'user_name' => $this->log->user ? $this->log->user->name : 'System',
             'user_role' => $this->log->user ? ($this->log->user->role instanceof \App\Enums\UserRole ? $this->log->user->role->label() : ucfirst($this->log->user->role)) : '-',
             'action' => $this->log->action,
             'description' => $this->log->description,
+            'properties' => $this->log->properties,
             'created_at' => $this->log->created_at->toISOString(),
             'created_at_human' => $this->log->created_at->diffForHumans(),
         ];

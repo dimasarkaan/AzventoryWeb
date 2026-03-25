@@ -410,6 +410,7 @@
             confirmDeleteId: null,
             confirmDeleteName: '',
             isDeleting: false,
+            isUpdatingLocation: false,
             deleteLocationError: '',
 
             // Category Management
@@ -421,6 +422,7 @@
             catConfirmDeleteId: null,
             catConfirmDeleteName: '',
             isDeletingCat: false,
+            isUpdatingCategory: false,
             deleteCategoryError: '',
 
             // Brand Management
@@ -432,6 +434,7 @@
             brandConfirmDeleteId: null,
             brandConfirmDeleteName: '',
             isDeletingBrand: false,
+            isUpdatingBrand: false,
             deleteBrandError: '',
             newBrandName: '',
             isAddingBrand: false,
@@ -496,8 +499,23 @@
                     this.cancelEdit();
                     return;
                 }
-                await this.updateLocationName(id, this.editingName);
-                this.cancelEdit();
+
+                // Cek jika tidak ada perubahan nama
+                const loc = this.locationsList.find(l => l.id === id);
+                if (loc && loc.name === this.editingName.trim()) {
+                    this.cancelEdit();
+                    return;
+                }
+
+                if (this.isUpdatingLocation) return;
+                this.isUpdatingLocation = true;
+
+                try {
+                    await this.updateLocationName(id, this.editingName);
+                } finally {
+                    this.isUpdatingLocation = false;
+                    this.cancelEdit();
+                }
             },
 
             askDelete(loc) {
@@ -583,6 +601,17 @@
 
             async saveCatEdit(id) {
                 if (!this.catEditingName.trim()) return;
+
+                // Cek jika tidak ada perubahan nama
+                const cat = this.categoriesList.find(c => c.id === id);
+                if (cat && cat.name === this.catEditingName.trim()) {
+                    this.cancelCatEdit();
+                    return;
+                }
+
+                if (this.isUpdatingCategory) return;
+                this.isUpdatingCategory = true;
+
                 try {
                     const response = await fetch(`/categories/${id}`, {
                         method: 'PATCH',
@@ -604,6 +633,8 @@
                 } catch (e) {
                     console.error('Update failed:', e);
                     this.showToast('error', 'Terjadi kesalahan saat memperbarui kategori.');
+                } finally {
+                    this.isUpdatingCategory = false;
                 }
             },
 
@@ -707,6 +738,17 @@
 
             async saveBrandEdit(id) {
                 if (!this.brandEditingName.trim()) return;
+
+                // Cek jika tidak ada perubahan nama
+                const brand = this.brandsList.find(b => b.id === id);
+                if (brand && brand.name === this.brandEditingName.trim()) {
+                    this.cancelBrandEdit();
+                    return;
+                }
+
+                if (this.isUpdatingBrand) return;
+                this.isUpdatingBrand = true;
+
                 try {
                     const response = await fetch(`/brands/${id}`, {
                         method: 'PATCH',
@@ -728,6 +770,8 @@
                 } catch (e) {
                     console.error('Update failed:', e);
                     if (window.showToast) window.showToast('error', 'Terjadi kesalahan saat memperbarui merk.');
+                } finally {
+                    this.isUpdatingBrand = false;
                 }
             },
 

@@ -68,9 +68,19 @@ class ProfileController extends Controller
             $request->user()->avatar = $path;
         }
 
-        $request->user()->save();
+        $user = $request->user();
+        $changes = [];
+        foreach ($request->validated() as $key => $value) {
+            // Hanya mencatat perubahan pada field teks/angka (scalar)
+            // Hindari mencatat object File/Image karena masalah serialisasi JSON
+            if ($user->isDirty($key) && is_scalar($value)) {
+                $changes[$key] = ['old' => $user->getOriginal($key), 'new' => $value];
+            }
+        }
 
-        $this->logActivity('Profil Diupdate', 'User mengupdate profil mereka.');
+        $user->save();
+
+        $this->logActivity('Profil Diupdate', 'User mengupdate profil mereka.', $changes);
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -122,6 +132,8 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->settings = array_merge($user->settings ?? [], $request->input('settings'));
         $user->save();
+
+        $this->logActivity('Update Pengaturan', 'User memperbarui pengaturan profil/tampilan mereka.', $request->input('settings'));
 
         return response()->json(['status' => 'success', 'settings' => $user->settings]);
     }

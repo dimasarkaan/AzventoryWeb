@@ -263,9 +263,12 @@ class InventoryController extends Controller
             return response()->json(['message' => 'Pilih minimal satu item.'], 400);
         }
 
+        $count = count($ids);
+        $this->logActivity('Hapus Massal (Soft)', "Menghapus {$count} item inventaris ke tong sampah.", ['ids' => $ids]);
+
         Sparepart::whereIn('id', $ids)->delete();
 
-        return response()->json(['message' => 'Berhasil menghapus ' . count($ids) . ' item.']);
+        return response()->json(['message' => 'Berhasil menghapus ' . $count . ' item.']);
     }
 
     /**

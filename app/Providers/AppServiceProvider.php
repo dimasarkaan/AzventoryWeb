@@ -37,6 +37,32 @@ class AppServiceProvider extends ServiceProvider
 
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
 
+        // Security Logging: Failed Login
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Failed::class, function ($event) {
+            \App\Models\ActivityLog::create([
+                'user_id' => $event->user ? $event->user->id : null,
+                'action' => 'Gagal Login',
+                'description' => "Upaya login gagal untuk identitas: " . ($event->credentials['login'] ?? ($event->credentials['email'] ?? ($event->credentials['username'] ?? 'Tidak diketahui'))),
+                'properties' => [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->header('User-Agent'),
+                ]
+            ]);
+        });
+
+        // Security Logging: Lockout
+        \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Lockout::class, function ($event) {
+            \App\Models\ActivityLog::create([
+                'user_id' => null,
+                'action' => 'Akun Terkunci',
+                'description' => "Akun/IP terkunci sementara karena terlalu banyak percobaan login.",
+                'properties' => [
+                    'login' => $event->request->input('login'),
+                    'ip' => $event->request->ip(),
+                ]
+            ]);
+        });
+
         // Ultimate Reset Password Email (Indonesian, Personalized, Secure)
         \Illuminate\Auth\Notifications\ResetPassword::toMailUsing(function ($notifiable, $token) {
             $resetUrl = route('password.reset', [

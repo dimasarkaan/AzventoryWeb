@@ -77,7 +77,30 @@ class BrandController extends Controller
 
         Cache::forget('inventory_brands');
 
-        $this->logActivity('Merk Diperbarui', "Nama merk diubah dari '{$oldName}' menjadi '{$newName}'.");
+        $hasChanged = ($oldName !== $newName) || ($request->has('is_active') && $brand->is_active != $request->is_active);
+
+        if ($hasChanged) {
+            $changes = [];
+            if ($oldName !== $newName) {
+                $changes['name'] = ['old' => $oldName, 'new' => $newName];
+            }
+            if ($request->has('is_active') && $brand->getOriginal('is_active') != $request->is_active) {
+                $changes['is_active'] = ['old' => (bool)$brand->getOriginal('is_active'), 'new' => (bool)$request->is_active];
+            }
+
+            // Pesan lebih detail: sebutkan apa yang berubah
+            if ($oldName !== $newName && $request->has('is_active') && $brand->getOriginal('is_active') != $request->is_active) {
+                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $logMessage = "Nama merk diubah dari '{$oldName}' menjadi '{$newName}' dan status diubah menjadi {$statusText}.";
+            } elseif ($oldName !== $newName) {
+                $logMessage = "Nama merk diubah dari '{$oldName}' menjadi '{$newName}'.";
+            } else {
+                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $logMessage = "Status merk '{$newName}' diubah menjadi {$statusText}.";
+            }
+
+            $this->logActivity('Merk Diperbarui', $logMessage, $changes);
+        }
 
         return response()->json([
             'message' => 'Merk berhasil diperbarui.',
