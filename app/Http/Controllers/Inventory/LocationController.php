@@ -61,6 +61,10 @@ class LocationController extends Controller
 
         $oldName = $location->name;
         $newName = $request->name;
+        $oldActive = (bool)$location->is_active;
+        $newActive = $request->has('is_active') ? (bool)$request->is_active : $oldActive;
+
+        $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
         DB::transaction(function () use ($location, $oldName, $newName, $request) {
             // Update master table
@@ -78,25 +82,23 @@ class LocationController extends Controller
 
         Cache::forget('inventory_locations');
 
-        $hasChanged = ($oldName !== $newName) || ($request->has('is_active') && $location->is_active != $request->is_active);
-
         if ($hasChanged) {
             $changes = [];
             if ($oldName !== $newName) {
                 $changes['name'] = ['old' => $oldName, 'new' => $newName];
             }
-            if ($request->has('is_active') && $location->is_active != $request->is_active) {
-                $changes['is_active'] = ['old' => (bool)$location->getOriginal('is_active'), 'new' => (bool)$request->is_active];
+            if ($oldActive !== $newActive) {
+                $changes['is_active'] = ['old' => $oldActive, 'new' => $newActive];
             }
 
             // Pesan lebih detail: sebutkan apa yang berubah
-            if ($oldName !== $newName && $request->has('is_active') && $location->getOriginal('is_active') != $request->is_active) {
-                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+            if ($oldName !== $newName && $oldActive !== $newActive) {
+                $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Nama lokasi diubah dari '{$oldName}' menjadi '{$newName}' dan status diubah menjadi {$statusText}.";
             } elseif ($oldName !== $newName) {
                 $logMessage = "Nama lokasi diubah dari '{$oldName}' menjadi '{$newName}'.";
             } else {
-                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Status lokasi '{$newName}' diubah menjadi {$statusText}.";
             }
             

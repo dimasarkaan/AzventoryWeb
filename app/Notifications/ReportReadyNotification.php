@@ -53,7 +53,7 @@ class ReportReadyNotification extends Notification implements ShouldQueue
         return [
             'title' => 'Laporan Siap!',
             'message' => 'Laporan "'.$this->title.'" siap diunduh.',
-            'url' => $this->downloadUrl,
+            'url' => str_replace(url('/'), '', $this->downloadUrl),
             'icon' => 'document-text',
             'type' => 'success',
         ];
@@ -67,7 +67,7 @@ class ReportReadyNotification extends Notification implements ShouldQueue
         return new BroadcastMessage([
             'title' => 'Laporan Siap!',
             'message' => 'Laporan "'.$this->title.'" siap diunduh.',
-            'url' => $this->downloadUrl,
+            'url' => str_replace(url('/'), '', $this->downloadUrl),
             'type' => 'success',
         ]);
     }

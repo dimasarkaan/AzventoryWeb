@@ -66,28 +66,7 @@ class ReportController extends Controller
             return back()->with('error', 'Tipe laporan tidak ditemukan atau tidak valid.');
         }
 
-        if ($format !== 'excel') {
-            // Snapshot data for PDF Queue
-            $reportData = $this->reportService->getReportData($type, $location, $startDate, $endDate);
-
-            \App\Jobs\GenerateReportJob::dispatch($request->user(), $reportData, $startDate, $endDate, $location, $type);
-
-            $this->logActivity('Laporan Diproses', "Meminta antrean laporan PDF tipe: {$type}");
-
-            $message = 'Laporan sedang diproses. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.';
-
-            if ($request->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'message' => $message,
-                    'type' => 'info'
-                ]);
-            }
-
-            return back()->with('info', $message);
-        }
-
-        // Jalur Export Excel (Response Langsung menggunakan Builder Streaming)
+        // Generate Filename
         $prefix = match ($type) {
             'inventory_list' => 'LaporanInventaris',
             'stock_mutation' => 'LaporanMutasi',
@@ -104,11 +83,47 @@ class ReportController extends Controller
             $filename = "{$prefix}SemuaRiwayat_".now()->format('d-m-Y');
         }
 
-        $this->logActivity('Laporan Diunduh', "Mengunduh file laporan Excel tipe: {$type}");
+        if ($format !== 'excel') {
+            // Snapshot data for PDF
+            $reportData = $this->reportService->getReportData($type, $location, $startDate, $endDate);
+            
+            // Jika data kecil (< 1000 item), langsung stream PDF (lebih handal di cPanel)
+            if (count($reportData) <= 1000) {
+                $this->logActivity('Laporan Diunduh', "Mengunduh PDF langsung tipe: {$type}");
 
+                $pdf = app()->make('dompdf.wrapper')->loadView('reports.' . $type . '.pdf', [
+                    'data' => $reportData,
+                    'isPdf' => true,
+                    'startDate' => $startDate,
+                    'endDate' => $endDate,
+                    'location' => $location,
+                ]);
+
+                return $pdf->download($filename . '.pdf');
+            }
+
+            // Jika data besar, gunakan antrean (Queue)
+            \App\Jobs\GenerateReportJob::dispatch($request->user(), $reportData, $startDate, $endDate, $location, $type);
+
+            $this->logActivity('Laporan Diproses', "Meminta antrean laporan PDF tipe: {$type}");
+
+            $message = 'Laporan sedang diproses karena ukuran data yang besar. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $message,
+                    'type' => 'info'
+                ]);
+            }
+
+            return back()->with('info', $message);
+        }
+
+        // Jalur Export Excel (Response Langsung menggunakan Builder Streaming)
         $excelService = new \App\Services\ExcelExportService;
 
-        // Pass the $query builder instead of $data collection for scalability
+        // Jalur Export Excel (Response Langsung menggunakan Builder Streaming)
         return match ($type) {
             'inventory_list' => $excelService->exportInventoryList($query, $filename),
             'stock_mutation' => $excelService->exportStockMutation($query, $filename),

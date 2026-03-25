@@ -43,7 +43,7 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
                 'name' => $this->sparepart->name,
                 'admin' => $this->addedBy->name,
             ]),
-            'url' => route('inventory.edit', $this->sparepart->id),
+            'url' => route('inventory.edit', $this->sparepart->id, false),
             'sparepart_id' => $this->sparepart->id,
             'added_by' => $this->addedBy->name,
         ];
@@ -60,7 +60,7 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
                 'name' => $this->sparepart->name,
                 'admin' => $this->addedBy->name,
             ]),
-            'url' => route('inventory.edit', $this->sparepart->id),
+            'url' => route('inventory.edit', $this->sparepart->id, false),
             'unread_count' => $notifiable->unreadNotifications()->count() + 1,
         ]);
     }

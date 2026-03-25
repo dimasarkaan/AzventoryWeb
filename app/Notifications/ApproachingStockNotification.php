@@ -42,7 +42,7 @@ class ApproachingStockNotification extends Notification implements ShouldQueue
         return [
             'type'         => 'approaching_stock',
             'message'      => "Stok '{$this->sparepart->name}' mendekati batas minimum ({$this->sparepart->stock}/{$this->sparepart->minimum_stock} unit, {$percentage}%).",
-            'url'          => route('inventory.show', $this->sparepart->id),
+            'url'          => route('inventory.show', $this->sparepart->id, false),
             'sparepart_id' => $this->sparepart->id,
             'current_stock'=> $this->sparepart->stock,
             'minimum_stock'=> $this->sparepart->minimum_stock,

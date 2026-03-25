@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 
 class ActivityLogged implements ShouldBroadcastNow
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, InteractsWithSockets;
 
     public $log;
 
@@ -39,6 +39,7 @@ class ActivityLogged implements ShouldBroadcastNow
         return [
             'id' => $this->log->id,
             'user_name' => $this->log->user ? $this->log->user->name : 'System',
+            'user_email' => $this->log->user ? $this->log->user->email : '-',
             'user_role' => $this->log->user ? ($this->log->user->role instanceof \App\Enums\UserRole ? $this->log->user->role->label() : ucfirst($this->log->user->role)) : '-',
             'action' => $this->log->action,
             'description' => $this->log->description,
@@ -46,5 +47,13 @@ class ActivityLogged implements ShouldBroadcastNow
             'created_at' => $this->log->created_at->toISOString(),
             'created_at_human' => $this->log->created_at->diffForHumans(),
         ];
+    }
+
+    /**
+     * Nama event yang akan disiarkan ke frontend.
+     */
+    public function broadcastAs(): string
+    {
+        return 'ActivityLogged';
     }
 }

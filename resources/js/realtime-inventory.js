@@ -109,6 +109,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
     // =================================================================
+    // ACTIVITY LOGS CHANNEL - Public Channel for Global Sync
+    // =================================================================
+    Echo.channel('activity-logs')
+        .listen('.ActivityLogged', (e) => {
+            console.log('📝 Activity Log Received:', e);
+            
+            // Trigger refresh data di dashboard agar angka-angka (stats) update otomatis
+            refreshDashboardData();
+        });
+
+    // =================================================================
     // STOCK ALERTS CHANNEL - Public Channel untuk Critical Alerts
     // =================================================================
 

@@ -58,7 +58,7 @@
              
              <!-- Message -->
              <div class="flex-1 w-0">
-                 <p class="text-sm font-semibold text-secondary-900" x-text="notification.message"></p>
+                 <p class="text-sm font-semibold text-secondary-900" x-html="notification.message"></p>
              </div>
              
              <!-- Close Button -->

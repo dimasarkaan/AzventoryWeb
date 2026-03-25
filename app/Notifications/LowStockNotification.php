@@ -38,7 +38,7 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
     {
         return [
             'message' => __('ui.notification_low_stock', ['name' => $this->sparepart->name]),
-            'url' => route('inventory.show', $this->sparepart->id),
+            'url' => route('inventory.show', $this->sparepart->id, false),
             'sparepart_id' => $this->sparepart->id,
         ];
     }
@@ -51,7 +51,7 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
         return new BroadcastMessage([
             'title' => __('ui.low_stock_alert'),
             'message' => __('ui.notification_low_stock', ['name' => $this->sparepart->name]),
-            'url' => route('inventory.show', $this->sparepart->id),
+            'url' => route('inventory.show', $this->sparepart->id, false),
             'sparepart_id' => $this->sparepart->id,
         ]);
     }

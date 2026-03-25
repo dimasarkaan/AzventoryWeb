@@ -178,26 +178,37 @@ class ActivityLogController extends Controller
         $logs = $query->latest()->get();
         $format = $request->input('format', 'pdf');
 
-        if ($format === 'pdf') {
-            // PDF diproses via Queue Job untuk mencegah timeout saat data berjumlah besar
-            \App\Jobs\ExportActivityLogJob::dispatch($request->user(), $request->all(), $logs);
+        if ($request->start_date && $request->end_date) {
+            $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
+            $end = \Carbon\Carbon::parse($request->end_date)->format('d-m-Y');
+            $filename = "LogAktivitas_{$start}sd{$end}";
+        } elseif ($request->start_date) {
+            $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
+            $filename = "LogAktivitas_Sejak{$start}";
+        } else {
+            $filename = 'LogAktivitasSemuaRiwayat_'.now()->format('d-m-Y');
+        }
 
+        if ($format === 'pdf') {
+            // Jika data kecil (< 500 baris), langsung stream untuk kenyamanan pengguna cPanel.
+            if ($logs->count() <= 500) {
+                $this->logActivity('Export Log Aktivitas', 'Mengunduh log aktivitas (PDF Langsung).');
+                
+                $pdf = app()->make('dompdf.wrapper')->loadView('reports.activity_logs.pdf', [
+                    'logs' => $logs,
+                    'isPdf' => true,
+                    'request' => $request,
+                ]);
+
+                return $pdf->download($filename . '.pdf');
+            }
+
+            \App\Jobs\ExportActivityLogJob::dispatch($request->user(), $request->all(), $logs);
             $this->logActivity('Export Log Aktivitas', 'Meminta antrean export log aktivitas (PDF).');
 
-            return back()->with('success', 'Export log sedang memproses. Anda akan menerima notifikasi saat file siap diunduh.');
+            return back()->with('success', 'Laporan PDF sedang diproses di latar belakang. Silakan cek menu Notifikasi dalam beberapa saat.');
         } else {
             $this->logActivity('Export Log Aktivitas', 'Mengunduh file log aktivitas (Excel).');
-
-            if ($request->start_date && $request->end_date) {
-                $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
-                $end = \Carbon\Carbon::parse($request->end_date)->format('d-m-Y');
-                $filename = "LogAktivitas_{$start}sd{$end}";
-            } elseif ($request->start_date) {
-                $start = \Carbon\Carbon::parse($request->start_date)->format('d-m-Y');
-                $filename = "LogAktivitas_Sejak{$start}";
-            } else {
-                $filename = 'LogAktivitasSemuaRiwayat_'.now()->format('d-m-Y');
-            }
 
             $excelService = new \App\Services\ExcelExportService;
 

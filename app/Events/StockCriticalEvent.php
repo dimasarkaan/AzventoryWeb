@@ -51,7 +51,7 @@ class StockCriticalEvent implements ShouldBroadcast
             'min_stock' => $this->sparepart->minimum_stock,
             'severity' => $this->severity,
             'percentage' => $this->calculatePercentage(),
-            'url' => route('inventory.show', $this->sparepart->id),
+            'url' => route('inventory.show', $this->sparepart->id, false),
         ];
     }
 

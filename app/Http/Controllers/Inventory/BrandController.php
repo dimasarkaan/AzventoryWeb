@@ -60,6 +60,10 @@ class BrandController extends Controller
 
         $oldName = $brand->name;
         $newName = $request->name;
+        $oldActive = (bool)$brand->is_active;
+        $newActive = $request->has('is_active') ? (bool)$request->is_active : $oldActive;
+
+        $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
         DB::transaction(function () use ($brand, $oldName, $newName, $request) {
             // Update master table
@@ -77,25 +81,23 @@ class BrandController extends Controller
 
         Cache::forget('inventory_brands');
 
-        $hasChanged = ($oldName !== $newName) || ($request->has('is_active') && $brand->is_active != $request->is_active);
-
         if ($hasChanged) {
             $changes = [];
             if ($oldName !== $newName) {
                 $changes['name'] = ['old' => $oldName, 'new' => $newName];
             }
-            if ($request->has('is_active') && $brand->getOriginal('is_active') != $request->is_active) {
-                $changes['is_active'] = ['old' => (bool)$brand->getOriginal('is_active'), 'new' => (bool)$request->is_active];
+            if ($oldActive !== $newActive) {
+                $changes['is_active'] = ['old' => $oldActive, 'new' => $newActive];
             }
 
             // Pesan lebih detail: sebutkan apa yang berubah
-            if ($oldName !== $newName && $request->has('is_active') && $brand->getOriginal('is_active') != $request->is_active) {
-                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+            if ($oldName !== $newName && $oldActive !== $newActive) {
+                $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Nama merk diubah dari '{$oldName}' menjadi '{$newName}' dan status diubah menjadi {$statusText}.";
             } elseif ($oldName !== $newName) {
                 $logMessage = "Nama merk diubah dari '{$oldName}' menjadi '{$newName}'.";
             } else {
-                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Status merk '{$newName}' diubah menjadi {$statusText}.";
             }
 

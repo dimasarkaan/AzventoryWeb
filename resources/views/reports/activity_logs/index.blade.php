@@ -436,7 +436,7 @@
                     if (window.Echo) {
                         console.log('[Alpine] Echo found, listening for activity-logs...');
                         window.Echo.channel('activity-logs')
-                            .listen('ActivityLogged', (e) => {
+                            .listen('.ActivityLogged', (e) => {
                                 console.log('[Alpine] Event received:', e);
                                 
                                 // Mapping payload dari broadcastWith ke format log lokal
@@ -451,8 +451,14 @@
                                 };
                                 
                                 if (!this.logs[activity.id]) {
+                                    console.log('[Alpine] New log added to UI:', activity.id);
                                     this.logs[activity.id] = activity;
                                     this.appendLogToUI(activity);
+                                    
+                                    // Update lastId agar polling tidak menduplikasi
+                                    if (activity.id > this.lastId) {
+                                        this.lastId = activity.id;
+                                    }
                                 }
                             });
                     }

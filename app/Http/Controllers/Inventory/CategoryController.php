@@ -55,6 +55,10 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $oldName = $category->name;
         $newName = $request->name;
+        $oldActive = (bool)$category->is_active;
+        $newActive = $request->has('is_active') ? (bool)$request->is_active : $oldActive;
+
+        $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
         DB::transaction(function () use ($category, $oldName, $newName, $request) {
             $updateData = ['name' => $newName];
@@ -71,25 +75,23 @@ class CategoryController extends Controller
 
         Cache::forget('inventory_categories');
 
-        $hasChanged = ($oldName !== $newName) || ($request->has('is_active') && $category->is_active != $request->is_active);
-
         if ($hasChanged) {
             $changes = [];
             if ($oldName !== $newName) {
                 $changes['name'] = ['old' => $oldName, 'new' => $newName];
             }
-            if ($request->has('is_active') && $category->getOriginal('is_active') != $request->is_active) {
-                $changes['is_active'] = ['old' => (bool)$category->getOriginal('is_active'), 'new' => (bool)$request->is_active];
+            if ($oldActive !== $newActive) {
+                $changes['is_active'] = ['old' => $oldActive, 'new' => $newActive];
             }
 
             // Pesan lebih detail: sebutkan apa yang berubah
-            if ($oldName !== $newName && $request->has('is_active') && $category->getOriginal('is_active') != $request->is_active) {
-                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+            if ($oldName !== $newName && $oldActive !== $newActive) {
+                $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Nama kategori diubah dari '{$oldName}' menjadi '{$newName}' dan status diubah menjadi {$statusText}.";
             } elseif ($oldName !== $newName) {
                 $logMessage = "Nama kategori diubah dari '{$oldName}' menjadi '{$newName}'.";
             } else {
-                $statusText = $request->is_active ? 'Aktif' : 'Non-aktif';
+                $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Status kategori '{$newName}' diubah menjadi {$statusText}.";
             }
             

@@ -372,8 +372,8 @@
             body { background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; }
             .preview-canvas { background: none !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
             .preview-inner { display: block !important; width: 100% !important; height: auto !important; min-height: 0 !important; }
-            .layout-grid, .layout-thermal { box-shadow: none !important; margin: 0 auto !important; padding: 0 !important; border: none !important; width: 100% !important; min-height: auto !important; height: auto !important; }
-            .layout-grid { padding: 5mm !important; display: flex !important; flex-wrap: wrap !important; gap: 2mm !important; align-content: flex-start !important; } /* Restore flex grid for A4 */
+            .layout-grid, .layout-thermal { box-shadow: none !important; margin: 0 auto !important; border: none !important; width: 100% !important; min-height: auto !important; height: auto !important; }
+            .layout-grid { display: flex !important; flex-wrap: wrap !important; gap: 2mm !important; align-content: flex-start !important; } /* Restore flex grid for A4 */
             .label-item { border: 1px dashed #cbd5e1 !important; transform: scale(1); flex-shrink: 0 !important; }
         }
 
@@ -756,13 +756,7 @@
                  :style="`padding-top: ${margin.top}mm; padding-bottom: ${margin.bottom}mm; padding-left: ${margin.left}mm; padding-right: ${margin.right}mm;`"
                  class="relative transition-all duration-300">
 
-                <!-- Visual Margin Guides (Only show when Layout Tab is active) -->
-                <div x-show="activeTab === 'margin'" class="absolute inset-0 pointer-events-none z-[10]" x-cloak>
-                    <div class="absolute w-full border-t-2 border-blue-500/40 border-dashed" :style="`top: ${margin.top}mm`" style="z-index: 10;"></div>
-                    <div class="absolute w-full border-b-2 border-blue-500/40 border-dashed" :style="`bottom: ${margin.bottom}mm`" style="z-index: 10;"></div>
-                    <div class="absolute h-full border-l-2 border-blue-500/40 border-dashed" :style="`left: ${margin.left}mm`" style="z-index: 10;"></div>
-                    <div class="absolute h-full border-r-2 border-blue-500/40 border-dashed" :style="`right: ${margin.right}mm`" style="z-index: 10;"></div>
-                </div>
+                <!-- Visual Margin Guides - REMOVED for clarity (padding handles the logic) -->
 
                 <!-- Empty State (User Friendly) -->
                 <div x-show="totalLabels === 0 && !loading" x-cloak class="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">

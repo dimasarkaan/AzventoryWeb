@@ -41,7 +41,8 @@ trait ActivityLogger
             // Dashboard Sync: Update global 'last_updated' timestamp to trigger cache refresh
             \Illuminate\Support\Facades\Cache::forever('inventory_last_updated', now()->timestamp);
         } catch (\Throwable $e) {
-            // Silently fail if broadcasting fails (e.g., offline/pusher error)
+            // Log error agar bisa didebug lewat storage/logs/laravel.log
+            \Illuminate\Support\Facades\Log::error('Broadcasting ActivityLogged failed: ' . $e->getMessage());
         }
     }
 }
