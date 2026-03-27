@@ -25,37 +25,28 @@ class GenerateQrCodes extends Command
     /**
      * Eksekusi console command.
      */
-    public function handle()
+    public function handle(\App\Services\QrCodeService $qrCodeService)
     {
         $spareparts = Sparepart::all();
 
         if ($spareparts->isEmpty()) {
-            $this->info('Semua sparepart sudah memiliki kode QR.');
+            $this->info('Tidak ada sparepart ditemukan.');
 
             return;
         }
 
-        $this->info('Membuat Kode QR untuk '.$spareparts->count().' sparepart...');
+        $this->info('Meregenerasi Kode QR untuk '.$spareparts->count().' sparepart...');
 
         $bar = $this->output->createProgressBar($spareparts->count());
         $bar->start();
 
-        $options = new \chillerlan\QRCode\QROptions([
-            'outputBase64' => false,
-        ]);
-
         foreach ($spareparts as $sparepart) {
-            $qrCodeUrl = route('inventory.show', $sparepart);
-            $qrCodeOutput = (new \chillerlan\QRCode\QRCode($options))->render($qrCodeUrl);
-            $qrCodePath = 'qrcodes/'.$sparepart->part_number.'_'.$sparepart->id.'.svg';
-            Storage::disk('public')->put($qrCodePath, $qrCodeOutput);
-
-            $sparepart->update(['qr_code_path' => $qrCodePath]);
+            $qrCodeService->generate($sparepart);
             $bar->advance();
         }
 
         $bar->finish();
         $this->newLine();
-        $this->info('Kode QR berhasil dibuat.');
+        $this->info('Seluruh Kode QR berhasil dioptimasi.');
     }
 }

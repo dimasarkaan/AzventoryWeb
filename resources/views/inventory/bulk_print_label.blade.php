@@ -325,13 +325,13 @@
         }
 
         .qr-section {
-            width: 12mm !important;
-            height: 12mm !important;
+            width: 13mm !important;
+            height: 13mm !important;
             flex-shrink: 0 !important;
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            margin-right: 1.25mm !important;
+            margin-right: 1.5mm !important;
         }
 
         .qr-image {

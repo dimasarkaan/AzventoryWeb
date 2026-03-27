@@ -18,7 +18,11 @@ class QrCodeService
      */
     public function generate(Sparepart $sparepart)
     {
-        $options = new QROptions(['outputBase64' => false]);
+        $options = new QROptions([
+            'outputBase64' => false,
+            'eccLevel' => QRCode::ECC_L,
+            'quietzoneSize' => 1,
+        ]);
         $qrCodeUrl = route('inventory.show', $sparepart);
         $qrCodeOutput = (new QRCode($options))->render($qrCodeUrl);
 
@@ -42,12 +46,14 @@ class QrCodeService
         // Ukuran label dikonversi ke satuan pixel @96DPI
         $width = 125;  // ~33mm
         $height = 57;  // ~15mm
-        $qrSize = 45;
+        $qrSize = 49;  // Tingkatkan sedikit (~13mm) agar lebih mudah dipindai
         $qrMargin = ($height - $qrSize) / 2;
 
         $options = new QROptions([
             'outputBase64' => false,
             'imageTransparent' => false,
+            'eccLevel' => QRCode::ECC_L, // Mengurangi kepadatan titik (modul jadi lebih besar)
+            'quietzoneSize' => 1, // Memberi jarak aman putih di sekeliling QR
         ]);
         $freshQr = (new QRCode($options))->render(route('inventory.show', $inventory));
 
@@ -69,9 +75,9 @@ class QrCodeService
 
     <!-- Info Barang (Kanan) -->
     <g font-family="sans-serif" fill="black">
-        <text x="55" y="18" font-size="5" font-weight="bold" fill="#555">PART NUMBER</text>
-        <text x="55" y="29" font-size="8" font-family="monospace" font-weight="bold">'.htmlspecialchars($inventory->part_number).'</text>
-        <text x="55" y="40" font-size="6">'.htmlspecialchars(Str::limit($inventory->name, 20)).'</text>
+        <text x="58" y="18" font-size="5" font-weight="bold" fill="#555">PART NUMBER</text>
+        <text x="58" y="29" font-size="8" font-family="monospace" font-weight="bold">'.htmlspecialchars($inventory->part_number).'</text>
+        <text x="58" y="40" font-size="6">'.htmlspecialchars(Str::limit($inventory->name, 20)).'</text>
     </g>
 </svg>';
 
