@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Inventory;
 
 use App\Events\InventoryUpdatedEvent;
 use App\Events\StockApprovalUpdatedEvent;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Event;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class TesInventarisRealTime extends TestCase
+class TesRealTime extends TestCase
 {
     use RefreshDatabase;
 

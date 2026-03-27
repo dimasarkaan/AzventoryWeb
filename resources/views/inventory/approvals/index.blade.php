@@ -100,6 +100,12 @@
 
             <div id="approvals-list-container">
                 <!-- Mobile Card View -->
+                <div class="md:hidden mb-4 flex items-center justify-between px-1">
+                    <label class="flex items-center gap-2.5 cursor-pointer group bg-white border border-secondary-100 rounded-xl px-4 py-2.5 shadow-sm active:scale-95 transition-all">
+                        <input type="checkbox" id="select-all-mobile" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition-all">
+                        <span class="text-sm font-bold text-secondary-600 group-hover:text-primary-600 transition-colors">Pilih Semua</span>
+                    </label>
+                </div>
                 <div class="md:hidden space-y-4" id="mobile-approvals-list">
                     @forelse ($pendingApprovals as $approval)
                         <x-approval.card :approval="$approval" />
@@ -324,11 +330,14 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const selectAll = document.getElementById('select-all');
+            const selectAllMobile = document.getElementById('select-all-mobile');
             const bulkContainer = document.getElementById('bulk-actions-container');
             const selectedCountDisplay = document.getElementById('selected-count');
 
             function updateBulkUI() {
-                const checkedCount = document.querySelectorAll('.row-checkbox:checked').length;
+                const checkboxesByClass = document.querySelectorAll('.row-checkbox');
+                const checkedCount = Array.from(checkboxesByClass).filter(cb => cb.checked).length;
+                
                 if (checkedCount > 0) {
                     bulkContainer.classList.remove('hidden');
                     bulkContainer.classList.add('flex');
@@ -337,6 +346,11 @@
                     bulkContainer.classList.add('hidden');
                     bulkContainer.classList.remove('flex');
                 }
+
+                // Sync select all status
+                const allChecked = checkedCount > 0 && checkedCount === checkboxesByClass.length;
+                if (selectAll) selectAll.checked = allChecked;
+                if (selectAllMobile) selectAllMobile.checked = allChecked;
             }
 
             if (selectAll) {
@@ -344,6 +358,17 @@
                     document.querySelectorAll('.row-checkbox').forEach(cb => {
                         cb.checked = selectAll.checked;
                     });
+                    if (selectAllMobile) selectAllMobile.checked = selectAll.checked;
+                    updateBulkUI();
+                });
+            }
+
+            if (selectAllMobile) {
+                selectAllMobile.addEventListener('change', function() {
+                    document.querySelectorAll('.row-checkbox').forEach(cb => {
+                        cb.checked = selectAllMobile.checked;
+                    });
+                    if (selectAll) selectAll.checked = selectAllMobile.checked;
                     updateBulkUI();
                 });
             }
@@ -356,11 +381,24 @@
 
             window.rebindBulkEvents = function() {
                 const newSelectAll = document.getElementById('select-all');
+                const newSelectAllMobile = document.getElementById('select-all-mobile');
+                
                 if (newSelectAll) {
                     newSelectAll.addEventListener('change', function() {
                         document.querySelectorAll('.row-checkbox').forEach(cb => {
                             cb.checked = newSelectAll.checked;
                         });
+                        if (newSelectAllMobile) newSelectAllMobile.checked = newSelectAll.checked;
+                        updateBulkUI();
+                    });
+                }
+
+                if (newSelectAllMobile) {
+                    newSelectAllMobile.addEventListener('change', function() {
+                        document.querySelectorAll('.row-checkbox').forEach(cb => {
+                            cb.checked = newSelectAllMobile.checked;
+                        });
+                        if (newSelectAll) newSelectAll.checked = newSelectAllMobile.checked;
                         updateBulkUI();
                     });
                 }

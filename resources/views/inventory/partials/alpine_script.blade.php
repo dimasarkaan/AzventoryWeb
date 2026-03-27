@@ -48,9 +48,65 @@
                             if (e.id === {{ $sparepart->id ?? 0 }}) {
                                 console.log('Live Stock Update received:', e);
                                 this.handleStockUpdate(e);
+                                
+                                // Refresh history if needed
+                                this.refreshHistory();
+                            }
+                        });
+                        
+                    // Listener untuk Log Aktivitas (untuk update tabel histori)
+                    window.Echo.channel('activity-logs')
+                        .listen('.ActivityLogged', (e) => {
+                            console.log('📝 Activity Log received in detail page:', e);
+                            this.refreshHistory();
+                        });
+
+                    // Listener untuk Persetujuan Stok (khusus untuk perpindahan status request)
+                    window.Echo.private('stock-approvals')
+                        .listen('.StockApprovalUpdated', (e) => {
+                            console.log('✅ Stock Approval Update received:', e);
+                            if (e.log && e.log.sparepart && e.log.sparepart.id === {{ $sparepart->id ?? 0 }}) {
+                                this.refreshHistory();
                             }
                         });
                 }
+            },
+
+            // Fungsi untuk refresh tabel histori via AJAX
+            refreshHistory() {
+                console.log('🔄 Refreshing activity history...');
+                const url = window.location.href;
+                
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    // Update main stock display (just in case)
+                    const newStock = doc.getElementById('main-stock-display');
+                    if (newStock) {
+                        document.getElementById('main-stock-display').innerHTML = newStock.innerHTML;
+                    }
+
+                    // Update History Table
+                    const newHistory = doc.getElementById('activity-history-container');
+                    if (newHistory) {
+                        const target = document.getElementById('activity-history-container');
+                        if (target) {
+                            target.innerHTML = newHistory.innerHTML;
+                            // Highlight the update
+                            target.classList.add('animate-rt-highlight');
+                            setTimeout(() => target.classList.remove('animate-rt-highlight'), 2000);
+                        }
+                    }
+                })
+                .catch(err => console.error('Error refreshing history:', err));
             },
 
             handleStockUpdate(data) {

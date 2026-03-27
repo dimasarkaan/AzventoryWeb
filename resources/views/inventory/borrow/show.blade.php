@@ -57,7 +57,7 @@
                     </div>
 
                     <!-- Borrowing Details Card -->
-                    <div class="card p-6">
+                    <div class="card p-6" id="borrowing-details">
                         <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Detail Peminjaman</h3>
                         
                         <div class="space-y-4">
@@ -513,4 +513,32 @@
 
     @include('inventory.partials.alpine_script')
     </div>
+    @push('styles')
+    <style>
+        @keyframes highlight-fade {
+            0% { background-color: rgba(239, 68, 68, 0.2); ring: 2px solid #ef4444; }
+            100% { background-color: transparent; ring: none; }
+        }
+        .highlight-overdue {
+            animation: highlight-fade 3s ease-in-out forwards;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('highlight') === 'overdue') {
+                const target = document.getElementById('borrowing-details');
+                if (target) {
+                    target.classList.add('highlight-overdue');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>

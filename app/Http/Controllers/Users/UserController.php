@@ -133,7 +133,15 @@ class UserController extends Controller
 
         $user->update($request->validated());
 
-        $this->logActivity('User Diupdate', __('messages.log_user_updated', ['name' => $user->name]), $changes);
+        $logDescription = __('messages.log_user_updated', ['name' => $user->name]);
+        if (isset($changes['role'])) {
+            $newRole = \App\Enums\UserRole::tryFrom($changes['role']['new']) ?? $changes['role']['new'];
+            $oldRoleLabel = $changes['role']['old'] instanceof \App\Enums\UserRole ? $changes['role']['old']->label() : $changes['role']['old'];
+            $newRoleLabel = $newRole instanceof \App\Enums\UserRole ? $newRole->label() : $newRole;
+            $logDescription .= " (Perubahan Peran: " . $oldRoleLabel . " -> " . $newRoleLabel . ")";
+        }
+
+        $this->logActivity('User Diupdate', $logDescription, $changes);
 
         return redirect()->route('users.index')
             ->with('success', __('messages.user_updated', ['name' => $user->name]));

@@ -119,7 +119,7 @@
                         <div class="flex items-start justify-between">
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.available_stock') }}</span>
-                                <div class="mt-1 text-4xl font-extrabold text-secondary-900 transition-all duration-300" :class="{'text-primary-600 scale-105': liveUpdateShow}">
+                                <div id="main-stock-display" class="mt-1 text-4xl font-extrabold text-secondary-900 transition-all duration-300" :class="{'text-primary-600 scale-105': liveUpdateShow}">
                                     <span x-text="liveStock">{{ $sparepart->stock }}</span>
                                     <span class="text-base font-medium text-secondary-500">{{ $sparepart->unit ?? 'Pcs' }}</span>
                                 </div>
@@ -409,7 +409,7 @@
                 <div class="col-span-1 lg:col-span-3">
 
                         <!-- History Card -->
-                        <div class="card p-6">
+                        <div id="activity-history-container" class="card p-6">
                             <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">{{ __('ui.borrowing_history') }}</h3>
 
                             @if($borrowings->count() > 0)

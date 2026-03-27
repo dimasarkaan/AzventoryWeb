@@ -1,13 +1,16 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Notifications;
 
 use App\Enums\UserRole;
+use App\Models\Borrowing;
 use App\Models\Sparepart;
 use App\Models\StockLog;
 use App\Models\User;
+use App\Notifications\ItemReturnedNotification;
 use App\Notifications\LowStockNotification;
 use App\Notifications\MissingPriceNotification;
+use App\Notifications\OverdueBorrowingNotification;
 use App\Notifications\StockRequestNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,7 +20,7 @@ use Tests\TestCase;
  * Unit test untuk kelas-kelas Notification.
  * Memastikan notifikasi mengandung data yang sesuai dan dikirim ke channel yang benar.
  */
-class TesKelasNotifikasi extends TestCase
+class TesNotification extends TestCase
 {
     use RefreshDatabase;
 
@@ -48,6 +51,19 @@ class TesKelasNotifikasi extends TestCase
         $this->assertEquals(['database', 'broadcast'], $notification->via($notifiable));
     }
 
+    #[Test]
+    public function low_stock_notification_menangani_logika_stok_habis()
+    {
+        // Skenario: Stok Habis ( 0 )
+        $sparepartEmpty = Sparepart::factory()->create(['name' => 'Mur', 'stock' => 0, 'minimum_stock' => 10]);
+        $notifEmpty = new LowStockNotification($sparepartEmpty);
+        $dataEmpty = $notifEmpty->toArray(new User());
+
+        $this->assertEquals('Peringatan: Stok Habis!', $dataEmpty['title']);
+        $this->assertEquals('danger', $dataEmpty['type']);
+        $this->assertStringContainsString('telah HABIS (0)', $dataEmpty['message']);
+    }
+
     // ── MissingPriceNotification ─────────────────────────────────
 
     #[Test]
@@ -68,7 +84,7 @@ class TesKelasNotifikasi extends TestCase
     }
 
     #[Test]
-    public function missing_price_notification_url_mengarah_ke_halaman_edit()
+    public function missing_price_notification_url_mengarah_ke_halaman_edit_dengan_focus_price()
     {
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
         $sparepart = Sparepart::factory()->create(['type' => 'sale']);
@@ -78,6 +94,7 @@ class TesKelasNotifikasi extends TestCase
         $data = $notification->toArray($notifiable);
 
         $this->assertStringContainsString('/inventory/'.$sparepart->id.'/edit', $data['url']);
+        $this->assertStringContainsString('?focus=price', $data['url']);
     }
 
     // ── StockRequestNotification ─────────────────────────────────
@@ -90,7 +107,7 @@ class TesKelasNotifikasi extends TestCase
             'status' => 'pending',
         ]);
         $notification = new StockRequestNotification($stockLog, 'Permintaan stok baru dari Operator');
-        $notifiable = User::factory()->make();
+        $notifiable = User::factory()->make(['role' => UserRole::ADMIN]);
 
         $data = $notification->toArray($notifiable);
 
@@ -107,6 +124,45 @@ class TesKelasNotifikasi extends TestCase
         $notifiable = User::factory()->make();
 
         $this->assertEquals(['database', 'broadcast'], $notification->via($notifiable));
+    }
+
+    // ── ItemReturnedNotification ────────────────────────────────
+    
+    #[Test]
+    public function item_returned_notification_berisi_data_yang_benar()
+    {
+        $operator = User::factory()->create(['name' => 'Op Jajang']);
+        $sparepart = Sparepart::factory()->create(['name' => 'Oli Mesin']);
+        $borrowing = Borrowing::factory()->create([
+            'user_id' => $operator->id,
+            'sparepart_id' => $sparepart->id,
+            'borrower_name' => $operator->name,
+            'quantity' => 2
+        ]);
+
+        $notification = new ItemReturnedNotification($borrowing, 2, 'baik');
+        $notifiable = User::factory()->make(['role' => UserRole::ADMIN]);
+
+        $data = $notification->toArray($notifiable);
+
+        $this->assertEquals('Barang Dikembalikan', $data['title']);
+        $this->assertStringContainsString('Op Jajang', $data['message']);
+        $this->assertStringContainsString('Oli Mesin', $data['message']);
+        $this->assertStringContainsString('2', $data['message']);
+        $this->assertStringContainsString('/inventory/borrow/'.$borrowing->id, $data['url']);
+    }
+
+    // ── OverdueBorrowingNotification ─────────────────────────────
+
+    #[Test]
+    public function overdue_borrowing_notification_memiliki_parameter_highlight_overdue()
+    {
+        $borrowing = Borrowing::factory()->create();
+        $notification = new OverdueBorrowingNotification($borrowing);
+
+        $data = $notification->toArray(new User());
+
+        $this->assertStringContainsString('?highlight=overdue', $data['url']);
     }
 }
 

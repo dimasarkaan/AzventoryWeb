@@ -1321,4 +1321,20 @@
     </div>
     @endif
 
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('focus') === 'price') {
+                const priceInput = document.getElementById('price');
+                if (priceInput) {
+                    setTimeout(() => {
+                        priceInput.focus();
+                        priceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }
+            }
+        });
+    </script>
+    @endpush
 </x-app-layout>

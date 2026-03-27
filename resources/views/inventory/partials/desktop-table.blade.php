@@ -1,4 +1,4 @@
-<div class="hidden md:block card overflow-hidden">
+<div id="inventory-desktop-container" class="hidden md:block card overflow-hidden">
     <div class="overflow-x-auto">
         <table class="table-modern w-full table-fixed">
             <thead>
@@ -24,7 +24,7 @@
                     <th class="px-4 py-3 text-center text-xs font-semibold text-secondary-500 uppercase tracking-wider w-[12%]">{{ __('ui.actions') }}</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="inventory-desktop-body">
                 @forelse ($spareparts as $sparepart)
                     <x-inventory.table-row :sparepart="$sparepart" :trash="request('trash')" />
                 @empty
@@ -139,7 +139,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="inventory-pagination-desktop">
+    <div id="inventory-pagination-desktop" class="inventory-pagination-desktop">
         @if($spareparts->hasPages())
             <div class="bg-secondary-50 px-4 py-3 border-t border-secondary-200 sm:px-6">
                 {{ $spareparts->appends(request()->query())->links() }}

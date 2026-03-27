@@ -112,8 +112,8 @@
                         class="card group relative transition-all duration-200 overflow-hidden cursor-pointer"
                         :class="read ? 'bg-white opacity-70 border border-secondary-100 shadow-none' : 'bg-white shadow-sm border-l-4 border-l-primary-500 border-y border-r border-secondary-100'"
                     >
-                        <div class="px-4 py-3 flex items-center justify-between gap-4">
-                            <div class="flex gap-4 w-full items-start">
+                        <div class="px-3 sm:px-4 py-3 flex items-center justify-between gap-2 sm:gap-4">
+                            <div class="flex gap-3 sm:gap-4 w-full items-start">
                                 <div class="flex-shrink-0 mt-0.5">
                                     {!! $getIcon($notification) !!}
                                 </div>
@@ -131,15 +131,15 @@
                                     </p>
                                 </div>
                             </div>
-
+ 
                             <!-- Action Link (Detail) -->
                             <div class="flex-shrink-0 self-center">
                                 <a :href="url" 
                                    :target="type.indexOf('ReportReady') !== -1 ? '_blank' : '_self'"
                                    @click.stop="markRead()"
-                                   class="inline-flex items-center px-2 py-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline transition-all">
-                                    {{ __('ui.notification_action_detail') }}
-                                    <svg class="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                   class="inline-flex items-center px-2 py-1 text-xs font-medium text-primary-600 hover:text-primary-700 hover:underline transition-all whitespace-nowrap">
+                                    <span class="hidden sm:inline-flex mr-1">{{ __('ui.notification_action_detail') }}</span>
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                 </a>
                             </div>
                         </div>

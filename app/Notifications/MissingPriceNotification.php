@@ -39,13 +39,15 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
     public function toArray(object $notifiable): array
     {
         return [
+            'title' => 'Peringatan Harga Kosong',
             'message' => __('ui.notification_missing_price', [
                 'name' => $this->sparepart->name,
                 'admin' => $this->addedBy->name,
             ]),
-            'url' => route('inventory.edit', $this->sparepart->id, false),
+            'url' => route('inventory.edit', $this->sparepart->id) . '?focus=price',
             'sparepart_id' => $this->sparepart->id,
             'added_by' => $this->addedBy->name,
+            'type' => 'warning',
         ];
     }
 
@@ -60,8 +62,9 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
                 'name' => $this->sparepart->name,
                 'admin' => $this->addedBy->name,
             ]),
-            'url' => route('inventory.edit', $this->sparepart->id, false),
+            'url' => route('inventory.edit', $this->sparepart->id) . '?focus=price',
             'unread_count' => $notifiable->unreadNotifications()->count() + 1,
+            'type' => 'warning',
         ]);
     }
 }

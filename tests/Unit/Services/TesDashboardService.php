@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services;
 
 use App\Models\Sparepart;
 use App\Models\StockLog;
@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class TesServisDashboard extends TestCase
+class TesDashboardService extends TestCase
 {
     use RefreshDatabase;
 

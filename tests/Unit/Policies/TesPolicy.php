@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Policies;
 
 use App\Enums\UserRole;
 use App\Models\Borrowing;
@@ -16,7 +16,7 @@ use Tests\TestCase;
  * Unit test untuk BorrowingPolicy dan UserPolicy.
  * Memastikan aturan otorisasi diterapkan dengan benar.
  */
-class TesKebijakanUnit extends TestCase
+class TesPolicy extends TestCase
 {
     use RefreshDatabase;
 

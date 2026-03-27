@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Cetak Banyak Label ({{ $spareparts->count() }} Item)</title>
+    <link rel="icon" href="{{ asset('logo.svg') }}?v=2" type="image/svg+xml">
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,6 +27,15 @@
         .preview-canvas {
             background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
             background-size: 20px 20px;
+        }
+
+        /* Paginated Preview for Screen */
+        @media screen {
+            .preview-inner {
+                background-image: linear-gradient(to bottom, transparent 296.5mm, rgba(59, 130, 246, 0.15) 296.5mm, rgba(59, 130, 246, 0.15) 297mm, transparent 297mm);
+                background-size: 100% 297mm;
+                background-attachment: local;
+            }
         }
 
         /* --- PREMIUIM UNIFIED TOOLBAR --- */
@@ -195,8 +205,8 @@
         /* --- PREVIEW CANVAS (STRICT CONTAINER) --- */
         .preview-canvas {
             padding-top: 100px;
-            padding-bottom: 40px;
-            background: #f1f5f9;
+            padding-bottom: 60px;
+            background: #e2e8f0;
         }
 
         @media (max-width: 768px) {
@@ -207,11 +217,19 @@
             width: 100%;
             overflow-x: auto;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
-        #label-container {
-            flex-shrink: 0; /* NO SCALING */
+        /* A4 Page Card on Screen */
+        .page-card {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08);
+            position: relative;
+            flex-shrink: 0;
         }
 
         .toolbar-btn {
@@ -269,46 +287,41 @@
             display: flex;
             flex-wrap: wrap;
             gap: 2mm;
-            width: 210mm; /* A4 Width */
-            margin: 0 auto;
-            background: white;
-            padding: 20mm 10mm;
-            min-height: 297mm; /* A4 Height */
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
             align-content: flex-start;
         }
 
         .layout-thermal {
             display: flex;
             flex-direction: column;
-            gap: 0;
+            gap: 2mm; /* Give gap between labels */
             width: 40mm; /* Generic thermal width */
+            min-height: 100mm; /* Just for visual on screen */
             margin: 0 auto;
             background: white;
-            padding: 0;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            padding: 2mm 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08); /* Similar shadow to A4 */
             align-items: center;
         }
 
-        .layout-thermal .label-item {
-            margin: 0 !important;
-            border: none !important;
+        .layout-thermal .layout-thermal-item {
+            margin: 0 !important; /* Managed by gap */
             page-break-after: always !important;
+            break-after: page !important;
+            /* Do not remove border */
         }
 
-        /* --- COMPACT LABEL STYLE REPLICATION --- */
         .label-item {
             width: 33mm;
             height: 15mm;
             display: flex !important;
             align-items: center !important;
             background: white !important;
-            border: 1.2px solid #ddd !important;
             box-sizing: border-box !important;
             padding: 1.25mm !important;
             page-break-inside: avoid;
             overflow: hidden !important;
-            border-radius: 1.5mm !important;
+            border-radius: 2mm !important;
+            border: 1px solid #000000 !important;
         }
 
         .qr-section {
@@ -367,21 +380,61 @@
         }
 
         @media print {
-            @page { size: auto; margin: 0; }
-            .premium-toolbar, .sidebar-glass, #sidebar-ui, #loading-ui { display: none !important; }
-            body { background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; }
-            .preview-canvas { background: none !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
-            .preview-inner { display: block !important; width: 100% !important; height: auto !important; min-height: 0 !important; }
-            .layout-grid, .layout-thermal { box-shadow: none !important; margin: 0 auto !important; border: none !important; width: 100% !important; min-height: auto !important; height: auto !important; }
-            .layout-grid { display: flex !important; flex-wrap: wrap !important; gap: 2mm !important; align-content: flex-start !important; } /* Restore flex grid for A4 */
-            .label-item { border: 1px dashed #cbd5e1 !important; transform: scale(1); flex-shrink: 0 !important; }
+            .premium-toolbar, .sidebar-glass, #sidebar-ui, #loading-ui, .margin-guide, .print-page-num { 
+                display: none !important; 
+            }
+            html, body { background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
+            .preview-canvas { background: none !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; display: block !important; }
+            .preview-inner { display: block !important; width: 100% !important; height: auto !important; min-height: 0 !important; overflow: visible !important; gap: 0 !important; }
+            .page-card { 
+                width: 100% !important; 
+                min-height: 0 !important; 
+                box-shadow: none !important; 
+                display: block !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                overflow: visible !important;
+            }
+            .page-card:last-child { page-break-after: auto !important; break-after: auto !important; }
+            .layout-grid { 
+                display: block !important; 
+                text-align: left !important; 
+                line-height: 0 !important;
+                width: 100% !important;
+                padding: 0 !important;
+            }
+            .label-item { 
+                display: inline-flex !important; 
+                margin: 1mm !important; 
+                border: 1px solid #000000 !important; 
+                transform: scale(1) !important; 
+                flex-shrink: 0 !important; 
+                page-break-inside: avoid !important; 
+                break-inside: avoid !important; 
+                vertical-align: top !important;
+            }
+            /* Specific fix for thermal print layout */
+            .layout-thermal {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                text-align: left !important;
+            }
+            .layout-thermal .layout-thermal-item {
+                display: flex !important; /* Force block-level flex to allow page-break */
+                margin: 0 !important;
+                border: 1px solid #000000 !important;
+                page-break-after: always !important;
+                break-after: page !important;
+            }
         }
 
         /* Sidebar Styles */
         .sidebar-glass {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(0, 0, 0, 0.05);
+            background: #ffffff;
+            border-left: 1px solid rgba(0, 0, 0, 0.08);
         }
 
         [x-cloak] { display: none !important; }
@@ -396,6 +449,27 @@
             -moz-appearance: textfield;
         }
     </style>
+    <!-- Dynamic @page handler.
+         Grid mode: respects custom margin per page but defaults to A4 size.
+         Thermal mode: forces physical size to 40mm x 20mm and strips browser margins. -->
+    <style x-html="layoutMode === 'grid' ? `
+        @media print {
+            @page { 
+                size: A4 portrait;
+                margin-top: ${margin.top}mm;
+                margin-bottom: ${margin.bottom}mm;
+                margin-left: ${margin.left}mm;
+                margin-right: ${margin.right}mm;
+            }
+        }
+    ` : `
+        @media print {
+            @page {
+                size: 40mm 20mm; /* Roughly the size of one label + gap */
+                margin: 0 !important;
+            }
+        }
+    `"></style>
 </head>
 <body x-data="{ 
     sidebarOpen: false, 
@@ -533,8 +607,42 @@
             });
         } catch (e) { console.error('Logging failed', e); }
         window.print();
+    },
+
+    /* ---- Pagination Helpers ---- */
+    get labelW() { return 34; /* label width + gap in mm */ },
+    get labelH() { return 16; /* label height + gap in mm */ },
+    get labelsPerRow() {
+        return Math.max(1, Math.floor((210 - this.margin.left - this.margin.right) / this.labelW));
+    },
+    get rowsPerPage() {
+        return Math.max(1, Math.floor((297 - this.margin.top - this.margin.bottom) / this.labelH));
+    },
+    get labelsPerPage() {
+        return this.labelsPerRow * this.rowsPerPage;
+    },
+    /* Returns a flat list of all label items [{id, qty_index}] across all items */
+    get allLabelItems() {
+        const items = [];
+        this.itemIds.forEach(id => {
+            const qty = Math.max(0, parseInt(this.quantities[id]) || 0);
+            for (let i = 0; i < qty; i++) items.push(id);
+        });
+        return items;
+    },
+    /* Pages: each page contains a slice of allLabelItems */
+    get pages() {
+        const all = this.allLabelItems;
+        if (all.length === 0) return [{ page: 1, items: [] }];
+        const perPage = this.labelsPerPage;
+        const numPages = Math.max(1, Math.ceil(all.length / perPage));
+        return Array.from({ length: numPages }, (_, i) => ({
+            page: i + 1,
+            items: all.slice(i * perPage, (i + 1) * perPage)
+        }));
     }
-}">
+}"
+>
     
     <nav class="premium-toolbar">
         <div class="toolbar-content">
@@ -578,7 +686,7 @@
                 </div>
 
                 <!-- Configuration Trigger -->
-                <button @click="sidebarOpen = true" class="toolbar-btn">
+                <button @click="sidebarOpen = !sidebarOpen" :class="{'active': sidebarOpen}" class="toolbar-btn">
                     <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
                     <span class="hidden sm:inline">Pengaturan</span>
                 </button>
@@ -587,23 +695,23 @@
     </nav>
 
     <!-- Sidebar -->
-    <div id="sidebar-ui" x-show="sidebarOpen" x-cloak class="fixed inset-0 z-[40] overflow-hidden">
+    <div id="sidebar-ui" x-show="sidebarOpen" x-cloak class="fixed inset-0 z-[60] overflow-hidden">
         <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" @click="sidebarOpen = false"></div>
         <div class="fixed inset-y-0 right-0 max-w-full flex">
             <div x-show="sidebarOpen" x-transition:enter="transform transition ease-in-out duration-500" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transform transition ease-in-out duration-500" class="w-screen max-w-sm pointer-events-auto">
                 <div class="flex h-full flex-col sidebar-glass shadow-2xl relative overflow-hidden">
-                    <!-- Sidebar Header (Padded Row) -->
-                    <div class="flex items-center justify-between mt-20 mb-8 px-6">
+                    <!-- Sidebar Header -->
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
                         <div>
                             <h2 class="text-xl font-black text-slate-900 tracking-tight leading-none group">
                                 Pengaturan
                                 <span class="block h-1 w-6 bg-blue-600 rounded-full mt-2 transition-all group-hover:w-12"></span>
                             </h2>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-3" x-text="activeTab === 'quantity' ? 'Sesuaikan jumlah cetak' : 'Atur tata letak & margin'">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.15em] mt-1" x-text="activeTab === 'quantity' ? 'Sesuaikan jumlah cetak' : 'Atur tata letak & margin'">
                                 Sesuaikan jumlah cetak
                             </p>
                         </div>
-                        <button @click="sidebarOpen = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-90 border border-slate-200/50 shadow-sm">
+                        <button @click="sidebarOpen = false" class="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition-all active:scale-90 border border-slate-200/50 shadow-sm flex-shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                         </button>
                     </div>
@@ -714,6 +822,8 @@
                                 </div>
                             </section>
 
+                            </section>
+
                             <!-- Presets Section -->
                             <section class="pt-4 border-t border-slate-100">
                                 <div class="flex items-center justify-between mb-3">
@@ -752,36 +862,69 @@
     <!-- Preview Container -->
     <main class="preview-canvas min-h-screen">
         <div class="preview-inner">
-            <div id="label-container" :class="layoutMode === 'grid' ? 'layout-grid' : 'layout-thermal'" 
-                 :style="`padding-top: ${margin.top}mm; padding-bottom: ${margin.bottom}mm; padding-left: ${margin.left}mm; padding-right: ${margin.right}mm;`"
-                 class="relative transition-all duration-300">
 
-                <!-- Visual Margin Guides - REMOVED for clarity (padding handles the logic) -->
+            <!-- Grid Mode: One page-card per A4 page -->
+            <template x-if="layoutMode === 'grid'">
+                <div>
+                    <template x-for="(pg, pgIdx) in pages" :key="pgIdx">
+                        <div class="page-card mb-8"
+                             :style="`padding-top: ${margin.top}mm; padding-bottom: ${margin.bottom}mm; padding-left: ${margin.left}mm; padding-right: ${margin.right}mm;`">
 
-                <!-- Empty State (User Friendly) -->
-                <div x-show="totalLabels === 0 && !loading" x-cloak class="absolute inset-0 flex flex-col items-center justify-center p-12 text-center">
-                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    <!-- Margin guides - visible on screen when margin tab is active -->
+                    <div x-show="activeTab === 'margin'" class="margin-guide absolute inset-0 pointer-events-none" style="z-index:10;" x-cloak>
+                        <div class="absolute w-full border-t-2 border-blue-500/40 border-dashed" :style="`top: ${margin.top}mm`"></div>
+                        <div class="absolute w-full border-b-2 border-blue-500/40 border-dashed" :style="`bottom: ${margin.bottom}mm`"></div>
+                        <div class="absolute h-full border-l-2 border-blue-500/40 border-dashed" :style="`left: ${margin.left}mm`"></div>
+                        <div class="absolute h-full border-r-2 border-blue-500/40 border-dashed" :style="`right: ${margin.right}mm`"></div>
                     </div>
-                    <h3 class="text-slate-400 font-black text-sm uppercase tracking-widest">Pratinjau Kosong</h3>
-                    <p class="text-slate-400 text-[10px] mt-2 font-bold">Atur jumlah salinan di sidebar untuk mulai melihat pratinjau</p>
-                    <button @click="sidebarOpen = true" class="mt-6 px-5 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-100 transition-all">Buka Sidebar</button>
-                </div>
 
-                <template x-for="id in Object.keys(quantities)" :key="id">
-                    <template x-for="j in Math.max(0, parseInt(quantities[id]) || 0)" :key="`${id}-${j}`">
-                        <div x-html="document.getElementById('template-' + id).innerHTML"></div>
+                    <!-- Page number badge -->
+                    <div class="print-page-num absolute top-2 right-2 bg-slate-100 text-slate-400 text-[8px] font-bold px-2 py-0.5 rounded-full" x-text="`Halaman ${pgIdx + 1} / ${pages.length}`"></div>
+
+                    <!-- Empty state on first page only -->
+                    <div x-show="totalLabels === 0 && pgIdx === 0" class="flex flex-col items-center justify-center p-12 text-center" style="min-height: 200px;">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        </div>
+                        <h3 class="text-slate-400 font-black text-sm uppercase tracking-widest">Pratinjau Kosong</h3>
+                        <p class="text-slate-400 text-[10px] mt-2 font-bold">Atur jumlah salinan di sidebar untuk mulai melihat pratinjau</p>
+                        <button @click="sidebarOpen = true" class="mt-6 px-5 py-2.5 bg-blue-50 text-blue-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-100 transition-all">Buka Sidebar</button>
+                    </div>
+
+                    <!-- Labels for this page -->
+                    <div x-show="totalLabels > 0" class="layout-grid">
+                        <template x-for="(itemId, idx) in pg.items" :key="`${pgIdx}-${idx}`">
+                            <div x-html="document.getElementById('template-' + itemId).innerHTML" class="label-item"></div>
+                        </template>
+                    </div>
+
+                        </div>
                     </template>
-                </template>
-
-                <div id="loading-ui" x-show="loading" x-cloak class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-20 rounded-[inherit]">
-                    <div class="flex flex-col items-center gap-3">
-                        <div class="w-10 h-10 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
-                        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest animate-pulse">Menghitung Tata Letak...</span>
-                    </div>
                 </div>
-            </div>
-        </main>
+            </template>
+
+            <!-- Thermal Mode: Single continuous column -->
+            <template x-if="layoutMode === 'thermal'">
+                <div class="layout-thermal pb-10">
+                    
+                    <div x-show="totalLabels === 0 && !loading" x-cloak class="flex flex-col items-center justify-center p-6 text-center w-full min-h-[100px]">
+                        <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center mb-2 text-slate-300">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        </div>
+                        <h3 class="text-slate-400 font-black text-[10px] uppercase tracking-widest">Kosong</h3>
+                    </div>
+
+                    <template x-for="id in Object.keys(quantities)" :key="id">
+                        <template x-for="j in Math.max(0, parseInt(quantities[id]) || 0)" :key="`${id}-${j}`">
+                            <div x-html="document.getElementById('template-' + id).innerHTML" class="label-item layout-thermal-item"></div>
+                        </template>
+                    </template>
+                </div>
+            </template>
+
+        </div>
+    </main>
+
 
     <!-- SAVE PRESET MODAL -->
     <x-modal name="save-preset-modal" focusable>
@@ -842,15 +985,13 @@
     <div style="display: none;">
         @foreach($spareparts as $sparepart)
         <template id="template-{{ $sparepart->id }}">
-            <div class="label-item">
-                <div class="qr-section">
-                    <img src="{{ asset('storage/' . $sparepart->qr_code_path) }}" alt="QR" class="qr-image">
-                </div>
-                <div class="info-section">
-                    <div class="label-title">Part Number</div>
-                    <div class="label-content part-number">{{ $sparepart->part_number }}</div>
-                    <div class="label-text">{{ $sparepart->name }}</div>
-                </div>
+            <div class="qr-section">
+                <img src="{{ asset('storage/' . $sparepart->qr_code_path) }}" alt="QR" class="qr-image">
+            </div>
+            <div class="info-section">
+                <div class="label-title">Part Number</div>
+                <div class="label-content part-number">{{ $sparepart->part_number }}</div>
+                <div class="label-text">{{ $sparepart->name }}</div>
             </div>
         </template>
         @endforeach

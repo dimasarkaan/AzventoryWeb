@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Services;
 
 use App\Services\ImageOptimizationService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-class TesServisGambar extends TestCase
+class TesImageService extends TestCase
 {
     /**
      * Test: ImageOptimizationService mengonversi gambar ke WebP dan menyimpannya.

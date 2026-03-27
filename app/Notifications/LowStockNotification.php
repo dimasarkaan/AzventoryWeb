@@ -36,9 +36,17 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
      */
     public function toArray(object $notifiable): array
     {
+        $isDepleted = $this->sparepart->stock <= 0;
+        $title = $isDepleted ? 'Peringatan: Stok Habis!' : 'Peringatan Stok Menipis';
+        $message = $isDepleted 
+            ? "Stok {$this->sparepart->name} telah HABIS (0). Segera lakukan pengadaan barang."
+            : "Stok {$this->sparepart->name} berada di bawah batas minimum ({$this->sparepart->stock} / {$this->sparepart->minimum_stock}).";
+
         return [
-            'message' => __('ui.notification_low_stock', ['name' => $this->sparepart->name]),
-            'url' => route('inventory.show', $this->sparepart->id, false),
+            'title' => $title,
+            'message' => $message,
+            'url' => route('inventory.show', $this->sparepart->id) . '#stock-history',
+            'type' => $isDepleted ? 'danger' : 'warning',
             'sparepart_id' => $this->sparepart->id,
         ];
     }
@@ -48,11 +56,16 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
      */
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
+        $isDepleted = $this->sparepart->stock <= 0;
+        $title = $isDepleted ? 'Stok Habis!' : 'Stok Menipis';
+        
         return new BroadcastMessage([
-            'title' => __('ui.low_stock_alert'),
-            'message' => __('ui.notification_low_stock', ['name' => $this->sparepart->name]),
-            'url' => route('inventory.show', $this->sparepart->id, false),
-            'sparepart_id' => $this->sparepart->id,
+            'title' => $title,
+            'message' => $isDepleted 
+                ? "Stok {$this->sparepart->name} telah HABIS (0)!" 
+                : "Stok {$this->sparepart->name} berada di bawah batas minimum ({$this->sparepart->stock} / {$this->sparepart->minimum_stock}).",
+            'url' => route('inventory.show', $this->sparepart->id) . '#stock-history',
+            'type' => $isDepleted ? 'danger' : 'warning',
         ]);
     }
 }

@@ -32,11 +32,13 @@ trait ActivityLogger
         ]);
 
         try {
-            // Eager load user agar informasi nama tersedia di broadcast
-            if (!$log->relationLoaded('user')) {
-                $log->load('user');
-            }
-            broadcast(new ActivityLogged($log));
+            // Ambil info user saat ini untuk broadcast agar tidak 'System'
+            $user = Auth::user();
+            $userName = $user ? $user->name : 'System';
+            $userEmail = $user ? $user->email : '-';
+            $userRole = $user ? ($user->role instanceof \App\Enums\UserRole ? $user->role->label() : ucfirst($user->role)) : '-';
+
+            broadcast(new ActivityLogged($log, $userName, $userEmail, $userRole));
 
             // Dashboard Sync: Update global 'last_updated' timestamp to trigger cache refresh
             \Illuminate\Support\Facades\Cache::forever('inventory_last_updated', now()->timestamp);

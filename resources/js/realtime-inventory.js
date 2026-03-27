@@ -64,6 +64,69 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
+    // Function untuk refresh data list inventaris secara parsial (Tanpa Reload)
+    const refreshInventoryListData = () => {
+        const isInventoryPage = window.location.pathname.includes('/inventory') && !window.location.pathname.includes('/inventory/');
+        
+        if (isInventoryPage) {
+            console.log('📦 Inventory page detected. Refreshing list partials...');
+            
+            // Tambahkan param table_only=1 untuk mendapatkan partial view
+            const url = new URL(window.location.href);
+            url.searchParams.set('table_only', '1');
+
+            fetch(url.toString(), {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ Inventory list data received. Updating DOM...');
+                    
+                    // 1. Update Desktop Table Body
+                    const desktopBody = document.getElementById('inventory-desktop-body');
+                    if (desktopBody && data.desktop) {
+                        desktopBody.innerHTML = data.desktop;
+                    }
+
+                    // 2. Update Mobile List
+                    const mobileList = document.getElementById('inventory-mobile-list');
+                    if (mobileList && data.mobile) {
+                        // Cari kontainer utama di dalam mobileList agar tidak menimpa checkbox 'Select All' jika ada
+                        // atau timpa seluruhnya jika data.mobile mengandung struktur lengkap
+                        mobileList.innerHTML = data.mobile;
+                    }
+
+                    // 3. Update Pagination
+                    const desktopPagination = document.getElementById('inventory-pagination-desktop');
+                    if (desktopPagination && data.pagination) {
+                        desktopPagination.innerHTML = data.pagination;
+                    }
+                    
+                    const mobilePagination = document.getElementById('inventory-pagination-mobile');
+                    if (mobilePagination && data.pagination) {
+                        mobilePagination.innerHTML = data.pagination;
+                    }
+
+                    // 4. Trigger Highlight Animation
+                    setTimeout(() => {
+                        const rows = document.querySelectorAll('#inventory-desktop-body tr, #inventory-mobile-list .card');
+                        rows.forEach(row => {
+                            row.classList.add('animate-rt-highlight');
+                        });
+                    }, 100);
+
+                    // 5. Re-initialize Tooltips or other UI components if necessary
+                    if (window.tippy) {
+                        window.tippy('[data-tippy-content]');
+                    }
+                })
+                .catch(error => console.error('❌ Error refreshing inventory list:', error));
+        }
+    };
+
     Echo.channel('inventory-updates')
         // Event: InventoryUpdated (barang dibuat/diupdate/dihapus)
         .listen('.InventoryUpdated', (e) => {
@@ -73,21 +136,16 @@ document.addEventListener('DOMContentLoaded', function () {
             if (window.currentUser && window.currentUser.name && e.user_name === window.currentUser.name) {
                 console.log('🚫 Mengabaikan notifikasi realtime dari aksi sendiri (InventoryUpdated).');
                 refreshDashboardData();
+                refreshInventoryListData();
                 return;
             }
 
             // Show toast notification ke semua user.
             showInventoryToast(e.message, e.action);
 
-            // Refresh dashboard
+            // Refresh dashboard & list
             refreshDashboardData();
-
-            // Auto-refresh inventory list jika sedang di halaman inventory.
-            if (window.location.pathname.includes('/inventory')) {
-                setTimeout(() => {
-                    location.reload();
-                }, 2000); // Delay 2 detik agar user baca toast dulu.
-            }
+            refreshInventoryListData();
         })
 
         // Event: BorrowingStatusChanged (peminjaman di-approve/reject/return)

@@ -75,6 +75,7 @@ class TesLogAktivitas extends TestCase
     public function ekspor_pdf_mendorong_job_ke_antrean()
     {
         Queue::fake();
+        ActivityLog::factory()->count(501)->create();
 
         $response = $this->actingAs($this->superAdmin)->get(route('reports.activity-logs.export', [
             'format' => 'pdf',

@@ -32,16 +32,27 @@ class InventoryController extends Controller
      */
     public function index(Request $request)
     {
-        if ($request->has('trash') && auth()->user()->role !== \App\Enums\UserRole::SUPERADMIN) {
+        if ($request->has('trash') && auth()->user()->role !== UserRole::SUPERADMIN) {
             abort(403, __('Akses tong sampah dibatasi untuk Superadmin.'));
         }
 
         $spareparts = $this->inventoryService->getFilteredSpareparts($request->all(), 10);
         $options = $this->inventoryService->getDropdownOptions();
 
-        return view('inventory.index', array_merge([
+        $data = array_merge([
             'spareparts' => $spareparts,
-        ], $options));
+        ], $options);
+
+        // Dukungan untuk pembaruan real-time via AJAX (Partial Refresh)
+        if ($request->ajax() || $request->has('table_only')) {
+            return response()->json([
+                'desktop' => view('inventory.partials.desktop-table', $data)->render(),
+                'mobile' => view('inventory.partials.mobile-list', $data)->render(),
+                'pagination' => (string) $spareparts->links(),
+            ]);
+        }
+
+        return view('inventory.index', $data);
     }
 
     /**
@@ -72,6 +83,7 @@ class InventoryController extends Controller
             $sparepart = $result['data'];
             if ($sparepart->type === 'sale' && ($sparepart->price === null || $sparepart->price == 0)) {
                 $superadmins = User::where('role', UserRole::SUPERADMIN)->get();
+                /** @var User $superadmin */
                 foreach ($superadmins as $superadmin) {
                     $superadmin->notify(new MissingPriceNotification($sparepart, auth()->user()));
                 }
@@ -92,7 +104,7 @@ class InventoryController extends Controller
             ->latest();
 
         // Operator hanya diizinkan melihat riwayat peminjamannya sendiri
-        if (auth()->user()->role === \App\Enums\UserRole::OPERATOR) {
+        if (auth()->user()->role === UserRole::OPERATOR) {
             $borrowingQuery->where('user_id', auth()->id());
         }
 

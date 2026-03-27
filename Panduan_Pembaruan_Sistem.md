@@ -19,43 +19,44 @@ Proses kompilasi aset frontend (CSS dan JavaScript) dilakukan di komputer lokal 
 ---
 
 ## Prosedur Pembaruan di Server
+
+Proses pembaruan di server dapat dilakukan melalui dua cara: menggunakan antarmuka grafis cPanel (Git Version Control) atau melalui koneksi SSH (Terminal).
+
+### Opsi A: Melalui Dashboard cPanel (Direkomendasikan)
+1. Buka menu **Git™ Version Control** di dashboard cPanel Anda.
+2. Cari repository proyek Azventory, lalu klik **Manage**.
+3. Klik tombol **Pull** untuk menarik kode terbaru dari GitHub.
+4. Lanjutkan ke langkah **Optimasi dan Database** di bawah menggunakan menu **Terminal** cPanel.
+
+### Opsi B: Melalui Terminal SSH
 Hubungkan terminal SSH ke server cPanel, kemudian jalankan perintah berikut secara berurutan:
 
-### 1. Mode Pemeliharaan
-Aktifkan mode pemeliharaan agar pengguna tidak dapat mengakses sistem selama proses update:
-```bash
-php artisan down
-```
+1. **Penarikan Kode Terbaru**:
+   ```bash
+   git pull origin main
+   ```
 
-### 2. Penarikan Kode Terbaru
-Ambil perubahan kode terbaru dari repositori:
-```bash
-git pull origin main
-```
+---
 
-### 3. Pembaruan Dependensi
-Instal pembaruan paket PHP tanpa menyertakan library pengembangan:
-```bash
-composer install --optimize-autoloader --no-dev
-```
+## Optimasi dan Database (Dilakukan di Terminal cPanel/SSH)
+Setelah kode terbaru ditarik, jalankan perintah-perintah berikut untuk sinkronisasi sistem:
 
-### 4. Pembaruan Struktur Database
-Jalankan migrasi database untuk menerapkan perubahan struktur tabel atau indeks baru:
+### 1. Update Struktur Database
 ```bash
 php artisan migrate --force
 ```
 
-### 5. Optimasi Sistem dan Pembersihan Cache
-Pastikan konfigurasi dan tampilan terbaru terbaca oleh sistem:
+### 2. Bersihkan & Optimasi Cache
 ```bash
-php artisan optimize
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
 php artisan view:cache
 ```
 
-### 6. Menonaktifkan Mode Pemeliharaan
-Kembalikan aplikasi ke kondisi aktif:
+### 3. Restart Queue (Jika Aktif)
 ```bash
-php artisan up
+php artisan queue:restart
 ```
 
 ---

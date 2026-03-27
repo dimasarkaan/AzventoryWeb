@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Reports;
 
 use App\Jobs\GenerateReportJob;
 use App\Models\Sparepart;

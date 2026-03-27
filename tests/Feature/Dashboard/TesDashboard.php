@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Dashboard;
 
 use App\Models\User;
 use App\Services\DashboardService;
@@ -8,9 +8,11 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class TesPeningkatanDashboard extends TestCase
+class TesDashboard extends TestCase
 {
     use RefreshDatabase;
+
+    protected $user;
 
     protected function setUp(): void
     {

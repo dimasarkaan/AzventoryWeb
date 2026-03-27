@@ -5,13 +5,15 @@ namespace App\Notifications;
 use App\Models\Sparepart;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 /**
  * Notifikasi peringatan stok mendekati minimum (antara 100%—150% dari minimum_stock).
  * Dikirim lebih awal dari LowStockNotification agar admin bisa bertindak sebelum kritis.
  */
-class ApproachingStockNotification extends Notification implements ShouldQueue
+class ApproachingStockNotification extends Notification implements ShouldQueue, ShouldBroadcast
 {
     use Queueable;
 
@@ -23,11 +25,11 @@ class ApproachingStockNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Channel pengiriman: hanya Database (tidak perlu broadcast realtime seperti LowStock).
+     * Channel pengiriman: Database dan Broadcast realtime.
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -35,18 +37,24 @@ class ApproachingStockNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        $percentage = $this->sparepart->minimum_stock > 0
-            ? round(($this->sparepart->stock / $this->sparepart->minimum_stock) * 100)
-            : 0;
-
         return [
-            'type'         => 'approaching_stock',
-            'message'      => "Stok '{$this->sparepart->name}' mendekati batas minimum ({$this->sparepart->stock}/{$this->sparepart->minimum_stock} unit, {$percentage}%).",
-            'url'          => route('inventory.show', $this->sparepart->id, false),
-            'sparepart_id' => $this->sparepart->id,
-            'current_stock'=> $this->sparepart->stock,
-            'minimum_stock'=> $this->sparepart->minimum_stock,
-            'percentage'   => $percentage,
+            'title' => 'Stok Mendekati Batas',
+            'message' => "Stok {$this->sparepart->name} tinggal {$this->sparepart->stock} {$this->sparepart->unit}. Segera lakukan pemesanan.",
+            'url' => route('inventory.show', $this->sparepart->id) . '#stock-history',
+            'type' => 'warning',
         ];
+    }
+ 
+    /**
+     * Pesan siaran real-time.
+     */
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([
+            'title' => 'Stok Mendekati Batas',
+            'message' => "Stok {$this->sparepart->name} tinggal {$this->sparepart->stock} {$this->sparepart->unit}. Segera lakukan pemesanan.",
+            'url' => route('inventory.show', $this->sparepart->id) . '#stock-history',
+            'type' => 'warning',
+        ]);
     }
 }

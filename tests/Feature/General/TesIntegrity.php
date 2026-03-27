@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\General;
 
 use App\Models\Borrowing;
 use App\Models\Sparepart;
@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-class TesPenguatanAkhir extends TestCase
+class TesIntegrity extends TestCase
 {
     use RefreshDatabase;
 

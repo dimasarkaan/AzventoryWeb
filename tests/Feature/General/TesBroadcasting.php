@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\General;
 
 use App\Events\InventoryUpdatedEvent;
 use App\Events\StockCriticalEvent;
@@ -11,7 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class TesBroadcastingDanKonkurensi extends TestCase
+class TesBroadcasting extends TestCase
 {
     use RefreshDatabase;
 

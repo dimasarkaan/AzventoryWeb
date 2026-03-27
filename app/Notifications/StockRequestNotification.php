@@ -3,12 +3,14 @@
 namespace App\Notifications;
 
 use App\Models\StockLog;
+use App\Enums\UserRole;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class StockRequestNotification extends Notification implements ShouldQueue
+class StockRequestNotification extends Notification implements ShouldQueue, ShouldBroadcast
 {
     use Queueable;
 
@@ -33,10 +35,16 @@ class StockRequestNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
+        $url = route('inventory.stock-approvals.index', ['search' => $this->stockLog->sparepart->name]);
+
+        if ($notifiable->role === UserRole::OPERATOR) {
+            $url = route('inventory.show', $this->stockLog->sparepart_id);
+        }
+
         return [
             'stock_log_id'     => $this->stockLog->id,
             'message'          => $this->message,
-            'url'              => route('inventory.stock-approvals.index', [], false),
+            'url'              => $url,
             'rejection_reason' => $this->stockLog->rejection_reason,
         ];
     }
@@ -46,10 +54,15 @@ class StockRequestNotification extends Notification implements ShouldQueue
      */
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
+        $url = route('inventory.stock-approvals.index', ['search' => $this->stockLog->sparepart->name]);
+        if ($notifiable->role === UserRole::OPERATOR) {
+            $url = route('inventory.show', $this->stockLog->sparepart_id);
+        }
+
         return new BroadcastMessage([
-            'title' => 'Permintaan Stok Baru',
+            'title' => 'Update Status Pengajuan Stok',
             'message' => $this->message,
-            'url' => route('inventory.stock-approvals.index', [], false),
+            'url' => $url,
             'unread_count' => $notifiable->unreadNotifications()->count() + 1,
         ]);
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Notifications;
 
 use App\Models\Sparepart;
 use App\Models\User;
@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
-class TesNotifikasiStokMenipis extends TestCase
+class TesLowStock extends TestCase
 {
     use RefreshDatabase;
 

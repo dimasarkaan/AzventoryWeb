@@ -4,11 +4,12 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ReportReadyNotification extends Notification implements ShouldQueue
+class ReportReadyNotification extends Notification implements ShouldQueue, ShouldBroadcast
 {
     use Queueable;
 
@@ -53,7 +54,7 @@ class ReportReadyNotification extends Notification implements ShouldQueue
         return [
             'title' => 'Laporan Siap!',
             'message' => 'Laporan "'.$this->title.'" siap diunduh.',
-            'url' => str_replace(url('/'), '', $this->downloadUrl),
+            'url' => $this->downloadUrl,
             'icon' => 'document-text',
             'type' => 'success',
         ];
@@ -67,7 +68,7 @@ class ReportReadyNotification extends Notification implements ShouldQueue
         return new BroadcastMessage([
             'title' => 'Laporan Siap!',
             'message' => 'Laporan "'.$this->title.'" siap diunduh.',
-            'url' => str_replace(url('/'), '', $this->downloadUrl),
+            'url' => $this->downloadUrl,
             'type' => 'success',
         ]);
     }

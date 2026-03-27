@@ -48,6 +48,7 @@ class TesAudit extends TestCase
     public function pembuatan_laporan_pdf_dimasukkan_ke_antrean()
     {
         Queue::fake();
+        Sparepart::factory()->count(1001)->create();
 
         $response = $this->actingAs($this->superAdmin)
             ->get(route('reports.download', [

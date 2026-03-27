@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Notifications\ApproachingStockNotification;
 use App\Notifications\LowStockNotification;
 use App\Notifications\StockRequestNotification;
+use App\Notifications\ItemReturnedNotification;
 use App\Traits\ActivityLogger;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
@@ -744,6 +745,10 @@ class InventoryService
 
             $this->clearCache();
             $this->broadcastUpdate($originalSparepart, 'returned', __('messages.realtime_returned', ['user' => auth()->user()->name, 'qty' => $qty, 'name' => $originalSparepart->name]));
+
+            // Kirim notifikasi ke Admin & Superadmin
+            $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+            Notification::send($admins, new ItemReturnedNotification($borrowing, $qty, $translatedCondition ?? 'Baik'));
 
             return ['status' => 'success'];
         });

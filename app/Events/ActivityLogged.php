@@ -13,13 +13,16 @@ class ActivityLogged implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets;
 
     public $log;
+    public $userName;
+    public $userEmail;
+    public $userRole;
 
-    /**
-     * Buat instance event baru.
-     */
-    public function __construct($log)
+    public function __construct($log, ?string $userName = null, ?string $userEmail = null, ?string $userRole = null)
     {
         $this->log = $log;
+        $this->userName = $userName;
+        $this->userEmail = $userEmail;
+        $this->userRole = $userRole;
     }
 
     /**
@@ -38,9 +41,9 @@ class ActivityLogged implements ShouldBroadcastNow
     {
         return [
             'id' => $this->log->id,
-            'user_name' => $this->log->user ? $this->log->user->name : 'System',
-            'user_email' => $this->log->user ? $this->log->user->email : '-',
-            'user_role' => $this->log->user ? ($this->log->user->role instanceof \App\Enums\UserRole ? $this->log->user->role->label() : ucfirst($this->log->user->role)) : '-',
+            'user_name' => $this->userName ?? ($this->log->user ? $this->log->user->name : 'System'),
+            'user_email' => $this->userEmail ?? ($this->log->user ? $this->log->user->email : '-'),
+            'user_role' => $this->userRole ?? ($this->log->user ? ($this->log->user->role instanceof \App\Enums\UserRole ? $this->log->user->role->label() : ucfirst($this->log->user->role)) : '-'),
             'action' => $this->log->action,
             'description' => $this->log->description,
             'properties' => $this->log->properties,

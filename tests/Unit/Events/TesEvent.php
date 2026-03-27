@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Events;
 
 use App\Events\ActivityLogged;
 use App\Events\BorrowingStatusChangedEvent;

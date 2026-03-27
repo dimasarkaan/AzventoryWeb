@@ -13,3 +13,4 @@ Schedule::command('app:send-monthly-reports')->monthlyOn(1, '01:00');
 Schedule::command('model:prune', [
     '--model' => [App\Models\ActivityLog::class],
 ])->daily();
+Schedule::command('reports:cleanup')->daily();

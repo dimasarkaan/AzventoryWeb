@@ -14,68 +14,7 @@
                 <form action="{{ route('reports.download') }}" method="GET" 
                     id="reportForm"
                     class="bg-white rounded-xl border border-secondary-200 shadow-card p-6 overflow-visible" 
-                    x-data="{ 
-                        reportType: 'inventory_list', 
-                        period: 'this_month',
-                        startDate: '',
-                        endDate: '',
-                        loading: false,
-                        get isDateInvalid() {
-                            if (this.period === 'custom' && this.startDate && this.endDate) {
-                                return new Date(this.startDate) > new Date(this.endDate);
-                            }
-                            return false;
-                        },
-                        async downloadReport(e) {
-                            if (this.isDateInvalid) {
-                                e.preventDefault();
-                                return;
-                            }
-
-                            const format = document.querySelector('input[name=export_format]:checked').value;
-                            
-                            // Jika Excel, biarkan submit normal (karena Excel adalah direct download)
-                            if (format === 'excel') {
-                                this.loading = true;
-                                setTimeout(() => this.loading = false, 3000);
-                                return;
-                            }
-
-                            // Jika PDF, gunakan AJAX agar tidak reload halaman
-                            e.preventDefault();
-                            this.loading = true;
-
-                            // Tampilkan toast segera agar user tahu proses dimulai
-                            if (window.showToast) {
-                                window.showToast('info', 'Laporan sedang diproses. Mohon tunggu...');
-                            }
-
-                            try {
-                                const formData = new FormData(e.target);
-                                const params = new URLSearchParams(formData);
-                                
-                                const response = await fetch(`${e.target.action}?${params.toString()}`, {
-                                    headers: {
-                                        'Accept': 'application/json',
-                                        'X-Requested-With': 'XMLHttpRequest'
-                                    }
-                                });
-
-                                const data = await response.json();
-
-                                if (data.success) {
-                                    // Berhasil kirim antrean (toast session tidak perlu karena kita sudah tampilkan di atas)
-                                } else {
-                                    window.showToast('error', data.message || 'Gagal mengirim permintaan.');
-                                }
-                            } catch (error) {
-                                console.error('Error:', error);
-                                window.showToast('error', 'Terjadi kesalahan sistem.');
-                            } finally {
-                                this.loading = false;
-                            }
-                        }
-                    }"
+                    x-data="reportManager"
                     @submit="downloadReport($event)">
                     @csrf
                     
@@ -284,21 +223,123 @@
                         </div>
                         <button type="submit" 
                             :disabled="loading || isDateInvalid"
-                            class="btn btn-primary px-8 py-3 text-base flex items-center gap-2 shadow-lg shadow-primary-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                            <template x-if="!loading">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                            </template>
-                            <template x-if="loading">
-                                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            </template>
-                            <span x-text="loading ? 'Memproses...' : '{{ __('ui.download_report') }}'"></span>
+                            class="btn btn-primary px-8 py-3 text-base flex items-center justify-center gap-2 shadow-lg shadow-primary-200 disabled:opacity-50 disabled:cursor-not-allowed">
+                            
+                            <!-- State: Normal -->
+                            <svg x-show="!loading" style="display: inline-block;" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            <span x-show="!loading" style="display: inline;" class="whitespace-nowrap font-bold">{{ __('ui.download_report') }}</span>
+                            
+                            <!-- State: Loading -->
+                            <svg x-show="loading" style="display: none;" class="animate-spin h-5 w-5 text-white flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span x-show="loading" style="display: none;">Memproses...</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('reportManager', () => ({
+                reportType: 'inventory_list', 
+                period: 'this_month',
+                startDate: '',
+                endDate: '',
+                loading: false,
+                
+                get isDateInvalid() {
+                    if (this.period === 'custom' && this.startDate && this.endDate) {
+                        return new Date(this.startDate) > new Date(this.endDate);
+                    }
+                    return false;
+                },
+
+                async downloadReport(e) {
+                    if (this.isDateInvalid) {
+                        e.preventDefault();
+                        return;
+                    }
+
+                    const format = document.querySelector('input[name=export_format]:checked').value;
+                    
+                    if (format === 'excel') {
+                        this.loading = true;
+                        setTimeout(() => this.loading = false, 3000);
+                        return;
+                    }
+
+                    e.preventDefault();
+                    this.loading = true;
+
+                    if (window.showToast) {
+                        window.showToast('info', 'Laporan sedang diproses. Mohon tunggu...');
+                    }
+
+                    try {
+                        const formData = new FormData(e.target);
+                        const params = new URLSearchParams(formData);
+                        
+                        const response = await fetch(`${e.target.action}?${params.toString()}`, {
+                            headers: {
+                                'Accept': 'application/json, application/pdf',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        });
+
+                        const contentType = response.headers.get('content-type');
+
+                        if (response.ok && contentType && contentType.includes('application/pdf')) {
+                            const blob = await response.blob();
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            
+                            const disposition = response.headers.get('content-disposition');
+                            let filename = 'laporan.pdf';
+                            if (disposition && disposition.indexOf('attachment') !== -1) {
+                                const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                                const matches = filenameRegex.exec(disposition);
+                                if (matches != null && matches[1]) { 
+                                    filename = matches[1].replace(/['"]/g, '');
+                                }
+                            }
+                            
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            
+                            if (window.showToast) {
+                                window.showToast('success', 'Laporan berhasil diunduh.');
+                            }
+                        } else if (response.ok && contentType && contentType.includes('application/json')) {
+                            const data = await response.json();
+                            if (data.success) {
+                                if (window.showToast && data.message) {
+                                    window.showToast('info', data.message);
+                                }
+                            } else {
+                                window.showToast('error', data.message || 'Gagal mengirim permintaan.');
+                            }
+                        } else {
+                            throw new Error('Respons tidak dikenali atau server error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        if (window.showToast) {
+                            window.showToast('error', 'Terjadi kesalahan sistem saat mengunduh.');
+                        }
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }));
+        });
+    </script>
+    @endpush
 </x-app-layout>

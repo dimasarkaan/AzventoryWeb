@@ -68,7 +68,7 @@ class TesKontrollerLaporan extends TestCase
     public function download_pdf_mendispatch_job_dan_mengembalikan_pesan_sukses()
     {
         Queue::fake();
-        Sparepart::factory()->count(3)->create();
+        Sparepart::factory()->count(1001)->create();
 
         $response = $this->actingAs($this->superadmin)
             ->get(route('reports.download', [
@@ -80,6 +80,23 @@ class TesKontrollerLaporan extends TestCase
         $response->assertRedirect();
         $response->assertSessionHas('info');
         Queue::assertPushed(\App\Jobs\GenerateReportJob::class);
+    }
+
+    #[Test]
+    public function download_pdf_langsung_berhasil_tanpa_antrean()
+    {
+        // Jangan Queue::fake() agar kita bisa mengetes alur sinkron
+        Sparepart::factory()->count(5)->create();
+
+        $response = $this->actingAs($this->superadmin)
+            ->get(route('reports.download', [
+                'report_type' => 'inventory_list',
+                'export_format' => 'pdf',
+                'period' => 'all',
+            ]));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
     }
 
     // ── Excel exports ────────────────────────────────────────────
@@ -175,6 +192,7 @@ class TesKontrollerLaporan extends TestCase
     public function export_activity_log_pdf_mendispatch_job()
     {
         Queue::fake();
+        ActivityLog::factory()->count(501)->create();
 
         $response = $this->actingAs($this->superadmin)
             ->get(route('reports.activity-logs.export', ['format' => 'pdf']));
@@ -220,6 +238,7 @@ class TesKontrollerLaporan extends TestCase
     public function download_pdf_menampilkan_pesan_sukses_baru()
     {
         Queue::fake();
+        Sparepart::factory()->count(1001)->create();
         $response = $this->actingAs($this->superadmin)
             ->get(route('reports.download', [
                 'report_type' => 'inventory_list',
@@ -227,7 +246,7 @@ class TesKontrollerLaporan extends TestCase
                 'period' => 'all',
             ]));
 
-        $response->assertSessionHas('info', 'Laporan sedang diproses. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.');
+        $response->assertSessionHas('info', 'Laporan sedang diproses karena ukuran data yang besar. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.');
     }
 }
 
