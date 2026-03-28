@@ -1,35 +1,31 @@
 @component('mail::message')
 # Halo {{ $user->name }},
 
-Berikut adalah laporan bulanan sistem **Azventory** untuk periode bulan **{{ $monthName }}**.
+Berikut kami sampaikan laporan bulanan sistem **Azventory** untuk periode **{{ $monthName }}**.
 
 @if(!empty($summary))
 @component('mail::panel')
-### 📊 Ringkasan Dasbor (Cepat)
+### 📊 Ringkasan Dasbor
+
 | Indikator | Statistik |
 | :--- | :--- |
-| **Total Barang Inventaris** | {{ $summary['total_items'] }} Item |
-| **Peminjaman Aktif** | {{ $summary['active_borrowings'] }} Transaksi |
-| **Barang Perlu Restock** | {{ $summary['low_stock_count'] }} Item |
-| **Aktivitas Bulan Ini** | {{ $summary['monthly_activities'] }} Log |
+| **Total Barang Inventaris** | {{ $summary['total_items'] }} item |
+| **Peminjaman Aktif** | {{ $summary['active_borrowings'] }} transaksi |
+| **Barang Perlu Restock** | {{ $summary['low_stock_count'] }} item |
+| **Aktivitas Bulan Ini** | {{ $summary['monthly_activities'] }} log |
 @endcomponent
 @endif
 
-Laporan ini mencakup lampiran detail:
-*   **Daftar Inventaris Terkini** (Stok & Lokasi)
-*   **Riwayat Mutasi Stok** (Masuk/Keluar)
-*   **Riwayat Peminjaman** (Lengkap dengan Status)
-*   **Laporan Stok Menipis** (Prioritas Restock)
-*   **Log Aktivitas Sistem** (Jejak Audit User)
-
-Silakan periksa lampiran file Excel pada email ini untuk analisis lebih mendalam.
+Lampiran mencakup detail inventaris, mutasi stok, peminjaman, serta log aktivitas pengguna. Silakan lihat lampiran file Excel untuk detail lengkap.
 
 @component('mail::button', ['url' => route('dashboard'), 'color' => 'primary'])
-Buka Dashboard Azventory
+Akses Dashboard Azventory
 @endcomponent
 
-Terima kasih atas dedikasi Anda dalam menjaga integritas data inventaris perusahaan.
+Terima kasih.
 
-Salam Hangat,<br>
+<hr style="border:none; border-top:1px solid #e2e8f0; margin: 30px 0;">
+
+Salam,<br>
 **Tim Sistem {{ config('app.name') }}**
 @endcomponent
