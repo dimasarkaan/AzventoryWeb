@@ -72,7 +72,7 @@ Periksa file `.env` di direktori utama aplikasi menggunakan File Manager cPanel 
 ---
 
 ## Optimasi Keamanan Akses (.htaccess)
-Gunakan aturan berikut pada file `public/.htaccess` untuk melindungi file sensitif dan meningkatkan kecepatan akses:
+Gunankan aturan berikut pada file `public/.htaccess` untuk melindungi file sensitif dan meningkatkan kecepatan akses:
 
 ```apache
 <IfModule mod_rewrite.c>

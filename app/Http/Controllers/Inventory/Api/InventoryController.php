@@ -13,16 +13,18 @@ use Illuminate\Http\Request;
 class InventoryController extends Controller
 {
     protected $inventoryService;
+    protected $qrCodeService;
 
-    public function __construct(\App\Services\InventoryService $inventoryService)
+    public function __construct(\App\Services\InventoryService $inventoryService, \App\Services\QrCodeService $qrCodeService)
     {
         $this->inventoryService = $inventoryService;
+        $this->qrCodeService = $qrCodeService;
     }
 
     /**
      * Mendapatkan daftar barang inventaris.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return mixed
      */
     public function index(Request $request)
     {
@@ -60,6 +62,7 @@ class InventoryController extends Controller
         ]);
 
         $sparepart = Sparepart::create($validated);
+        $this->qrCodeService->generate($sparepart);
 
         return response()->json([
             'status' => 'success',
@@ -125,6 +128,7 @@ class InventoryController extends Controller
         ]);
 
         $sparepart->update($validated);
+        $this->qrCodeService->generate($sparepart->fresh());
 
         return response()->json([
             'status' => 'success',
@@ -238,6 +242,34 @@ class InventoryController extends Controller
                 'is_low_stock' => $sparepart->stock <= $sparepart->minimum_stock,
                 'part_number' => $sparepart->part_number,
             ],
+        ]);
+    }
+    /**
+     * Mendapatkan riwayat mutasi stok untuk barang tertentu.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logs(Request $request, $id)
+    {
+        $sparepart = Sparepart::find($id);
+
+        if (! $sparepart) {
+            return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
+        }
+
+        $logs = StockLog::where('sparepart_id', $id)
+            ->with('user')
+            ->latest()
+            ->paginate($request->input('per_page', 20));
+
+        return response()->json([
+            'status' => 'success',
+            'sparepart' => [
+                'name' => $sparepart->name,
+                'part_number' => $sparepart->part_number,
+            ],
+            'data' => $logs
         ]);
     }
 }

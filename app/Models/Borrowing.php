@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Model Borrowing untuk mencatat setiap transaksi peminjaman barang oleh personil.
  */
 class Borrowing extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'sparepart_id', 'user_id', 'borrower_name', 'quantity', 'borrowed_at',

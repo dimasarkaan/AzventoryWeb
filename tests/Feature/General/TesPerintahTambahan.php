@@ -49,7 +49,7 @@ class TesPerintahTambahan extends TestCase
     {
         // Database kosong
         $this->artisan('app:generate-qr-codes')
-            ->expectsOutput('Semua sparepart sudah memiliki kode QR.')
+            ->expectsOutput('Tidak ada sparepart ditemukan.')
             ->assertExitCode(0);
     }
 

@@ -28,38 +28,41 @@ class CleanupOldReports extends Command
     public function handle(): int
     {
         $days = (int) $this->option('days');
-        $directory = 'reports'; // storage/app/public/reports
-        
-        if (!Storage::disk('public')->exists($directory)) {
-            $this->warn("Direktori '{$directory}' tidak ditemukan.");
-            return self::FAILURE;
-        }
-
-        $files = Storage::disk('public')->files($directory);
-        $count = 0;
         $now = now();
+        $totalDeleted = 0;
 
-        $this->info("Memulai pembersihan laporan yang lebih tua dari {$days} hari...");
-
-        foreach ($files as $file) {
-            // Abaikan file .gitignore
-            if (basename($file) === '.gitignore') {
-                continue;
-            }
-
-            $lastModified = Carbon::createFromTimestamp(Storage::disk('public')->lastModified($file));
-
-            if ($lastModified->diffInDays($now) >= $days) {
-                Storage::disk('public')->delete($file);
-                $this->line("Menghapus: {$file}");
-                $count++;
+        // 1. Bersihkan Laporan di Disk Public
+        $reportDir = 'reports';
+        if (Storage::disk('public')->exists($reportDir)) {
+            $files = Storage::disk('public')->files($reportDir);
+            foreach ($files as $file) {
+                if (basename($file) === '.gitignore') continue;
+                $lastModified = Carbon::createFromTimestamp(Storage::disk('public')->lastModified($file));
+                if ($lastModified->diffInDays($now) >= $days) {
+                    Storage::disk('public')->delete($file);
+                    $totalDeleted++;
+                }
             }
         }
 
-        if ($count > 0) {
-            $this->info("✅ Berhasil menghapus {$count} file laporan lama.");
+        // 2. Bersihkan Backup DB di Disk Local (storage/app/backups)
+        $backupDir = 'backups';
+        if (Storage::disk('local')->exists($backupDir)) {
+            $files = Storage::disk('local')->files($backupDir);
+            foreach ($files as $file) {
+                if (basename($file) === '.gitignore') continue;
+                $lastModified = Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file));
+                if ($lastModified->diffInDays($now) >= $days) {
+                    Storage::disk('local')->delete($file);
+                    $totalDeleted++;
+                }
+            }
+        }
+
+        if ($totalDeleted > 0) {
+            $this->info("✅ Berhasil menghapus {$totalDeleted} file lama (Laporan & Backup DB).");
         } else {
-            $this->info("ℹ️ Tidak ada file laporan lama yang perlu dihapus.");
+            $this->info("ℹ️ Tidak ada file lama yang perlu dihapus.");
         }
 
         return self::SUCCESS;

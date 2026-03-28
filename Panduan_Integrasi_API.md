@@ -1,21 +1,12 @@
-# Panduan Integrasi API Azventory
-Dokumen teknis untuk pengembang internal dan pihak ketiga.
-
-Dokumen ini menjelaskan prosedur integrasi aplikasi eksternal (seperti Website, POS, atau Sistem Kasir) dengan server Azventory melalui REST API.
+# Panduan Integrasi API Azventory v1.5 (FINAL)
+Dokumen teknis komprehensif untuk pengembang internal dan integrasi sistem pihak ketiga.
 
 ---
 
-## Autentikasi (Bearer Token)
-Azventory menggunakan Laravel Sanctum untuk mengamankan akses API. Setiap permintaan harus menyertakan token autentikasi pada bagian header.
+## 🔐 Autentikasi (Sanctum Bearer Token)
+Azventory menggunakan **Laravel Sanctum**. Setiap permintaan wajib menyertakan token pada header permintaan.
 
-### Cara Mendapatkan Token
-1. Masuk ke aplikasi Azventory menggunakan akun SuperAdmin.
-2. Buka menu Profil, lalu pilih Kunci Akses API.
-3. Buat token baru dengan memberikan identitas yang jelas (misalnya: Sistem Kasir Toko).
-4. Simpan token tersebut di tempat yang aman karena sistem hanya akan menampilkannya satu kali.
-
-### Struktur Header
-Sertakan detail berikut pada setiap header permintaan:
+### 1. Header Standar
 ```http
 Authorization: Bearer <TOKEN_ANDA>
 Accept: application/json
@@ -24,63 +15,56 @@ Content-Type: application/json
 
 ---
 
-## Base URL
-Sesuaikan URL dasar dengan alamat server hosting yang digunakan:
-- Produksi: https://api.domain-anda.com/api/v1
-- Pengembangan: http://localhost:8000/api/v1
+## 🛠️ Endpoint Mega CRUD (100% Coverage)
+
+### 1. Inventaris (`/inventory`)
+- **Semua Operasi**: `GET` (List), `POST` (Create), `GET /{id}` (Show), `PUT /{id}` (Update), `DELETE /{id}` (Delete).
+- **Stok**: `PUT /{id}/adjust-stock` (Increment/Decrement), `GET /{id}/logs` (Mutation History).
+
+### 2. Peminjaman (`/borrowings`)
+- **Semua Operasi**: `GET` (List), `POST` (Create), `GET /{id}` (Show).
+- **Kembali**: `POST /{id}/return` (Return item process).
+
+### 3. Data Master (`/brands`, `/categories`, `/locations`)
+- **Full CRUD**: Kini mendukung **Create, Update, dan Delete** via API untuk semua tabel master data.
+- **Konsistensi**: Mengubah nama Merk/Kategori via API otomatis memperbarui string di seluruh data barang terkait (Integritas Data).
+
+### 4. Manajemen User (`/users`)
+- **Kontrol Penuh**: List (inc. trash), Create, Show, Update, Delete, dan Reset Password.
+- **Akses**: Terkunci khusus untuk Superadmin.
+
+### 5. Sistem & Profil (`/me`, `/stats`, `/notifications`, `/activity-logs`)
+- **Statistik**: `/stats` untuk ringkasan real-time.
+- **Audit**: `/activity-logs` untuk melihat jejak audit sistem.
+- **Notifikasi**: `/notifications` untuk manajemen peringatan stok.
 
 ---
 
-## Endpoint Utama
-
-### 1. Daftar Katalog Barang
-Digunakan untuk mengambil seluruh data inventaris yang berstatus aktif.
-- Metode: GET
-- Jalur: /inventory
-- Parameter Opsional: per_page (jumlah data), page (halaman), search (kata kunci pencarian).
-
-### 2. Detail Barang
-Mengambil informasi terperinci mengenai satu item berdasarkan ID.
-- Metode: GET
-- Jalur: /inventory/{id}
-
-### 3. Penyesuaian Stok
-Digunakan untuk menambah atau mengurangi stok barang saat terjadi transaksi eksternal.
-- Metode: PUT
-- Jalur: /inventory/{id}/adjust-stock
-- Payload (JSON):
-  ```json
-  {
-      "type": "decrement", 
-      "quantity": 5,
-      "description": "Transaksi via Website"
-  }
-  ```
-  Isi field "type" dengan "increment" untuk menambah stok atau "decrement" untuk mengurangi stok.
-
-### 4. Menambah Barang Baru
-Mendaftarkan item baru ke dalam katalog sistem.
-- Metode: POST
-- Jalur: /inventory
+## 🚀 Tutorial: Create Item via API
+```javascript
+const response = await fetch('https://domain.com/api/v1/inventory', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        part_number: "SP-001",
+        name: "Contoh Barang",
+        brand: "SAMSUNG",
+        location: "Gudang A",
+        category: "Storage",
+        type: "asset",
+        stock: 10,
+        condition: "Baru",
+        status: "aktif"
+    })
+});
+```
 
 ---
 
-## Pengujian dengan Postman
-Untuk mempercepat proses pengembangan, tersedia file koleksi Postman yang dapat digunakan:
-1. Cari file Azventory_API_Collection.postman_collection.json di direktori utama proyek.
-2. Impor file tersebut ke dalam aplikasi Postman.
-3. Atur variabel base_url dan token pada bagian Variables di dalam koleksi tersebut.
+## 📂 Postman Collection v1.5
+Gunakan file `Azventory_API_v1.postman_collection.json` di root proyek.
+- **Struktur Folder Baru**: Dikelompokkan berdasarkan modul CRUD (Inventory, Master Data, Borrowing, Management).
+- **Pewarisan Auth**: Otomatis menggunakan token dari variabel koleksi.
 
 ---
-
-## Penanganan Error
-Sistem menggunakan kode status HTTP standar untuk menandai status permintaan:
-- 200 OK: Berhasil.
-- 401 Unauthorized: Token tidak valid atau tidak disertakan.
-- 403 Forbidden: Akses ditolak karena izin akses tidak mencukupi.
-- 404 Not Found: Data barang tidak ditemukan.
-- 422 Unprocessable Entity: Validasi data gagal (misalnya format data salah).
-- 429 Too Many Requests: Batas akses terlampaui (default: 60 permintaan per menit).
-
----
-Seluruh token API bersifat rahasia. Keamanan data bergantung pada kerahasiaan token yang Anda kelola.
+*Terakhir diperbarui: 29 Maret 2026*

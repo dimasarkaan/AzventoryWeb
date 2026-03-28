@@ -84,6 +84,12 @@ class ReportService
             }
             $title = 'Laporan Stok Menipis';
             $view = 'reports.pdf_low_stock';
+        } elseif ($type == 'activity_log') {
+            $query = \App\Models\ActivityLog::with('user');
+            $this->applyDateRange($query, 'created_at', $startDate, $endDate);
+            $query->latest();
+            $title = 'Laporan Riwayat Aktivitas';
+            $view = 'reports.pdf_activity_log';
         }
 
         return [

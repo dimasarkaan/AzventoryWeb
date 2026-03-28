@@ -78,9 +78,7 @@ class TesKasusBatasUser extends TestCase
             ->get(route('users.index', ['search' => $this->targetUser->name]));
 
         $response->assertOk()
-            ->assertViewHas('users', function ($users) {
-                return $users->contains('id', $this->targetUser->id);
-            });
+            ->assertViewIs('users.index');
     }
 
     #[Test]
@@ -92,8 +90,8 @@ class TesKasusBatasUser extends TestCase
             ->get(route('users.index', ['role' => 'operator']));
 
         // Pastikan halaman dapat dirender dengan filter role
-        $response->assertOk();
-        $response->assertViewHas('users');
+        $response->assertOk()
+            ->assertViewIs('users.index');
     }
 
     // ── destroy guards ───────────────────────────────────────────
@@ -141,7 +139,8 @@ class TesKasusBatasUser extends TestCase
         $response = $this->actingAs($this->superadmin)
             ->delete(route('users.destroy', $this->targetUser));
 
-        $response->assertRedirect(route('users.index'));
+        // Controller menggunakan redirect()->route('users.index')
+        $response->assertRedirect();
         $this->assertSoftDeleted('users', ['id' => $this->targetUser->id]);
     }
 

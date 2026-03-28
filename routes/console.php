@@ -14,3 +14,4 @@ Schedule::command('model:prune', [
     '--model' => [App\Models\ActivityLog::class],
 ])->daily();
 Schedule::command('reports:cleanup')->daily();
+Schedule::command('app:backup-db')->weeklyOn(0, '02:00');

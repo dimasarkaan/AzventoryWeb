@@ -47,6 +47,7 @@ class SendMonthlyReports extends Command
             'stock_mutation' => ['title' => 'Riwayat Mutasi Stok', 'start' => $startDate, 'end' => $endDate],
             'borrowing_history' => ['title' => 'Riwayat Peminjaman', 'start' => $startDate, 'end' => $endDate],
             'low_stock' => ['title' => 'Laporan Stok Menipis', 'start' => null, 'end' => null],
+            'activity_log' => ['title' => 'Log Aktivitas Sistem', 'start' => $startDate, 'end' => $endDate],
         ];
 
         $attachments = [];
@@ -80,9 +81,18 @@ class SendMonthlyReports extends Command
             return 1;
         }
 
+        // Dashboard Summary Data
+        $summary = [
+            'total_items' => \App\Models\Sparepart::count(),
+            'active_borrowings' => \App\Models\Borrowing::where('status', 'dipinjam')->count(),
+            'low_stock_count' => \App\Models\Sparepart::where('minimum_stock', '>', 0)
+                                    ->whereColumn('stock', '<=', 'minimum_stock')->count(),
+            'monthly_activities' => \App\Models\ActivityLog::whereBetween('created_at', [$startDate, $endDate])->count(),
+        ];
+
         foreach ($superadmins as $admin) {
             $this->info("Mengirim email ke: {$admin->email}");
-            Mail::to($admin->email)->send(new MonthlyReportMail($admin, $attachments, $monthName));
+            Mail::to($admin->email)->send(new MonthlyReportMail($admin, $attachments, $monthName, $summary));
         }
 
         $this->info('Laporan bulanan berhasil dikirim.');
@@ -113,6 +123,7 @@ class SendMonthlyReports extends Command
             'stock_mutation' => $this->callPrivate($excelService, 'generateStockMutationSpreadsheet', [$query]),
             'borrowing_history' => $this->callPrivate($excelService, 'generateBorrowingHistorySpreadsheet', [$query]),
             'low_stock' => $this->callPrivate($excelService, 'generateLowStockSpreadsheet', [$query]),
+            'activity_log' => $this->callPrivate($excelService, 'generateActivityLogsSpreadsheet', [$query]),
         };
     }
     

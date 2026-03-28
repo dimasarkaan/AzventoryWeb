@@ -1,0 +1,92 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Azventory API v1.5 (FINAL)",
+		"description": "Koleksi API Azventory v1.5 - Edisi Mega CRUD (Lengkap 100% untuk Inventaris, Master Data, User, Peminjaman, dll).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Inventory (CRUD)",
+			"item": [
+				{ "name": "List Inventory", "request": { "method": "GET", "url": "{{base_url}}/inventory?search=&brand=&category=&location=&filter=&sort=latest" } },
+				{ "name": "Create Item", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\n    \"part_number\": \"SP-001\",\n    \"name\": \"Samsung SSD 980\",\n    \"brand\": \"SAMSUNG\",\n    \"location\": \"Gudang A\",\n    \"category\": \"Storage\",\n    \"type\": \"asset\",\n    \"stock\": 10,\n    \"condition\": \"Baru\",\n    \"status\": \"aktif\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/inventory" } },
+				{ "name": "Show Detail", "request": { "method": "GET", "url": "{{base_url}}/inventory/1" } },
+				{ "name": "Update Item", "request": { "method": "PUT", "body": { "mode": "raw", "raw": "{\"name\": \"Samsung SSD 980 PRO\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/inventory/1" } },
+				{ "name": "Delete Item", "request": { "method": "DELETE", "url": "{{base_url}}/inventory/1" } },
+				{ "name": "Stock Logs & Mutation", "request": { "method": "GET", "url": "{{base_url}}/inventory/1/logs" } },
+				{ "name": "Adjust Stock (Quick)", "request": { "method": "PUT", "body": { "mode": "raw", "raw": "{\"type\": \"increment\", \"quantity\": 5, \"description\": \"API Sync\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/inventory/1/adjust-stock" } }
+			]
+		},
+		{
+			"name": "Master Data (CRUD)",
+			"item": [
+				{
+					"name": "Brands",
+					"item": [
+						{ "name": "List Brands", "request": { "method": "GET", "url": "{{base_url}}/brands" } },
+						{ "name": "Create Brand", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\"name\": \"ASUS\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/brands" } },
+						{ "name": "Update Brand", "request": { "method": "PUT", "body": { "mode": "raw", "raw": "{\"name\": \"ASUS ROG\", \"is_active\": 1}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/brands/1" } },
+						{ "name": "Delete Brand", "request": { "method": "DELETE", "url": "{{base_url}}/brands/1" } }
+					]
+				},
+				{
+					"name": "Categories",
+					"item": [
+						{ "name": "List Categories", "request": { "method": "GET", "url": "{{base_url}}/categories" } },
+						{ "name": "Create Category", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\"name\": \"Network Equipment\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/categories" } },
+						{ "name": "Update Category", "request": { "method": "PUT", "body": { "mode": "raw", "raw": "{\"name\": \"Networking\", \"is_active\": 1}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/categories/1" } },
+						{ "name": "Delete Category", "request": { "method": "DELETE", "url": "{{base_url}}/categories/1" } }
+					]
+				},
+				{
+					"name": "Locations",
+					"item": [
+						{ "name": "List Locations", "request": { "method": "GET", "url": "{{base_url}}/locations" } },
+						{ "name": "Create Location", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\"name\": \"Laboratorium 2\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/locations" } },
+						{ "name": "Update Location", "request": { "method": "PUT", "body": { "mode": "raw", "raw": "{\"name\": \"Lab Komputer 2\", \"is_active\": 1}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/locations/1" } },
+						{ "name": "Delete Location", "request": { "method": "DELETE", "url": "{{base_url}}/locations/1" } }
+					]
+				}
+			]
+		},
+		{
+			"name": "Borrowing (CRUD)",
+			"item": [
+				{ "name": "List Borrowings", "request": { "method": "GET", "url": "{{base_url}}/borrowings?status=borrowed" } },
+				{ "name": "Create Borrowing", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\"sparepart_id\": 1, \"quantity\": 1, \"borrower_name\": \"User API\", \"expected_return_at\": \"2026-12-31 17:00:00\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/borrowings" } },
+				{ "name": "Show Detail", "request": { "method": "GET", "url": "{{base_url}}/borrowings/1" } },
+				{ "name": "Return Item", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\"quantity\": 1, \"condition\": \"Baik\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/borrowings/1/return" } }
+			]
+		},
+		{
+			"name": "User Management (Superadmin)",
+			"item": [
+				{ "name": "List Users", "request": { "method": "GET", "url": "{{base_url}}/users?search=&role=&trash=false" } },
+				{ "name": "Create User", "request": { "method": "POST", "body": { "mode": "raw", "raw": "{\n    \"name\": \"Staff API\",\n    \"email\": \"staff_api@example.com\",\n    \"role\": \"operator\",\n    \"status\": \"Aktif\"\n}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/users" } },
+				{ "name": "Show User", "request": { "method": "GET", "url": "{{base_url}}/users/1" } },
+				{ "name": "Update User", "request": { "method": "PUT", "body": { "mode": "raw", "raw": "{\"jabatan\": \"Koordinator Lab\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/users/1" } },
+				{ "name": "Reset Password", "request": { "method": "POST", "url": "{{base_url}}/users/1/reset-password" } },
+				{ "name": "Delete User", "request": { "method": "DELETE", "url": "{{base_url}}/users/1" } }
+			]
+		},
+		{
+			"name": "System, Profile & Notifications",
+			"item": [
+				{ "name": "Get My Profile", "request": { "method": "GET", "url": "{{base_url}}/me" } },
+				{ "name": "Get Stats Summary", "request": { "method": "GET", "url": "{{base_url}}/stats" } },
+				{ "name": "Get Activity Logs", "request": { "method": "GET", "url": "{{base_url}}/activity-logs" } },
+				{ "name": "Get Notifications", "request": { "method": "GET", "url": "{{base_url}}/notifications" } },
+				{ "name": "Mark Read", "request": { "method": "POST", "url": "{{base_url}}/notifications/{{id}}/read" } }
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ]
+	},
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:8000/api/v1", "type": "string" },
+		{ "key": "token", "value": "TOKEN_DISINI", "type": "string" }
+	]
+}

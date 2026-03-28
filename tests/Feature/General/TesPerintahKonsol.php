@@ -77,61 +77,76 @@ class TesPerintahKonsol extends TestCase
     }
 
     /**
-     * Test: Command logs:cleanup menghapus log lama.
+     * Test: Command app:backup-db berjalan dan mengirim email.
      */
-    public function test_command_cleanup_logs_menghapus_data_lama()
+    public function test_command_backup_database_berhasil_mengirim_email()
     {
-        // Buat log lama (7 bulan lalu)
-        ActivityLog::factory()->create([
-            'created_at' => now()->subMonths(7),
-            'description' => 'Old Log',
-        ]);
+        \Illuminate\Support\Facades\Mail::fake();
+        
+        $disk = \Illuminate\Support\Facades\Storage::disk('local');
+        if (!$disk->exists('backups')) {
+            $disk->makeDirectory('backups');
+        }
 
-        // Buat log baru
-        ActivityLog::factory()->create([
-            'created_at' => now(),
-            'description' => 'New Log',
-        ]);
+        // Trick: Jika database adalah :memory:, buat file dummy agar copy() di command tidak gagal
+        $dbPath = config('database.connections.sqlite.database');
+        if ($dbPath === ':memory:') {
+            $tempDb = $disk->path('temp_test.sqlite');
+            file_put_contents($tempDb, 'dummy sqlite content');
+            config(['database.connections.sqlite.database' => $tempDb]);
+        }
 
-        $this->assertEquals(2, ActivityLog::count());
+        // Pastikan ada superadmin
+        User::factory()->create(['role' => \App\Enums\UserRole::SUPERADMIN]);
 
-        // Jalankan cleanup (default 6 bulan)
-        $this->artisan('logs:cleanup')
-            ->expectsOutput('Menghapus activity logs lebih tua dari 6 bulan (sebelum '.now()->subMonths(6)->format('Y-m-d').')...')
+        $this->artisan('app:backup-db')
             ->assertExitCode(0);
 
-        $this->assertEquals(1, ActivityLog::count());
-        $this->assertDatabaseHas('activity_logs', ['description' => 'New Log']);
-        $this->assertDatabaseMissing('activity_logs', ['description' => 'Old Log']);
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\DatabaseBackupMail::class);
+        
+        // Bersihkan
+        $files = glob($disk->path('backups/backup_*.zip'));
+        foreach ($files as $file) {
+            @unlink($file);
+        }
+        if (isset($tempDb)) @unlink($tempDb);
     }
 
     /**
-     * Test: Command activitylog:clean menghapus log berdasarkan hari.
+     * Test: Command reports:cleanup menghapus laporan dan backup lama.
      */
-    public function test_command_activitylog_clean_menghapus_data_lama()
+    public function test_command_cleanup_old_reports_dan_backups()
     {
-        // Buat log lama (190 hari lalu)
-        ActivityLog::factory()->create([
-            'created_at' => now()->subDays(190),
-            'description' => 'Very Old Log',
-        ]);
+        $diskPublic = \Illuminate\Support\Facades\Storage::disk('public');
+        $diskLocal = \Illuminate\Support\Facades\Storage::disk('local');
 
-        // Buat log baru
-        ActivityLog::factory()->create([
-            'created_at' => now(),
-            'description' => 'Recent Log',
-        ]);
+        if (!$diskPublic->exists('reports')) $diskPublic->makeDirectory('reports');
+        if (!$diskLocal->exists('backups')) $diskLocal->makeDirectory('backups');
 
-        $this->assertEquals(2, ActivityLog::count());
+        $oldReportRel = 'reports/old_test_report.xlsx';
+        $oldBackupRel = 'backups/old_test_backup.sql';
+        $newReportRel = 'reports/new_test_report.xlsx';
 
-        // Jalankan clean (default 180 hari)
-        $this->artisan('activitylog:clean')
-            ->expectsOutput('Berhasil menghapus 1 log aktivitas yang lebih lama dari 180 hari.')
+        $oldReportFull = $diskPublic->path($oldReportRel);
+        $oldBackupFull = $diskLocal->path($oldBackupRel);
+        $newReportFull = $diskPublic->path($newReportRel);
+
+        file_put_contents($oldReportFull, 'old content');
+        file_put_contents($oldBackupFull, 'old backup');
+        file_put_contents($newReportFull, 'new content');
+
+        // Set timestamp ke 60 hari yang lalu
+        touch($oldReportFull, now()->subDays(60)->getTimestamp());
+        touch($oldBackupFull, now()->subDays(60)->getTimestamp());
+
+        $this->artisan('reports:cleanup', ['--days' => 30])
             ->assertExitCode(0);
 
-        $this->assertEquals(1, ActivityLog::count());
-        $this->assertDatabaseHas('activity_logs', ['description' => 'Recent Log']);
-        $this->assertDatabaseMissing('activity_logs', ['description' => 'Very Old Log']);
+        $this->assertFileDoesNotExist($oldReportFull, "Laporan lama harus dihapus");
+        $this->assertFileDoesNotExist($oldBackupFull, "Backup lama harus dihapus");
+        $this->assertFileExists($newReportFull, "Laporan baru harus tetap ada");
+
+        @unlink($newReportFull);
     }
 }
 

@@ -39,6 +39,7 @@ class SparepartResource extends JsonResource
             // Sembunyikan harga jika nilainya null, atau ubah menjadi float
             'price' => $this->when($this->price !== null, (float) $this->price),
             'image_url' => $this->image ? asset('storage/'.$this->image) : null,
+            'qr_code_url' => $this->qr_code_path ? asset('storage/'.$this->qr_code_path) : null,
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,
             'updated_at' => $this->updated_at ? $this->updated_at->toIso8601String() : null,
         ];

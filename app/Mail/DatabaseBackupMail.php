@@ -9,24 +9,22 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class MonthlyReportMail extends Mailable
+class DatabaseBackupMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $user;
-    public $attachmentsPaths;
-    public $monthName;
-    public $summary;
+    public $backupPath;
+    public $filename;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($user, $attachmentsPaths, $monthName, $summary = [])
+    public function __construct($user, $backupPath, $filename)
     {
         $this->user = $user;
-        $this->attachmentsPaths = $attachmentsPaths;
-        $this->monthName = $monthName;
-        $this->summary = $summary;
+        $this->backupPath = $backupPath;
+        $this->filename = $filename;
     }
 
     /**
@@ -35,7 +33,7 @@ class MonthlyReportMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Laporan Bulanan Azventory - ' . $this->monthName,
+            subject: '📦 Cadangan Database Azventory - ' . now()->format('d F Y'),
         );
     }
 
@@ -45,7 +43,7 @@ class MonthlyReportMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.monthly-report',
+            markdown: 'emails.database-backup',
         );
     }
 
@@ -56,12 +54,10 @@ class MonthlyReportMail extends Mailable
      */
     public function attachments(): array
     {
-        $attachments = [];
-        foreach ($this->attachmentsPaths as $name => $path) {
-            $attachments[] = Attachment::fromPath($path)
-                ->as($name)
-                ->withMime('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        }
-        return $attachments;
+        return [
+            Attachment::fromPath($this->backupPath)
+                ->as($this->filename)
+                ->withMime('application/sql'),
+        ];
     }
 }

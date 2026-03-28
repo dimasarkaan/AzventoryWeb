@@ -1,37 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Laporan Bulanan Azventory</title>
-    <style>
-        body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #333; }
-        .container { padding: 20px; max-width: 600px; margin: auto; border: 1px solid #e2e8f0; border-radius: 8px; }
-        .header { background: #1e40af; color: white; padding: 15px; border-radius: 6px 6px 0 0; text-align: center; }
-        .content { padding: 20px; }
-        .footer { font-size: 12px; color: #718096; text-align: center; margin-top: 20px; }
-        .highlight { font-weight: bold; color: #1e40af; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Azventory</h1>
-        </div>
-        <div class="content">
-            <p>Halo <span class="highlight">{{ $user->name }}</span>,</p>
-            <p>Berikut adalah laporan bulanan sistem <span class="highlight">Azventory</span> untuk periode bulan <span class="highlight">{{ $monthName }}</span>.</p>
-            <p>Laporan ini mencakup:</p>
-            <ul>
-                <li>Daftar Inventaris Terkini</li>
-                <li>Riwayat Mutasi Stok (Bulan Lalu)</li>
-                <li>Riwayat Peminjaman (Bulan Lalu)</li>
-                <li>Laporan Stok Menipis</li>
-            </ul>
-            <p>Silakan periksa lampiran pada email ini untuk detail selengkapnya (dalam format Excel).</p>
-            <p>Terima kasih atas dedikasi Anda dalam menggunakan sistem ini.</p>
-        </div>
-        <div class="footer">
-            <p>Email ini dikirim secara otomatis oleh sistem Azventory.</p>
-        </div>
-    </div>
-</body>
-</html>
+@component('mail::message')
+# Halo {{ $user->name }},
+
+Berikut adalah laporan bulanan sistem **Azventory** untuk periode bulan **{{ $monthName }}**.
+
+@if(!empty($summary))
+@component('mail::panel')
+### 📊 Ringkasan Dasbor (Cepat)
+| Indikator | Statistik |
+| :--- | :--- |
+| **Total Barang Inventaris** | {{ $summary['total_items'] }} Item |
+| **Peminjaman Aktif** | {{ $summary['active_borrowings'] }} Transaksi |
+| **Barang Perlu Restock** | {{ $summary['low_stock_count'] }} Item |
+| **Aktivitas Bulan Ini** | {{ $summary['monthly_activities'] }} Log |
+@endcomponent
+@endif
+
+Laporan ini mencakup lampiran detail:
+*   **Daftar Inventaris Terkini** (Stok & Lokasi)
+*   **Riwayat Mutasi Stok** (Masuk/Keluar)
+*   **Riwayat Peminjaman** (Lengkap dengan Status)
+*   **Laporan Stok Menipis** (Prioritas Restock)
+*   **Log Aktivitas Sistem** (Jejak Audit User)
+
+Silakan periksa lampiran file Excel pada email ini untuk analisis lebih mendalam.
+
+@component('mail::button', ['url' => route('dashboard'), 'color' => 'primary'])
+Buka Dashboard Azventory
+@endcomponent
+
+Terima kasih atas dedikasi Anda dalam menjaga integritas data inventaris perusahaan.
+
+Salam Hangat,<br>
+**Tim Sistem {{ config('app.name') }}**
+@endcomponent

@@ -622,8 +622,8 @@ class InventoryService
 
             $borrowing = Borrowing::create([
                 'sparepart_id' => $sparepart->id,
-                'user_id' => auth()->id(),
-                'borrower_name' => auth()->user()->name,
+                'user_id' => $data['user_id'] ?? auth()->id(),
+                'borrower_name' => $data['borrower_name'] ?? (auth()->user() ? auth()->user()->name : 'System'),
                 'quantity' => $data['quantity'],
                 'borrowed_at' => now(),
                 'expected_return_at' => $data['expected_return_at'],

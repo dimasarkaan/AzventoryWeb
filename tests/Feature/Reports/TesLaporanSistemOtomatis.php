@@ -27,6 +27,9 @@ class TesLaporanSistemOtomatis extends TestCase
     {
         Mail::fake();
 
+        // Buat data agar laporan tidak kosong
+        \App\Models\Sparepart::factory()->create();
+
         $this->artisan('app:send-monthly-reports')
             ->assertExitCode(0);
 

@@ -28,33 +28,40 @@ class TesIntegritasEkspor extends TestCase
 
         $service = new ExcelExportService;
 
+        // Clean up any old test files first
+        $oldFiles = glob(storage_path('app/public/reports/temp_*_test_export.xlsx'));
+        foreach ($oldFiles as $file) { @unlink($file); }
+
         $response = $service->exportInventoryList($spareparts, 'test_export');
 
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $response->headers->get('Content-Type'));
 
-        // On Windows, ZipArchive often locks the file even after save() completes in the same process
-        // making IOFactory::load fail with 'Could not open file for reading'.
-        // We will verify the file exists first.
-        $files = glob(storage_path('app/temp_*.xlsx'));
+        // Find the specific file we just created
+        $files = glob(storage_path('app/public/reports/temp_*_test_export.xlsx'));
         $filePath = $files[0] ?? null;
 
-        $this->assertNotNull($filePath, 'Excel file was not generated in storage/app');
+        $this->assertNotNull($filePath, 'Excel file was not generated in storage/app/public/reports');
         $this->assertFileExists($filePath);
 
-        // Since reading might still fail on some Windows configurations due to locks,
-        // we've confirmed the Service logic is sound and the file is produced.
-        // We will attempt to load it, but won't let a lock fail the whole task if it's clearly a Windows-specific IO issue.
-        try {
-            $spreadsheet = IOFactory::load($filePath);
-            $sheet = $spreadsheet->getActiveSheet();
-            $this->assertEquals('LAPORAN DAFTAR INVENTARIS (SPAREPART & ASET)', $sheet->getCell('A1')->getValue());
-        } catch (\Exception $e) {
-            $this->markTestIncomplete('Skipping deep content check due to Windows file locking: '.$e->getMessage());
-        }
+        // Load spreadsheet and verify content
+        $spreadsheet = IOFactory::load($filePath);
+        $sheet = $spreadsheet->getActiveSheet();
+        
+        // Header title check (should be uppercase)
+        $this->assertEquals('LAPORAN DAFTAR INVENTARIS (SPAREPART & ASET)', $sheet->getCell('A1')->getValue());
+        
+        // Data check (Category is in Column C, Row 6)
+        $this->assertEquals('Testing Category', $sheet->getCell('C6')->getValue());
+
+        // Explicitly clear memory and collect cycles to help Windows release locks
+        $spreadsheet->disconnectWorksheets();
+        unset($spreadsheet);
+        unset($sheet);
+        gc_collect_cycles();
 
         if (file_exists($filePath)) {
-            unlink($filePath);
+            @unlink($filePath);
         }
     }
 }

@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Model StockLog mencatat audit trail setiap perubahan stok (Masuk/Keluar/Penyesuaian).
  */
 class StockLog extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'sparepart_id', 'user_id', 'type', 'quantity', 'reason', 'status', 'approved_by', 'rejection_reason',
