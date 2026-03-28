@@ -7,12 +7,24 @@ Berikut kami sampaikan laporan bulanan sistem **Azventory** untuk periode **{{ $
 @component('mail::panel')
 ### 📊 Ringkasan Dasbor
 
-| Indikator | Statistik |
-| :--- | :--- |
-| **Total Barang Inventaris** | {{ $summary['total_items'] }} item |
-| **Peminjaman Aktif** | {{ $summary['active_borrowings'] }} transaksi |
-| **Barang Perlu Restock** | {{ $summary['low_stock_count'] }} item |
-| **Aktivitas Bulan Ini** | {{ $summary['monthly_activities'] }} log |
+<table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Inter', sans-serif;">
+    <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eef2f7;"><strong>Total Barang Inventaris</strong></td>
+        <td align="right" style="padding: 10px 0; border-bottom: 1px solid #eef2f7;">{{ $summary['total_items'] }} item</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eef2f7;"><strong>Peminjaman Aktif</strong></td>
+        <td align="right" style="padding: 10px 0; border-bottom: 1px solid #eef2f7;">{{ $summary['active_borrowings'] }} transaksi</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eef2f7;"><strong>Barang Perlu Restock</strong></td>
+        <td align="right" style="padding: 10px 0; border-bottom: 1px solid #eef2f7; color: #ef4444;">{{ $summary['low_stock_count'] }} item</td>
+    </tr>
+    <tr>
+        <td style="padding: 10px 0;"><strong>Aktivitas Bulan Ini</strong></td>
+        <td align="right" style="padding: 10px 0;">{{ $summary['monthly_activities'] }} log</td>
+    </tr>
+</table>
 @endcomponent
 @endif
 
