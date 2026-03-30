@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
 use App\Models\Sparepart;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use App\Traits\ActivityLogger;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class BrandController extends Controller
 {
@@ -44,7 +44,7 @@ class BrandController extends Controller
 
         return response()->json([
             'message' => 'Merk baru berhasil ditambahkan.',
-            'brand' => $brand
+            'brand' => $brand,
         ], 201);
     }
 
@@ -54,14 +54,14 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
         $request->validate([
-            'name' => 'required|string|max:191|unique:brands,name,' . $brand->id,
+            'name' => 'required|string|max:191|unique:brands,name,'.$brand->id,
             'is_active' => 'sometimes|boolean',
         ]);
 
         $oldName = $brand->name;
         $newName = $request->name;
-        $oldActive = (bool)$brand->is_active;
-        $newActive = $request->has('is_active') ? (bool)$request->is_active : $oldActive;
+        $oldActive = (bool) $brand->is_active;
+        $newActive = $request->has('is_active') ? (bool) $request->is_active : $oldActive;
 
         $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
@@ -106,7 +106,7 @@ class BrandController extends Controller
 
         return response()->json([
             'message' => 'Merk berhasil diperbarui.',
-            'brand' => $brand
+            'brand' => $brand,
         ]);
     }
 
@@ -119,7 +119,7 @@ class BrandController extends Controller
 
         if ($count > 0) {
             return response()->json([
-                'message' => "Tidak dapat menghapus. Masih ada {$count} barang di merk ini. Ubah terlebih dahulu."
+                'message' => "Tidak dapat menghapus. Masih ada {$count} barang di merk ini. Ubah terlebih dahulu.",
             ], 422);
         }
 
@@ -129,7 +129,7 @@ class BrandController extends Controller
         $this->logActivity('Merk Dihapus', "Merk '{$brand->name}' dihapus.");
 
         return response()->json([
-            'message' => 'Merk berhasil dihapus.'
+            'message' => 'Merk berhasil dihapus.',
         ]);
     }
 }

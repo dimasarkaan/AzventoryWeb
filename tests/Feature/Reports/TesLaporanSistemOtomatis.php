@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Reports;
 
-use App\Models\User;
 use App\Enums\UserRole;
+use App\Mail\MonthlyReportMail;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\MonthlyReportMail;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 

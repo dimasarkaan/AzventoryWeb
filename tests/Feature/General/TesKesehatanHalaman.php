@@ -93,4 +93,3 @@ class TesKesehatanHalaman extends TestCase
         $response->assertStatus(200);
     }
 }
-

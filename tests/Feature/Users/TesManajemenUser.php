@@ -127,11 +127,11 @@ class TesManajemenUser extends TestCase
             'status' => 'nonaktif',
         ]);
     }
-    
+
     public function test_user_tidak_dapat_dihapus_jika_memiliki_pinjaman_aktif()
     {
         $targetUser = User::factory()->create(['role' => 'operator']);
-        
+
         // Buat pinjaman aktif
         $sparepart = \App\Models\Sparepart::factory()->create();
         \App\Models\Borrowing::create([
@@ -155,7 +155,7 @@ class TesManajemenUser extends TestCase
     {
         $user1 = User::factory()->create();
         $user2 = User::factory()->create(); // User ini punya pinjaman
-        
+
         $sparepart = \App\Models\Sparepart::factory()->create();
         \App\Models\Borrowing::create([
             'sparepart_id' => $sparepart->id,
@@ -171,7 +171,7 @@ class TesManajemenUser extends TestCase
 
         $response = $this->actingAs($this->superadmin)
             ->delete(route('users.bulk-force-delete'), [
-                'ids' => [$user1->id, $user2->id]
+                'ids' => [$user1->id, $user2->id],
             ]);
 
         $response->assertSessionHas('success');
@@ -182,10 +182,10 @@ class TesManajemenUser extends TestCase
     public function test_superadmin_tidak_dapat_menghapus_diri_sendiri_secara_bulk()
     {
         $this->superadmin->delete(); // Soft delete diri sendiri (mungkin via DB atau logic lain, tapi destroy melarangnya)
-        
+
         $response = $this->actingAs($this->superadmin)
             ->delete(route('users.bulk-force-delete'), [
-                'ids' => [$this->superadmin->id]
+                'ids' => [$this->superadmin->id],
             ]);
 
         $this->assertSoftDeleted('users', ['id' => $this->superadmin->id]);
@@ -199,7 +199,7 @@ class TesManajemenUser extends TestCase
         ]);
 
         $response = $this->actingAs($this->superadmin)->get(route('users.index'));
-        
+
         $response->assertStatus(200);
         $response->assertSee('08123456789');
     }

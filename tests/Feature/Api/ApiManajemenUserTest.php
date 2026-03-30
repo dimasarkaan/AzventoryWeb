@@ -38,12 +38,12 @@ class ApiManajemenUserTest extends TestCase
     public function superadmin_dapat_membuat_user_baru()
     {
         Sanctum::actingAs($this->makeUser('superadmin'));
-        
+
         $payload = [
             'name' => 'Operator Baru',
             'email' => 'opbaru@example.com',
             'role' => 'operator',
-            'status' => 'Aktif'
+            'status' => 'Aktif',
         ];
 
         $this->postJson('/api/v1/users', $payload)

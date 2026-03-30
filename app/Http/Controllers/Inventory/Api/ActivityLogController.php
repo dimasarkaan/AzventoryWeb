@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Inventory\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class ActivityLogController extends Controller
 {
@@ -18,7 +17,7 @@ class ActivityLogController extends Controller
         if ($request->user()->role !== \App\Enums\UserRole::SUPERADMIN) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Hanya Superadmin yang diizinkan mengakses log aktivitas global'
+                'message' => 'Hanya Superadmin yang diizinkan mengakses log aktivitas global',
             ], 403);
         }
 
@@ -29,14 +28,14 @@ class ActivityLogController extends Controller
         }
 
         if ($request->has('action')) {
-            $query->where('action', 'like', '%' . $request->action . '%');
+            $query->where('action', 'like', '%'.$request->action.'%');
         }
 
         $logs = $query->latest()->paginate($request->input('per_page', 20));
 
         return response()->json([
             'status' => 'success',
-            'data' => $logs
+            'data' => $logs,
         ]);
     }
 
@@ -49,7 +48,7 @@ class ActivityLogController extends Controller
 
         // Proteksi: Admin hanya boleh lihat log user lain (bukan Superadmin lain?)
         // Untuk sederhananya, kita batasi ke role Admin/Superadmin
-        if (!in_array($request->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
+        if (! in_array($request->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -61,7 +60,7 @@ class ActivityLogController extends Controller
         return response()->json([
             'status' => 'success',
             'user' => $targetUser->name,
-            'data' => $logs
+            'data' => $logs,
         ]);
     }
 }

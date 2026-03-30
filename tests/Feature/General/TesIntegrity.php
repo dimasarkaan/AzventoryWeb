@@ -153,4 +153,3 @@ class TesIntegrity extends TestCase
         $this->assertEquals($user->id, $log->approved_by);
     }
 }
-

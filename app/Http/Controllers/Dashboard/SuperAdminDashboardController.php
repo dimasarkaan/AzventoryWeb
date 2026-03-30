@@ -156,7 +156,7 @@ class SuperAdminDashboardController extends Controller
             ->orderBy('stock', 'asc')
             ->take(5)
             ->get();
-            
+
         $lowStockItems = $lowStockItemsRaw->map(function ($item) {
             return [
                 'id' => $item->id,
@@ -175,7 +175,7 @@ class SuperAdminDashboardController extends Controller
             ->latest()
             ->take(10)
             ->get();
-            
+
         // Map data agar aman dikonsumsi oleh JavaScript/Alpine
         $noPriceItems = $noPriceItemsRaw->map(function ($item) {
             return [
@@ -189,7 +189,7 @@ class SuperAdminDashboardController extends Controller
         if ($request->wantsJson()) {
             return response()->json(array_merge($data, [
                 'noPriceItems' => $noPriceItems,
-                'lowStockItems' => $lowStockItems
+                'lowStockItems' => $lowStockItems,
             ]));
         }
 

@@ -69,4 +69,3 @@ class TesVerifikasiEmail extends TestCase
         \Illuminate\Support\Facades\Notification::assertSentTo($user, \Illuminate\Auth\Notifications\VerifyEmail::class);
     }
 }
-

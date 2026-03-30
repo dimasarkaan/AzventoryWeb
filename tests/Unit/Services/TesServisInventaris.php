@@ -193,4 +193,3 @@ class TesServisInventaris extends TestCase
         $this->assertEquals(3, $result->first()->stock);
     }
 }
-

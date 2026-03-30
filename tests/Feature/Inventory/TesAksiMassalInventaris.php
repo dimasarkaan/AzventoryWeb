@@ -96,4 +96,3 @@ class TesAksiMassalInventaris extends TestCase
         $response->assertForbidden();
     }
 }
-

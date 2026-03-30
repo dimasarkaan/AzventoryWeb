@@ -18,8 +18,8 @@ trait ActivityLogger
     {
         // Metadata dasar untuk audit keamanan
         $metadata = [
-            'ip' => request()->header('X-Forwarded-For') 
-                    ? explode(',', request()->header('X-Forwarded-For'))[0] 
+            'ip' => request()->header('X-Forwarded-For')
+                    ? explode(',', request()->header('X-Forwarded-For'))[0]
                     : request()->ip(),
             'user_agent' => request()->header('User-Agent'),
         ];
@@ -44,7 +44,7 @@ trait ActivityLogger
             \Illuminate\Support\Facades\Cache::forever('inventory_last_updated', now()->timestamp);
         } catch (\Throwable $e) {
             // Log error agar bisa didebug lewat storage/logs/laravel.log
-            \Illuminate\Support\Facades\Log::error('Broadcasting ActivityLogged failed: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Broadcasting ActivityLogged failed: '.$e->getMessage());
         }
     }
 }

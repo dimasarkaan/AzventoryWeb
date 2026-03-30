@@ -261,4 +261,3 @@ class TesTransaksiInventaris extends TestCase
         $this->assertDatabaseCount('spareparts', 1);
     }
 }
-

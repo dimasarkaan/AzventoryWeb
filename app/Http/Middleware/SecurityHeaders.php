@@ -19,8 +19,8 @@ class SecurityHeaders
 
         // Izinkan Vite dev server (port 5173) saat development/local
         $viteDevSources = app()->environment('local')
-            ? " http://127.0.0.1:5173 ws://127.0.0.1:5173"
-            : "";
+            ? ' http://127.0.0.1:5173 ws://127.0.0.1:5173'
+            : '';
 
         // Security headers to harden the application
         $response->headers->set('X-Frame-Options', 'DENY');

@@ -6,15 +6,17 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
 
 class ActivityLogged implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets;
 
     public $log;
+
     public $userName;
+
     public $userEmail;
+
     public $userRole;
 
     public function __construct($log, ?string $userName = null, ?string $userEmail = null, ?string $userRole = null)

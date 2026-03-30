@@ -25,10 +25,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->dontReport([
             \Pusher\PusherException::class,
         ]);
-        
+
         $exceptions->reportable(function (\Throwable $e) {
             // Abaikan error "Could not resolve host" yang berkaitan dengan Pusher
-            if (str_contains($e->getMessage(), 'api-ap1.pusher.com') || 
+            if (str_contains($e->getMessage(), 'api-ap1.pusher.com') ||
                 str_contains($e->getMessage(), 'cURL error 6')) {
                 return false;
             }

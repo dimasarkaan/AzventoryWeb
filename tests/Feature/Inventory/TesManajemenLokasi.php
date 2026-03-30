@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\UserRole;
 use App\Models\Location;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -42,7 +42,7 @@ class TesManajemenLokasi extends TestCase
     {
         $response = $this->actingAs($this->superadmin)
             ->postJson(route('locations.store'), [
-                'name' => 'Semarang'
+                'name' => 'Semarang',
             ]);
 
         $response->assertStatus(201);
@@ -60,7 +60,7 @@ class TesManajemenLokasi extends TestCase
 
         $response = $this->actingAs($this->superadmin)
             ->putJson(route('locations.update', $location->id), [
-                'name' => 'Tegal Baru'
+                'name' => 'Tegal Baru',
             ]);
 
         $response->assertStatus(200);
@@ -83,7 +83,7 @@ class TesManajemenLokasi extends TestCase
             ->deleteJson(route('locations.destroy', $location->id));
 
         $response->assertStatus(422);
-        
+
         $this->assertDatabaseHas('locations', ['name' => 'Tegal']);
     }
 
@@ -117,5 +117,3 @@ class TesManajemenLokasi extends TestCase
             ->assertStatus(403);
     }
 }
-
-

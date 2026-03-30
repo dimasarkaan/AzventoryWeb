@@ -252,10 +252,10 @@ class TesValidasiInventaris extends TestCase
             ->get(route('inventory.index', ['filter' => 'problematic']));
 
         $response->assertOk();
-        
+
         // Tab Aset Bermasalah tidak boleh dirender
         $response->assertDontSee('Aset Bermasalah');
-        
+
         // Data harus kosong karena difilter menjadi 1 = 0 di InventoryService
         $returnedSpareparts = $response->original->gatherData()['spareparts'];
         $this->assertEquals(0, $returnedSpareparts->total());
@@ -273,10 +273,9 @@ class TesValidasiInventaris extends TestCase
             $response->assertOk();
             $response->assertSee('Aset Bermasalah');
             $response->assertSee('Barang Hancur Test');
-            
+
             $returnedSpareparts = $response->original->gatherData()['spareparts'];
             $this->assertEquals(1, $returnedSpareparts->total());
         }
     }
 }
-

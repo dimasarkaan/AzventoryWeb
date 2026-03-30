@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\UserRole;
 use App\Models\Brand;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -42,7 +42,7 @@ class TesManajemenBrand extends TestCase
     {
         $response = $this->actingAs($this->superadmin)
             ->postJson(route('brands.store'), [
-                'name' => 'Asus'
+                'name' => 'Asus',
             ]);
 
         $response->assertStatus(201);
@@ -60,7 +60,7 @@ class TesManajemenBrand extends TestCase
 
         $response = $this->actingAs($this->superadmin)
             ->patchJson(route('brands.update', $brand->id), [
-                'name' => 'Logitech' // Corrected
+                'name' => 'Logitech', // Corrected
             ]);
 
         $response->assertStatus(200);
@@ -83,7 +83,7 @@ class TesManajemenBrand extends TestCase
             ->deleteJson(route('brands.destroy', $brand->id));
 
         $response->assertStatus(422);
-        
+
         $this->assertDatabaseHas('brands', ['name' => 'Lenovo']);
     }
 
@@ -115,11 +115,9 @@ class TesManajemenBrand extends TestCase
         $this->actingAs($operator)
             ->deleteJson(route('brands.destroy', $brand->id))
             ->assertStatus(403);
-            
+
         $this->actingAs($operator)
             ->postJson(route('brands.store'), ['name' => 'Fail'])
             ->assertStatus(403);
     }
 }
-
-

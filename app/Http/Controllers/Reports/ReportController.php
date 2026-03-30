@@ -3,12 +3,11 @@
 namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
-use App\Services\ReportService;
-use App\Services\InventoryService;
-use App\Traits\ActivityLogger;
-use App\Enums\UserRole;
 use App\Jobs\GenerateReportJob;
 use App\Notifications\ReportReadyNotification;
+use App\Services\InventoryService;
+use App\Services\ReportService;
+use App\Traits\ActivityLogger;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +25,7 @@ class ReportController extends Controller
         $this->reportService = $reportService;
         $this->inventoryService = $inventoryService;
     }
- 
+
     /**
      * Menampilkan halaman indeks pelaporan.
      */
@@ -34,10 +33,10 @@ class ReportController extends Controller
     {
         $options = $this->inventoryService->getDropdownOptions();
         $locations = $options['locations'];
- 
+
         return view('reports.index', compact('locations'));
     }
- 
+
     /**
      * Memproses permintaan unduhan laporan.
      * Untuk PDF, pembuatan file didelegasikan ke Queue Job untuk efisiensi server.
@@ -50,27 +49,27 @@ class ReportController extends Controller
         ], [
             'end_date.after_or_equal' => 'Tanggal akhir tidak boleh lebih awal dari tanggal mulai.',
         ]);
- 
+
         $type = $request->input('report_type', 'inventory');
         $period = $request->input('period', 'all');
         $format = $request->input('export_format', 'pdf');
- 
+
         $location = $request->input('location', 'all');
- 
+
         [$startDate, $endDate] = $this->reportService->resolveDateRange(
             $period,
             $request->input('start_date'),
             $request->input('end_date')
         );
- 
+
         // Fetch query for non-PDF (Excel usually)
         $reportQuery = $this->reportService->getReportQuery($type, $location, $startDate, $endDate);
         $query = $reportQuery['query'];
- 
+
         if (! $query) {
             return back()->with('error', 'Tipe laporan tidak ditemukan atau tidak valid.');
         }
- 
+
         // Generate Filename
         $prefix = match ($type) {
             'inventory_list' => 'LaporanInventaris',
@@ -79,7 +78,7 @@ class ReportController extends Controller
             'low_stock' => 'LaporanStokMenipis',
             default => 'Laporan'
         };
- 
+
         if ($startDate && $endDate) {
             $start = $startDate->format('d-m-Y');
             $end = $endDate->format('d-m-Y');
@@ -87,15 +86,15 @@ class ReportController extends Controller
         } else {
             $filename = "{$prefix}SemuaRiwayat_".now()->format('d-m-Y');
         }
- 
+
         if ($format !== 'excel') {
             // Snapshot data for PDF
             $reportData = $this->reportService->getReportData($type, $location, $startDate, $endDate);
-            
+
             // Jika data kecil (<= 1000 item), langsung stream PDF (lebih handal di cPanel)
             if (count($reportData['data']) <= 1000) {
                 $this->logActivity('Laporan Diunduh', "Mengunduh PDF langsung tipe: {$type}");
- 
+
                 $pdf = app()->make('dompdf.wrapper')->loadView($reportData['view'], [
                     'data' => $reportData['data'],
                     'title' => $reportData['title'],
@@ -104,13 +103,13 @@ class ReportController extends Controller
                     'endDate' => $endDate,
                     'location' => $location,
                 ]);
- 
+
                 // Tambahan: Simpan ke storage & Notifikasi agar ada History/Riwayat di lonceng (sesuai permintaan user)
                 $pdfOutput = $pdf->output();
-                $filenameWithExt = $filename . '.pdf';
-                $path = 'reports/' . $filenameWithExt;
+                $filenameWithExt = $filename.'.pdf';
+                $path = 'reports/'.$filenameWithExt;
                 Storage::disk('public')->put($path, $pdfOutput);
- 
+
                 // Kirim Notifikasi (History)
                 $url = Storage::url($path);
                 $notifyTitle = match ($type) {
@@ -121,13 +120,13 @@ class ReportController extends Controller
                     default => 'Laporan Sistem'
                 };
                 $request->user()->notify(new ReportReadyNotification($notifyTitle, $url));
- 
+
                 return response($pdfOutput)
                     ->header('Content-Type', 'application/pdf')
-                    ->header('Content-Disposition', 'attachment; filename="' . $filenameWithExt . '"')
+                    ->header('Content-Disposition', 'attachment; filename="'.$filenameWithExt.'"')
                     ->header('Access-Control-Expose-Headers', 'Content-Disposition');
             }
- 
+
             // Jika data besar, gunakan antrean (Queue)
             GenerateReportJob::dispatch($request->user(), $reportData, $startDate, $endDate, $location, $type);
 
@@ -139,7 +138,7 @@ class ReportController extends Controller
                 return response()->json([
                     'success' => true,
                     'message' => $message,
-                    'type' => 'info'
+                    'type' => 'info',
                 ]);
             }
 

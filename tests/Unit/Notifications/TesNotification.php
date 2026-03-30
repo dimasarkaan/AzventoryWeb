@@ -57,7 +57,7 @@ class TesNotification extends TestCase
         // Skenario: Stok Habis ( 0 )
         $sparepartEmpty = Sparepart::factory()->create(['name' => 'Mur', 'stock' => 0, 'minimum_stock' => 10]);
         $notifEmpty = new LowStockNotification($sparepartEmpty);
-        $dataEmpty = $notifEmpty->toArray(new User());
+        $dataEmpty = $notifEmpty->toArray(new User);
 
         $this->assertEquals('Peringatan: Stok Habis!', $dataEmpty['title']);
         $this->assertEquals('danger', $dataEmpty['type']);
@@ -127,7 +127,7 @@ class TesNotification extends TestCase
     }
 
     // ── ItemReturnedNotification ────────────────────────────────
-    
+
     #[Test]
     public function item_returned_notification_berisi_data_yang_benar()
     {
@@ -137,7 +137,7 @@ class TesNotification extends TestCase
             'user_id' => $operator->id,
             'sparepart_id' => $sparepart->id,
             'borrower_name' => $operator->name,
-            'quantity' => 2
+            'quantity' => 2,
         ]);
 
         $notification = new ItemReturnedNotification($borrowing, 2, 'baik');
@@ -160,9 +160,8 @@ class TesNotification extends TestCase
         $borrowing = Borrowing::factory()->create();
         $notification = new OverdueBorrowingNotification($borrowing);
 
-        $data = $notification->toArray(new User());
+        $data = $notification->toArray(new User);
 
         $this->assertStringContainsString('?highlight=overdue', $data['url']);
     }
 }
-

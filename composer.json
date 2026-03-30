@@ -21,6 +21,7 @@
         "pusher/pusher-php-server": "^7.2"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.7",
         "fakerphp/faker": "^1.23",
         "knuckleswtf/scribe": "^5.6",
         "laravel/breeze": "^2.3",

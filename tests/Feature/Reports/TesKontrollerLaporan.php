@@ -249,4 +249,3 @@ class TesKontrollerLaporan extends TestCase
         $response->assertSessionHas('info', 'Laporan sedang diproses karena ukuran data yang besar. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.');
     }
 }
-

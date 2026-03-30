@@ -2,9 +2,8 @@
 
 namespace Tests\Feature\Api;
 
-use App\Models\User;
 use App\Models\Sparepart;
-use App\Models\ActivityLog;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\Test;
@@ -32,8 +31,8 @@ class ApiSistemTest extends TestCase
                 'data' => [
                     'inventory' => ['total_items', 'total_stock', 'low_stock_count'],
                     'borrowing' => ['active_count', 'overdue_count'],
-                    'master_data' => ['brands_count', 'categories_count', 'locations_count']
-                ]
+                    'master_data' => ['brands_count', 'categories_count', 'locations_count'],
+                ],
             ]);
     }
 
@@ -48,8 +47,8 @@ class ApiSistemTest extends TestCase
             ->assertJson([
                 'data' => [
                     'email' => $user->email,
-                    'role' => 'operator'
-                ]
+                    'role' => 'operator',
+                ],
             ]);
     }
 

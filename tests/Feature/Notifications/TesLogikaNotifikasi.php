@@ -104,4 +104,3 @@ class TesLogikaNotifikasi extends TestCase
         );
     }
 }
-

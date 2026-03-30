@@ -54,16 +54,16 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id'      => $this->operator->id,
-            'type'         => 'masuk',
-            'quantity'     => 10,
-            'reason'       => 'Restock operator',
-            'status'       => 'pending',
+            'user_id' => $this->operator->id,
+            'type' => 'masuk',
+            'quantity' => 10,
+            'reason' => 'Restock operator',
+            'status' => 'pending',
         ]);
 
         $response = $this->actingAs($this->superadmin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status'           => 'rejected',
+                'status' => 'rejected',
                 'rejection_reason' => 'Stok masih aman, tidak perlu restock.',
             ]);
 
@@ -71,8 +71,8 @@ class TesKasusBatasPersetujuanStok extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('stock_logs', [
-            'id'               => $log->id,
-            'status'           => 'rejected',
+            'id' => $log->id,
+            'status' => 'rejected',
             'rejection_reason' => 'Stok masih aman, tidak perlu restock.',
         ]);
         // Stok harus TIDAK berubah setelah rejected
@@ -86,16 +86,16 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id'      => $this->operator->id,
-            'type'         => 'keluar',
-            'quantity'     => 5,
-            'reason'       => 'Permintaan keluar',
-            'status'       => 'pending',
+            'user_id' => $this->operator->id,
+            'type' => 'keluar',
+            'quantity' => 5,
+            'reason' => 'Permintaan keluar',
+            'status' => 'pending',
         ]);
 
         $this->actingAs($this->admin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status'           => 'rejected',
+                'status' => 'rejected',
                 'rejection_reason' => 'Stok tidak mencukupi untuk permintaan ini.',
             ]);
 
@@ -109,11 +109,11 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id'      => $this->operator->id,
-            'type'         => 'masuk',
-            'quantity'     => 15,
-            'reason'       => 'Restock',
-            'status'       => 'pending',
+            'user_id' => $this->operator->id,
+            'type' => 'masuk',
+            'quantity' => 15,
+            'reason' => 'Restock',
+            'status' => 'pending',
         ]);
 
         $this->actingAs($this->superadmin)
@@ -131,11 +131,11 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id'      => $this->operator->id,
-            'type'         => 'keluar',
-            'quantity'     => 5,
-            'reason'       => 'Dipakai maintenance',
-            'status'       => 'pending',
+            'user_id' => $this->operator->id,
+            'type' => 'keluar',
+            'quantity' => 5,
+            'reason' => 'Dipakai maintenance',
+            'status' => 'pending',
         ]);
 
         $this->actingAs($this->superadmin)
@@ -154,11 +154,11 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id'      => $this->operator->id,
-            'type'         => 'keluar',
-            'quantity'     => 10, // lebih dari stok
-            'reason'       => 'Keluar melebihi stok',
-            'status'       => 'pending',
+            'user_id' => $this->operator->id,
+            'type' => 'keluar',
+            'quantity' => 10, // lebih dari stok
+            'reason' => 'Keluar melebihi stok',
+            'status' => 'pending',
         ]);
 
         $this->actingAs($this->superadmin)
@@ -175,17 +175,17 @@ class TesKasusBatasPersetujuanStok extends TestCase
     {
         $log = StockLog::create([
             'sparepart_id' => $this->sparepart->id,
-            'user_id'      => $this->operator->id,
-            'type'         => 'masuk',
-            'quantity'     => 5,
-            'reason'       => 'Restock',
-            'status'       => 'approved', // sudah diproses!
-            'approved_by'  => $this->superadmin->id,
+            'user_id' => $this->operator->id,
+            'type' => 'masuk',
+            'quantity' => 5,
+            'reason' => 'Restock',
+            'status' => 'approved', // sudah diproses!
+            'approved_by' => $this->superadmin->id,
         ]);
 
         $response = $this->actingAs($this->superadmin)
             ->put(route('inventory.stock-approvals.update', $log->id), [
-                'status'           => 'rejected',
+                'status' => 'rejected',
                 'rejection_reason' => 'Dicoba proses ulang.',
             ]);
 
@@ -202,7 +202,7 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $response = $this->actingAs($this->superadmin)
             ->post(route('inventory.stock-approvals.bulk-approve'), [
-                'ids'    => [$log1->id, $log2->id],
+                'ids' => [$log1->id, $log2->id],
                 'status' => 'approved',
             ]);
 
@@ -220,8 +220,8 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $response = $this->actingAs($this->superadmin)
             ->post(route('inventory.stock-approvals.bulk-approve'), [
-                'ids'              => [$log->id],
-                'status'           => 'rejected',
+                'ids' => [$log->id],
+                'status' => 'rejected',
                 'rejection_reason' => '', // kosong — harus gagal
             ]);
 
@@ -235,8 +235,8 @@ class TesKasusBatasPersetujuanStok extends TestCase
 
         $response = $this->actingAs($this->superadmin)
             ->post(route('inventory.stock-approvals.bulk-approve'), [
-                'ids'              => [$log->id],
-                'status'           => 'rejected',
+                'ids' => [$log->id],
+                'status' => 'rejected',
                 'rejection_reason' => 'Stok sudah cukup, tidak perlu penambahan.',
             ]);
 
@@ -244,10 +244,9 @@ class TesKasusBatasPersetujuanStok extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('stock_logs', [
-            'id'               => $log->id,
-            'status'           => 'rejected',
+            'id' => $log->id,
+            'status' => 'rejected',
             'rejection_reason' => 'Stok sudah cukup, tidak perlu penambahan.',
         ]);
     }
 }
-

@@ -142,4 +142,3 @@ class TesCakupanLogAktivitas extends TestCase
         $response->assertOk();
     }
 }
-

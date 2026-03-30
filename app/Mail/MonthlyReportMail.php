@@ -14,8 +14,11 @@ class MonthlyReportMail extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+
     public $attachmentsPaths;
+
     public $monthName;
+
     public $summary;
 
     /**
@@ -35,7 +38,7 @@ class MonthlyReportMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Laporan Bulanan Azventory - ' . $this->monthName,
+            subject: 'Laporan Bulanan Azventory - '.$this->monthName,
         );
     }
 
@@ -62,6 +65,7 @@ class MonthlyReportMail extends Mailable
                 ->as($name)
                 ->withMime('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         }
+
         return $attachments;
     }
 }

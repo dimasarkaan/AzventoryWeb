@@ -112,4 +112,3 @@ class TesPeminjamanKompleks extends TestCase
         $this->assertNull($borrowing->fresh()->user);
     }
 }
-

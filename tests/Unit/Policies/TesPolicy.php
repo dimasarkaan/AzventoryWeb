@@ -144,4 +144,3 @@ class TesPolicy extends TestCase
         $this->assertFalse($policy->create($admin));
     }
 }
-

@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Inventory;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Sparepart;
+use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use App\Traits\ActivityLogger;
 
 class CategoryController extends Controller
 {
@@ -41,22 +41,22 @@ class CategoryController extends Controller
 
         return response()->json([
             'message' => 'Kategori baru berhasil ditambahkan.',
-            'category' => $category
+            'category' => $category,
         ], 201);
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $id,
+            'name' => 'required|string|max:255|unique:categories,name,'.$id,
             'is_active' => 'sometimes|boolean',
         ]);
 
         $category = Category::findOrFail($id);
         $oldName = $category->name;
         $newName = $request->name;
-        $oldActive = (bool)$category->is_active;
-        $newActive = $request->has('is_active') ? (bool)$request->is_active : $oldActive;
+        $oldActive = (bool) $category->is_active;
+        $newActive = $request->has('is_active') ? (bool) $request->is_active : $oldActive;
 
         $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
@@ -94,7 +94,7 @@ class CategoryController extends Controller
                 $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Status kategori '{$newName}' diubah menjadi {$statusText}.";
             }
-            
+
             $this->logActivity('Kategori Diperbarui', $logMessage, $changes);
         }
 
@@ -110,7 +110,7 @@ class CategoryController extends Controller
 
         if ($count > 0) {
             return response()->json([
-                'message' => "Tidak dapat menghapus. Masih ada $count barang dalam kategori ini. Kosongkan terlebih dahulu."
+                'message' => "Tidak dapat menghapus. Masih ada $count barang dalam kategori ini. Kosongkan terlebih dahulu.",
             ], 422);
         }
 

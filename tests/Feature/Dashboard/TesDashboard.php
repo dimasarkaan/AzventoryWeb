@@ -60,4 +60,3 @@ class TesDashboard extends TestCase
         $response->assertSee('showActivityModal', false);
     }
 }
-

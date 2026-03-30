@@ -87,4 +87,3 @@ class TesLogAktivitas extends TestCase
         Queue::assertPushed(\App\Jobs\ExportActivityLogJob::class);
     }
 }
-

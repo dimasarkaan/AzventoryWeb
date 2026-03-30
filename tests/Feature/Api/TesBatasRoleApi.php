@@ -86,4 +86,3 @@ class TesBatasRoleApi extends TestCase
         $response->assertStatus(200);
     }
 }
-

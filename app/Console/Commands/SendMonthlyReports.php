@@ -10,7 +10,6 @@ use App\Services\ReportService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
 
 class SendMonthlyReports extends Command
 {
@@ -38,7 +37,7 @@ class SendMonthlyReports extends Command
         $now = Carbon::now();
         $lastMonth = $now->copy()->subMonth();
         $monthName = $lastMonth->translatedFormat('F Y');
-        
+
         // Resolve date range for last month
         [$startDate, $endDate] = $reportService->resolveDateRange('last_month');
 
@@ -54,23 +53,26 @@ class SendMonthlyReports extends Command
 
         foreach ($reports as $type => $config) {
             $this->info("Generating report: {$config['title']}...");
-            
+
             $queryResult = $reportService->getReportQuery($type, 'all', $config['start'], $config['end']);
             $query = $queryResult['query'];
 
-            if (!$query) continue;
+            if (! $query) {
+                continue;
+            }
 
-            $filename = str_replace(' ', '_', $config['title']) . '_' . $lastMonth->format('m_Y');
-            
+            $filename = str_replace(' ', '_', $config['title']).'_'.$lastMonth->format('m_Y');
+
             // Generate Excel file
             $spreadsheet = $this->generateSpreadsheet($excelService, $type, $query);
             $path = $excelService->saveToFile($spreadsheet, $filename);
-            
-            $attachments[$filename . '.xlsx'] = $path;
+
+            $attachments[$filename.'.xlsx'] = $path;
         }
 
         if (empty($attachments)) {
             $this->warn('Tidak ada data laporan untuk dikirim.');
+
             return 0;
         }
 
@@ -78,6 +80,7 @@ class SendMonthlyReports extends Command
 
         if ($superadmins->isEmpty()) {
             $this->error('Tidak ada Superadmin ditemukan.');
+
             return 1;
         }
 
@@ -86,7 +89,7 @@ class SendMonthlyReports extends Command
             'total_items' => \App\Models\Sparepart::count(),
             'active_borrowings' => \App\Models\Borrowing::where('status', 'dipinjam')->count(),
             'low_stock_count' => \App\Models\Sparepart::where('minimum_stock', '>', 0)
-                                    ->whereColumn('stock', '<=', 'minimum_stock')->count(),
+                ->whereColumn('stock', '<=', 'minimum_stock')->count(),
             'monthly_activities' => \App\Models\ActivityLog::whereBetween('created_at', [$startDate, $endDate])->count(),
         ];
 
@@ -101,7 +104,7 @@ class SendMonthlyReports extends Command
         // For now, I'll leave them or I can delete them after loop.
         // But since Mail is queued usually, we should not delete them immediately if it's sent synchronously.
         // In local, it's usually sync.
-        
+
         return 0;
     }
 
@@ -109,12 +112,12 @@ class SendMonthlyReports extends Command
     {
         // We need to access the exact same logic as in ExcelExportService
         // Since we can't easily call the private methods, we might need to expose them or replicate.
-        // Replicating is safer for now but suboptimal. 
+        // Replicating is safer for now but suboptimal.
         // Better: refactor ExcelExportService even more.
-        
+
         // I'll use Reflection or just a hacky way since I already refactored it.
         // Actually, I'll just use the public methods I refactored.
-        
+
         // Wait, I didn't make them return the spreadsheet.
         // I'll update ExcelExportService once more to have "getSpreadsheet" methods.
 
@@ -126,10 +129,12 @@ class SendMonthlyReports extends Command
             'activity_log' => $this->callPrivate($excelService, 'generateActivityLogsSpreadsheet', [$query]),
         };
     }
-    
-    private function callPrivate($object, $method, $args) {
+
+    private function callPrivate($object, $method, $args)
+    {
         $reflection = new \ReflectionMethod(get_class($object), $method);
         $reflection->setAccessible(true);
+
         return $reflection->invokeArgs($object, $args);
     }
 }

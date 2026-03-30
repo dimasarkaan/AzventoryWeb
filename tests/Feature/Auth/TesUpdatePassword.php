@@ -49,4 +49,3 @@ class TesUpdatePassword extends TestCase
             ->assertRedirect('/profile');
     }
 }
-

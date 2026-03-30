@@ -560,4 +560,3 @@ class TesApiInventaris extends TestCase
         $this->getJson("/api/v1/inventory/{$sparepart->id}")->assertStatus(200);
     }
 }
-

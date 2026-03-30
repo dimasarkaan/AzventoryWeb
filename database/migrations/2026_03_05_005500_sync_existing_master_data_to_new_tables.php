@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -20,7 +19,7 @@ return new class extends Migration
 
         foreach ($categories as $category) {
             $exists = DB::table('categories')->where('name', $category)->exists();
-            if (!$exists) {
+            if (! $exists) {
                 DB::table('categories')->insert([
                     'name' => $category,
                     'created_at' => now(),
@@ -38,7 +37,7 @@ return new class extends Migration
 
         foreach ($brands as $brand) {
             $exists = DB::table('brands')->where('name', $brand)->exists();
-            if (!$exists) {
+            if (! $exists) {
                 DB::table('brands')->insert([
                     'name' => $brand,
                     'created_at' => now(),
@@ -56,7 +55,7 @@ return new class extends Migration
 
         foreach ($locations as $location) {
             $exists = DB::table('locations')->where('name', $location)->exists();
-            if (!$exists) {
+            if (! $exists) {
                 DB::table('locations')->insert([
                     'name' => $location,
                     'is_default' => false,
@@ -72,7 +71,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Sinkronisasi data ke master tabel sebaiknya tidak dihapus pada skenario rollback 
+        // Sinkronisasi data ke master tabel sebaiknya tidak dihapus pada skenario rollback
         // karena data string pada spareparts tetap utuh dan ini hanya operasi salin (copy).
     }
 };

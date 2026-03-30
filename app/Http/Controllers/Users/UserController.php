@@ -126,7 +126,7 @@ class UserController extends Controller
             if ($user->{$key} != $value) {
                 $changes[$key] = [
                     'old' => $user->{$key},
-                    'new' => $value
+                    'new' => $value,
                 ];
             }
         }
@@ -138,7 +138,7 @@ class UserController extends Controller
             $newRole = \App\Enums\UserRole::tryFrom($changes['role']['new']) ?? $changes['role']['new'];
             $oldRoleLabel = $changes['role']['old'] instanceof \App\Enums\UserRole ? $changes['role']['old']->label() : $changes['role']['old'];
             $newRoleLabel = $newRole instanceof \App\Enums\UserRole ? $newRole->label() : $newRole;
-            $logDescription .= " (Perubahan Peran: " . $oldRoleLabel . " -> " . $newRoleLabel . ")";
+            $logDescription .= ' (Perubahan Peran: '.$oldRoleLabel.' -> '.$newRoleLabel.')';
         }
 
         $this->logActivity('User Diupdate', $logDescription, $changes);
@@ -245,9 +245,9 @@ class UserController extends Controller
 
         $ids = $request->ids;
         $count = 0;
-        
+
         $users = User::onlyTrashed()->whereIn('id', $ids)->get();
-        
+
         foreach ($users as $user) {
             /** @var \App\Models\User $user */
             $user->restore();

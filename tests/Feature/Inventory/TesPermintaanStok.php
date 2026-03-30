@@ -157,4 +157,3 @@ class TesPermintaanStok extends TestCase
         $response->assertSessionHasErrors('reason');
     }
 }
-

@@ -188,4 +188,3 @@ class TesAnalitikDashboard extends TestCase
         $response->assertJsonValidationErrors(['end_date']);
     }
 }
-

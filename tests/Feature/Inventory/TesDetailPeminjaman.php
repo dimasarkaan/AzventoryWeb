@@ -128,4 +128,3 @@ class TesDetailPeminjaman extends TestCase
             ->assertJsonFragment(['items' => []]);
     }
 }
-

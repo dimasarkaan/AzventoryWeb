@@ -186,4 +186,3 @@ class TesServisInventarisTahap5 extends TestCase
         $this->service->approveStockRequest($stockLog, 'approved');
     }
 }
-

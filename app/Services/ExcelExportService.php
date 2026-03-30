@@ -7,7 +7,6 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExcelExportService
@@ -151,14 +150,15 @@ class ExcelExportService
     public function saveToFile($spreadsheet, $filename)
     {
         $writer = new Xlsx($spreadsheet);
-        $path = storage_path('app/public/reports/temp_' . uniqid() . '_' . $filename . '.xlsx');
-        
+        $path = storage_path('app/public/reports/temp_'.uniqid().'_'.$filename.'.xlsx');
+
         // Ensure directory exists
-        if (!file_exists(storage_path('app/public/reports'))) {
+        if (! file_exists(storage_path('app/public/reports'))) {
             mkdir(storage_path('app/public/reports'), 0755, true);
         }
 
         $writer->save($path);
+
         return $path;
     }
 
@@ -180,6 +180,7 @@ class ExcelExportService
     public function exportActivityLogs($logs, $filename)
     {
         $spreadsheet = $this->generateActivityLogsSpreadsheet($logs);
+
         return $this->downloadResponse($spreadsheet, $filename);
     }
 
@@ -230,6 +231,7 @@ class ExcelExportService
     public function exportInventoryList($data, $filename)
     {
         $spreadsheet = $this->generateInventoryListSpreadsheet($data);
+
         return $this->downloadResponse($spreadsheet, $filename);
     }
 
@@ -270,7 +272,7 @@ class ExcelExportService
                 $statusText = 'Habis';
             }
             $sheet->setCellValue("D{$row}", $statusText);
-            
+
             // Status Color Coding
             $color = match (strtolower($statusText ?? '')) {
                 'aman', 'aktif' => 'FF059669', // Emerald-600
@@ -279,7 +281,7 @@ class ExcelExportService
                 default => 'FF64748B', // Slate-500
             };
             $sheet->getStyle("D{$row}")->applyFromArray([
-                'font' => ['color' => ['argb' => $color], 'bold' => true]
+                'font' => ['color' => ['argb' => $color], 'bold' => true],
             ]);
 
             $sheet->setCellValue("E{$row}", $item->location);
@@ -313,6 +315,7 @@ class ExcelExportService
     public function exportStockMutation($data, $filename)
     {
         $spreadsheet = $this->generateStockMutationSpreadsheet($data);
+
         return $this->downloadResponse($spreadsheet, $filename);
     }
 
@@ -381,6 +384,7 @@ class ExcelExportService
     public function exportBorrowingHistory($data, $filename)
     {
         $spreadsheet = $this->generateBorrowingHistorySpreadsheet($data);
+
         return $this->downloadResponse($spreadsheet, $filename);
     }
 
@@ -425,7 +429,7 @@ class ExcelExportService
             // Handle Enum or String for Borrowing Status
             $statusText = ($borrowing->status instanceof \BackedEnum) ? $borrowing->status->value : (is_string($borrowing->status) ? ucfirst($borrowing->status) : $borrowing->status);
             $sheet->setCellValue("G{$row}", $statusText);
-            
+
             // Status Color Coding
             $color = match (strtolower($statusText ?? '')) {
                 'dikembalikan', 'selesai', 'disetujui' => 'FF059669', // Emerald-600
@@ -434,9 +438,9 @@ class ExcelExportService
                 default => 'FF64748B', // Slate-500
             };
             $sheet->getStyle("G{$row}")->applyFromArray([
-                'font' => ['color' => ['argb' => $color], 'bold' => true]
+                'font' => ['color' => ['argb' => $color], 'bold' => true],
             ]);
-            
+
             // Format Quantity Column
             $sheet->getStyle("C{$row}")->getNumberFormat()->setFormatCode('#,##0');
 
@@ -468,6 +472,7 @@ class ExcelExportService
     public function exportLowStock($data, $filename)
     {
         $spreadsheet = $this->generateLowStockSpreadsheet($data);
+
         return $this->downloadResponse($spreadsheet, $filename);
     }
 

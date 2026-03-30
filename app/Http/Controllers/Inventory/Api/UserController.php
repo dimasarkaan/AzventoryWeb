@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -22,9 +21,10 @@ class UserController extends Controller
             if ($request->user()->role !== \App\Enums\UserRole::SUPERADMIN) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Hanya Superadmin yang diizinkan mengakses manajemen user.'
+                    'message' => 'Hanya Superadmin yang diizinkan mengakses manajemen user.',
                 ], 403);
             }
+
             return $next($request);
         });
     }
@@ -56,7 +56,7 @@ class UserController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'data' => $users
+            'data' => $users,
         ]);
     }
 
@@ -100,8 +100,8 @@ class UserController extends Controller
             'data' => [
                 'user' => $user,
                 'temporary_username' => $username,
-                'temporary_password' => $password
-            ]
+                'temporary_password' => $password,
+            ],
         ], 201);
     }
 
@@ -112,13 +112,13 @@ class UserController extends Controller
     {
         $user = User::withTrashed()->with(['borrowings.sparepart'])->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User tidak ditemukan'], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $user
+            'data' => $user,
         ]);
     }
 
@@ -137,13 +137,13 @@ class UserController extends Controller
         ]);
 
         $user->update($validated);
-        
+
         $this->logActivity('User Diupdate (API)', "Data user '{$user->name}' diperbarui via API.");
 
         return response()->json([
             'status' => 'success',
             'message' => 'User berhasil diperbarui',
-            'data' => $user
+            'data' => $user,
         ]);
     }
 
@@ -165,7 +165,7 @@ class UserController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Password berhasil direset ke default',
-            'temporary_password' => $password
+            'temporary_password' => $password,
         ]);
     }
 
@@ -185,12 +185,12 @@ class UserController extends Controller
         }
 
         $user->delete();
-        
+
         $this->logActivity('User Dihapus (API)', "User '{$user->name}' dihapus (soft-delete) via API.");
 
         return response()->json([
             'status' => 'success',
-            'message' => 'User berhasil dihapus'
+            'message' => 'User berhasil dihapus',
         ]);
     }
 }

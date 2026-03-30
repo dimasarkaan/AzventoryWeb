@@ -2,15 +2,15 @@
 
 namespace App\Notifications;
 
-use App\Models\StockLog;
 use App\Enums\UserRole;
+use App\Models\StockLog;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class StockRequestNotification extends Notification implements ShouldQueue, ShouldBroadcast
+class StockRequestNotification extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
 
@@ -42,9 +42,9 @@ class StockRequestNotification extends Notification implements ShouldQueue, Shou
         }
 
         return [
-            'stock_log_id'     => $this->stockLog->id,
-            'message'          => $this->message,
-            'url'              => $url,
+            'stock_log_id' => $this->stockLog->id,
+            'message' => $this->message,
+            'url' => $url,
             'rejection_reason' => $this->stockLog->rejection_reason,
         ];
     }

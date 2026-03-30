@@ -71,4 +71,3 @@ class TesResetPassword extends TestCase
         });
     }
 }
-

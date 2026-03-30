@@ -125,4 +125,3 @@ class TesBroadcasting extends TestCase
             ])->assertSessionHas('error'); // Ditolak karena tidak cukup
     }
 }
-

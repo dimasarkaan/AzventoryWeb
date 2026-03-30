@@ -106,4 +106,3 @@ class TesKebijakanInventaris extends TestCase
         $this->delete(route('inventory.force-delete', $inventory))->assertForbidden();
     }
 }
-

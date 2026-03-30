@@ -405,4 +405,3 @@ class TesKonfirmasiPenggabungan extends TestCase
         ]);
     }
 }
-

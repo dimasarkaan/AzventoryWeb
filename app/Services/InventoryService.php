@@ -7,9 +7,9 @@ use App\Models\Sparepart;
 use App\Models\StockLog;
 use App\Models\User;
 use App\Notifications\ApproachingStockNotification;
+use App\Notifications\ItemReturnedNotification;
 use App\Notifications\LowStockNotification;
 use App\Notifications\StockRequestNotification;
-use App\Notifications\ItemReturnedNotification;
 use App\Traits\ActivityLogger;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
@@ -23,6 +23,7 @@ class InventoryService
     use ActivityLogger;
 
     protected $imageOptimizer;
+
     protected $qrCodeService;
 
     public function __construct(ImageOptimizationService $imageOptimizer, QrCodeService $qrCodeService)
@@ -126,8 +127,8 @@ class InventoryService
                     $this->logActivity('Stok Diupdate', $message, [
                         'stock' => [
                             'old' => $existingItem->stock - $data['stock'],
-                            'new' => $existingItem->stock
-                        ]
+                            'new' => $existingItem->stock,
+                        ],
                     ]);
                     $this->clearCache();
                     $this->broadcastUpdate($existingItem, 'updated');
@@ -177,9 +178,15 @@ class InventoryService
             ]);
 
             $this->logActivity('Sparepart Dibuat', $message);
-            if ($sparepart->location) $this->syncLocations($sparepart->location);
-            if ($sparepart->category) $this->syncCategories($sparepart->category);
-            if ($sparepart->brand) $this->syncBrands($sparepart->brand);
+            if ($sparepart->location) {
+                $this->syncLocations($sparepart->location);
+            }
+            if ($sparepart->category) {
+                $this->syncCategories($sparepart->category);
+            }
+            if ($sparepart->brand) {
+                $this->syncBrands($sparepart->brand);
+            }
             $this->clearCache();
             $this->broadcastUpdate($sparepart, 'created');
 
@@ -210,12 +217,6 @@ class InventoryService
                 $this->qrCodeService->generate($sparepart);
             }
 
-            // Notifikasi stok rendah jika melampaui ambang batas
-            if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && $sparepart->wasChanged('stock')) {
-                $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                Notification::send($admins, new LowStockNotification($sparepart));
-            }
-
             $changes = [];
             if ($sparepart->isDirty()) {
                 foreach ($sparepart->getDirty() as $key => $value) {
@@ -240,21 +241,23 @@ class InventoryService
             $this->clearCache();
             $this->broadcastUpdate($sparepart, 'updated');
 
-            // Notifikasi stok rendah jika melampaui ambang batas kritis
-            if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
-                $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                Notification::send($admins, new LowStockNotification($sparepart));
+            // Notifikasi stok rendah — hanya kirim jika nilai stok benar-benar berubah di save ini
+            if ($sparepart->wasChanged('stock')) {
+                if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
+                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+                    Notification::send($admins, new LowStockNotification($sparepart));
 
-                $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
-                try {
-                    broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
-                } catch (\Throwable $e) {
+                    $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
+                    try {
+                        broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                    } catch (\Throwable $e) {
+                    }
+
+                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
+                    // Notifikasi approaching: stok menuju minimum (antara 100%-150% dari minimum)
+                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+                    Notification::send($admins, new ApproachingStockNotification($sparepart));
                 }
-
-            } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5) && $sparepart->wasChanged('stock')) {
-                // Notifikasi approaching: stok menuju minimum (antara 100%-150% dari minimum)
-                $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                Notification::send($admins, new ApproachingStockNotification($sparepart));
             }
 
             return ['status' => 'updated', 'message' => __('messages.item_updated'), 'data' => $sparepart];
@@ -573,8 +576,8 @@ class InventoryService
             $this->logActivity('Penggabungan Sparepart', $message, [
                 'stock' => [
                     'old' => $target->stock - $stockToAdd,
-                    'new' => $target->stock
-                ]
+                    'new' => $target->stock,
+                ],
             ]);
             $this->clearCache();
             $this->broadcastUpdate($target, 'updated');
@@ -662,8 +665,8 @@ class InventoryService
             $this->logActivity('Peminjaman Barang', "Meminjam {$data['quantity']} {$sparepart->unit} '{$sparepart->name}'.", [
                 'stock' => [
                     'old' => $sparepart->stock + $data['quantity'],
-                    'new' => $sparepart->stock
-                ]
+                    'new' => $sparepart->stock,
+                ],
             ]);
             $this->clearCache();
             $this->broadcastUpdate($sparepart, 'borrowing', __('messages.realtime_borrowed', ['user' => auth()->user()->name, 'qty' => $data['quantity'], 'name' => $sparepart->name]));
@@ -681,6 +684,9 @@ class InventoryService
             $qty = $data['return_quantity'];
             $condition = $data['return_condition'];
             $originalSparepart = $borrowing->sparepart;
+            // Inisialisasi null agar tidak terjadi undefined variable di notifikasi akhir
+            // jika kondisi pengembalian adalah 'good' (blok else tidak dieksekusi)
+            $translatedCondition = null;
 
             $borrowing->returns()->create([
                 'return_date' => now(),
@@ -714,8 +720,8 @@ class InventoryService
                 $this->logActivity('Pengembalian Barang (Baik)', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi Baik.", [
                     'stock' => [
                         'old' => $originalSparepart->stock - $qty,
-                        'new' => $originalSparepart->stock
-                    ]
+                        'new' => $originalSparepart->stock,
+                    ],
                 ]);
 
             } else {
@@ -738,8 +744,8 @@ class InventoryService
                 $this->logActivity('Pengembalian Barang ('.$translatedCondition.')', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi {$translatedCondition}.", [
                     'stock' => [
                         'old' => $targetItem->stock - $qty,
-                        'new' => $targetItem->stock
-                    ]
+                        'new' => $targetItem->stock,
+                    ],
                 ]);
             }
 
@@ -802,7 +808,7 @@ class InventoryService
             }
 
             $updateData = [
-                'status'      => $status,
+                'status' => $status,
                 'approved_by' => auth()->id(),
             ];
             if ($status === 'rejected' && $rejectionReason) {
@@ -820,7 +826,7 @@ class InventoryService
             if ($status === 'approved' && isset($sparepart)) {
                 $properties['stock'] = [
                     'old' => $oldStock,
-                    'new' => $sparepart->stock
+                    'new' => $sparepart->stock,
                 ];
             }
 
@@ -840,8 +846,8 @@ class InventoryService
             $requester = $stockLog->user;
             if ($requester) {
                 $message = __('ui.notification_stock_request_body', [
-                    'type'   => $stockLog->type,
-                    'name'   => $stockLog->sparepart->name,
+                    'type' => $stockLog->type,
+                    'name' => $stockLog->sparepart->name,
                     'status' => $statusText,
                 ]);
                 Notification::send($requester, new StockRequestNotification($stockLog, $message));

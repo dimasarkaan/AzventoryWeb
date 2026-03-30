@@ -54,4 +54,3 @@ class TesHalamanUtama extends TestCase
         $response->assertSee(date('Y'));
     }
 }
-

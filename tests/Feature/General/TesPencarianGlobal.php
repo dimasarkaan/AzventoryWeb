@@ -106,4 +106,3 @@ class TesPencarianGlobal extends TestCase
         $response->assertUnauthorized();
     }
 }
-

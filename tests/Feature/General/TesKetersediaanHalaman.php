@@ -22,7 +22,9 @@ class TesKetersediaanHalaman extends TestCase
     use RefreshDatabase;
 
     protected User $superadmin;
+
     protected User $admin;
+
     protected User $operator;
 
     protected function setUp(): void
@@ -30,15 +32,15 @@ class TesKetersediaanHalaman extends TestCase
         parent::setUp();
 
         $this->superadmin = User::factory()->create([
-            'role'               => UserRole::SUPERADMIN,
+            'role' => UserRole::SUPERADMIN,
             'password_changed_at' => now(),
         ]);
         $this->admin = User::factory()->create([
-            'role'               => UserRole::ADMIN,
+            'role' => UserRole::ADMIN,
             'password_changed_at' => now(),
         ]);
         $this->operator = User::factory()->create([
-            'role'               => UserRole::OPERATOR,
+            'role' => UserRole::OPERATOR,
             'password_changed_at' => now(),
         ]);
 
@@ -245,4 +247,3 @@ class TesKetersediaanHalaman extends TestCase
         $response->assertRedirect(route('login'));
     }
 }
-

@@ -223,4 +223,3 @@ class TesRequestForm extends TestCase
         $this->assertFalse($validator->fails(), implode(', ', $validator->errors()->all()));
     }
 }
-

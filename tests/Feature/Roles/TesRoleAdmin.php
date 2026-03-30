@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Roles;
 
+use App\Enums\UserRole;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -399,4 +399,3 @@ class TesRoleAdmin extends TestCase
         $response->assertStatus(200);
     }
 }
-

@@ -29,18 +29,18 @@ class TesPeningkatanLogAktivitas extends TestCase
             'user_id' => $this->superAdmin->id,
             'action' => 'Sparepart Diperbarui',
             'description' => 'Test Deskripsi Peningkatan',
-            'properties' => ['test' => ['old' => 'a', 'new' => 'b']]
+            'properties' => ['test' => ['old' => 'a', 'new' => 'b']],
         ]);
 
         $response = $this->actingAs($this->superAdmin)->get(route('reports.activity-logs.index'));
-        
+
         $response->assertStatus(200);
         $response->assertSee('Sparepart Diperbarui');
         $response->assertSee('Test Deskripsi Peningkatan');
-        
+
         $this->assertDatabaseHas('activity_logs', [
             'id' => $log->id,
-            'action' => 'Sparepart Diperbarui'
+            'action' => 'Sparepart Diperbarui',
         ]);
     }
 
@@ -54,7 +54,7 @@ class TesPeningkatanLogAktivitas extends TestCase
         ]);
 
         $response = $this->actingAs($this->superAdmin)->get(route('reports.activity-logs.index', [
-            'subject_type' => 'inventory'
+            'subject_type' => 'inventory',
         ]));
 
         $response->assertViewHas('activityLogs', function ($logs) {
@@ -70,7 +70,7 @@ class TesPeningkatanLogAktivitas extends TestCase
         $log = ActivityLog::create([
             'user_id' => $this->superAdmin->id,
             'action' => 'Test Event',
-            'description' => 'Testing broadcast'
+            'description' => 'Testing broadcast',
         ]);
 
         event(new ActivityLogged($log));
@@ -78,4 +78,3 @@ class TesPeningkatanLogAktivitas extends TestCase
         Event::assertDispatched(ActivityLogged::class);
     }
 }
-

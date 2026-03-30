@@ -83,4 +83,3 @@ class TesAudit extends TestCase
         Queue::assertNotPushed(GenerateReportJob::class);
     }
 }
-

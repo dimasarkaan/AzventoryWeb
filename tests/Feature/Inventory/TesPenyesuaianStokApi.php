@@ -137,4 +137,3 @@ class TesPenyesuaianStokApi extends TestCase
         ])->assertStatus(422);
     }
 }
-

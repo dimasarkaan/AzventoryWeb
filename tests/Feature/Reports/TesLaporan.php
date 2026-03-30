@@ -71,4 +71,3 @@ class TesLaporan extends TestCase
         }
     }
 }
-

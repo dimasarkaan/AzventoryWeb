@@ -46,4 +46,3 @@ class TesPaksaGantiPassword extends TestCase
         $response->assertStatus(200);
     }
 }
-

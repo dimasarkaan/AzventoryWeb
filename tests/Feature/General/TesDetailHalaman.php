@@ -23,10 +23,15 @@ class TesDetailHalaman extends TestCase
     use RefreshDatabase;
 
     protected User $superadmin;
+
     protected User $admin;
+
     protected User $operator;
+
     protected Sparepart $sparepart;
+
     protected Borrowing $borrowing;
+
     protected User $targetUser;
 
     protected function setUp(): void
@@ -34,21 +39,21 @@ class TesDetailHalaman extends TestCase
         parent::setUp();
 
         $this->superadmin = User::factory()->create([
-            'role'               => UserRole::SUPERADMIN,
+            'role' => UserRole::SUPERADMIN,
             'password_changed_at' => now(),
         ]);
         $this->admin = User::factory()->create([
-            'role'               => UserRole::ADMIN,
+            'role' => UserRole::ADMIN,
             'password_changed_at' => now(),
         ]);
         $this->operator = User::factory()->create([
-            'role'               => UserRole::OPERATOR,
+            'role' => UserRole::OPERATOR,
             'password_changed_at' => now(),
         ]);
 
         // Target user untuk test users.show/edit
         $this->targetUser = User::factory()->create([
-            'role'               => UserRole::OPERATOR,
+            'role' => UserRole::OPERATOR,
             'password_changed_at' => now(),
         ]);
 
@@ -57,13 +62,13 @@ class TesDetailHalaman extends TestCase
 
         // Borrowing untuk test borrow.show dan borrow.history
         $this->borrowing = Borrowing::create([
-            'sparepart_id'       => $this->sparepart->id,
-            'user_id'            => $this->operator->id,
-            'borrower_name'      => $this->operator->name,
-            'quantity'           => 1,
-            'borrowed_at'        => now(),
+            'sparepart_id' => $this->sparepart->id,
+            'user_id' => $this->operator->id,
+            'borrower_name' => $this->operator->name,
+            'quantity' => 1,
+            'borrowed_at' => now(),
             'expected_return_at' => now()->addDays(7),
-            'status'             => 'borrowed',
+            'status' => 'borrowed',
         ]);
     }
 
@@ -272,4 +277,3 @@ class TesDetailHalaman extends TestCase
         $response->assertRedirect(route('login'));
     }
 }
-

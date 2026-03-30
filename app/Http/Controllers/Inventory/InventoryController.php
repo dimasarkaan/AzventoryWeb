@@ -280,7 +280,7 @@ class InventoryController extends Controller
 
         Sparepart::whereIn('id', $ids)->delete();
 
-        return response()->json(['message' => 'Berhasil menghapus ' . $count . ' item.']);
+        return response()->json(['message' => 'Berhasil menghapus '.$count.' item.']);
     }
 
     /**
@@ -300,11 +300,11 @@ class InventoryController extends Controller
 
         $this->logActivity(
             'Cetak Label',
-            "Mencetak total " . $total . " label untuk " . count($ids) . " item inventaris.",
+            'Mencetak total '.$total.' label untuk '.count($ids).' item inventaris.',
             [
                 'item_ids' => $ids,
                 'counts' => $counts,
-                'total_labels' => $total
+                'total_labels' => $total,
             ]
         );
 

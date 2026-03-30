@@ -74,7 +74,7 @@ class Sparepart extends Model
      */
     public function getProblemChronologyAttribute()
     {
-        if (!in_array($this->condition, ['Rusak', 'Hilang'])) {
+        if (! in_array($this->condition, ['Rusak', 'Hilang'])) {
             return null;
         }
 
@@ -93,7 +93,8 @@ class Sparepart extends Model
             if ($latestReturn) {
                 $userName = $latestReturn->borrowing->borrower_name ?? 'Seseorang';
                 $date = $latestReturn->created_at->format('d M Y');
-                $note = $latestReturn->notes ? " - Catatan: {$latestReturn->notes}" : "";
+                $note = $latestReturn->notes ? " - Catatan: {$latestReturn->notes}" : '';
+
                 return "Dikembalikan oleh {$userName} pada {$date}{$note}";
             }
         }
@@ -102,9 +103,10 @@ class Sparepart extends Model
         $latestLog = $this->stockLogs->first();
         if ($latestLog && $latestLog->reason) {
             $date = $latestLog->created_at->format('d M Y');
+
             return "Update log pada {$date} - {$latestLog->reason}";
         }
 
-        return "Tidak ada riwayat catatan.";
+        return 'Tidak ada riwayat catatan.';
     }
 }

@@ -183,9 +183,27 @@
 
         const handleResult = (decodedText) => {
             const resultDiv = document.getElementById('result');
+            const errorDiv = document.getElementById('error-message');
+
+            // Validasi keamanan: hanya izinkan redirect ke domain sistem ini
+            // Mencegah open redirect jika QR berisi URL eksternal
+            try {
+                const url = new URL(decodedText);
+                if (url.origin !== window.location.origin) {
+                    document.getElementById('error-text').innerText = 'QR Code ini tidak berasal dari sistem Azventory. Scan dibatalkan.';
+                    errorDiv.classList.remove('hidden');
+                    return;
+                }
+            } catch (e) {
+                // Bukan URL yang valid sama sekali
+                document.getElementById('error-text').innerText = 'Format QR Code tidak valid atau tidak dikenali.';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+
             resultDiv.classList.remove('hidden');
-            
-            // Redirect
+
+            // Redirect setelah terkonfirmasi aman
             setTimeout(() => {
                 window.location.href = decodedText;
             }, 1000);

@@ -42,4 +42,3 @@ class TesKonfirmasiPassword extends TestCase
         $response->assertSessionHasErrors();
     }
 }
-

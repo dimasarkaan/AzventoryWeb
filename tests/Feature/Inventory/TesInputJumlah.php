@@ -45,4 +45,3 @@ class TesInputJumlah extends TestCase
         $response->assertSee("quantity: ''", false);
     }
 }
-

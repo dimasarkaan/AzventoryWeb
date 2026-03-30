@@ -5,8 +5,8 @@ namespace Tests\Feature\General;
 use App\Enums\UserRole;
 use App\Models\Sparepart;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -27,9 +27,13 @@ class TesEndpointUnduh extends TestCase
     use RefreshDatabase;
 
     protected User $superadmin;
+
     protected User $admin;
+
     protected User $operator;
+
     protected Sparepart $sparepart;
+
     protected Sparepart $sparepartWithQr;
 
     protected function setUp(): void
@@ -37,15 +41,15 @@ class TesEndpointUnduh extends TestCase
         parent::setUp();
 
         $this->superadmin = User::factory()->create([
-            'role'               => UserRole::SUPERADMIN,
+            'role' => UserRole::SUPERADMIN,
             'password_changed_at' => now(),
         ]);
         $this->admin = User::factory()->create([
-            'role'               => UserRole::ADMIN,
+            'role' => UserRole::ADMIN,
             'password_changed_at' => now(),
         ]);
         $this->operator = User::factory()->create([
-            'role'               => UserRole::OPERATOR,
+            'role' => UserRole::OPERATOR,
             'password_changed_at' => now(),
         ]);
 
@@ -53,13 +57,13 @@ class TesEndpointUnduh extends TestCase
         $this->sparepart = Sparepart::factory()->create(['stock' => 5]);
 
         Storage::fake('public');
-        
+
         // Sparepart dengan qr_code_path — untuk test print label
         $this->sparepartWithQr = Sparepart::factory()->create([
-            'stock'        => 5,
+            'stock' => 5,
             'qr_code_path' => 'qr_codes/test_qr.svg',
         ]);
-        
+
         Storage::disk('public')->put($this->sparepartWithQr->qr_code_path, 'dummy content');
     }
 
@@ -216,4 +220,3 @@ class TesEndpointUnduh extends TestCase
         $response->assertRedirect(route('login'));
     }
 }
-

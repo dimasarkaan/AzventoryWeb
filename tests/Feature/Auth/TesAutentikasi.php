@@ -46,4 +46,3 @@ class TesAutentikasi extends TestCase
         $this->assertGuest();
     }
 }
-

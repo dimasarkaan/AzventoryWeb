@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
-use App\Traits\ActivityLogger;
-
 class PasswordController extends Controller
 {
     use ActivityLogger;
+
     /**
      * Memperbarui password pengguna.
      */
@@ -21,8 +21,8 @@ class PasswordController extends Controller
         $validated = $request->validateWithBag('updatePassword', [
             'current_password' => ['required', 'current_password'],
             'password' => [
-                'required', 
-                Password::min(8)->max(16)->letters()->numbers(), 
+                'required',
+                Password::min(8)->max(16)->letters()->numbers(),
                 'confirmed',
                 function ($attribute, $value, $fail) {
                     if (Hash::check($value, auth()->user()->password)) {

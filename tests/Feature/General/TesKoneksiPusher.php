@@ -90,4 +90,3 @@ class TesKoneksiPusher extends TestCase
         $this->assertArrayHasKey('auth', $response->json());
     }
 }
-

@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Sparepart;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 
 class GenerateQrCodes extends Command
 {

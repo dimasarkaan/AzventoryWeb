@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Inventory\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Borrowing;
 use App\Models\Sparepart;
-use App\Services\InventoryService;
 use App\Services\ImageOptimizationService;
+use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class BorrowingController extends Controller
 {
     protected $inventoryService;
+
     protected $imageOptimizer;
 
     public function __construct(InventoryService $inventoryService, ImageOptimizationService $imageOptimizer)
@@ -76,12 +77,12 @@ class BorrowingController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Peminjaman berhasil dicatat via API',
-                'data' => $borrowing->load(['sparepart', 'user'])
+                'data' => $borrowing->load(['sparepart', 'user']),
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 400);
         }
     }
@@ -93,13 +94,13 @@ class BorrowingController extends Controller
     {
         $borrowing = Borrowing::with(['user', 'sparepart', 'returns'])->find($id);
 
-        if (!$borrowing) {
+        if (! $borrowing) {
             return response()->json(['message' => 'Data peminjaman tidak ditemukan'], 404);
         }
 
         return response()->json([
             'status' => 'success',
-            'data' => $borrowing
+            'data' => $borrowing,
         ]);
     }
 
@@ -115,10 +116,10 @@ class BorrowingController extends Controller
         }
 
         $validated = $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $borrowing->quantity,
+            'quantity' => 'required|integer|min:1|max:'.$borrowing->quantity,
             'condition' => 'required|string',
             'notes' => 'nullable|string',
-            // Photos handling via API might be tricky depending on client, 
+            // Photos handling via API might be tricky depending on client,
             // but we'll support base64 or file if provided.
         ]);
 
@@ -143,12 +144,12 @@ class BorrowingController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Pengembalian berhasil dicatat',
-                'data' => $borrowing->fresh(['sparepart', 'returns'])
+                'data' => $borrowing->fresh(['sparepart', 'returns']),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 400);
         }
     }

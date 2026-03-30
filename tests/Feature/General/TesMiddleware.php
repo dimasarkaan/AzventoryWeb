@@ -117,4 +117,3 @@ class TesMiddleware extends TestCase
         $response->assertOk();
     }
 }
-

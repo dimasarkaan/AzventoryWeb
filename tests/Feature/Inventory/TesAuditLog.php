@@ -33,7 +33,7 @@ class TesAuditLog extends TestCase
             ]);
 
         $response->assertRedirect();
-        
+
         $this->assertDatabaseHas('activity_logs', [
             'action' => 'User Diupdate',
             'user_id' => $superadmin->id,
@@ -49,20 +49,20 @@ class TesAuditLog extends TestCase
     public function ekspor_laporan_excel_mencatat_log_audit()
     {
         $admin = User::factory()->create(['role' => UserRole::ADMIN]);
-        
+
         // Mocking Excel export response to be fast
         $response = $this->actingAs($admin)
             ->get(route('reports.download', [
                 'report_type' => 'inventory_list',
                 'export_format' => 'excel',
-                'period' => 'all'
+                'period' => 'all',
             ]));
 
         $this->assertDatabaseHas('activity_logs', [
             'action' => 'Laporan Diunduh (Excel)',
             'user_id' => $admin->id,
         ]);
-        
+
         $log = ActivityLog::where('action', 'Laporan Diunduh (Excel)')->first();
         $this->assertStringContainsString('inventory_list', $log->description);
     }
@@ -82,7 +82,7 @@ class TesAuditLog extends TestCase
             'sparepart_id' => $sparepart->id,
             'borrower_name' => $operator->name,
             'quantity' => 5,
-            'status' => 'borrowed'
+            'status' => 'borrowed',
         ]);
 
         // Simulasikan pengembalian via InventoryService (trigger by controller)
@@ -91,7 +91,7 @@ class TesAuditLog extends TestCase
                 'return_quantity' => 5,
                 'return_condition' => 'good',
                 'return_notes' => 'Kembali aman',
-                'return_photos' => [\Illuminate\Http\UploadedFile::fake()->image('bukti.jpg')]
+                'return_photos' => [\Illuminate\Http\UploadedFile::fake()->image('bukti.jpg')],
             ]);
 
         Notification::assertSentTo(

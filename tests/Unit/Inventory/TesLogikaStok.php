@@ -41,4 +41,3 @@ class TesLogikaStok extends TestCase
         $this->assertEquals(0, $newStock, 'Stok tidak boleh di bawah nol.');
     }
 }
-

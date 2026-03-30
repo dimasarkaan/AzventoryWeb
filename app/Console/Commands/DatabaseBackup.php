@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\User;
 use App\Enums\UserRole;
 use App\Mail\DatabaseBackupMail;
+use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -34,16 +34,16 @@ class DatabaseBackup extends Command
         $this->info('Memulai pencadangan database...');
         ini_set('memory_limit', '512M'); // Tingkatkan memori untuk encoding lampiran
 
-        $basename = "backup_" . config('app.name') . "_" . now()->format('Y-m-d_H-i-s');
-        $sqlFilename = $basename . ".sql";
-        $zipFilename = $basename . ".zip";
-        
+        $basename = 'backup_'.config('app.name').'_'.now()->format('Y-m-d_H-i-s');
+        $sqlFilename = $basename.'.sql';
+        $zipFilename = $basename.'.zip';
+
         $disk = Storage::disk('local');
-        $path = $disk->path("backups/" . $sqlFilename);
-        $zipPath = $disk->path("backups/" . $zipFilename);
+        $path = $disk->path('backups/'.$sqlFilename);
+        $zipPath = $disk->path('backups/'.$zipFilename);
 
         // Pastikan folder backup ada
-        if (!$disk->exists('backups')) {
+        if (! $disk->exists('backups')) {
             $disk->makeDirectory('backups');
         }
 
@@ -67,31 +67,35 @@ class DatabaseBackup extends Command
 
             if ($returnVar !== 0) {
                 $this->error('Gagal menjalankan mysqldump. Pastikan mysqldump terinstal di server.');
-                Log::error('Backup DB Gagal: ' . implode("\n", $output));
+                Log::error('Backup DB Gagal: '.implode("\n", $output));
+
                 return 1;
             }
         } elseif ($connection === 'sqlite') {
             $dbPath = $dbConfig['database'];
-            if (!file_exists($dbPath)) {
+            if (! file_exists($dbPath)) {
                 $this->error("File database SQLite tidak ditemukan di: {$dbPath}");
+
                 return 1;
             }
             copy($dbPath, $path);
         } else {
             $this->error("Koneksi '{$connection}' tidak didukung untuk pencadangan otomatis ini.");
+
             return 1;
         }
 
         $this->info("Backup database berhasil disimpan di: {$path}");
 
         // Kompres ke ZIP agar hemat memori saat dikirim
-        $zip = new \ZipArchive();
-        if ($zip->open($zipPath, \ZipArchive::CREATE) === TRUE) {
+        $zip = new \ZipArchive;
+        if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
             $zip->addFile($path, $sqlFilename);
             $zip->close();
             @unlink($path); // Hapus file SQL mentah
         } else {
             $this->error('Gagal membuat file ZIP.');
+
             return 1;
         }
 
@@ -100,6 +104,7 @@ class DatabaseBackup extends Command
 
         if ($superadmins->isEmpty()) {
             $this->warn('Tidak ada Superadmin untuk dikirimkan backup.');
+
             return 0;
         }
 

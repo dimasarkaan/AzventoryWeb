@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Dashboard;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 
 class OperatorDashboardController extends Controller
 {
@@ -14,7 +13,7 @@ class OperatorDashboardController extends Controller
     {
         $userId = auth()->id();
         $lastUpdate = \Illuminate\Support\Facades\Cache::get('inventory_last_updated', now()->timestamp);
-        $cacheKey = "operator_dashboard_{$userId}_{$lastUpdate}_" . request('trend_period', '6_months');
+        $cacheKey = "operator_dashboard_{$userId}_{$lastUpdate}_".request('trend_period', '6_months');
 
         $data = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($userId) {
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart'])
@@ -112,7 +111,7 @@ class OperatorDashboardController extends Controller
                 ->select('borrowed_at', 'expected_return_at', 'returned_at')
                 ->get();
 
-            $groupedTrend = $trendRawData->groupBy(fn($item) => $item->borrowed_at->format($config['format']));
+            $groupedTrend = $trendRawData->groupBy(fn ($item) => $item->borrowed_at->format($config['format']));
 
             $borrowingTrend = collect(range($config['count'] - 1, 0))->map(function ($offset) use ($config, $groupedTrend) {
                 $date = now()->{'sub'.ucfirst($config['unit'])}($offset);

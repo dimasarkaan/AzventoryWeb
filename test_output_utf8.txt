@@ -1,0 +1,887 @@
+﻿
+   WARN  Metadata found in doc-comment for method Tests\Feature\Users\LogoutUserNonaktifTest::user_nonaktif_otomatis_terlogout_dari_halaman_profil(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Metadata found in doc-comment for method Tests\Feature\Users\LogoutUserNonaktifTest::user_nonaktif_tidak_bisa_login(). Metadata in doc-comments is deprecated and will no longer be supported in PHPUnit 12. Update your test code to use attributes instead.
+
+   WARN  Cannot add file E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\tests\Feature\Api\ApiDataMasterTest.php to test suite "Feature" as it was already added to test suite "Feature"
+
+   WARN  Cannot add file E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\tests\Feature\Api\ApiManajemenUserTest.php to test suite "Feature" as it was already added to test suite "Feature"
+
+   WARN  Cannot add file E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\tests\Feature\Api\ApiSistemTest.php to test suite "Feature" as it was already added to test suite "Feature"
+
+   WARN  Cannot add file E:\KULI AH\Semester\Semester 8\Tugas Akhir\Web 2\AzventoryWeb\tests\Feature\Users\LogoutUserNonaktifTest.php to test suite "Feature" as it was already added to test suite "Feature"
+
+   PASS  Tests\Unit\Events\TesEvent
+  Γ£ô stock critical event brΓÇª 0.39s  
+  Γ£ô stock critical event brΓÇª 0.04s  
+  Γ£ô stock critical event brΓÇª 0.03s  
+  Γ£ô stock critical event peΓÇª 0.03s  
+  Γ£ô inventory updated eventΓÇª 0.02s  
+  Γ£ô inventory updated eventΓÇª 0.02s  
+  Γ£ô borrowing status changeΓÇª 0.03s  
+  Γ£ô borrowing status changeΓÇª 0.02s  
+  Γ£ô stock request event broΓÇª 0.02s  
+  Γ£ô stock request event broΓÇª 0.03s  
+  Γ£ô activity logged event bΓÇª 0.02s  
+
+   PASS  Tests\Unit\Http\Requests\TesRequestForm
+  Γ£ô store sparepart requestΓÇª 0.03s  
+  Γ£ô store sparepart harga wΓÇª 0.02s  
+  Γ£ô store sparepart harga tΓÇª 0.02s  
+  Γ£ô store sparepart age harΓÇª 0.02s  
+  Γ£ô store sparepart stok tiΓÇª 0.02s  
+  Γ£ô update sparepart requesΓÇª 0.02s  
+  Γ£ô update sparepart requesΓÇª 0.02s  
+  Γ£ô store user request gagaΓÇª 0.02s  
+  Γ£ô store user request gagaΓÇª 0.02s  
+  Γ£ô store user request loloΓÇª 0.02s  
+
+   PASS  Tests\Unit\Inventory\TesLogikaStok
+  Γ£ô periksa apakah stok renΓÇª 0.01s  
+  Γ£ô periksa apakah stok aman
+  Γ£ô logika stok tidak boleh negatif
+
+   PASS  Tests\Unit\Inventory\TesServisQrCode
+  Γ£ô generate menghasilkan fΓÇª 0.05s  
+  Γ£ô generate menyimpan pathΓÇª 0.04s  
+  Γ£ô get label filename mengΓÇª 0.03s  
+  Γ£ô generate label svg mengΓÇª 0.05s  
+  Γ£ô generate label svg mereΓÇª 0.03s  
+
+   PASS  Tests\Unit\Notifications\TesNotification
+  Γ£ô low stock notificationΓÇª  0.03s  
+  Γ£ô low stock notificationΓÇª  0.02s  
+  Γ£ô low stock notificationΓÇª  0.02s  
+  Γ£ô missing price notificatΓÇª 0.02s  
+  Γ£ô missing price notificatΓÇª 0.03s  
+  Γ£ô stock request notificatΓÇª 0.02s  
+  Γ£ô stock request notificatΓÇª 0.02s  
+  Γ£ô item returned notificatΓÇª 0.03s  
+  Γ£ô overdue borrowing notifΓÇª 0.02s  
+
+   PASS  Tests\Unit\Policies\TesPolicy
+  Γ£ô borrowing policy semuaΓÇª  0.03s  
+  Γ£ô borrowing policy adminΓÇª  0.03s  
+  Γ£ô borrowing policy operatΓÇª 0.03s  
+  Γ£ô borrowing policy hanyaΓÇª  0.03s  
+  Γ£ô borrowing policy semuaΓÇª  0.02s  
+  Γ£ô user policy hanya superΓÇª 0.02s  
+  Γ£ô user policy superadminΓÇª  0.03s  
+  Γ£ô user policy user bisa mΓÇª 0.02s  
+  Γ£ô user policy admin tidakΓÇª 0.02s  
+
+   PASS  Tests\Unit\Services\TesDashboardService
+  Γ£ô menghitung rentang tangΓÇª 0.03s  
+  Γ£ô mengembalikan snapshotΓÇª  0.04s  
+  Γ£ô mengembalikan pergerakaΓÇª 0.04s  
+  Γ£ô mengembalikan item teraΓÇª 0.06s  
+  Γ£ô snapshot low stock tidaΓÇª 0.03s  
+  Γ£ô snapshot low stock tidaΓÇª 0.02s  
+  Γ£ô snapshot low stock inclΓÇª 0.02s  
+  Γ£ô recent activities menghΓÇª 0.03s  
+
+   PASS  Tests\Unit\Services\TesImageService
+  Γ£ô optimize and save mengoΓÇª 0.41s  
+  Γ£ô gambar kecil tidak di rΓÇª 0.06s  
+
+   PASS  Tests\Unit\Services\TesServisInventaris
+  Γ£ô filter pencarian menemuΓÇª 0.03s  
+  Γ£ô filter pencarian menemuΓÇª 0.02s  
+  Γ£ô filter kategori menampiΓÇª 0.02s  
+  Γ£ô filter low stock hanyaΓÇª  0.02s  
+  Γ£ô filter no price menampiΓÇª 0.03s  
+  Γ£ô filter trash menampilkaΓÇª 0.02s  
+  Γ£ô sorting berdasarkan stoΓÇª 0.02s  
+  Γ£ô sorting berdasarkan stoΓÇª 0.02s  
+  Γ£ô get dropdown options meΓÇª 0.03s  
+  Γ£ô filter low stock tidakΓÇª  0.02s  
+  Γ£ô filter low stock tidakΓÇª  0.02s  
+  Γ£ô filter low stock hanyaΓÇª  0.02s  
+
+   PASS  Tests\Feature\Api\ApiDataMasterTest
+  Γ£ô crud brands berhasil viΓÇª 0.08s  
+  Γ£ô crud categories berhasiΓÇª 0.04s  
+  Γ£ô crud locations berhasilΓÇª 0.03s  
+
+   PASS  Tests\Feature\Api\ApiManajemenUserTest
+  Γ£ô superadmin dapat melihaΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô superadmin dapat membuaΓÇª 0.03s  
+  Γ£ô superadmin dapat resetΓÇª  0.03s  
+  Γ£ô superadmin dapat menghaΓÇª 0.03s  
+
+   PASS  Tests\Feature\Api\ApiSistemTest
+  Γ£ô stats mengembalikan datΓÇª 0.04s  
+  Γ£ô me mengembalikan profilΓÇª 0.02s  
+  Γ£ô activity logs hanya bisΓÇª 0.03s  
+  Γ£ô notifications berhasilΓÇª  0.02s  
+
+   PASS  Tests\Feature\Users\LogoutUserNonaktifTest
+  Γ£ô user nonaktif otomatisΓÇª  0.08s  
+  Γ£ô user nonaktif tidak bisΓÇª 0.03s  
+
+   PASS  Tests\Feature\Api\TesApiInventaris
+  Γ£ô semua endpoint ditolakΓÇª  0.03s  
+  Γ£ô index mengembalikan dafΓÇª 0.03s  
+  Γ£ô index dengan filter seaΓÇª 0.02s  
+  Γ£ô index dengan filter catΓÇª 0.03s  
+  Γ£ô index dengan filter perΓÇª 0.03s  
+  Γ£ô index mengembalikan datΓÇª 0.03s  
+  Γ£ô show mengembalikan detaΓÇª 0.02s  
+  Γ£ô show mengembalikan 404ΓÇª  0.02s  
+  Γ£ô show mengembalikan struΓÇª 0.03s  
+  Γ£ô store berhasil membuatΓÇª  0.03s  
+  Γ£ô store berhasil dengan pΓÇª 0.04s  
+  Γ£ô store gagal jika part nΓÇª 0.03s  
+  Γ£ô store gagal jika fieldΓÇª  0.04s  
+  Γ£ô store gagal jika type tΓÇª 0.02s  
+  Γ£ô store gagal jika stockΓÇª  0.02s  
+  Γ£ô store gagal jika statusΓÇª 0.02s  
+  Γ£ô update berhasil mengubaΓÇª 0.04s  
+  Γ£ô update berhasil partialΓÇª 0.04s  
+  Γ£ô update mengembalikan 40ΓÇª 0.02s  
+  Γ£ô update gagal jika partΓÇª  0.02s  
+  Γ£ô update berhasil denganΓÇª  0.03s  
+  Γ£ô destroy berhasil soft dΓÇª 0.03s  
+  Γ£ô destroy mengembalikan 4ΓÇª 0.03s  
+  Γ£ô barang yang sudah dihapΓÇª 0.03s  
+  Γ£ô adjust stock decrementΓÇª  0.03s  
+  Γ£ô adjust stock incrementΓÇª  0.03s  
+  Γ£ô adjust stock gagal jikaΓÇª 0.03s  
+  Γ£ô adjust stock gagal jikaΓÇª 0.03s  
+  Γ£ô adjust stock gagal jikaΓÇª 0.03s  
+  Γ£ô adjust stock gagal jikaΓÇª 0.03s  
+  Γ£ô adjust stock tanpa tokeΓÇª 0.03s  
+  Γ£ô adjust stock tanpa descΓÇª 0.03s  
+  Γ£ô adjust stock mengembaliΓÇª 0.03s  
+  Γ£ô adjust stock mengembaliΓÇª 0.03s  
+  Γ£ô admin dapat mengakses sΓÇª 0.03s  
+  Γ£ô operator dapat mengakseΓÇª 0.03s  
+
+   PASS  Tests\Feature\Api\TesBatasRoleApi
+  Γ£ô operator tidak dapat meΓÇª 0.05s  
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô operator tetap dapat meΓÇª 0.03s  
+
+   PASS  Tests\Feature\Api\TesPenyesuaianStokApi
+  Γ£ô regression adjust stockΓÇª 0.04s  
+  Γ£ô adjust stock decrementΓÇª  0.03s  
+  Γ£ô adjust stock decrementΓÇª  0.03s  
+  Γ£ô adjust stock incrementΓÇª  0.03s  
+  Γ£ô adjust stock gagal jikaΓÇª 0.04s  
+  Γ£ô adjust stock gagal jikaΓÇª 0.03s  
+  Γ£ô adjust stock gagal jikaΓÇª 0.02s  
+  Γ£ô adjust stock gagal tanpΓÇª 0.02s  
+  Γ£ô adjust stock gagal dengΓÇª 0.02s  
+  Γ£ô adjust stock mengembaliΓÇª 0.02s  
+  Γ£ô adjust stock menandai iΓÇª 0.04s  
+  Γ£ô approved by diisi dengaΓÇª 0.03s  
+
+   PASS  Tests\Feature\Api\TesTokenApi
+  Γ£ô superadmin dapat membuaΓÇª 0.03s  
+  Γ£ô superadmin dapat membuaΓÇª 0.03s  
+  Γ£ô pembuatan token gagal jΓÇª 0.03s  
+  Γ£ô admin tidak bisa membuaΓÇª 0.03s  
+  Γ£ô operator tidak bisa memΓÇª 0.03s  
+  Γ£ô guest tidak bisa membuaΓÇª 0.02s  
+  Γ£ô token yang dibuat superΓÇª 0.02s  
+  Γ£ô token yang dibuat superΓÇª 0.03s  
+  Γ£ô token salah ditolak denΓÇª 0.02s  
+  Γ£ô request tanpa header otΓÇª 0.03s  
+  Γ£ô token format bearer harΓÇª 0.02s  
+  Γ£ô superadmin dapat mencabΓÇª 0.02s  
+  Γ£ô token yang dicabut tidaΓÇª 0.04s  
+  Γ£ô superadmin tidak bisa mΓÇª 0.03s  
+  Γ£ô admin tidak bisa mencabΓÇª 0.03s  
+  Γ£ô user baru tidak punya tΓÇª 0.03s  
+  Γ£ô setelah buat token jumlΓÇª 0.03s  
+  Γ£ô setelah cabut token jumΓÇª 0.03s  
+
+   PASS  Tests\Feature\Auth\TesAutentikasi
+  Γ£ô halaman login dapat tamΓÇª 0.05s  
+  Γ£ô user dapat otentikasi mΓÇª 0.04s  
+  Γ£ô user tidak dapat otentiΓÇª 0.24s  
+
+   PASS  Tests\Feature\Auth\TesGantiPassword
+  Γ£ô user baru dapat mengganΓÇª 0.05s  
+  Γ£ô username otomatis menjaΓÇª 0.03s  
+  Γ£ô username harus minimalΓÇª  0.03s  
+  Γ£ô username tidak boleh meΓÇª 0.02s  
+  Γ£ô user baru gagal ganti pΓÇª 0.03s  
+  Γ£ô user baru gagal jika paΓÇª 0.03s  
+  Γ£ô user baru gagal jika paΓÇª 0.03s  
+  Γ£ô user lama harus memasukΓÇª 0.03s  
+  Γ£ô user lama gagal jika paΓÇª 0.03s  
+  Γ£ô setelah ganti passwordΓÇª  0.03s  
+
+   PASS  Tests\Feature\Auth\TesKonfirmasiPassword
+  Γ£ô halaman konfirmasi passΓÇª 0.03s  
+  Γ£ô password dapat dikonfirΓÇª 0.02s  
+  Γ£ô password tidak dikonfirΓÇª 0.23s  
+
+   PASS  Tests\Feature\Auth\TesPaksaGantiPassword
+  Γ£ô user baru diarahkan keΓÇª  0.03s  
+  Γ£ô user dapat mengakses haΓÇª 0.04s  
+  Γ£ô user dengan password yaΓÇª 0.07s  
+
+   PASS  Tests\Feature\Auth\TesResetPassword
+  Γ£ô halaman link reset passΓÇª 0.02s  
+  Γ£ô link reset password dapΓÇª 0.24s  
+  Γ£ô halaman reset passwordΓÇª  0.26s  
+  Γ£ô password dapat diresetΓÇª  0.26s  
+
+   PASS  Tests\Feature\Auth\TesUpdatePassword
+  Γ£ô password dapat diperbarΓÇª 0.04s  
+  Γ£ô password yang benar harΓÇª 0.03s  
+
+   PASS  Tests\Feature\Auth\TesVerifikasiEmail
+  Γ£ô halaman verifikasi emaiΓÇª 0.05s  
+  Γ£ô email dapat diverifikasΓÇª 0.03s  
+  Γ£ô email tidak diverifikasΓÇª 0.02s  
+  Γ£ô notifikasi verifikasi eΓÇª 0.02s  
+
+   PASS  Tests\Feature\Dashboard\TesAksesDashboard
+  Γ£ô superadmin dapat mengakΓÇª 0.12s  
+
+   PASS  Tests\Feature\Dashboard\TesAnalitikDashboard
+  Γ£ô dashboard menampilkan sΓÇª 0.11s  
+  Γ£ô dashboard mengidentifikΓÇª 0.10s  
+  Γ£ô dashboard logika perhitΓÇª 0.10s  
+  Γ£ô dashboard filter tanggaΓÇª 0.03s  
+  Γ£ô dashboard memvalidasi tΓÇª 0.02s  
+  Γ£ô dashboard memvalidasi rΓÇª 0.02s  
+
+   PASS  Tests\Feature\Dashboard\TesDashboard
+  Γ£ô ia dapat memperbarui peΓÇª 0.03s  
+  Γ£ô service dashboard menanΓÇª 0.02s  
+  Γ£ô modal aktivitas dapat dΓÇª 0.10s  
+
+   PASS  Tests\Feature\Dashboard\TesDashboardOperator
+  Γ£ô operator dapat mengakseΓÇª 0.08s  
+  Γ£ô dashboard operator memiΓÇª 0.08s  
+
+   PASS  Tests\Feature\Dashboard\TesDataPergerakanDashboard
+  Γ£ô superadmin dapat mengakΓÇª 0.03s  
+  Γ£ô superadmin movement datΓÇª 0.03s  
+  Γ£ô superadmin movement datΓÇª 0.03s  
+  Γ£ô superadmin movement datΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô admin dapat mengakses eΓÇª 0.03s  
+  Γ£ô admin movement data menΓÇª 0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+
+   PASS  Tests\Feature\General\TesAksesRute
+  Γ£ô halaman publik dapat diΓÇª 0.04s  
+  Γ£ô rute terproteksi mengarΓÇª 0.02s  
+  Γ£ô superadmin dapat mengakΓÇª 0.16s  
+  Γ£ô operator memiliki aksesΓÇª 0.12s  
+  Γ£ô dashboard mengarahkan sΓÇª 0.03s  
+
+   PASS  Tests\Feature\General\TesBroadcasting
+  Γ£ô otorisasi channel privaΓÇª 0.04s  
+  Γ£ô pembaruan inventaris meΓÇª 0.02s  
+  Γ£ô pessimistic locking menΓÇª 0.05s  
+
+   PASS  Tests\Feature\General\TesDetailHalaman
+  Γ£ô superadmin dapat mengakΓÇª 0.05s  
+  Γ£ô admin dapat mengakses fΓÇª 0.05s  
+  Γ£ô operator tidak dapat meΓÇª 0.05s  
+  Γ£ô superadmin dapat mengakΓÇª 0.10s  
+  Γ£ô superadmin dapat mengakΓÇª 0.04s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.03s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô superadmin dapat mengakΓÇª 0.08s  
+  Γ£ô admin dapat mengakses dΓÇª 0.09s  
+  Γ£ô operator dapat mengakseΓÇª 0.12s  
+  Γ£ô superadmin dapat mengakΓÇª 0.08s  
+  Γ£ô admin dapat mengakses hΓÇª 0.09s  
+  Γ£ô operator dapat mengakseΓÇª 0.08s  
+  Γ£ô superadmin dapat mengguΓÇª 0.03s  
+  Γ£ô admin dapat menggunakanΓÇª 0.05s  
+  Γ£ô operator dapat menggunaΓÇª 0.03s  
+  Γ£ô global search mengembalΓÇª 0.04s  
+  Γ£ô superadmin dapat mengakΓÇª 0.03s  
+  Γ£ô admin dapat mengakses aΓÇª 0.05s  
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô guest tidak dapat mengaΓÇª 0.03s  
+  Γ£ô guest tidak dapat mengaΓÇª 0.03s  
+
+   PASS  Tests\Feature\General\TesEndpointUnduh
+  Γ£ô superadmin dapat mengunΓÇª 0.07s  
+  Γ£ô admin dapat mengunduh qΓÇª 0.07s  
+  Γ£ô operator dapat mengunduΓÇª 0.05s  
+  Γ£ô guest tidak dapat menguΓÇª 0.04s  
+  Γ£ô superadmin dapat mengakΓÇª 0.05s  
+  Γ£ô admin dapat mengakses hΓÇª 0.04s  
+  Γ£ô operator dapat mengakseΓÇª 0.04s  
+  Γ£ô print qr mengembalikanΓÇª  0.04s  
+  Γ£ô guest tidak dapat mengaΓÇª 0.03s  
+  Γ£ô check part number mengeΓÇª 0.04s  
+  Γ£ô check part number mengeΓÇª 0.05s  
+  Γ£ô check part number dapatΓÇª 0.04s  
+  Γ£ô check part number dapatΓÇª 0.05s  
+  Γ£ô guest tidak dapat mengaΓÇª 0.03s  
+
+   PASS  Tests\Feature\General\TesEventRealtime
+  Γ£ô event inventory updatedΓÇª 0.13s  
+  Γ£ô event stock critical diΓÇª 0.15s  
+
+   PASS  Tests\Feature\General\TesHalamanUtama
+  Γ£ô halaman landing dapat dΓÇª 0.03s  
+  Γ£ô halaman landing memilikΓÇª 0.02s  
+  Γ£ô halaman landing memilikΓÇª 0.03s  
+  Γ£ô halaman landing memilikΓÇª 0.02s  
+
+   PASS  Tests\Feature\General\TesIntegrity
+  Γ£ô pwa manifest and meta tΓÇª 0.07s  
+  Γ£ô offline page is accessiΓÇª 0.03s  
+  Γ£ô cannot mass assign sensΓÇª 0.02s  
+  Γ£ô borrowing status protecΓÇª 0.02s  
+  Γ£ô dashboard query count iΓÇª 0.38s  
+  Γ£ô stock only changes whenΓÇª 0.03s  
+
+   PASS  Tests\Feature\General\TesKeamanan
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.04s  
+  Γ£ô user tanpa autentikasiΓÇª  0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô operator dapat mengakseΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô admin dapat mengakses dΓÇª 0.05s  
+  Γ£ô superadmin dapat mengakΓÇª 0.15s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.04s  
+
+   PASS  Tests\Feature\General\TesKesehatanHalaman
+  Γ£ô periksa semua halaman uΓÇª 0.21s  
+  Γ£ô periksa semua halaman uΓÇª 0.11s  
+  Γ£ô periksa semua halaman uΓÇª 0.17s  
+  Γ£ô periksa halaman detailΓÇª  0.12s  
+
+   PASS  Tests\Feature\General\TesKetersediaanHalaman
+  Γ£ô superadmin dapat mengakΓÇª 0.05s  
+  Γ£ô superadmin dapat mengakΓÇª 0.07s  
+  Γ£ô superadmin dapat mengakΓÇª 0.04s  
+  Γ£ô superadmin dapat mengakΓÇª 0.05s  
+  Γ£ô superadmin dapat mengakΓÇª 0.05s  
+  Γ£ô superadmin dapat mengakΓÇª 0.06s  
+  Γ£ô admin dapat mengakses hΓÇª 0.04s  
+  Γ£ô admin dapat mengakses hΓÇª 0.04s  
+  Γ£ô admin dapat mengakses hΓÇª 0.04s  
+  Γ£ô admin dapat mengakses hΓÇª 0.04s  
+  Γ£ô admin dapat mengakses hΓÇª 0.04s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.03s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.03s  
+  Γ£ô admin tidak dapat membuΓÇª 0.04s  
+  Γ£ô operator dapat mengakseΓÇª 0.04s  
+  Γ£ô operator dapat mengakseΓÇª 0.04s  
+  Γ£ô operator dapat mengakseΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.05s  
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô guest tidak dapat mengaΓÇª 0.04s  
+  Γ£ô guest tidak dapat mengaΓÇª 0.05s  
+  Γ£ô guest tidak dapat mengaΓÇª 0.05s  
+{#15000
+  +"auth": "610485fdc2e42ca343be:ac403e4d1604507a45db3f678b8ddce29c0d3ffb7b1492648059007fea3e1b4a"
+} // vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:1849
+
+   PASS  Tests\Feature\General\TesKoneksiPusher
+  Γ£ô driver broadcast diaturΓÇª 0.04s  
+  Γ£ô konfigurasi pusher tersΓÇª 0.02s  
+  Γ£ô memancarkan event invenΓÇª 0.04s  
+  Γ£ô endpoint auth broadcastΓÇª 0.04s  
+
+   PASS  Tests\Feature\General\TesLogikaJob
+  Γ£ô generate report job menΓÇª 0.66s  
+  Γ£ô export activity log jobΓÇª 0.70s  
+
+   PASS  Tests\Feature\General\TesLokalisasi
+  Γ£ô tampilan guest terlokalΓÇª 0.03s  
+  Γ£ô tampilan superadmin terΓÇª 0.20s  
+
+   PASS  Tests\Feature\General\TesMiddleware
+  Γ£ô role middleware menolakΓÇª 0.03s  
+  Γ£ô role middleware mengiziΓÇª 0.11s  
+  Γ£ô role middleware logoutΓÇª  0.03s  
+  Γ£ô role middleware admin dΓÇª 0.05s  
+  Γ£ô role middleware operatoΓÇª 0.02s  
+  Γ£ô middleware password chaΓÇª 0.02s  
+  Γ£ô middleware password chaΓÇª 0.13s  
+
+   PASS  Tests\Feature\General\TesPencarianGlobal
+  Γ£ô pencarian terlalu pendeΓÇª 0.04s  
+  Γ£ô pencarian sparepart menΓÇª 0.03s  
+  Γ£ô pencarian tidak mengembΓÇª 0.04s  
+  Γ£ô superadmin dapat mencarΓÇª 0.04s  
+  Γ£ô pencarian mengembalikanΓÇª 0.04s  
+  Γ£ô pencarian tanpa autentiΓÇª 0.03s  
+
+   PASS  Tests\Feature\General\TesPerintahKonsol
+  Γ£ô command kirim notifikasΓÇª 0.03s  
+  Γ£ô command backup databaseΓÇª 0.06s  
+  Γ£ô command cleanup old repΓÇª 0.07s  
+
+   PASS  Tests\Feature\General\TesPerintahTambahan
+  Γ£ô perintah generate qr coΓÇª 0.07s  
+  Γ£ô perintah generate qr coΓÇª 0.05s  
+  Γ£ô perintah generate qr coΓÇª 0.02s  
+  Γ£ô perintah create api tokΓÇª 0.02s  
+  Γ£ô perintah create api tokΓÇª 0.02s  
+
+   PASS  Tests\Feature\General\TesUIFrontend
+  Γ£ô operator tidak dapat meΓÇª 0.05s  
+  Γ£ô admin dapat melihat ediΓÇª 0.03s  
+  Γ£ô operator melihat widgetΓÇª 0.14s  
+  Γ£ô tampilan indeks inventaΓÇª 0.06s  
+
+   PASS  Tests\Feature\Inventory\TesAksiMassalInventaris
+  Γ£ô superadmin dapat memuliΓÇª 0.04s  
+  Γ£ô superadmin dapat menghaΓÇª 0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesAuditLog
+  Γ£ô perubahan peran user meΓÇª 0.03s  
+  Γ£ô ekspor laporan excel meΓÇª 0.10s  
+  Γ£ô pengembalian barang menΓÇª 0.04s  
+
+   PASS  Tests\Feature\Inventory\TesCrudInventaris
+  Γ£ô daftar inventaris dapatΓÇª 0.06s  
+  Γ£ô dapat membuat sparepartΓÇª 0.06s  
+  Γ£ô dapat memperbarui stokΓÇª  0.06s  
+  Γ£ô dapat menghapus sparepaΓÇª 0.05s  
+  Γ£ô superadmin dapat memeriΓÇª 0.05s  
+
+   PASS  Tests\Feature\Inventory\TesDetailPeminjaman
+  Γ£ô halaman detail peminjamΓÇª 0.13s  
+  Γ£ô halaman detail peminjamΓÇª 0.13s  
+  Γ£ô halaman detail peminjamΓÇª 0.03s  
+  Γ£ô endpoint history mengemΓÇª 0.10s  
+  Γ£ô endpoint history mengemΓÇª 0.10s  
+  Γ£ô endpoint history tidakΓÇª  0.04s  
+  Γ£ô endpoint history mengemΓÇª 0.11s  
+
+   PASS  Tests\Feature\Inventory\TesInputJumlah
+  Γ£ô input stok halaman tambΓÇª 0.04s  
+  Γ£ô halaman show alpine menΓÇª 0.11s  
+
+   PASS  Tests\Feature\Inventory\TesInventarisLengkap
+  Γ£ô item duplikat menggabunΓÇª 0.03s  
+  Γ£ô item duplikat menampilkΓÇª 0.03s  
+  Γ£ô buat item baru memvalidΓÇª 0.04s  
+
+   PASS  Tests\Feature\Inventory\TesItemDuplikat
+  Γ£ô stok digabungkan ketikaΓÇª 0.06s  
+  Γ£ô membuat item baru jikaΓÇª  0.07s  
+
+   PASS  Tests\Feature\Inventory\TesKasusBatasInventaris
+  Γ£ô sistem mencegah input sΓÇª 0.03s  
+  Γ£ô sistem mencegah stok neΓÇª 0.03s  
+  Γ£ô tidak dapat menghapus iΓÇª 0.03s  
+  Γ£ô menggabungkan stok jikaΓÇª 0.03s  
+  Γ£ô sistem mencegah bypassΓÇª  0.03s  
+  Γ£ô sistem mencegah kondisiΓÇª 0.05s  
+  Γ£ô sistem mencegah tipe daΓÇª 0.03s  
+  Γ£ô user tidak dapat meminjΓÇª 0.03s  
+  Γ£ô operator hanya dapat meΓÇª 0.05s  
+
+   PASS  Tests\Feature\Inventory\TesKasusBatasPersetujuanStok
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô superadmin dapat menolaΓÇª 0.05s  
+  Γ£ô admin dapat menolak perΓÇª 0.04s  
+  Γ£ô persetujuan stok masukΓÇª  0.04s  
+  Γ£ô persetujuan stok keluarΓÇª 0.04s  
+  Γ£ô persetujuan keluar ditoΓÇª 0.03s  
+  Γ£ô persetujuan stok tidakΓÇª  0.04s  
+  Γ£ô bulk approve memprosesΓÇª  0.05s  
+  Γ£ô bulk reject tanpa alasaΓÇª 0.03s  
+  Γ£ô bulk reject dengan alasΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesKebijakanInventaris
+  Γ£ô superadmin dapat mengakΓÇª 0.26s  
+  Γ£ô admin dapat mengakses sΓÇª 0.12s  
+  Γ£ô operator hanya dapat meΓÇª 0.17s  
+
+   PASS  Tests\Feature\Inventory\TesKonfirmasiPenggabungan
+  Γ£ô edit barang tanpa dupliΓÇª 0.04s  
+  Γ£ô edit barang yang menjadΓÇª 0.04s  
+  Γ£ô user pilih merge stockΓÇª  0.03s  
+  Γ£ô user pilih keep separatΓÇª 0.03s  
+  Γ£ô merge transfer borrowinΓÇª 0.03s  
+  Γ£ô cannot merge if item cuΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesLokasiDinamis
+  Γ£ô lokasi default selalu aΓÇª 0.03s  
+  Γ£ô lokasi baru tersimpan dΓÇª 0.05s  
+  Γ£ô lokasi default tidak duΓÇª 0.03s  
+  Γ£ô superadmin dapat mengakΓÇª 0.04s  
+  Γ£ô admin dapat mengakses hΓÇª 0.05s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesManajemenBrand
+  Γ£ô superadmin dapat melihaΓÇª 0.03s  
+  Γ£ô superadmin dapat menyimΓÇª 0.03s  
+  Γ£ô superadmin dapat mengubΓÇª 0.03s  
+  Γ£ô superadmin tidak dapatΓÇª  0.02s  
+  Γ£ô superadmin dapat menghaΓÇª 0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesManajemenKategori
+  Γ£ô superadmin dapat melihaΓÇª 0.04s  
+  Γ£ô superadmin dapat menyimΓÇª 0.03s  
+  Γ£ô superadmin dapat mengubΓÇª 0.03s  
+  Γ£ô superadmin tidak dapatΓÇª  0.04s  
+  Γ£ô superadmin dapat menghaΓÇª 0.03s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesManajemenLokasi
+  Γ£ô superadmin dapat melihaΓÇª 0.03s  
+  Γ£ô superadmin dapat menyimΓÇª 0.03s  
+  Γ£ô superadmin dapat mengubΓÇª 0.03s  
+  Γ£ô superadmin tidak dapatΓÇª  0.02s  
+  Γ£ô superadmin dapat menghaΓÇª 0.02s  
+  Γ£ô operator tidak dapat meΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesOptimasiDanAksiInventaris
+  Γ£ô superadmin dapat mengubΓÇª 0.03s  
+  Γ£ô item brand nonaktif tidΓÇª 0.06s  
+  Γ£ô admin dapat menjalankanΓÇª 0.04s  
+  Γ£ô cetak label massal dapaΓÇª 0.05s  
+  Γ£ô admin dibatasi akses haΓÇª 0.03s  
+  Γ£ô admin dibatasi akses reΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesPeminjaman
+  Γ£ô superadmin dapat meminjΓÇª 0.06s  
+  Γ£ô superadmin tidak dapatΓÇª  0.03s  
+  Γ£ô superadmin dapat mengemΓÇª 0.04s  
+
+   PASS  Tests\Feature\Inventory\TesPeminjamanKompleks
+  Γ£ô pengembalian parsial beΓÇª 0.03s  
+  Γ£ô integritas data saat baΓÇª 0.03s  
+  Γ£ô integritas data saat usΓÇª 0.04s  
+
+   PASS  Tests\Feature\Inventory\TesPencetakanLabel
+  Γ£ô superadmin dapat mengakΓÇª 0.03s  
+  Γ£ô admin dapat mengakses hΓÇª 0.03s  
+  Γ£ô superadmin dapat mengakΓÇª 0.05s  
+  Γ£ô halaman cetak banyak meΓÇª 0.04s  
+  Γ£ô operator dapat mengakseΓÇª 0.04s  
+  Γ£ô halaman cetak satuan reΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô operator tidak dapat meΓÇª 0.04s  
+  Γ£ô cetak banyak dibatasi mΓÇª 0.03s  
+  Γ£ô pencetakan mencatat logΓÇª 0.03s  
+  Γ£ô hanya user terautentikaΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesPengembalianPinjaman
+  Γ£ô validasi pengembalian iΓÇª 0.03s  
+  Γ£ô validasi pengembalian iΓÇª 0.03s  
+  Γ£ô pengembalian item berhaΓÇª 0.03s  
+  Γ£ô pengembalian item dengaΓÇª 0.05s  
+
+   PASS  Tests\Feature\Inventory\TesPenyesuaianStokApi
+  Γ£ô api adjust stock decremΓÇª 0.04s  
+  Γ£ô api adjust stock incremΓÇª 0.02s  
+  Γ£ô api adjust stock gagalΓÇª  0.02s  
+  Γ£ô api adjust stock ditolaΓÇª 0.02s  
+  Γ£ô api adjust stock gagalΓÇª  0.02s  
+  Γ£ô api adjust stock validaΓÇª 0.02s  
+
+   PASS  Tests\Feature\Inventory\TesPermintaanStok
+  Γ£ô operator dapat mengajukΓÇª 0.05s  
+  Γ£ô operator dapat mengajukΓÇª 0.03s  
+  Γ£ô admin mengajukan stok mΓÇª 0.03s  
+  Γ£ô superadmin mengajukan sΓÇª 0.05s  
+  Γ£ô pengajuan stok keluar gΓÇª 0.04s  
+  Γ£ô validasi gagal jika quaΓÇª 0.04s  
+  Γ£ô validasi gagal jika reaΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesPersetujuanStok
+  Γ£ô superadmin dapat melihaΓÇª 0.06s  
+  Γ£ô superadmin dapat menyetΓÇª 0.04s  
+  Γ£ô superadmin dapat menolaΓÇª 0.03s  
+  Γ£ô reject tanpa alasan gagΓÇª 0.03s  
+  Γ£ô reject menyimpan alasanΓÇª 0.04s  
+  Γ£ô pesan success approve bΓÇª 0.04s  
+  Γ£ô halaman approval mendukΓÇª 0.05s  
+  Γ£ô halaman approval mendukΓÇª 0.04s  
+  Γ£ô rejection reason maksimΓÇª 0.03s  
+  Γ£ô notifikasi operator menΓÇª 0.03s  
+  Γ£ô filter kombinasi searchΓÇª 0.04s  
+  Γ£ô halaman approval mendukΓÇª 0.09s  
+
+   PASS  Tests\Feature\Inventory\TesRealTime
+  Γ£ô mengirim event inventorΓÇª 0.15s  
+  Γ£ô mengirim event stock apΓÇª 0.13s  
+  Γ£ô mengirim event stock apΓÇª 0.14s  
+
+   PASS  Tests\Feature\Inventory\TesServisInventarisTahap5
+  Γ£ô create borrowing otomatΓÇª 0.03s  
+  Γ£ô return borrowing good cΓÇª 0.03s  
+  Γ£ô approve stock request mΓÇª 0.03s  
+  Γ£ô bulk approve via controΓÇª 0.04s  
+  Γ£ô approve stock request kΓÇª 0.03s  
+
+   PASS  Tests\Feature\Inventory\TesTransaksiInventaris
+  Γ£ô membuat sparepart membuΓÇª 0.07s  
+  Γ£ô memperbarui sparepart dΓÇª 0.06s  
+  Γ£ô menghapus lunak sparepaΓÇª 0.07s  
+  Γ£ô memulihkan sparepart daΓÇª 0.07s  
+  Γ£ô menghapus permanen sparΓÇª 0.09s  
+  Γ£ô menangani penggabunganΓÇª  0.08s  
+
+   PASS  Tests\Feature\Inventory\TesValidasiInventaris
+  Γ£ô guest tidak bisa aksesΓÇª  0.06s  
+  Γ£ô guest tidak bisa aksesΓÇª  0.10s  
+  Γ£ô guest tidak bisa aksesΓÇª  0.12s  
+  Γ£ô store inventory gagal jΓÇª 0.13s  
+  Γ£ô store inventory gagal jΓÇª 0.06s  
+  Γ£ô store inventory gagal jΓÇª 0.12s  
+  Γ£ô operator tidak bisa menΓÇª 0.13s  
+  Γ£ô operator tidak bisa menΓÇª 0.08s  
+  Γ£ô semua role dapat melihaΓÇª 0.35s  
+  Γ£ô superadmin dapat mengakΓÇª 0.07s  
+  Γ£ô superadmin dapat mendowΓÇª 0.10s  
+  Γ£ô superadmin dapat memuliΓÇª 0.07s  
+  Γ£ô superadmin dapat hapusΓÇª  0.08s  
+  Γ£ô inventory tidak bisa diΓÇª 0.10s  
+  Γ£ô operator tidak bisa menΓÇª 0.12s  
+  Γ£ô superadmin dan admin biΓÇª 0.16s  
+
+   PASS  Tests\Feature\Notifications\TesKontrollerNotifikasi
+  Γ£ô halaman notifikasi dapaΓÇª 0.14s  
+  Γ£ô halaman notifikasi tidaΓÇª 0.08s  
+  Γ£ô api notifikasi mengembaΓÇª 0.06s  
+  Γ£ô pengguna dapat menandaiΓÇª 0.06s  
+  Γ£ô pengguna dapat menandaiΓÇª 0.08s  
+  Γ£ô api mark all read mengeΓÇª 0.06s  
+  Γ£ô pengguna tidak dapat meΓÇª 0.07s  
+
+   PASS  Tests\Feature\Notifications\TesLogikaNotifikasi
+  Γ£ô notifikasi stok rendahΓÇª  0.10s  
+  Γ£ô notifikasi harga kosongΓÇª 0.09s  
+
+   PASS  Tests\Feature\Notifications\TesLowStock
+  Γ£ô approaching stock notifΓÇª 0.08s  
+  Γ£ô approaching notificatioΓÇª 0.07s  
+
+   PASS  Tests\Feature\Notifications\TesNotifikasi
+  Γ£ô superadmin dapat melihaΓÇª 0.32s  
+  Γ£ô superadmin dapat menandΓÇª 0.06s  
+  Γ£ô notifikasi stok rendahΓÇª  0.05s  
+
+   PASS  Tests\Feature\Profile\TesKasusBatasProfil
+  Γ£ô profil dapat diakses seΓÇª 0.11s  
+  Γ£ô profil tidak dapat diakΓÇª 0.06s  
+  Γ£ô user dapat mengupdate nΓÇª 0.09s  
+  Γ£ô update profil gagal jikΓÇª 0.06s  
+  Γ£ô user tidak bisa hapus aΓÇª 0.06s  
+  Γ£ô user dapat mengupload aΓÇª 0.07s  
+  Γ£ô halaman my inventory haΓÇª 0.10s  
+
+   PASS  Tests\Feature\Profile\TesKontrollerTokenApi
+  Γ£ô superadmin dapat membuaΓÇª 0.07s  
+  Γ£ô admin tidak dapat membuΓÇª 0.07s  
+  Γ£ô membuat api token gagalΓÇª 0.06s  
+  Γ£ô membuat api token gagalΓÇª 0.09s  
+  Γ£ô superadmin dapat mencabΓÇª 0.06s  
+  Γ£ô superadmin tidak bisa mΓÇª 0.06s  
+  Γ£ô admin tidak dapat mencaΓÇª 0.07s  
+
+   PASS  Tests\Feature\Profile\TesProfil
+  Γ£ô halaman profil dapat taΓÇª 0.10s  
+  Γ£ô informasi profil dapatΓÇª  0.05s  
+  Γ£ô status verifikasi emailΓÇª 0.05s  
+  Γ£ô user dapat menghapus akΓÇª 0.06s  
+  Γ£ô password yang benar harΓÇª 0.06s  
+  Γ£ô halaman inventaris sayaΓÇª 0.10s  
+  Γ£ô superadmin terakhir tidΓÇª 0.07s  
+  Γ£ô superadmin dapat menghaΓÇª 0.07s  
+  Γ£ô foto profil dapat dihapΓÇª 0.06s  
+  Γ£ô user tidak dapat menghaΓÇª 0.07s  
+  Γ£ô update profile dengan nΓÇª 0.07s  
+  Γ£ô update password sama deΓÇª 0.08s  
+  Γ£ô update username denganΓÇª  0.06s  
+  Γ£ô username otomatis menjaΓÇª 0.08s  
+  Γ£ô username minimal 3 karaΓÇª 0.08s  
+
+   PASS  Tests\Feature\Profile\TesProfilLanjutan
+  Γ£ô halaman my inventory daΓÇª 0.11s  
+  Γ£ô halaman my inventory tiΓÇª 0.06s  
+  Γ£ô halaman my inventory meΓÇª 0.09s  
+  Γ£ô halaman my inventory tiΓÇª 0.09s  
+  Γ£ô user dapat memperbaruiΓÇª  0.07s  
+  Γ£ô update settings menggabΓÇª 0.06s  
+  Γ£ô update settings gagal jΓÇª 0.06s  
+  Γ£ô update settings tidak dΓÇª 0.07s  
+  Γ£ô halaman scan qr dapat dΓÇª 0.07s  
+  Γ£ô halaman scan qr tidak dΓÇª 0.06s  
+
+   PASS  Tests\Feature\Reports\TesAudit
+  Γ£ô indeks inventaris menggΓÇª 0.18s  
+  Γ£ô pembuatan laporan pdf dΓÇª 1.18s  
+  Γ£ô pembuatan laporan excelΓÇª 0.18s  
+
+   PASS  Tests\Feature\Reports\TesCakupanLogAktivitas
+  Γ£ô operator hanya melihatΓÇª  0.54s  
+  Γ£ô admin tidak bisa melihaΓÇª 0.49s  
+  Γ£ô superadmin bisa melihatΓÇª 0.51s  
+  Γ£ô filter berdasarkan tangΓÇª 0.52s  
+  Γ£ô operator tidak dapat meΓÇª 0.09s  
+
+   PASS  Tests\Feature\Reports\TesIntegritasEkspor
+  Γ£ô isi file excel inventarΓÇª 0.21s  
+
+   PASS  Tests\Feature\Reports\TesIntegritasLaporan
+  Γ£ô job laporan pdf menggunΓÇª 0.10s  
+
+   PASS  Tests\Feature\Reports\TesKontrollerLaporan
+  Γ£ô superadmin dapat mengakΓÇª 0.13s  
+  Γ£ô admin dapat mengakses hΓÇª 0.11s  
+  Γ£ô operator tidak dapat meΓÇª 0.10s  
+  Γ£ô download pdf mendispatcΓÇª 1.14s  
+  Γ£ô download pdf langsung bΓÇª 1.74s  
+  Γ£ô download excel inventorΓÇª 0.22s  
+  Γ£ô download excel stock muΓÇª 0.13s  
+  Γ£ô download excel borrowinΓÇª 0.11s  
+  Γ£ô download excel low stocΓÇª 0.13s  
+  Γ£ô superadmin dapat mengakΓÇª 0.13s  
+  Γ£ô export activity log pdfΓÇª 2.77s  
+  Γ£ô export activity log excΓÇª 0.10s  
+  Γ£ô download dengan tanggalΓÇª 0.10s  
+  Γ£ô download pdf menampilkaΓÇª 1.11s  
+
+   PASS  Tests\Feature\Reports\TesLaporan
+  Γ£ô superadmin dapat mengunΓÇª 1.24s  
+  Γ£ô superadmin dapat mengunΓÇª 0.19s  
+  Γ£ô superadmin dapat mengakΓÇª 0.12s  
+  Γ£ô superadmin dapat mengakΓÇª 0.11s  
+
+   PASS  Tests\Feature\Reports\TesLaporanSistemOtomatis
+  Γ£ô perintah laporan bulanaΓÇª 0.70s  
+
+   PASS  Tests\Feature\Reports\TesLogAktivitas
+  Γ£ô dapat memfilter log berΓÇª 0.59s  
+  Γ£ô dapat mengekspor log keΓÇª 0.20s  
+  Γ£ô ekspor pdf mendorong joΓÇª 2.81s  
+
+   PASS  Tests\Feature\Reports\TesPeningkatanLogAktivitas
+  Γ£ô log aktivitas dapat disΓÇª 0.55s  
+  Γ£ô filter subject type menΓÇª 0.54s  
+  Γ£ô memancarkan event activΓÇª 0.06s  
+
+   PASS  Tests\Feature\Roles\TesRoleAdmin
+  Γ£ô admin dapat mengakses dΓÇª 0.15s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.10s  
+  Γ£ô admin dapat mengakses dΓÇª 0.57s  
+  Γ£ô admin dapat mengakses dΓÇª 0.16s  
+  Γ£ô admin dapat mengakses pΓÇª 0.10s  
+  Γ£ô admin dapat mengakses lΓÇª 0.10s  
+  Γ£ô admin dapat mengakses lΓÇª 0.14s  
+  Γ£ô admin tidak dapat mengaΓÇª 0.10s  
+  Γ£ô admin dapat membuat invΓÇª 0.11s  
+  Γ£ô admin dapat memperbaruiΓÇª 0.10s  
+  Γ£ô admin dapat menghapus lΓÇª 0.09s  
+  Γ£ô admin tidak dapat memulΓÇª 0.08s  
+  Γ£ô admin tidak dapat menghΓÇª 0.09s  
+  Γ£ô admin tidak dapat memulΓÇª 0.14s  
+  Γ£ô admin tidak dapat menghΓÇª 0.09s  
+  Γ£ô admin dapat meminta stoΓÇª 0.11s  
+  Γ£ô admin dapat meminjam itΓÇª 0.10s  
+  Γ£ô admin dapat mengakses pΓÇª 0.18s  
+  Γ£ô admin dapat mengakses tΓÇª 0.14s  
+  Γ£ô admin dapat mengakses dΓÇª 0.54s  
+  Γ£ô admin dapat mengakses eΓÇª 0.16s  
+  Γ£ô admin dapat mengakses sΓÇª 0.11s  
+  Γ£ô admin dapat memeriksa nΓÇª 0.09s  
+  Γ£ô admin dapat mengunduh qΓÇª 0.09s  
+  Γ£ô admin dapat mencetak qrΓÇª 0.11s  
+  Γ£ô admin dapat mengakses rΓÇª 0.56s  
+  Γ£ô admin dapat mengakses dΓÇª 0.54s  
+  Γ£ô admin dapat mengembalikΓÇª 0.09s  
+  Γ£ô admin dapat mengunduh lΓÇª 0.08s  
+  Γ£ô admin dapat mengakses dΓÇª 0.09s  
+
+   PASS  Tests\Feature\Roles\TesRoleOperator
+  Γ£ô operator dapat mengakseΓÇª 0.67s  
+  Γ£ô operator tidak dapat meΓÇª 0.06s  
+  Γ£ô operator tidak dapat meΓÇª 0.08s  
+  Γ£ô operator dapat mengakseΓÇª 0.17s  
+  Γ£ô operator tidak dapat meΓÇª 0.08s  
+  Γ£ô operator tidak dapat meΓÇª 0.08s  
+  Γ£ô operator dapat mengakseΓÇª 0.11s  
+  Γ£ô operator tidak dapat meΓÇª 0.12s  
+  Γ£ô operator tidak dapat meΓÇª 0.18s  
+  Γ£ô operator tidak dapat meΓÇª 0.17s  
+  Γ£ô operator tidak dapat meΓÇª 0.16s  
+  Γ£ô operator tidak dapat meΓÇª 0.09s  
+  Γ£ô operator tidak dapat meΓÇª 0.13s  
+  Γ£ô operator tidak dapat meΓÇª 0.10s  
+  Γ£ô operator tidak dapat meΓÇª 0.09s  
+  Γ£ô operator dapat memintaΓÇª  0.08s  
+  Γ£ô operator dapat meminjamΓÇª 0.11s  
+  Γ£ô operator dapat mengakseΓÇª 0.18s  
+  Γ£ô operator tidak dapat meΓÇª 0.09s  
+  Γ£ô operator dapat mengakseΓÇª 0.64s  
+  Γ£ô operator tidak dapat meΓÇª 0.10s  
+  Γ£ô operator dapat mengakseΓÇª 0.11s  
+  Γ£ô operator dapat memeriksΓÇª 0.08s  
+  Γ£ô operator dapat mengunduΓÇª 0.10s  
+  Γ£ô operator dapat mencetakΓÇª 0.10s  
+  Γ£ô operator dapat mengakseΓÇª 0.85s  
+  Γ£ô operator dapat mengakseΓÇª 0.73s  
+  Γ£ô operator dapat mengembaΓÇª 0.13s  
+  Γ£ô operator tidak dapat meΓÇª 0.11s  
+
+   PASS  Tests\Feature\Roles\TesRoleSuperadmin
+  Γ£ô superadmin dapat mengakΓÇª 0.75s  
+  Γ£ô superadmin dapat mengakΓÇª 0.12s  
+  Γ£ô superadmin dapat mengakΓÇª 0.10s  
+  Γ£ô superadmin dapat mengakΓÇª 0.22s  
+  Γ£ô superadmin dapat mengakΓÇª 0.12s  
+  Γ£ô superadmin dapat mengakΓÇª 0.15s  
+
+   PASS  Tests\Feature\Users\TesAksesUser
+  Γ£ô operator tidak dapat meΓÇª 0.12s  
+  Γ£ô admin tidak dapat melihΓÇª 0.05s  
+  Γ£ô operator tidak dapat meΓÇª 0.06s  
+  Γ£ô operator tidak dapat meΓÇª 0.08s  
+
+   PASS  Tests\Feature\Users\TesKasusBatasUser
+  Γ£ô superadmin dapat melihaΓÇª 0.80s  
+  Γ£ô superadmin dapat melihaΓÇª 0.16s  
+  Γ£ô halaman daftar user tidΓÇª 0.10s  
+  Γ£ô superadmin dapat melihaΓÇª 0.13s  
+  Γ£ô superadmin dapat mencarΓÇª 0.13s  
+  Γ£ô superadmin dapat memfilΓÇª 0.11s  
+  Γ£ô superadmin tidak dapatΓÇª  0.08s  
+  Γ£ô user tidak dapat dihapuΓÇª 0.07s  
+  Γ£ô superadmin dapat menghaΓÇª 0.07s  
+  Γ£ô superadmin dapat memuliΓÇª 0.08s  
+  Γ£ô superadmin dapat hapusΓÇª  0.17s  
+  Γ£ô force delete user gagalΓÇª 0.10s  
+  Γ£ô superadmin dapat mengakΓÇª 0.14s  
+  Γ£ô superadmin dapat memuliΓÇª 0.17s  
+  Γ£ô superadmin dapat menghaΓÇª 0.19s  
+
+   PASS  Tests\Feature\Users\TesManajemenUser
+  Γ£ô superadmin dapat melihaΓÇª 0.21s  
+  Γ£ô superadmin dapat membuaΓÇª 0.14s  
+  Γ£ô superadmin dapat membuaΓÇª 0.14s  
+  Γ£ô superadmin dapat menghaΓÇª 0.11s  
+  Γ£ô superadmin dapat mereseΓÇª 0.11s  
+  Γ£ô superadmin dapat memperΓÇª 0.10s  
+  Γ£ô user tidak dapat dihapuΓÇª 0.09s  
+  Γ£ô bulk force delete melomΓÇª 0.10s  
+  Γ£ô superadmin tidak dapatΓÇª  0.08s  
+  Γ£ô superadmin melihat linkΓÇª 0.11s  
+
+  Tests:    674 passed (1668 assertions)
+  Duration: 65.95s
+

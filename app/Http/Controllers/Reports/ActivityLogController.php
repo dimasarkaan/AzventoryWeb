@@ -122,7 +122,7 @@ class ActivityLogController extends Controller
         if ($request->wantsJson()) {
             return response()->json([
                 'activityLogs' => $activityLogs,
-                'last_id' => $activityLogs->first()?->id
+                'last_id' => $activityLogs->first()?->id,
             ]);
         }
 
@@ -193,14 +193,14 @@ class ActivityLogController extends Controller
             // Jika data kecil (< 500 baris), langsung stream untuk kenyamanan pengguna cPanel.
             if ($logs->count() <= 500) {
                 $this->logActivity('Export Log Aktivitas', 'Mengunduh log aktivitas (PDF Langsung).');
-                
+
                 $pdf = app()->make('dompdf.wrapper')->loadView('reports.activity_logs.pdf', [
                     'logs' => $logs,
                     'isPdf' => true,
                     'request' => $request,
                 ]);
 
-                return $pdf->download($filename . '.pdf');
+                return $pdf->download($filename.'.pdf');
             }
 
             \App\Jobs\ExportActivityLogJob::dispatch($request->user(), $request->all(), $logs);

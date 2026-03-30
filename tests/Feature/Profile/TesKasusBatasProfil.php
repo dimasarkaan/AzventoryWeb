@@ -163,4 +163,3 @@ class TesKasusBatasProfil extends TestCase
         $this->assertCount(1, $activeBorrowings);
     }
 }
-

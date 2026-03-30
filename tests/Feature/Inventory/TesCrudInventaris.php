@@ -122,4 +122,3 @@ class TesCrudInventaris extends TestCase
         $response2->assertJson(['exists' => false]);
     }
 }
-

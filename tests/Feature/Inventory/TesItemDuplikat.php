@@ -106,4 +106,3 @@ class TesItemDuplikat extends TestCase
         $this->assertDatabaseHas('spareparts', ['part_number' => 'K120-LOGI', 'condition' => 'Rusak', 'stock' => 3]);
     }
 }
-

@@ -92,4 +92,3 @@ class TesServisQrCode extends TestCase
         $this->assertStringContainsString('REGEN-001', $svg);
     }
 }
-

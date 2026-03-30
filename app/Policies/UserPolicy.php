@@ -45,7 +45,7 @@ class UserPolicy
     public function delete(User $user, ?User $model = null): bool
     {
         // Jika model null (misal: cek otoritas umum), izinkan jika superadmin
-        if (!$model) {
+        if (! $model) {
             return $user->role === UserRole::SUPERADMIN;
         }
 
@@ -66,9 +66,10 @@ class UserPolicy
      */
     public function forceDelete(User $user, ?User $model = null): bool
     {
-        if (!$model) {
+        if (! $model) {
             return $user->role === UserRole::SUPERADMIN;
         }
+
         return $user->role === UserRole::SUPERADMIN && $user->id !== $model->id;
     }
 }

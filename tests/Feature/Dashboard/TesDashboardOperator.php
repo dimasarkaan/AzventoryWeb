@@ -4,7 +4,6 @@ namespace Tests\Feature\Dashboard;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class TesDashboardOperator extends TestCase
@@ -14,19 +13,19 @@ class TesDashboardOperator extends TestCase
     public function test_operator_dapat_mengakses_halaman_dashboard()
     {
         $operator = User::factory()->create([
-            'role' => \App\Enums\UserRole::OPERATOR
+            'role' => \App\Enums\UserRole::OPERATOR,
         ]);
 
         $response = $this->actingAs($operator)->get('/dashboard/operator');
 
         $response->assertStatus(200);
-        $response->assertSee('Halo, ' . $operator->name);
+        $response->assertSee('Halo, '.$operator->name);
     }
 
     public function test_dashboard_operator_memiliki_fab_scan_qr_dan_modal_lengkap()
     {
         $operator = User::factory()->create([
-            'role' => \App\Enums\UserRole::OPERATOR
+            'role' => \App\Enums\UserRole::OPERATOR,
         ]);
 
         $response = $this->actingAs($operator)->get('/dashboard/operator');
@@ -50,4 +49,3 @@ class TesDashboardOperator extends TestCase
         $response->assertSeeText('Upload Galeri');
     }
 }
-

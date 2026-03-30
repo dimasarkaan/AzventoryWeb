@@ -63,4 +63,3 @@ class TesIntegritasLaporan extends TestCase
         $this->assertEquals(100, $jobMemoryData['data']->first()->stock);
     }
 }
-

@@ -133,4 +133,3 @@ class TesInventarisLengkap extends TestCase
         $response->assertSessionHasErrors(['part_number', 'name', 'stock']);
     }
 }
-

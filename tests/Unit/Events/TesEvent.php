@@ -193,4 +193,3 @@ class TesEvent extends TestCase
         $this->assertNotNull($firstChannel);
     }
 }
-

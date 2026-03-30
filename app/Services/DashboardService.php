@@ -3,10 +3,10 @@
 namespace App\Services;
 
 use App\Models\ActivityLog;
+use App\Models\Borrowing;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Location;
-use App\Models\Borrowing;
 use App\Models\Sparepart;
 use App\Models\StockLog;
 use App\Models\User;

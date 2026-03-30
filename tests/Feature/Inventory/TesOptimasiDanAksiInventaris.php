@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\UserRole;
 use App\Models\Brand;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\Test;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class TesOptimasiDanAksiInventaris extends TestCase
@@ -16,6 +16,7 @@ class TesOptimasiDanAksiInventaris extends TestCase
     use RefreshDatabase;
 
     protected $superadmin;
+
     protected $admin;
 
     protected function setUp(): void
@@ -34,7 +35,7 @@ class TesOptimasiDanAksiInventaris extends TestCase
         $this->actingAs($this->superadmin)
             ->patchJson(route('brands.update', $brand->id), [
                 'name' => 'BRAND_STATUS_TEST_ABC_UPDATED',
-                'is_active' => false
+                'is_active' => false,
             ])
             ->assertStatus(200);
 
@@ -76,7 +77,7 @@ class TesOptimasiDanAksiInventaris extends TestCase
         $ids = $items->pluck('id')->toArray();
 
         foreach ($items as $item) {
-            $item->update(['qr_code_path' => 'qr_codes/' . $item->id . '.svg']);
+            $item->update(['qr_code_path' => 'qr_codes/'.$item->id.'.svg']);
             Storage::disk('public')->put($item->qr_code_path, 'dummy');
         }
 

@@ -47,13 +47,13 @@ class TesDashboardService extends TestCase
         Sparepart::factory()->count(3)->create(['stock' => 10]);
         \App\Models\Brand::insert([
             ['name' => 'Brand A'],
-            ['name' => 'Brand B']
+            ['name' => 'Brand B'],
         ]);
         \App\Models\Category::insert([
             ['name' => 'Cat A'],
             ['name' => 'Cat B'],
             ['name' => 'Cat C'],
-            ['name' => 'Cat D']
+            ['name' => 'Cat D'],
         ]);
 
         $snapshots = $this->service->getStockSnapshots();
@@ -206,4 +206,3 @@ class TesDashboardService extends TestCase
         $this->assertCount(6, $this->service->getRecentActivities(null, 6));
     }
 }
-

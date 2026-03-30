@@ -120,4 +120,3 @@ class TesAksesRute extends TestCase
             ->assertRedirect(route('dashboard.operator'));
     }
 }
-

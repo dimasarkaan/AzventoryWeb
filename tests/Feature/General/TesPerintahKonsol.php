@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\General;
 
-use App\Models\ActivityLog;
 use App\Models\Borrowing;
 use App\Models\Sparepart;
 use App\Models\User;
@@ -82,9 +81,9 @@ class TesPerintahKonsol extends TestCase
     public function test_command_backup_database_berhasil_mengirim_email()
     {
         \Illuminate\Support\Facades\Mail::fake();
-        
+
         $disk = \Illuminate\Support\Facades\Storage::disk('local');
-        if (!$disk->exists('backups')) {
+        if (! $disk->exists('backups')) {
             $disk->makeDirectory('backups');
         }
 
@@ -103,13 +102,15 @@ class TesPerintahKonsol extends TestCase
             ->assertExitCode(0);
 
         \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\DatabaseBackupMail::class);
-        
+
         // Bersihkan
         $files = glob($disk->path('backups/backup_*.zip'));
         foreach ($files as $file) {
             @unlink($file);
         }
-        if (isset($tempDb)) @unlink($tempDb);
+        if (isset($tempDb)) {
+            @unlink($tempDb);
+        }
     }
 
     /**
@@ -120,8 +121,12 @@ class TesPerintahKonsol extends TestCase
         $diskPublic = \Illuminate\Support\Facades\Storage::disk('public');
         $diskLocal = \Illuminate\Support\Facades\Storage::disk('local');
 
-        if (!$diskPublic->exists('reports')) $diskPublic->makeDirectory('reports');
-        if (!$diskLocal->exists('backups')) $diskLocal->makeDirectory('backups');
+        if (! $diskPublic->exists('reports')) {
+            $diskPublic->makeDirectory('reports');
+        }
+        if (! $diskLocal->exists('backups')) {
+            $diskLocal->makeDirectory('backups');
+        }
 
         $oldReportRel = 'reports/old_test_report.xlsx';
         $oldBackupRel = 'backups/old_test_backup.sql';
@@ -142,11 +147,10 @@ class TesPerintahKonsol extends TestCase
         $this->artisan('reports:cleanup', ['--days' => 30])
             ->assertExitCode(0);
 
-        $this->assertFileDoesNotExist($oldReportFull, "Laporan lama harus dihapus");
-        $this->assertFileDoesNotExist($oldBackupFull, "Backup lama harus dihapus");
-        $this->assertFileExists($newReportFull, "Laporan baru harus tetap ada");
+        $this->assertFileDoesNotExist($oldReportFull, 'Laporan lama harus dihapus');
+        $this->assertFileDoesNotExist($oldBackupFull, 'Backup lama harus dihapus');
+        $this->assertFileExists($newReportFull, 'Laporan baru harus tetap ada');
 
         @unlink($newReportFull);
     }
 }
-

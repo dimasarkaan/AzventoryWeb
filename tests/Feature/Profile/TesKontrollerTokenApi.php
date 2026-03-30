@@ -128,4 +128,3 @@ class TesKontrollerTokenApi extends TestCase
         $this->assertEquals(1, $this->superadmin->tokens()->count());
     }
 }
-

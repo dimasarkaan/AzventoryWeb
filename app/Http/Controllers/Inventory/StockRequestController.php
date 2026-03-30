@@ -68,7 +68,7 @@ class StockRequestController extends Controller
 
                 // Clear Dashboard Cache & Broadcast Update
                 $this->inventoryService->clearCache();
-                
+
                 $actionType = $request->type === 'masuk' ? 'success' : 'warning';
                 $actionText = $request->type === 'masuk' ? 'menambah stok' : 'mengurangi stok';
                 $customMessage = "{$user->name} {$actionText} sebanyak {$request->quantity} {$sparepart->unit} pada barang: {$sparepart->name}";
@@ -89,14 +89,14 @@ class StockRequestController extends Controller
             if ($isAutoApproved) {
                 // Determine Log Title
                 $actionTitle = $request->type === 'masuk' ? 'Penambahan Stok' : 'Pengurangan Stok';
-                
+
                 $changes = [
                     'stock' => [
                         'old' => $sparepart->getOriginal('stock'),
-                        'new' => $sparepart->stock
-                    ]
+                        'new' => $sparepart->stock,
+                    ],
                 ];
-                
+
                 $this->logActivity($actionTitle, "{$actionTitle}: {$request->quantity} {$sparepart->unit} untuk '{$sparepart->name}'. Alasan: {$request->reason}", $changes);
 
                 // Low Stock Notification Check (if reduced)

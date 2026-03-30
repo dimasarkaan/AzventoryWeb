@@ -38,14 +38,14 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
     {
         $isDepleted = $this->sparepart->stock <= 0;
         $title = $isDepleted ? 'Peringatan: Stok Habis!' : 'Peringatan Stok Menipis';
-        $message = $isDepleted 
+        $message = $isDepleted
             ? "Stok {$this->sparepart->name} telah HABIS (0). Segera lakukan pengadaan barang."
             : "Stok {$this->sparepart->name} berada di bawah batas minimum ({$this->sparepart->stock} / {$this->sparepart->minimum_stock}).";
 
         return [
             'title' => $title,
             'message' => $message,
-            'url' => route('inventory.show', $this->sparepart->id) . '#stock-history',
+            'url' => route('inventory.show', $this->sparepart->id).'#stock-history',
             'type' => $isDepleted ? 'danger' : 'warning',
             'sparepart_id' => $this->sparepart->id,
         ];
@@ -58,13 +58,13 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
     {
         $isDepleted = $this->sparepart->stock <= 0;
         $title = $isDepleted ? 'Stok Habis!' : 'Stok Menipis';
-        
+
         return new BroadcastMessage([
             'title' => $title,
-            'message' => $isDepleted 
-                ? "Stok {$this->sparepart->name} telah HABIS (0)!" 
+            'message' => $isDepleted
+                ? "Stok {$this->sparepart->name} telah HABIS (0)!"
                 : "Stok {$this->sparepart->name} berada di bawah batas minimum ({$this->sparepart->stock} / {$this->sparepart->minimum_stock}).",
-            'url' => route('inventory.show', $this->sparepart->id) . '#stock-history',
+            'url' => route('inventory.show', $this->sparepart->id).'#stock-history',
             'type' => $isDepleted ? 'danger' : 'warning',
         ]);
     }

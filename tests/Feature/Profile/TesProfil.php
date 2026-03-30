@@ -105,7 +105,7 @@ class TesProfil extends TestCase
     {
         $user = User::factory()->create();
         $sparepart = \App\Models\Sparepart::factory()->create();
-        
+
         // Buat pinjaman
         \App\Models\Borrowing::create([
             'sparepart_id' => $sparepart->id,
@@ -158,9 +158,9 @@ class TesProfil extends TestCase
     public function test_foto_profil_dapat_dihapus(): void
     {
         $user = User::factory()->create([
-            'avatar' => 'avatars/test.jpg'
+            'avatar' => 'avatars/test.jpg',
         ]);
-        
+
         // Buat file palsu di storage
         \Illuminate\Support\Facades\Storage::fake('public');
         \Illuminate\Support\Facades\Storage::disk('public')->put('avatars/test.jpg', 'content');
@@ -181,7 +181,7 @@ class TesProfil extends TestCase
     {
         $user = User::factory()->create();
         $sparepart = \App\Models\Sparepart::factory()->create();
-        
+
         // Buat peminjaman aktif
         \App\Models\Borrowing::create([
             'sparepart_id' => $sparepart->id,
@@ -286,4 +286,3 @@ class TesProfil extends TestCase
         $response->assertSessionHasErrors('username');
     }
 }
-

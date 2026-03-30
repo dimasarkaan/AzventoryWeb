@@ -757,4 +757,3 @@ return [
     'offline_banner_text' => 'Mode Offline - Beberapa fitur mungkin terbatas',
     'offline_retry' => 'Coba Lagi',
 ];
-

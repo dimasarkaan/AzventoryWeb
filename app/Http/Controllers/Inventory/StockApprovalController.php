@@ -37,10 +37,10 @@ class StockApprovalController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereHas('sparepart', function ($sq) use ($search) {
                     $sq->where('name', 'like', '%'.$search.'%')
-                       ->orWhere('part_number', 'like', '%'.$search.'%');
+                        ->orWhere('part_number', 'like', '%'.$search.'%');
                 })->orWhereHas('user', function ($uq) use ($search) {
                     $uq->where('name', 'like', '%'.$search.'%')
-                       ->orWhere('username', 'like', '%'.$search.'%');
+                        ->orWhere('username', 'like', '%'.$search.'%');
                 });
             });
         }
@@ -73,7 +73,7 @@ class StockApprovalController extends Controller
 
         $stock_log->load(['sparepart', 'user']);
         $request->validate([
-            'status'           => 'required|in:approved,rejected',
+            'status' => 'required|in:approved,rejected',
             // Gap 1: wajib isi alasan jika menolak
             'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
         ]);
@@ -105,9 +105,9 @@ class StockApprovalController extends Controller
         $this->authorize('update', new StockLog);
 
         $request->validate([
-            'ids'              => 'required|array',
-            'ids.*'            => 'exists:stock_logs,id',
-            'status'           => 'required|in:approved,rejected',
+            'ids' => 'required|array',
+            'ids.*' => 'exists:stock_logs,id',
+            'status' => 'required|in:approved,rejected',
             // Gap 1: wajib isi alasan jika bulk reject
             'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
         ]);

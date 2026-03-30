@@ -293,4 +293,3 @@ class TesTokenApi extends TestCase
         $this->assertEquals(1, $user->fresh()->tokens()->count());
     }
 }
-

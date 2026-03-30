@@ -21,10 +21,10 @@ class StatsController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        
+
         // Stock Snapshots (Total items, stock, low stock count, etc)
         $snapshots = $this->dashboardService->getStockSnapshots();
-        
+
         // Borrowing Stats (Active, Overdue)
         $borrowingStats = $this->dashboardService->getBorrowingStats($user);
 
@@ -44,8 +44,8 @@ class StatsController extends Controller
                     'brands_count' => $snapshots['totalBrands'] ?? 0,
                     'categories_count' => $snapshots['totalCategories'] ?? 0,
                     'locations_count' => $snapshots['totalLocations'] ?? 0,
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

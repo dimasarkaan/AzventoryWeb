@@ -7,8 +7,8 @@ use App\Models\Location;
 use App\Models\Sparepart;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 class LocationController extends Controller
 {
@@ -45,7 +45,7 @@ class LocationController extends Controller
 
         return response()->json([
             'message' => 'Lokasi baru berhasil ditambahkan.',
-            'location' => $location
+            'location' => $location,
         ], 201);
     }
 
@@ -55,14 +55,14 @@ class LocationController extends Controller
     public function update(Request $request, Location $location)
     {
         $request->validate([
-            'name' => 'required|string|max:191|unique:locations,name,' . $location->id,
+            'name' => 'required|string|max:191|unique:locations,name,'.$location->id,
             'is_active' => 'sometimes|boolean',
         ]);
 
         $oldName = $location->name;
         $newName = $request->name;
-        $oldActive = (bool)$location->is_active;
-        $newActive = $request->has('is_active') ? (bool)$request->is_active : $oldActive;
+        $oldActive = (bool) $location->is_active;
+        $newActive = $request->has('is_active') ? (bool) $request->is_active : $oldActive;
 
         $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
@@ -101,13 +101,13 @@ class LocationController extends Controller
                 $statusText = $newActive ? 'Aktif' : 'Non-aktif';
                 $logMessage = "Status lokasi '{$newName}' diubah menjadi {$statusText}.";
             }
-            
+
             $this->logActivity('Lokasi Diperbarui', $logMessage, $changes);
         }
 
         return response()->json([
             'message' => 'Lokasi berhasil diperbarui.',
-            'location' => $location
+            'location' => $location,
         ]);
     }
 
@@ -120,7 +120,7 @@ class LocationController extends Controller
 
         if ($count > 0) {
             return response()->json([
-                'message' => "Tidak dapat menghapus. Masih ada {$count} barang di lokasi ini. Kosongkan terlebih dahulu."
+                'message' => "Tidak dapat menghapus. Masih ada {$count} barang di lokasi ini. Kosongkan terlebih dahulu.",
             ], 422);
         }
 
@@ -130,7 +130,7 @@ class LocationController extends Controller
         $this->logActivity('Lokasi Dihapus', "Lokasi '{$location->name}' dihapus.");
 
         return response()->json([
-            'message' => 'Lokasi berhasil dihapus.'
+            'message' => 'Lokasi berhasil dihapus.',
         ]);
     }
 }

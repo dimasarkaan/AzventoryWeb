@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 class InventoryController extends Controller
 {
     protected $inventoryService;
+
     protected $qrCodeService;
 
     public function __construct(\App\Services\InventoryService $inventoryService, \App\Services\QrCodeService $qrCodeService)
@@ -244,6 +245,7 @@ class InventoryController extends Controller
             ],
         ]);
     }
+
     /**
      * Mendapatkan riwayat mutasi stok untuk barang tertentu.
      *
@@ -269,7 +271,7 @@ class InventoryController extends Controller
                 'name' => $sparepart->name,
                 'part_number' => $sparepart->part_number,
             ],
-            'data' => $logs
+            'data' => $logs,
         ]);
     }
 }

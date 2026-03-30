@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\Models\StockLog;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -19,6 +18,7 @@ class StockApprovalUpdatedEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $stockLog;
+
     public $action; // 'created', 'processed' (approved/rejected)
 
     /**
@@ -72,8 +72,8 @@ class StockApprovalUpdatedEvent implements ShouldBroadcast
                 ],
                 'user' => [
                     'name' => $user ? $user->name : 'System',
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

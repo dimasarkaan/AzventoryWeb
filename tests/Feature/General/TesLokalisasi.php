@@ -44,4 +44,3 @@ class TesLokalisasi extends TestCase
         $response->assertSee('Informasi Profil'); // ui.profile_info_title
     }
 }
-

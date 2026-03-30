@@ -199,4 +199,3 @@ class TesGantiPassword extends TestCase
         $response->assertRedirect(route('dashboard.superadmin'));
     }
 }
-

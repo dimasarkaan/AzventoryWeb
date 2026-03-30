@@ -17,7 +17,7 @@ class TesUIFrontend extends TestCase
     protected $admin;
 
     protected $superAdmin;
-    
+
     protected $item;
 
     protected function setUp(): void
@@ -85,4 +85,3 @@ class TesUIFrontend extends TestCase
         $response->assertSee('overflow-x-auto'); // Table responsif
     }
 }
-

@@ -3,7 +3,6 @@
 use App\Enums\UserRole;
 use Illuminate\Support\Facades\Broadcast;
 
-
 /*
 |--------------------------------------------------------------------------
 | Broadcast Channels
@@ -66,6 +65,7 @@ Broadcast::channel('user.{userId}', function ($user, $userId) {
  */
 Broadcast::channel('admin-dashboard', function ($user) {
     $role = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+
     return in_array($role, [UserRole::ADMIN->value, UserRole::SUPERADMIN->value]);
 });
 
@@ -76,6 +76,7 @@ Broadcast::channel('admin-dashboard', function ($user) {
  */
 Broadcast::channel('borrowing-requests', function ($user) {
     $role = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+
     return in_array($role, [UserRole::ADMIN->value, UserRole::SUPERADMIN->value]);
 });
 
@@ -86,6 +87,7 @@ Broadcast::channel('borrowing-requests', function ($user) {
  */
 Broadcast::channel('stock-approvals', function ($user) {
     $role = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+
     return in_array($role, [UserRole::ADMIN->value, UserRole::SUPERADMIN->value]);
 });
 

@@ -30,7 +30,9 @@ class TesIntegritasEkspor extends TestCase
 
         // Clean up any old test files first
         $oldFiles = glob(storage_path('app/public/reports/temp_*_test_export.xlsx'));
-        foreach ($oldFiles as $file) { @unlink($file); }
+        foreach ($oldFiles as $file) {
+            @unlink($file);
+        }
 
         $response = $service->exportInventoryList($spareparts, 'test_export');
 
@@ -47,10 +49,10 @@ class TesIntegritasEkspor extends TestCase
         // Load spreadsheet and verify content
         $spreadsheet = IOFactory::load($filePath);
         $sheet = $spreadsheet->getActiveSheet();
-        
+
         // Header title check (should be uppercase)
         $this->assertEquals('LAPORAN DAFTAR INVENTARIS (SPAREPART & ASET)', $sheet->getCell('A1')->getValue());
-        
+
         // Data check (Category is in Column C, Row 6)
         $this->assertEquals('Testing Category', $sheet->getCell('C6')->getValue());
 
@@ -65,4 +67,3 @@ class TesIntegritasEkspor extends TestCase
         }
     }
 }
-

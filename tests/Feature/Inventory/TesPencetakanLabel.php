@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\UserRole;
 use App\Models\Sparepart;
 use App\Models\User;
-use App\Enums\UserRole;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
@@ -14,13 +14,15 @@ class TesPencetakanLabel extends TestCase
     use RefreshDatabase;
 
     protected $superadmin;
+
     protected $admin;
+
     protected $operator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Mock storage
         \Illuminate\Support\Facades\Storage::fake('public');
 
@@ -155,11 +157,11 @@ class TesPencetakanLabel extends TestCase
             ->postJson(route('inventory.qr.log'), [
                 'ids' => [$sparepart->id],
                 'counts' => [$sparepart->id => 5],
-                'total' => 5
+                'total' => 5,
             ]);
 
         $response->assertStatus(200);
-        
+
         $this->assertDatabaseHas('activity_logs', [
             'user_id' => $this->superadmin->id,
             'action' => 'Cetak Label',
@@ -172,7 +174,7 @@ class TesPencetakanLabel extends TestCase
         $response = $this->postJson(route('inventory.qr.log'), [
             'ids' => [1],
             'counts' => [1 => 1],
-            'total' => 1
+            'total' => 1,
         ]);
 
         $response->assertStatus(401); // Unauthorized

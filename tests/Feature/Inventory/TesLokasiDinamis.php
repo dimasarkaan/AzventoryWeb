@@ -3,7 +3,6 @@
 namespace Tests\Feature\Inventory;
 
 use App\Enums\UserRole;
-use App\Models\Sparepart;
 use App\Models\User;
 use App\Services\InventoryService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -119,4 +118,3 @@ class TesLokasiDinamis extends TestCase
         $response->assertStatus(403);
     }
 }
-

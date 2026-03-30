@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 
 class CleanupOldReports extends Command
 {
@@ -36,7 +36,9 @@ class CleanupOldReports extends Command
         if (Storage::disk('public')->exists($reportDir)) {
             $files = Storage::disk('public')->files($reportDir);
             foreach ($files as $file) {
-                if (basename($file) === '.gitignore') continue;
+                if (basename($file) === '.gitignore') {
+                    continue;
+                }
                 $lastModified = Carbon::createFromTimestamp(Storage::disk('public')->lastModified($file));
                 if ($lastModified->diffInDays($now) >= $days) {
                     Storage::disk('public')->delete($file);
@@ -50,7 +52,9 @@ class CleanupOldReports extends Command
         if (Storage::disk('local')->exists($backupDir)) {
             $files = Storage::disk('local')->files($backupDir);
             foreach ($files as $file) {
-                if (basename($file) === '.gitignore') continue;
+                if (basename($file) === '.gitignore') {
+                    continue;
+                }
                 $lastModified = Carbon::createFromTimestamp(Storage::disk('local')->lastModified($file));
                 if ($lastModified->diffInDays($now) >= $days) {
                     Storage::disk('local')->delete($file);
@@ -62,7 +66,7 @@ class CleanupOldReports extends Command
         if ($totalDeleted > 0) {
             $this->info("✅ Berhasil menghapus {$totalDeleted} file lama (Laporan & Backup DB).");
         } else {
-            $this->info("ℹ️ Tidak ada file lama yang perlu dihapus.");
+            $this->info('ℹ️ Tidak ada file lama yang perlu dihapus.');
         }
 
         return self::SUCCESS;

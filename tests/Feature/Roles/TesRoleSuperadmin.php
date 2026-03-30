@@ -2,11 +2,7 @@
 
 namespace Tests\Feature\Roles;
 
-use App\Models\Sparepart;
 use App\Models\User;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;

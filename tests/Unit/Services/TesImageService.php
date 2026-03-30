@@ -55,4 +55,3 @@ class TesImageService extends TestCase
         $this->assertEquals('image/webp', $size['mime']);
     }
 }
-

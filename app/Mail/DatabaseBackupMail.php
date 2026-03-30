@@ -14,7 +14,9 @@ class DatabaseBackupMail extends Mailable
     use Queueable, SerializesModels;
 
     public $user;
+
     public $backupPath;
+
     public $filename;
 
     /**
@@ -33,7 +35,7 @@ class DatabaseBackupMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '📦 Cadangan Database Azventory - ' . now()->format('d F Y'),
+            subject: '📦 Cadangan Database Azventory - '.now()->format('d F Y'),
         );
     }
 

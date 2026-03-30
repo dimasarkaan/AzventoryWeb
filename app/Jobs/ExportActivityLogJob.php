@@ -39,7 +39,7 @@ class ExportActivityLogJob implements ShouldQueue
     {
         // Fetch snapshot from constructor memory, immune to delayed data drift
         $logs = $this->logs;
-        
+
         // Eager load relationships that might have been lost during job serialization
         $logs->loadMissing('user');
 

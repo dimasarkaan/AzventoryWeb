@@ -15,7 +15,7 @@ return new class extends Migration
             // Index komposit untuk mempercepat penghitungan unread notifications (COUNT & Filter)
             // Urutan: notifiable_id & type dulu (karena ini morphs), lalu read_at
             $table->index(['notifiable_id', 'notifiable_type', 'read_at'], 'notifications_unread_index');
-            
+
             // Index komposit untuk mempercepat pengurutan listing terbaru (Pagination)
             $table->index(['notifiable_id', 'notifiable_type', 'created_at'], 'notifications_latest_index');
         });
