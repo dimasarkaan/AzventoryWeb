@@ -681,11 +681,19 @@ class InventoryService
     public function returnBorrowing(Borrowing $borrowing, array $data, array $photos = [])
     {
         return DB::transaction(function () use ($borrowing, $data, $photos) {
+            // Pessimistic Locking untuk mencegah race condition / duplikasi stok
+            $borrowing = Borrowing::where('id', $borrowing->id)->lockForUpdate()->first();
+            
             $qty = $data['return_quantity'];
+            
+            // Validasi ulang di dalam lock
+            if ($qty > $borrowing->remaining_quantity) {
+                throw new \Exception('Jumlah pengembalian melebihi sisa pinjaman (indikasi concurrent request).');
+            }
+
             $condition = $data['return_condition'];
             $originalSparepart = $borrowing->sparepart;
-            // Inisialisasi null agar tidak terjadi undefined variable di notifikasi akhir
-            // jika kondisi pengembalian adalah 'good' (blok else tidak dieksekusi)
+            
             $translatedCondition = null;
 
             $borrowing->returns()->create([
@@ -765,11 +773,17 @@ class InventoryService
      */
     public function approveStockRequest(StockLog $stockLog, string $status, ?string $rejectionReason = null)
     {
-        if ($stockLog->status !== 'pending') {
-            throw new \Exception('Pengajuan ini sudah diproses sebelumnya.');
-        }
-
         return DB::transaction(function () use ($stockLog, $status, $rejectionReason) {
+            // Pessimistic Locking untuk mencegah dua admin menyetujui log yang sama serentak
+            $lockedLog = clone $stockLog;
+            if ($lockedLog->exists) {
+                $lockedLog = StockLog::where('id', $stockLog->id)->lockForUpdate()->first();
+            }
+
+            if ($lockedLog->status !== 'pending') {
+                throw new \Exception('Pengajuan ini sudah diproses sebelumnya.');
+            }
+
             $oldStock = null;
             if ($status === 'approved') {
                 $sparepart = Sparepart::where('id', $stockLog->sparepart_id)->lockForUpdate()->first();
@@ -814,10 +828,10 @@ class InventoryService
             if ($status === 'rejected' && $rejectionReason) {
                 $updateData['rejection_reason'] = $rejectionReason;
             }
-            $stockLog->update($updateData);
+            $lockedLog->update($updateData);
 
             $statusText = $status === 'approved' ? 'disetujui' : 'ditolak';
-            $description = "Pengajuan stok {$stockLog->type} untuk '{$stockLog->sparepart->name}' sejumlah {$stockLog->quantity} telah {$statusText}.";
+            $description = "Pengajuan stok {$lockedLog->type} untuk '{$lockedLog->sparepart->name}' sejumlah {$lockedLog->quantity} telah {$statusText}.";
             if ($status === 'rejected' && $rejectionReason) {
                 $description .= " Alasan: {$rejectionReason}";
             }
@@ -838,19 +852,19 @@ class InventoryService
 
             // Broadcast real-time stock approval processing (remove from list)
             try {
-                broadcast(new \App\Events\StockApprovalUpdatedEvent($stockLog->fresh(), 'processed'))->toOthers();
+                broadcast(new \App\Events\StockApprovalUpdatedEvent($lockedLog->fresh(), 'processed'))->toOthers();
             } catch (\Throwable $e) {
             }
 
             // Notifikasi balik ke pemohon (Operator/Admin) mengenai hasil approval
-            $requester = $stockLog->user;
+            $requester = $lockedLog->user;
             if ($requester) {
                 $message = __('ui.notification_stock_request_body', [
-                    'type' => $stockLog->type,
-                    'name' => $stockLog->sparepart->name,
+                    'type' => $lockedLog->type,
+                    'name' => $lockedLog->sparepart->name,
                     'status' => $statusText,
                 ]);
-                Notification::send($requester, new StockRequestNotification($stockLog, $message));
+                Notification::send($requester, new StockRequestNotification($lockedLog, $message));
             }
 
             return ['status' => 'success'];

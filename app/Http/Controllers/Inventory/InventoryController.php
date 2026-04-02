@@ -275,6 +275,16 @@ class InventoryController extends Controller
             return response()->json(['message' => 'Pilih minimal satu item.'], 400);
         }
 
+        // Cek barang yang sedang dipinjam
+        $borrowedItemsCount = Sparepart::whereIn('id', $ids)
+            ->whereHas('borrowings', function ($query) {
+                $query->whereIn('status', ['borrowed', 'overdue']);
+            })->count();
+
+        if ($borrowedItemsCount > 0) {
+            return response()->json(['message' => 'Beberapa item tidak dapat dihapus karena masih sedang dipinjam.'], 422);
+        }
+
         $count = count($ids);
         $this->logActivity('Hapus Massal (Soft)', "Menghapus {$count} item inventaris ke tong sampah.", ['ids' => $ids]);
 
