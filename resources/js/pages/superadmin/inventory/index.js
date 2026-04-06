@@ -3,7 +3,7 @@ window.Swal = Swal;
 
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('#inventory-filter-form');
-    const realBody = document.querySelector('tbody:not(#skeleton-body)');
+    const realBody = document.querySelector('#inventory-desktop-body');
     const skeletonBody = document.getElementById('skeleton-body');
 
     if (form) {
@@ -77,65 +77,74 @@ document.addEventListener('DOMContentLoaded', function () {
         // 3. Update Browser URL (for history)
         window.history.pushState({}, '', url);
 
-        // 4. Fetch Data
+        // 4. Fetch Data (server returns JSON with rendered HTML partials)
         fetch(url, {
             headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
         })
-            .then(response => response.text())
-            .then(html => {
-                // 5. Parse Response
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
-                // 6. Replace Table Body
-                const newBody = doc.querySelector('tbody:not(#skeleton-body)');
-                if (newBody && realBody) {
-                    realBody.innerHTML = newBody.innerHTML;
+            .then(response => response.json())
+            .then(data => {
+                // 5. Inject Desktop Table
+                const desktopContainer = document.getElementById('inventory-desktop-container');
+                if (desktopContainer && data.desktop) {
+                    const parser = new DOMParser();
+                    const desktopDoc = parser.parseFromString(data.desktop, 'text/html');
+                    const newDesktop = desktopDoc.getElementById('inventory-desktop-container');
+                    if (newDesktop) {
+                        desktopContainer.innerHTML = newDesktop.innerHTML;
+                    }
                 }
 
-                // 7. Replace Pagination
-                const desktopPaginationContainer = document.querySelector('.inventory-pagination-desktop');
-                const newDesktopPaginationContainer = doc.querySelector('.inventory-pagination-desktop');
-                if (desktopPaginationContainer && newDesktopPaginationContainer) {
-                    desktopPaginationContainer.innerHTML = newDesktopPaginationContainer.innerHTML;
+                // 6. Inject Mobile List
+                const mobileContainer = document.getElementById('inventory-mobile-list');
+                if (mobileContainer && data.mobile) {
+                    const parser = new DOMParser();
+                    const mobileDoc = parser.parseFromString(data.mobile, 'text/html');
+                    const newMobile = mobileDoc.getElementById('inventory-mobile-list');
+                    if (newMobile) {
+                        mobileContainer.innerHTML = newMobile.innerHTML;
+                    }
                 }
 
-                // Replace Mobile Pagination
-                const mobilePaginationContainer = document.querySelector('.inventory-pagination-mobile');
-                const newMobilePaginationContainer = doc.querySelector('.inventory-pagination-mobile');
-                if (mobilePaginationContainer && newMobilePaginationContainer) {
-                    mobilePaginationContainer.innerHTML = newMobilePaginationContainer.innerHTML;
+                // 7. Inject Pagination
+                if (data.pagination) {
+                    const desktopPaginationContainer = document.querySelector('.inventory-pagination-desktop');
+                    if (desktopPaginationContainer) {
+                        desktopPaginationContainer.innerHTML = data.pagination;
+                    }
+                    const mobilePaginationContainer = document.querySelector('.inventory-pagination-mobile');
+                    if (mobilePaginationContainer) {
+                        mobilePaginationContainer.innerHTML = data.pagination;
+                    }
                 }
 
                 // 8. Re-attach Pagination Listeners
                 attachPaginationListeners();
 
-                // 9. Re-initialize Bulk Actions (if needed)
+                // 9. Re-initialize Bulk Actions
                 if (window.resetBulkActions) {
                     window.resetBulkActions();
                 } else {
-                    // Fallback if function not ready yet
-                    const newSelectAll = doc.getElementById('select-all');
-                    if (document.getElementById('select-all') && newSelectAll) {
-                        document.getElementById('select-all').checked = false;
-                    }
+                    const desktopSelectAll = document.getElementById('select-all');
+                    if (desktopSelectAll) desktopSelectAll.checked = false;
                 }
-
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             })
             .finally(() => {
                 // 10. Hide Skeleton
-                setTimeout(() => { // Small delay to ensure smooth transition
-                    if (realBody && skeletonBody) {
+                setTimeout(() => {
+                    if (skeletonBody) {
                         skeletonBody.classList.add('hidden');
-                        realBody.classList.remove('hidden');
                     }
+                    const freshBody = document.getElementById('inventory-desktop-body');
+                    if (freshBody) freshBody.classList.remove('hidden');
                 }, 300);
             });
+
     }
 
     // Function to attach listeners to dynamic pagination links
