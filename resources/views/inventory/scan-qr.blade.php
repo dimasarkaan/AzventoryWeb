@@ -185,27 +185,32 @@
             const resultDiv = document.getElementById('result');
             const errorDiv = document.getElementById('error-message');
 
-            // Validasi keamanan: hanya izinkan redirect ke domain sistem ini
-            // Mencegah open redirect jika QR berisi URL eksternal
+            let targetUrl = decodedText;
+
             try {
                 const url = new URL(decodedText);
-                if (url.origin !== window.location.origin) {
+                
+                // Fallback pintar: Jika QR lama masih pakai localhost, otomatis ubah ke domain live saat ini
+                if (url.origin.includes('localhost') || url.origin.includes('127.0.0.1')) {
+                    targetUrl = window.location.origin + url.pathname + url.search;
+                } 
+                // Keamanan: Cegah open redirect ke web lain
+                else if (url.origin !== window.location.origin) {
                     document.getElementById('error-text').innerText = 'QR Code ini tidak berasal dari sistem Azventory. Scan dibatalkan.';
                     errorDiv.classList.remove('hidden');
                     return;
                 }
             } catch (e) {
-                // Bukan URL yang valid sama sekali
-                document.getElementById('error-text').innerText = 'Format QR Code tidak valid atau tidak dikenali.';
-                errorDiv.classList.remove('hidden');
-                return;
+                // Bukan URL (mungkin sekedar Part Number / Nama Barang)
+                targetUrl = `{{ route('inventory.index') }}?search=${encodeURIComponent(decodedText)}`;
             }
 
+            errorDiv.classList.add('hidden');
             resultDiv.classList.remove('hidden');
 
             // Redirect setelah terkonfirmasi aman
             setTimeout(() => {
-                window.location.href = decodedText;
+                window.location.href = targetUrl;
             }, 1000);
         }
 

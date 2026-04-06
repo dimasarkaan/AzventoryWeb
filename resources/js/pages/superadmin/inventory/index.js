@@ -108,17 +108,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
-                // 7. Inject Pagination
-                if (data.pagination) {
-                    const desktopPaginationContainer = document.querySelector('.inventory-pagination-desktop');
-                    if (desktopPaginationContainer) {
-                        desktopPaginationContainer.innerHTML = data.pagination;
-                    }
-                    const mobilePaginationContainer = document.querySelector('.inventory-pagination-mobile');
-                    if (mobilePaginationContainer) {
-                        mobilePaginationContainer.innerHTML = data.pagination;
-                    }
-                }
+                // 7. Pagination sudah ter-include di dalam data.desktop dan data.mobile
+                // (tidak perlu inject terpisah — akan menimpa wrapper styling yang benar)
 
                 // 8. Re-attach Pagination Listeners
                 attachPaginationListeners();

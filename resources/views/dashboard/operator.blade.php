@@ -764,13 +764,28 @@
                 
                 const processResult = () => {
                     resultDiv.classList.remove('hidden');
-                    resultDiv.innerText = `Mengalihkan ke barang: ${decodedText}...`;
+                    resultDiv.innerText = `Memproses data QR...`;
                     
-                    if (decodedText.startsWith('http')) {
-                        window.location.href = decodedText;
-                    } else {
-                        window.location.href = `{{ route('inventory.index') }}?search=${encodeURIComponent(decodedText)}`;
+                    let targetUrl = decodedText;
+                    try {
+                        const url = new URL(decodedText);
+                        // Fallback pintar: Jika QR lama masih pakai localhost, otomatis ubah ke domain live saat ini
+                        if (url.origin.includes('localhost') || url.origin.includes('127.0.0.1')) {
+                            targetUrl = window.location.origin + url.pathname + url.search;
+                        } 
+                        // Keamanan: Cegah QR dari website lain
+                        else if (url.origin !== window.location.origin) {
+                            Swal.fire('Akses Ditolak', 'QR Code ini bukan berasal dari sistem Azventory.', 'error');
+                            resultDiv.classList.add('hidden');
+                            return;
+                        }
+                    } catch (e) {
+                        // Jika bukan URL (teks biasa), arahkan ke pencarian stok
+                        targetUrl = `{{ route('inventory.index') }}?search=${encodeURIComponent(decodedText)}`;
                     }
+
+                    resultDiv.innerText = `Mengalihkan ke barang...`;
+                    window.location.href = targetUrl;
                 };
 
                 // Hentikan scan secara aman jika sedang jalan
