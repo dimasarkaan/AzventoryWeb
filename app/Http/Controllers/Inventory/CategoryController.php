@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group Master Data
+ *
+ * API endpoints untuk kelola struktur kategori inventaris.
+ */
 class CategoryController extends Controller
 {
     use ActivityLogger;

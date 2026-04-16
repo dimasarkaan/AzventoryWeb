@@ -8,6 +8,11 @@ use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * @group User Management
+ *
+ * API endpoints khusus Superadmin untuk CRUD manajemen pengguna dan hak akses.
+ */
 class UserController extends Controller
 {
     use ActivityLogger;

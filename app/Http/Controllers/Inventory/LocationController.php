@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group Master Data
+ *
+ * API endpoints untuk kelola daftar lokasi atau ruangan laboratorium.
+ */
 class LocationController extends Controller
 {
     use ActivityLogger;

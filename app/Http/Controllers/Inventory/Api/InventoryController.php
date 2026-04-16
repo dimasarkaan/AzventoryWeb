@@ -10,6 +10,11 @@ use App\Models\StockLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 
+/**
+ * @group Inventory Management
+ *
+ * API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+ */
 class InventoryController extends Controller
 {
     protected $inventoryService;

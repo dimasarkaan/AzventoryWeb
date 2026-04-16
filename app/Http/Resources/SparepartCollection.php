@@ -11,6 +11,10 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
  */
 class SparepartCollection extends ResourceCollection
 {
+    public function __construct($resource)
+    {
+        parent::__construct($resource);
+    }
     /**
      * Transform resource collection ke array.
      *

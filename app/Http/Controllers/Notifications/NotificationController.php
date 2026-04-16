@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Notifications;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+/**
+ * @group Notifications
+ *
+ * API endpoints interaksi sistem pemberitahuan *real-time*.
+ */
 class NotificationController extends Controller
 {
     /**

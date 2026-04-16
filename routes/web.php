@@ -39,6 +39,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
 // Rute Autentikasi
 require __DIR__.'/auth.php';
 
@@ -55,6 +56,11 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         Route::get('/superadmin', [SuperAdminDashboardController::class, 'index'])
             ->middleware('role:superadmin')
             ->name('superadmin');
+
+        // Swagger UI (Khusus Superadmin)
+        Route::get('/swagger', function () {
+            return view('swagger');
+        })->middleware('role:superadmin')->name('swagger');
 
         // Endpoint AJAX: data pergerakan stok per-widget (Opsi C)
         Route::get('/movement-data', [SuperAdminDashboardController::class, 'movementData'])

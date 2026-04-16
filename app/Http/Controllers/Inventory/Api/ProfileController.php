@@ -5,6 +5,11 @@ namespace App\Http\Controllers\Inventory\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+/**
+ * @group Profile & Account
+ *
+ * API endpoints terkait data akun user yang sedang aktif dan riwayat transaksinya.
+ */
 class ProfileController extends Controller
 {
     /**

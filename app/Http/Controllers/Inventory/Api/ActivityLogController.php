@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
+/**
+ * @group System Reports
+ *
+ * API endpoints untuk membaca riwayat dan log aktivitas sistem.
+ */
 class ActivityLogController extends Controller
 {
     /**

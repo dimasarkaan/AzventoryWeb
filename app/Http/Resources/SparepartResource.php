@@ -11,6 +11,10 @@ use Illuminate\Http\Resources\Json\JsonResource;
  */
 class SparepartResource extends JsonResource
 {
+    public function __construct($resource)
+    {
+        parent::__construct($resource);
+    }
     /**
      * Transform resource ke array.
      *

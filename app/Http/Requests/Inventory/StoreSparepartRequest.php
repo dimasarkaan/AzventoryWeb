@@ -15,6 +15,19 @@ class StoreSparepartRequest extends FormRequest
     }
 
     /**
+     * Siapkan data untuk validasi.
+     * Mencegah Admin mengatur harga via by-pass HTTP Request (Postman / Inspect Element).
+     */
+    protected function prepareForValidation(): void
+    {
+        if ($this->user()->role === \App\Enums\UserRole::ADMIN) {
+            $this->merge([
+                'price' => $this->input('type') === 'sale' ? 0 : null,
+            ]);
+        }
+    }
+
+    /**
      * Dapatkan aturan validasi yang berlaku untuk request ini.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>

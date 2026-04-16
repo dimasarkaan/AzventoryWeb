@@ -5,11 +5,19 @@ use Illuminate\Support\Facades\Route;
 
 // API Routes
 
+// Authentication (Public)
+Route::prefix('v1')->group(function () {
+    Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login'])->name('api.login');
+});
+
 Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(function () {
     // Inventory
     Route::apiResource('inventory', InventoryController::class)->names('api.inventory');
     Route::get('/inventory/{id}/logs', [InventoryController::class, 'logs'])->name('api.inventory.logs');
     Route::put('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('api.inventory.adjust-stock');
+
+    // Authentication (Protected)
+    Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout'])->name('api.logout');
 
     // Borrowing
     Route::get('/borrowings', [\App\Http\Controllers\Inventory\Api\BorrowingController::class, 'index'])->name('api.borrowings.index');

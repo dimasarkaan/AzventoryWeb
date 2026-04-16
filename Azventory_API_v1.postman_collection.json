@@ -7,6 +7,33 @@
 	},
 	"item": [
 		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login (Get Token)",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "POST",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"superadmin@example.com\",\n    \"password\": \"password\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": "{{base_url}}/login"
+					}
+				},
+				{
+					"name": "Logout (Revoke Token)",
+					"request": {
+						"method": "POST",
+						"header": [ { "key": "Accept", "value": "application/json" } ],
+						"url": "{{base_url}}/logout"
+					}
+				}
+			]
+		},
+		{
 			"name": "Inventory (CRUD)",
 			"item": [
 				{ "name": "List Inventory", "request": { "method": "GET", "url": "{{base_url}}/inventory?search=&brand=&category=&location=&filter=&sort=latest" } },

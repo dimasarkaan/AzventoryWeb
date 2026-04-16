@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Services\DashboardService;
 use Illuminate\Http\Request;
 
+/**
+ * @group System Reports
+ *
+ * API endpoints untuk mengambil ringkasan metrik statistik aplikasi.
+ */
 class StatsController extends Controller
 {
     protected $dashboardService;

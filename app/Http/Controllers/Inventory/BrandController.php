@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @group Master Data
+ *
+ * API endpoints untuk kelola merek barang / vendor.
+ */
 class BrandController extends Controller
 {
     use ActivityLogger;

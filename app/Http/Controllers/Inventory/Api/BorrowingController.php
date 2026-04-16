@@ -10,6 +10,11 @@ use App\Services\InventoryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+/**
+ * @group Peminjaman (Borrowing)
+ *
+ * API endpoints untuk alur peminjaman, persetujuan, dan pengembalian inventaris.
+ */
 class BorrowingController extends Controller
 {
     protected $inventoryService;
