@@ -64,13 +64,13 @@
                                     <span class="p-1.5 bg-primary-50 text-primary-600 rounded-md">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                                     </span>
-                                    {{ $sparepart->category }}
+                                    {{ $sparepart->category->name ?? '-' }}
                                 </div>
                             </div>
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.brand') }}</span>
                                 <div class="mt-1 text-secondary-900 font-medium">
-                                    {{ $sparepart->brand ?? '-' }}
+                                    {{ $sparepart->brand->name ?? '-' }}
                                 </div>
                             </div>
                             <div>
@@ -85,7 +85,7 @@
                                      <span class="p-1.5 bg-warning-50 text-warning-600 rounded-md">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                                     </span>
-                                    {{ $sparepart->location }}
+                                    {{ $sparepart->location->name ?? '-' }}
                                 </div>
                             </div>
                             <div>
@@ -495,7 +495,7 @@
                                                 @endif
                                             </td>
                                             <td class="px-4 py-3 text-right">
-                                                @if(($borrowing->status === 'borrowed' || $borrowing->remaining_quantity > 0) && auth()->id() === $borrowing->user_id)
+                                                @if(($borrowing->status === 'borrowed' || $borrowing->remaining_quantity > 0) && auth()->user()->can('update', $borrowing))
                                                     <!-- Return Button -->
                                                     <button
                                                         type="button"
@@ -527,7 +527,7 @@
                                                     @endif
                                                 @endif
 
-                                                @if($borrowing->returns->count() > 0 || !(($borrowing->status === 'borrowed' || $borrowing->remaining_quantity > 0) && auth()->id() === $borrowing->user_id))
+                                                @if($borrowing->returns->count() > 0 || !(($borrowing->status === 'borrowed' || $borrowing->remaining_quantity > 0) && auth()->user()->can('update', $borrowing)))
                                                     <a 
                                                         href="{{ route('inventory.borrow.show', $borrowing) }}"
                                                         @click.stop
@@ -622,7 +622,7 @@
 
                                         <!-- Footer: Actions -->
                                         <div class="flex items-center justify-end border-t border-gray-100 pt-3 gap-3">
-                                            @if(($borrowing->status === 'borrowed' || $borrowing->remaining_quantity > 0) && auth()->id() === $borrowing->user_id)
+                                            @if(($borrowing->status === 'borrowed' || $borrowing->remaining_quantity > 0) && auth()->user()->can('update', $borrowing))
                                                 <button
                                                     type="button"
                                                     @click.stop="$dispatch('open-return-modal', { maxQty: {{ $borrowing->remaining_quantity }}, borrowingId: {{ $borrowing->id }} })"
@@ -712,7 +712,7 @@
                                     <!-- Info -->
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-sm font-bold text-secondary-900 truncate group-hover:text-primary-600 transition-colors">{{ $item->name }}</h4>
-                                        <p class="text-xs text-secondary-500 mb-2 truncate">{{ $item->brand ?? __('ui.no_brand') }} • {{ $item->category }}</p>
+                                        <p class="text-xs text-secondary-500 mb-2 truncate">{{ $item->brand->name ?? __('ui.no_brand') }} • {{ $item->category->name ?? '-' }}</p>
                                         
                                         <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-xs">
                                             <div>
@@ -725,7 +725,7 @@
                                             </div>
                                             <div>
                                                 <span class="text-secondary-400 block text-[10px] uppercase">{{ __('ui.location') }}</span>
-                                                <span class="font-medium text-secondary-700 truncate">{{ $item->location }}</span>
+                                                <span class="font-medium text-secondary-700 truncate">{{ $item->location->name ?? '-' }}</span>
                                             </div>
                                             <div>
                                                 <span class="text-secondary-400 block text-[10px] uppercase">{{ __('ui.stock') }}</span>
@@ -899,7 +899,7 @@
 
                                     processFiles(newFiles) {
                                         if (this.files.length + newFiles.length > 5) {
-                                            alert('Maksimal 5 foto');
+                                            window.showAlert('Peringatan', 'Maksimal 5 foto', 'warning');
                                             return;
                                         }
                                         this.files = this.files.concat(newFiles);
@@ -933,7 +933,7 @@
                                                 this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                                                 this.$refs.video.srcObject = this.stream;
                                             } catch (err) {
-                                                alert('Tidak dapat mengakses kamera: ' + err.message);
+                                                window.showAlert('Error', 'Tidak dapat mengakses kamera: ' + err.message, 'error');
                                                 this.cameraOpen = false;
                                             }
                                         });

@@ -40,10 +40,18 @@ class StockRequestController extends Controller
     {
         $this->authorize('create', StockLog::class);
 
-        $request->validate([
+        $rules = [
             'type' => 'required|in:masuk,keluar',
             'quantity' => 'required|integer|min:1',
             'reason' => 'required|string|max:255',
+        ];
+
+        if ($request->type === 'keluar') {
+            $rules['quantity'] .= '|max:'.$sparepart->stock;
+        }
+
+        $request->validate($rules, [
+            'quantity.max' => "Permintaan dibatalkan: Stok fisik hanya tersisa {$sparepart->stock}. Anda tidak dapat meminta stok lebih dari jumlah yang tersedia.",
         ]);
 
         $user = Auth::user();

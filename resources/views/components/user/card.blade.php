@@ -54,7 +54,7 @@
     <!-- Actions -->
     <div class="flex items-center justify-end gap-2 pt-1 border-t border-secondary-50">
         @if($trash)
-            <form action="{{ route('users.restore', $user->id) }}" method="POST" class="w-full">
+            <form action="{{ route('users.restore', $user->uuid) }}" method="POST" class="w-full">
                 @csrf
                 @method('PATCH')
                 <button type="submit" class="btn btn-sm btn-success w-full justify-center flex items-center gap-2 h-8 text-xs" onclick="confirmUserRestore(event)">

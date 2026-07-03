@@ -40,10 +40,12 @@ class ReportReadyNotification extends Notification implements ShouldBroadcast, S
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Laporan Siap Diunduh - Azventory')
+            ->subject('Laporan Siap Diunduh - '.config('app.name'))
+            ->greeting('Halo,')
             ->line('Laporan Anda "'.$this->title.'" telah selesai dibuat.')
             ->action('Unduh Laporan', url($this->downloadUrl))
-            ->line('Tautan ini akan valid selama file masih tersimpan di server.');
+            ->line('Tautan ini akan valid selama file masih tersimpan di server.')
+            ->salutation('Salam hangat,<br>**Tim '.config('app.name').'**');
     }
 
     /**

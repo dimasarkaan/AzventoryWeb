@@ -4,13 +4,14 @@ namespace Tests\Feature\Users;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class LogoutUserNonaktifTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[Test]
     public function user_nonaktif_otomatis_terlogout_dari_halaman_profil()
     {
         // 1. Buat user aktif
@@ -38,7 +39,7 @@ class LogoutUserNonaktifTest extends TestCase
         $response->assertSessionHasErrors(['login' => 'Akun Anda telah dinonaktifkan oleh Administrator.']);
     }
 
-    /** @test */
+    #[Test]
     public function user_nonaktif_tidak_bisa_login()
     {
         $user = User::factory()->create([

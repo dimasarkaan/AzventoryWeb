@@ -90,12 +90,15 @@
                             url: '{{ $notification->data['url'] ?? '#' }}',
                             markRead() {
                                 if (!this.read) {
+                                    this.read = true; // Optimistic update & double-click protection
                                     axios.patch('{{ route('notifications.read', $notification->id) }}')
                                         .then(() => { 
-                                            this.read = true; 
                                             window.dispatchEvent(new CustomEvent('notification-read'));
                                         })
-                                        .catch(err => console.error(err));
+                                        .catch(err => {
+                                            this.read = false; // Revert if failed
+                                            console.error(err);
+                                        });
                                 }
                                 this.navigate();
                             },

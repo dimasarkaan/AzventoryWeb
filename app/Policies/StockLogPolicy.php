@@ -13,7 +13,7 @@ class StockLogPolicy
      */
     public function viewAny(User $user): bool
     {
-        return in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN]);
+        return $user->role === UserRole::ADMIN;
     }
 
     /**
@@ -31,8 +31,8 @@ class StockLogPolicy
      */
     public function update(User $user, StockLog $stockLog): bool
     {
-        // Hanya Admin dan Superadmin yang bisa melakukan approval.
-        return in_array($user->role, [UserRole::SUPERADMIN, UserRole::ADMIN]);
+        // Hanya Admin yang bisa melakukan approval.
+        return $user->role === UserRole::ADMIN;
     }
 
     /**

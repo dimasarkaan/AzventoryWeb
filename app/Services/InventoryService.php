@@ -37,7 +37,7 @@ class InventoryService
      */
     public function getFilteredSpareparts(array $filters, int $perPage = 10)
     {
-        $query = Sparepart::query();
+        $query = Sparepart::with(['brand', 'category', 'location']);
 
         // Filter untuk item yang dihapus (trash)
         if (($filters['trash'] ?? '') === 'true') {
@@ -49,14 +49,16 @@ class InventoryService
             $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', '%'.$filters['search'].'%')
                     ->orWhere('part_number', 'like', '%'.$filters['search'].'%')
-                    ->orWhere('brand', 'like', '%'.$filters['search'].'%');
+                    ->orWhereHas('brand', function ($bq) use ($filters) {
+                        $bq->where('name', 'like', '%'.$filters['search'].'%');
+                    });
             });
         }
 
-        // Penerapan filter eksak
-        $this->applyExactFilter($query, 'brand', $filters['brand'] ?? null, __('messages.all_brands'));
-        $this->applyExactFilter($query, 'category', $filters['category'] ?? null, __('messages.all_categories'));
-        $this->applyExactFilter($query, 'location', $filters['location'] ?? null, __('messages.all_locations'));
+        // Penerapan filter eksak via relasi
+        $this->applyRelationFilter($query, 'category', $filters['category'] ?? null, __('messages.all_categories'));
+        $this->applyRelationFilter($query, 'brand', $filters['brand'] ?? null, __('messages.all_brands'));
+        $this->applyRelationFilter($query, 'location', $filters['location'] ?? null, __('messages.all_locations'));
         $this->applyExactFilter($query, 'color', $filters['color'] ?? null, __('messages.all_colors'));
         $this->applyExactFilter($query, 'type', $filters['type'] ?? null, __('messages.all_types'));
         $this->applyExactFilter($query, 'condition', $filters['condition'] ?? null, __('messages.all_conditions'));
@@ -100,98 +102,110 @@ class InventoryService
      */
     public function createSparepart(array $data)
     {
-        return DB::transaction(function () use ($data) {
-            $existingItem = $this->findExactDuplicate($data);
+        $lockKey = 'create_sparepart_'.md5(
+            ($data['part_number'] ?? '').
+            ($data['name'] ?? '').
+            ($data['brand_id'] ?? '').
+            ($data['category_id'] ?? '').
+            ($data['location_id'] ?? '').
+            ($data['condition'] ?? '').
+            ($data['type'] ?? '')
+        );
 
-            if ($existingItem) {
-                // Jika aset identik ditemukan, lakukan penggabungan stok (merging)
-                if ($data['stock'] > 0) {
-                    $existingItem->stock += $data['stock'];
-                    $existingItem->save();
+        $lock = Cache::lock($lockKey, 5); // 5 seconds lock
 
-                    $message = __('messages.stock_merged', [
-                        'name' => $existingItem->name,
-                        'part_number' => $existingItem->part_number,
-                    ]);
+        if (! $lock->get()) {
+            return ['status' => 'error_zero_stock', 'message' => __('Sistem mendeteksi proses ganda. Silakan tunggu sebentar.'), 'data' => null];
+        }
 
+        try {
+            return DB::transaction(function () use ($data) {
+                $existingItem = $this->findExactDuplicate($data);
+
+                if ($existingItem) {
+                    // Jika aset identik ditemukan, lakukan penggabungan stok (merging)
+                    if ($data['stock'] > 0) {
+                        $existingItem->stock += $data['stock'];
+                        $existingItem->save();
+
+                        $message = __('messages.stock_merged', [
+                            'name' => $existingItem->name,
+                            'part_number' => $existingItem->part_number,
+                        ]);
+
+                        StockLog::create([
+                            'sparepart_id' => $existingItem->id,
+                            'user_id' => auth()->id(),
+                            'type' => 'masuk',
+                            'quantity' => $data['stock'],
+                            'reason' => __('messages.log_stock_added_duplicate'),
+                            'status' => 'approved',
+                            'approved_by' => auth()->id(),
+                        ]);
+
+                        $this->logActivity('Stok Diupdate', $message, [
+                            'stock' => [
+                                'old' => $existingItem->stock - $data['stock'],
+                                'new' => $existingItem->stock,
+                            ],
+                        ]);
+                        $this->clearCache();
+                        $this->broadcastUpdate($existingItem, 'updated');
+
+                        return ['status' => 'merged', 'message' => $message, 'data' => $existingItem];
+                    } else {
+                        $message = __('messages.stock_zero_duplicate', [
+                            'name' => $existingItem->name,
+                            'part_number' => $existingItem->part_number,
+                        ]);
+
+                        return ['status' => 'error_zero_stock', 'message' => $message, 'data' => $existingItem];
+                    }
+                }
+
+                // Proses pembuatan item baru
+                if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+                    $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
+                } elseif (! empty($data['existing_image'])) {
+                    $existingPath = $data['existing_image'];
+                    if (Storage::disk('public')->exists($existingPath)) {
+                        $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
+                        $newPath = 'spareparts/'.Str::random(40).'.'.$extension;
+                        Storage::disk('public')->copy($existingPath, $newPath);
+                        $data['image'] = $newPath;
+                    }
+                }
+
+                $sparepart = Sparepart::create($data);
+                $sparepart->refresh(); // PASTIKAN UUID dimuat dari database
+                $this->qrCodeService->generate($sparepart);
+
+                if ($sparepart->stock > 0) {
                     StockLog::create([
-                        'sparepart_id' => $existingItem->id,
+                        'sparepart_id' => $sparepart->id,
                         'user_id' => auth()->id(),
                         'type' => 'masuk',
-                        'quantity' => $data['stock'],
-                        'reason' => __('messages.log_stock_added_duplicate'),
+                        'quantity' => $sparepart->stock,
+                        'reason' => __('messages.log_stock_initial'),
                         'status' => 'approved',
                         'approved_by' => auth()->id(),
                     ]);
-
-                    $this->logActivity('Stok Diupdate', $message, [
-                        'stock' => [
-                            'old' => $existingItem->stock - $data['stock'],
-                            'new' => $existingItem->stock,
-                        ],
-                    ]);
-                    $this->clearCache();
-                    $this->broadcastUpdate($existingItem, 'updated');
-
-                    return ['status' => 'merged', 'message' => $message, 'data' => $existingItem];
-                } else {
-                    $message = __('messages.stock_zero_duplicate', [
-                        'name' => $existingItem->name,
-                        'part_number' => $existingItem->part_number,
-                    ]);
-
-                    return ['status' => 'error_zero_stock', 'message' => $message, 'data' => $existingItem];
                 }
-            }
 
-            // Proses pembuatan item baru
-            if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
-            } elseif (! empty($data['existing_image'])) {
-                $existingPath = $data['existing_image'];
-                if (Storage::disk('public')->exists($existingPath)) {
-                    $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
-                    $newPath = 'spareparts/'.Str::random(40).'.'.$extension;
-                    Storage::disk('public')->copy($existingPath, $newPath);
-                    $data['image'] = $newPath;
-                }
-            }
-
-            $sparepart = Sparepart::create($data);
-            $this->qrCodeService->generate($sparepart);
-
-            if ($sparepart->stock > 0) {
-                StockLog::create([
-                    'sparepart_id' => $sparepart->id,
-                    'user_id' => auth()->id(),
-                    'type' => 'masuk',
-                    'quantity' => $sparepart->stock,
-                    'reason' => __('messages.log_stock_initial'),
-                    'status' => 'approved',
-                    'approved_by' => auth()->id(),
+                $message = __('messages.item_created', [
+                    'name' => $sparepart->name,
+                    'part_number' => $sparepart->part_number,
                 ]);
-            }
 
-            $message = __('messages.item_created', [
-                'name' => $sparepart->name,
-                'part_number' => $sparepart->part_number,
-            ]);
+                $this->logActivity('Sparepart Dibuat', $message);
+                $this->clearCache();
+                $this->broadcastUpdate($sparepart, 'created');
 
-            $this->logActivity('Sparepart Dibuat', $message);
-            if ($sparepart->location) {
-                $this->syncLocations($sparepart->location);
-            }
-            if ($sparepart->category) {
-                $this->syncCategories($sparepart->category);
-            }
-            if ($sparepart->brand) {
-                $this->syncBrands($sparepart->brand);
-            }
-            $this->clearCache();
-            $this->broadcastUpdate($sparepart, 'created');
-
-            return ['status' => 'created', 'message' => $message, 'data' => $sparepart];
-        });
+                return ['status' => 'created', 'message' => $message, 'data' => $sparepart];
+            });
+        } finally {
+            $lock->release();
+        }
     }
 
     /**
@@ -205,7 +219,16 @@ class InventoryService
                     Storage::disk('public')->delete($sparepart->image);
                 }
                 $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
+            } elseif (array_key_exists('existing_image', $data) && empty($data['existing_image'])) {
+                // User menghapus foto (klik ikon X) tanpa mengunggah foto baru
+                if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
+                    Storage::disk('public')->delete($sparepart->image);
+                }
+                $data['image'] = null; // Set field image di database menjadi null
             }
+
+            // Hapus existing_image dari array data agar tidak di-fill ke model
+            unset($data['existing_image']);
 
             $sparepart->fill($data);
 
@@ -226,16 +249,6 @@ class InventoryService
             }
 
             $sparepart->save();
-
-            if ($sparepart->isDirty('location') && $sparepart->location) {
-                $this->syncLocations($sparepart->location);
-            }
-            if ($sparepart->isDirty('category') && $sparepart->category) {
-                $this->syncCategories($sparepart->category);
-            }
-            if ($sparepart->isDirty('brand') && $sparepart->brand) {
-                $this->syncBrands($sparepart->brand);
-            }
 
             $this->logActivity('Sparepart Diperbarui', __('messages.log_item_updated', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]), $changes);
             $this->clearCache();
@@ -413,13 +426,24 @@ class InventoryService
     public function getDropdownOptions()
     {
         return [
+            // Data {id, name} untuk form create/edit (submit ID)
             'categories' => Cache::remember('inventory_categories', 3600, function () {
-                return \App\Models\Category::where('is_active', true)->orderBy('name')->pluck('name');
+                return \App\Models\Category::where('is_active', true)->orderBy('name')->get(['id', 'name']);
             }),
             'brands' => Cache::remember('inventory_brands', 3600, function () {
-                return \App\Models\Brand::where('is_active', true)->orderBy('name')->pluck('name');
+                return \App\Models\Brand::where('is_active', true)->orderBy('name')->get(['id', 'name']);
             }),
             'locations' => Cache::remember('inventory_locations', 3600, function () {
+                return \App\Models\Location::where('is_active', true)->orderBy('name')->get(['id', 'name']);
+            }),
+            // Data nama saja untuk filter dropdown di halaman index
+            'categoryOptions' => Cache::remember('inventory_category_options', 3600, function () {
+                return \App\Models\Category::where('is_active', true)->orderBy('name')->pluck('name');
+            }),
+            'brandOptions' => Cache::remember('inventory_brand_options', 3600, function () {
+                return \App\Models\Brand::where('is_active', true)->orderBy('name')->pluck('name');
+            }),
+            'locationOptions' => Cache::remember('inventory_location_options', 3600, function () {
                 return \App\Models\Location::where('is_active', true)->orderBy('name')->pluck('name');
             }),
             'colors' => Cache::remember('inventory_colors', 3600, fn () => Sparepart::whereNotNull('color')->select('color')->distinct()->pluck('color')),
@@ -430,30 +454,6 @@ class InventoryService
         ];
     }
 
-    public function syncLocations(string $locationName): void
-    {
-        if (auth()->check() && auth()->user()->role === \App\Enums\UserRole::SUPERADMIN) {
-            \App\Models\Location::firstOrCreate(['name' => $locationName]);
-            $this->clearCache();
-        }
-    }
-
-    public function syncCategories(string $categoryName): void
-    {
-        if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
-            \App\Models\Category::firstOrCreate(['name' => $categoryName]);
-            $this->clearCache();
-        }
-    }
-
-    public function syncBrands(string $brandName): void
-    {
-        if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
-            \App\Models\Brand::firstOrCreate(['name' => $brandName]);
-            $this->clearCache();
-        }
-    }
-
     /**
      * Invalidasi seluruh cache terkait inventaris dan dashboard.
      */
@@ -462,6 +462,9 @@ class InventoryService
         Cache::forget('inventory_categories');
         Cache::forget('inventory_brands');
         Cache::forget('inventory_locations');
+        Cache::forget('inventory_category_options');
+        Cache::forget('inventory_brand_options');
+        Cache::forget('inventory_location_options');
         Cache::forget('inventory_colors');
         Cache::forget('inventory_units');
         Cache::forget('inventory_names');
@@ -477,6 +480,18 @@ class InventoryService
     {
         if ($value && $value !== $ignoreValue) {
             $query->where($column, $value);
+        }
+    }
+
+    /**
+     * Menerapkan filter berdasarkan nama relasi (category, brand, location).
+     */
+    private function applyRelationFilter(Builder $query, string $relation, ?string $value, string $ignoreValue)
+    {
+        if ($value && $value !== $ignoreValue) {
+            $query->whereHas($relation, function ($q) use ($value) {
+                $q->where('name', $value);
+            });
         }
     }
 
@@ -518,9 +533,9 @@ class InventoryService
         $query = Sparepart::where('id', '!=', $currentItem->id)
             ->where('part_number', $checkData['part_number'])
             ->where('name', $checkData['name'])
-            ->where('brand', $checkData['brand'])
-            ->where('category', $checkData['category'])
-            ->where('location', $checkData['location'])
+            ->where('brand_id', $checkData['brand_id'])
+            ->where('category_id', $checkData['category_id'])
+            ->where('location_id', $checkData['location_id'])
             ->where('condition', $checkData['condition'])
             ->where('type', $checkData['type']);
 
@@ -593,9 +608,9 @@ class InventoryService
     {
         $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
             ->where('name', $data['name'])
-            ->where('brand', $data['brand'])
-            ->where('category', $data['category'])
-            ->where('location', $data['location'])
+            ->where('brand_id', $data['brand_id'])
+            ->where('category_id', $data['category_id'])
+            ->where('location_id', $data['location_id'])
             ->where('condition', $data['condition'])
             ->where('type', $data['type']);
 
@@ -683,9 +698,9 @@ class InventoryService
         return DB::transaction(function () use ($borrowing, $data, $photos) {
             // Pessimistic Locking untuk mencegah race condition / duplikasi stok
             $borrowing = Borrowing::where('id', $borrowing->id)->lockForUpdate()->first();
-            
+
             $qty = $data['return_quantity'];
-            
+
             // Validasi ulang di dalam lock
             if ($qty > $borrowing->remaining_quantity) {
                 throw new \Exception('Jumlah pengembalian melebihi sisa pinjaman (indikasi concurrent request).');
@@ -693,7 +708,7 @@ class InventoryService
 
             $condition = $data['return_condition'];
             $originalSparepart = $borrowing->sparepart;
-            
+
             $translatedCondition = null;
 
             $borrowing->returns()->create([

@@ -26,6 +26,31 @@ window.showToast = (type, message) => {
     }));
 };
 
+// Global Alert Helper (Consistent Styling)
+window.showAlert = function(title, text, icon = 'info') {
+    let btnClass = 'btn-primary ring-primary-500';
+    if(icon === 'error') btnClass = 'btn-danger ring-danger-500';
+    if(icon === 'warning') btnClass = 'btn-warning ring-warning-500';
+    if(icon === 'success') btnClass = 'btn-success ring-success-500';
+    
+    return Swal.fire({
+        title: title,
+        text: text,
+        icon: icon,
+        confirmButtonText: 'Tutup',
+        customClass: {
+            popup: '!rounded-2xl !font-sans',
+            title: '!text-secondary-900 !text-xl !font-bold',
+            htmlContainer: '!text-secondary-500 !text-sm',
+            confirmButton: `btn ${btnClass} px-6 py-2.5 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2`
+        },
+        buttonsStyling: false,
+        width: '24em',
+        padding: '2em',
+        backdrop: `rgba(0,0,0,0.4)`
+    });
+};
+
 // Global Delete Confirmation
 window.confirmDelete = function (event) {
     event.preventDefault();

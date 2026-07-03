@@ -103,7 +103,8 @@
                 </div>
                 @endif
 
-                <!-- Delete Account -->
+                <!-- Delete Account (Hanya Superadmin) -->
+                @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                 <div class="card border-danger-200">
                     <div class="card-header px-4 py-2 bg-danger-50 border-danger-100 flex flex-col items-start gap-1">
                         <h3 class="text-lg font-bold text-danger-900">{{ __('ui.profile_delete_title') }}</h3>
@@ -115,6 +116,7 @@
                         @include('profile.partials.delete-user-form')
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>

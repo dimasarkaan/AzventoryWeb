@@ -14,7 +14,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     // Inventory
     Route::apiResource('inventory', InventoryController::class)->names('api.inventory');
     Route::get('/inventory/{id}/logs', [InventoryController::class, 'logs'])->name('api.inventory.logs');
-    Route::put('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->name('api.inventory.adjust-stock');
+    Route::put('/inventory/{id}/adjust-stock', [InventoryController::class, 'adjustStock'])->middleware('throttle:10,1')->name('api.inventory.adjust-stock');
 
     // Authentication (Protected)
     Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout'])->name('api.logout');
@@ -45,8 +45,10 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     // Stats
     Route::get('/stats', [\App\Http\Controllers\Inventory\Api\StatsController::class, 'index'])->name('api.stats.index');
 
-    // Master Data (Full CRUD via API)
-    Route::apiResource('brands', \App\Http\Controllers\Inventory\BrandController::class)->names('api.brands');
-    Route::apiResource('categories', \App\Http\Controllers\Inventory\CategoryController::class)->names('api.categories');
-    Route::apiResource('locations', \App\Http\Controllers\Inventory\LocationController::class)->names('api.locations');
+    // Master Data (Full CRUD via API) - Khusus Superadmin
+    Route::middleware('role:superadmin')->group(function () {
+        Route::apiResource('brands', \App\Http\Controllers\Inventory\BrandController::class)->names('api.brands');
+        Route::apiResource('categories', \App\Http\Controllers\Inventory\CategoryController::class)->names('api.categories');
+        Route::apiResource('locations', \App\Http\Controllers\Inventory\LocationController::class)->names('api.locations');
+    });
 });

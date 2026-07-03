@@ -47,20 +47,24 @@ class ReportService
         $view = '';
 
         if ($type == 'inventory_list') {
-            $query = Sparepart::orderBy('name');
+            $query = Sparepart::with(['brand', 'category', 'location'])->orderBy('name');
             if ($location !== 'all' && $location) {
-                $query->where('location', $location);
+                $query->whereHas('location', function ($q) use ($location) {
+                    $q->where('name', $location);
+                });
             }
             $title = 'Laporan Data Inventaris Saat Ini';
             $view = 'reports.pdf_inventory_list';
 
         } elseif ($type == 'stock_mutation') {
-            $query = StockLog::with(['sparepart', 'user']);
+            $query = StockLog::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user']);
             $this->applyDateRange($query, 'created_at', $startDate, $endDate);
 
             if ($location !== 'all' && $location) {
                 $query->whereHas('sparepart', function ($q) use ($location) {
-                    $q->where('location', $location);
+                    $q->whereHas('location', function ($lq) use ($location) {
+                        $lq->where('name', $location);
+                    });
                 });
             }
             $query->latest();
@@ -68,7 +72,7 @@ class ReportService
             $view = 'reports.pdf_stock_mutation';
 
         } elseif ($type == 'borrowing_history') {
-            $query = Borrowing::with(['sparepart', 'user'])->withSum('returns', 'quantity');
+            $query = Borrowing::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user'])->withSum('returns', 'quantity');
             $this->applyDateRange($query, 'borrowed_at', $startDate, $endDate);
 
             $query->latest();
@@ -76,11 +80,14 @@ class ReportService
             $view = 'reports.pdf_borrowing_history';
 
         } elseif ($type == 'low_stock') {
-            $query = Sparepart::where('minimum_stock', '>', 0)
+            $query = Sparepart::with(['brand', 'category', 'location'])
+                ->where('minimum_stock', '>', 0)
                 ->whereColumn('stock', '<=', 'minimum_stock')
                 ->orderBy('stock', 'asc');
             if ($location !== 'all' && $location) {
-                $query->where('location', $location);
+                $query->whereHas('location', function ($q) use ($location) {
+                    $q->where('name', $location);
+                });
             }
             $title = 'Laporan Stok Menipis';
             $view = 'reports.pdf_low_stock';

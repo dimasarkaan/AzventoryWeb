@@ -15,7 +15,7 @@ class ApiDataMasterTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function makeUser(string $role = 'admin'): User
+    private function makeUser(string $role = 'superadmin'): User
     {
         return User::factory()->create(['role' => $role, 'password_changed_at' => now()]);
     }

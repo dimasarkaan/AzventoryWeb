@@ -37,11 +37,18 @@ class GlobalSearchController extends Controller
         // 2. Cari Inventaris (Spareparts)
         $spareparts = [];
         if ($user->can('viewAny', Sparepart::class)) {
-            $spareparts = Sparepart::where('name', 'like', "%{$query}%")
+            $spareparts = Sparepart::with(['brand', 'category', 'location'])
+                ->where('name', 'like', "%{$query}%")
                 ->orWhere('part_number', 'like', "%{$query}%")
-                ->orWhere('brand', 'like', "%{$query}%")
-                ->orWhere('category', 'like', "%{$query}%")
-                ->orWhere('location', 'like', "%{$query}%")
+                ->orWhereHas('brand', function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                })
+                ->orWhereHas('category', function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                })
+                ->orWhereHas('location', function ($q) use ($query) {
+                    $q->where('name', 'like', "%{$query}%");
+                })
                 ->limit(5)
                 ->get()
                 ->map(function ($item) {
@@ -54,7 +61,7 @@ class GlobalSearchController extends Controller
                     return [
                         'id' => $item->id,
                         'title' => $item->name,
-                        'subtitle' => $item->part_number.' • '.$item->location.' • Stok: '.$item->stock,
+                        'subtitle' => $item->part_number.' • '.($item->location->name ?? '-').' • Stok: '.$item->stock,
                         'image' => $item->image ? asset('storage/'.$item->image) : null,
                         'url' => $url,
                         'type' => 'Inventaris',

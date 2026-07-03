@@ -33,7 +33,7 @@
                 <td style="text-align:center;">{{ $index + 1 }}</td>
                 <td>{{ $row->part_number }}</td>
                 <td>{{ $row->name }}</td>
-                <td>{{ $row->location }}</td>
+                <td>{{ $row->location?->name ?? '-' }}</td>
                 <td class="critical" style="text-align: center; font-size: 11pt;">{{ $row->stock }}</td>
                 <td style="text-align: center;">{{ $row->minimum_stock }}</td>
                 <td class="critical">{{ strtoupper(__('ui.status_critical')) }}</td>

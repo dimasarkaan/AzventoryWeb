@@ -24,9 +24,9 @@ class UpdateSparepartRequest extends FormRequest
         $rules = [
             'name' => 'required|string|max:255',
             'part_number' => 'required|string|max:255',
-            'brand' => 'required|string|max:255',
-            'category' => 'required|string|max:255',
-            'location' => 'required|string|max:255',
+            'brand_id' => 'required|exists:brands,id',
+            'category_id' => 'required|exists:categories,id',
+            'location_id' => 'required|exists:locations,id',
             'condition' => 'required|string|max:255',
             'color' => 'nullable|string|max:50',
             'type' => 'required|in:sale,asset',
@@ -36,6 +36,7 @@ class UpdateSparepartRequest extends FormRequest
             'unit' => 'nullable|string|max:50',
             'status' => 'required|in:aktif,nonaktif',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // Max 5MB untuk foto HP
+            'existing_image' => 'nullable|string',
             'age' => 'required|in:Baru,Pernah Dipakai (Bekas)',
         ];
 
@@ -57,9 +58,9 @@ class UpdateSparepartRequest extends FormRequest
             'price' => 'Harga Satuan',
             'part_number' => 'Part Number',
             'name' => 'Nama Barang',
-            'brand' => 'Merk',
-            'category' => 'Kategori',
-            'location' => 'Lokasi Penyimpanan',
+            'brand_id' => 'Merk',
+            'category_id' => 'Kategori',
+            'location_id' => 'Lokasi Penyimpanan',
             'condition' => 'Kondisi Barang',
             'color' => 'Warna',
             'type' => 'Tipe Barang',

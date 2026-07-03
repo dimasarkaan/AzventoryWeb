@@ -12,6 +12,7 @@
                 
                 <div class="flex gap-2">
                     <!-- Export Dropdown -->
+                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                     <div x-data="{ open: false, isExporting: false }" class="relative">
                         <button @click="open = !open" @click.away="open = false" 
                                 :disabled="isExporting"
@@ -47,6 +48,7 @@
                             </a>
                         </div>
                     </div>
+                    @endif
 
                     <button @click="showFilters = !showFilters" 
                             class="btn btn-secondary flex items-center gap-2"
@@ -197,7 +199,9 @@
                     <table class="table-modern w-full">
                         <thead>
                             <tr>
+                                @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                                 <th>{{ __('ui.user_header') }}</th>
+                                @endif
                                 <th>{{ __('ui.action_header') }}</th>
                                  <th>{{ __('ui.description_header') }}</th>
                                 <th>{{ __('ui.time_header') }}</th>
@@ -207,6 +211,7 @@
                         <tbody id="desktop-logs-body">
                             @forelse ($activityLogs as $log)
                                 <tr class="group hover:bg-secondary-50 transition-colors" id="log-{{ $log->id }}">
+                                    @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                                     <td>
                                         <div class="flex items-center gap-3">
                                             <div class="h-8 w-8 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0">
@@ -222,6 +227,7 @@
                                             </div>
                                         </div>
                                     </td>
+                                    @endif
                                     <td>
                                         @php
                                             $badgeColor = 'bg-secondary-50 text-secondary-700 border-secondary-200';
@@ -258,7 +264,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="p-8 text-center text-secondary-500">
+                                    <td colspan="{{ auth()->user()->role === \App\Enums\UserRole::OPERATOR ? '4' : '5' }}" class="p-8 text-center text-secondary-500">
                                         {{ __('ui.no_activity_logs') }}
                                     </td>
                                 </tr>
@@ -273,6 +279,7 @@
                 @forelse ($activityLogs as $log)
                     <div class="card p-4 flex flex-col gap-3">
                         <div class="flex items-center justify-between gap-4">
+                            @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                             <div class="flex items-center gap-3 min-w-0">
                                 <div class="h-10 w-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0 font-bold overflow-hidden">
                                      @if($log->user && $log->user->avatar)
@@ -286,6 +293,11 @@
                                     <div class="text-xs text-secondary-500">{{ $log->created_at->diffForHumans() }}</div>
                                 </div>
                             </div>
+                            @else
+                            <div class="min-w-0">
+                                <div class="text-sm font-bold text-secondary-900">{{ $log->created_at->diffForHumans() }}</div>
+                            </div>
+                            @endif
                             @php
                                 $badgeColor = 'bg-secondary-50 text-secondary-700 border-secondary-200';
                                 $action = strtolower($log->action);
@@ -418,6 +430,7 @@
     <script>
         function activityLogComponent() {
             return {
+                userRole: '{{ auth()->user()->role->value }}',
                 showFilters: false,
                 showActivityModal: false,
                 selectedActivity: null,
@@ -520,11 +533,12 @@
                     }
 
                     if (desktopBody) {
-                        const emptyRow = desktopBody.querySelector('td[colspan="5"]');
+                        const emptyRow = desktopBody.querySelector('td[colspan]');
                         if (emptyRow) emptyRow.closest('tr').remove();
                         
                         const newRowHTML = `
                             <tr class="group hover:bg-secondary-50 transition-colors animate-highlight" id="log-${activity.id}">
+                                ${this.userRole !== 'operator' ? `
                                 <td>
                                     <div class="flex items-center gap-3">
                                         <div class="h-8 w-8 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0">
@@ -536,6 +550,7 @@
                                         </div>
                                     </div>
                                 </td>
+                                ` : ''}
                                 <td>
                                     <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${badgeColor}">
                                         ${activity.action}
@@ -570,6 +585,7 @@
                         const newCardHTML = `
                             <div class="card p-4 flex flex-col gap-3 animate-highlight">
                                 <div class="flex items-center justify-between gap-4">
+                                    ${this.userRole !== 'operator' ? `
                                     <div class="flex items-center gap-3 min-w-0">
                                         <div class="h-10 w-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0 font-bold overflow-hidden">
                                             ${(activity.user_name || 'S').charAt(0)}
@@ -579,6 +595,11 @@
                                             <div class="text-xs text-secondary-500">Baru Saja</div>
                                         </div>
                                     </div>
+                                    ` : `
+                                    <div class="min-w-0">
+                                        <div class="text-sm font-bold text-secondary-900">Baru Saja</div>
+                                    </div>
+                                    `}
                                     <span class="badge ${badgeColor} text-[10px] uppercase font-bold tracking-wider flex-shrink-0 whitespace-nowrap">${activity.action}</span>
                                 </div>
                                 <div class="text-sm text-secondary-600 bg-secondary-50 p-3 rounded-lg border border-secondary-100 flex justify-between items-start gap-4">

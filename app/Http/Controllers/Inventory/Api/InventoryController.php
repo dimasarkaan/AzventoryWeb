@@ -54,14 +54,14 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'part_number' => 'required|unique:spareparts,part_number',
             'name' => 'required|string',
-            'brand' => 'required|string',
-            'location' => 'required|string',
+            'brand_id' => 'required|exists:brands,id',
+            'location_id' => 'required|exists:locations,id',
             'type' => 'required|in:sale,asset',
             'stock' => 'required|integer|min:0',
             'price' => 'nullable|numeric|min:0',
             'unit' => 'nullable|string',
             'minimum_stock' => 'nullable|integer|min:0',
-            'category' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
             'condition' => 'required|string',
             'age' => 'nullable|string|max:50',
             'status' => 'required|in:aktif,nonaktif',
@@ -85,19 +85,20 @@ class InventoryController extends Controller
      */
     public function show($id)
     {
-        $sparepart = Sparepart::find($id);
-
-        if (! $sparepart) {
+        $inventory = Sparepart::where('uuid', $id)->first();
+        if (! $inventory) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Data Barang tidak ditemukan di katalog.',
             ], 404);
         }
 
+        $inventory->load(['brand', 'category', 'location']);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Detail data barang berhasil diambil',
-            'data' => new SparepartResource($sparepart),
+            'data' => new SparepartResource($inventory),
         ]);
     }
 
@@ -109,37 +110,40 @@ class InventoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $sparepart = Sparepart::find($id);
-
-        if (! $sparepart) {
-            return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
+        $inventory = Sparepart::where('uuid', $id)->first();
+        if (! $inventory) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data Barang tidak ditemukan di katalog.',
+            ], 404);
         }
 
-        $this->authorize('update', $sparepart);
+        $this->authorize('update', $inventory);
 
         $validated = $request->validate([
-            'part_number' => 'sometimes|unique:spareparts,part_number,'.$id,
+            'part_number' => 'sometimes|unique:spareparts,part_number,'.$inventory->id,
             'name' => 'sometimes|string',
-            'brand' => 'sometimes|string',
-            'location' => 'sometimes|string',
+            'brand_id' => 'sometimes|exists:brands,id',
+            'location_id' => 'sometimes|exists:locations,id',
             'type' => 'sometimes|in:sale,asset',
             'stock' => 'sometimes|integer|min:0',
             'price' => 'nullable|numeric|min:0',
             'unit' => 'nullable|string',
             'minimum_stock' => 'nullable|integer|min:0',
-            'category' => 'sometimes|string',
+            'category_id' => 'sometimes|exists:categories,id',
             'condition' => 'sometimes|string',
             'age' => 'sometimes|string|max:50',
             'status' => 'sometimes|in:aktif,nonaktif',
         ]);
 
-        $sparepart->update($validated);
-        $this->qrCodeService->generate($sparepart->fresh());
+        $inventory->update($validated);
+        $inventory->load(['brand', 'category', 'location']);
+        $this->qrCodeService->generate($inventory);
 
         return response()->json([
             'status' => 'success',
             'message' => 'Data Barang berhasil diperbarui',
-            'data' => new SparepartResource($sparepart),
+            'data' => new SparepartResource($inventory),
         ]);
     }
 
@@ -151,15 +155,17 @@ class InventoryController extends Controller
      */
     public function destroy($id)
     {
-        $sparepart = Sparepart::find($id);
-
-        if (! $sparepart) {
-            return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
+        $inventory = Sparepart::where('uuid', $id)->first();
+        if (! $inventory) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data Barang tidak ditemukan di katalog.',
+            ], 404);
         }
 
-        $this->authorize('delete', $sparepart);
+        $this->authorize('delete', $inventory);
 
-        $sparepart->delete();
+        $inventory->delete();
 
         return response()->json([
             'status' => 'success',
@@ -175,12 +181,13 @@ class InventoryController extends Controller
      */
     public function adjustStock(Request $request, $id)
     {
-        $sparepart = Sparepart::find($id);
+        $sparepart = Sparepart::where('uuid', $id)->first();
 
         if (! $sparepart) {
-            return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
+            return response()->json(['status' => 'error', 'message' => 'Data Barang tidak ditemukan di katalog.'], 404);
         }
 
+        // Fix Role-Based Access for API (Only Superadmin and Admin)
         $this->authorize('update', $sparepart);
 
         $request->validate([
@@ -189,43 +196,56 @@ class InventoryController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        if ($request->type === 'decrement' && $sparepart->stock < $request->quantity) {
-            return response()->json(['status' => 'error', 'message' => 'Insufficient stock'], 400);
-        }
-
-        // PENTING: Gunakan $request->user() bukan auth() karena
-        // auth() bisa resolve ke guard 'web' (null) saat pakai Sanctum token.
         $apiUser = $request->user();
 
         if (! $apiUser) {
             return response()->json(['status' => 'error', 'message' => 'Unauthenticated'], 401);
         }
 
-        // Update Stock
-        if ($request->type === 'increment') {
-            $sparepart->increment('stock', $request->quantity);
-        } else {
-            $sparepart->decrement('stock', $request->quantity);
+        // Bungkus dengan Transaction dan DB Lock (Pessimistic Locking)
+        $result = \Illuminate\Support\Facades\DB::transaction(function () use ($id, $request, $apiUser) {
+            // Mengunci baris ini untuk mencegah race condition dari scanner lain
+            $lockedSparepart = Sparepart::where('uuid', $id)->lockForUpdate()->first();
+
+            if ($request->type === 'decrement' && $lockedSparepart->stock < $request->quantity) {
+                return ['status' => 'error', 'message' => 'Insufficient stock', 'code' => 400];
+            }
+
+            // Update Stock aman di dalam lock
+            if ($request->type === 'increment') {
+                $lockedSparepart->stock += $request->quantity;
+            } else {
+                $lockedSparepart->stock -= $request->quantity;
+            }
+            $lockedSparepart->save();
+
+            // Log the change
+            StockLog::create([
+                'sparepart_id' => $lockedSparepart->id,
+                'user_id' => $apiUser->id,
+                'type' => $request->type === 'increment' ? 'masuk' : 'keluar',
+                'quantity' => $request->quantity,
+                'reason' => 'API Adjustment: '.($request->description ?? 'No description'),
+                'status' => 'approved',
+                'approved_by' => $apiUser->id,
+                'approved_at' => now(),
+            ]);
+
+            return ['status' => 'success', 'data' => $lockedSparepart];
+        });
+
+        if ($result['status'] === 'error') {
+            return response()->json(['status' => 'error', 'message' => $result['message']], $result['code']);
         }
 
-        // Log the change
-        StockLog::create([
-            'sparepart_id' => $sparepart->id,
-            'user_id' => $apiUser->id, // FIX: pakai $request->user() bukan auth()->id()
-            'type' => $request->type === 'increment' ? 'masuk' : 'keluar',
-            'quantity' => $request->quantity,
-            'reason' => 'API Adjustment: '.($request->description ?? 'No description'),
-            'status' => 'approved',
-            'approved_by' => $apiUser->id,
-            'approved_at' => now(),
-        ]);
+        $sparepart = $result['data'];
 
         // 1. Broadcast update ke semua user.
         try {
             broadcast(new \App\Events\InventoryUpdatedEvent(
-                $sparepart->fresh(),
+                $sparepart,
                 'updated',
-                $apiUser->name  // FIX: pakai $apiUser bukan auth()->user()
+                $apiUser->name
             ))->toOthers();
         } catch (\Exception $e) {
         }
@@ -259,13 +279,13 @@ class InventoryController extends Controller
      */
     public function logs(Request $request, $id)
     {
-        $sparepart = Sparepart::find($id);
+        $sparepart = Sparepart::where('uuid', $id)->first();
 
         if (! $sparepart) {
             return response()->json(['status' => 'error', 'message' => 'Sparepart not found'], 404);
         }
 
-        $logs = StockLog::where('sparepart_id', $id)
+        $logs = StockLog::where('sparepart_id', $sparepart->id)
             ->with('user')
             ->latest()
             ->paginate($request->input('per_page', 20));

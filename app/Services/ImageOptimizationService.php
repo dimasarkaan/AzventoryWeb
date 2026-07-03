@@ -5,8 +5,6 @@ namespace App\Services;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Intervention\Image\Drivers\Gd\Driver;
-use Intervention\Image\ImageManager;
 
 /**
  * ImageOptimizationService menangani kompresi, resize, dan konversi gambar ke format WebP.
@@ -16,11 +14,18 @@ class ImageOptimizationService
     protected $manager;
 
     /**
-     * Inisialisasi ImageManager dengan driver GD.
+     * Inisialisasi ImageManager dengan driver GD (lazy, agar tidak crash saat boot).
      */
-    public function __construct()
+    protected function getManager()
     {
-        $this->manager = new ImageManager(new Driver);
+        if (! $this->manager) {
+            if (! extension_loaded('gd')) {
+                return null;
+            }
+            $this->manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver);
+        }
+
+        return $this->manager;
     }
 
     /**
@@ -30,14 +35,26 @@ class ImageOptimizationService
      */
     public function optimizeAndSave(UploadedFile $file, string $folder, int $maxWidth = 1000, int $quality = 80): string
     {
-        $filename = Str::random(40).'.webp';
-        $path = $folder.'/'.$filename;
-
         if (! Storage::disk('public')->exists($folder)) {
             Storage::disk('public')->makeDirectory($folder);
         }
 
-        $image = $this->manager->read($file);
+        $manager = $this->getManager();
+
+        // Fallback: jika GD tidak tersedia, simpan file apa adanya tanpa optimasi
+        if (! $manager) {
+            $extension = $file->getClientOriginalExtension() ?: 'jpg';
+            $filename = Str::random(40).'.'.$extension;
+            $path = $folder.'/'.$filename;
+            Storage::disk('public')->put($path, file_get_contents($file));
+
+            return $path;
+        }
+
+        $filename = Str::random(40).'.webp';
+        $path = $folder.'/'.$filename;
+
+        $image = $manager->read($file);
 
         // Resize otomatis jika lebar gambar melebihi batas maksimal, tetap menjaga aspek rasio.
         if ($image->width() > $maxWidth) {

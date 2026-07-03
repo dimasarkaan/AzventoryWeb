@@ -62,12 +62,12 @@
     @else
         <td class="px-4 py-3 text-center">
             <span class="text-sm text-secondary-700 font-medium truncate block">
-                {{ $sparepart->brand ?? '-' }}
+                {{ $sparepart->brand->name ?? '-' }}
             </span>
         </td>
         <td class="px-4 py-3 text-center">
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-secondary-100 text-secondary-600 truncate border border-secondary-200">
-                {{ $sparepart->category }}
+                {{ $sparepart->category->name ?? '-' }}
             </span>
         </td>
         <!-- Condition Column -->
@@ -98,7 +98,7 @@
         <td class="px-4 py-3">
             <div class="flex items-center justify-center gap-1.5 text-secondary-600 text-sm truncate bg-secondary-50/50 px-2 py-1 rounded transition-colors">
                 <svg class="w-4 h-4 text-secondary-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                <span class="truncate">{{ $sparepart->location }}</span>
+                <span class="truncate">{{ $sparepart->location->name ?? '-' }}</span>
             </div>
         </td>
     @endif
@@ -123,7 +123,7 @@
         <div class="flex items-center justify-center gap-2">
             @if($trash)
                 @can('restore', $sparepart)
-                <form action="{{ route('inventory.restore', $sparepart->id) }}" method="POST" class="inline-block">
+                <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="inline-block">
                     @csrf
                     @method('PATCH')
                     <button type="submit" class="btn btn-ghost p-2 text-success-600 hover:text-success-700 bg-success-50 hover:bg-success-100 rounded-lg transition-all" title="{{ __('ui.restore') }}" onclick="confirmInventoryRestore(event)">
@@ -132,7 +132,7 @@
                 </form>
                 @endcan
                 @can('forceDelete', $sparepart)
-                <form action="{{ route('inventory.force-delete', $sparepart->id) }}" method="POST" class="inline-block">
+                <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-ghost p-2 text-danger-600 hover:text-danger-700 bg-danger-50 hover:bg-danger-100 rounded-lg transition-all" title="{{ __('ui.force_delete') }}" onclick="confirmInventoryForceDelete(event)">

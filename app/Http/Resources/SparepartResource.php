@@ -15,6 +15,7 @@ class SparepartResource extends JsonResource
     {
         parent::__construct($resource);
     }
+
     /**
      * Transform resource ke array.
      *
@@ -27,8 +28,10 @@ class SparepartResource extends JsonResource
             'id' => $this->id,
             'part_number' => $this->part_number,
             'name' => $this->name,
-            'brand' => $this->brand,
-            'category' => $this->category,
+            'brand' => $this->brand?->name,
+            'brand_id' => $this->brand_id,
+            'category' => $this->category?->name,
+            'category_id' => $this->category_id,
             'type' => $this->type,
             'condition' => $this->condition,
             'status' => $this->status,
@@ -39,7 +42,8 @@ class SparepartResource extends JsonResource
                 'unit' => $this->unit,
                 'is_low' => $this->minimum_stock > 0 && $this->stock <= $this->minimum_stock,
             ],
-            'location' => $this->location,
+            'location' => $this->location?->name,
+            'location_id' => $this->location_id,
             // Sembunyikan harga jika nilainya null, atau ubah menjadi float
             'price' => $this->when($this->price !== null, (float) $this->price),
             'image_url' => $this->image ? asset('storage/'.$this->image) : null,

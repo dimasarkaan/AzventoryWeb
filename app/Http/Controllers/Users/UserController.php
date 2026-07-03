@@ -192,7 +192,7 @@ class UserController extends Controller
      */
     public function restore($id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()->where('uuid', $id)->firstOrFail();
         $this->authorize('restore', $user);
         $user->restore();
 
@@ -207,7 +207,7 @@ class UserController extends Controller
      */
     public function forceDelete($id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::withTrashed()->where('uuid', $id)->firstOrFail();
         $this->authorize('forceDelete', $user);
 
         // Final check to prevent self-deletion even if force

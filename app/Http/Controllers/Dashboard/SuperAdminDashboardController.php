@@ -151,7 +151,7 @@ class SuperAdminDashboardController extends Controller
         });
 
         // --- Stok Menipis (max 5) ---
-        $lowStockItemsRaw = \App\Models\Sparepart::whereColumn('stock', '<=', 'minimum_stock')
+        $lowStockItemsRaw = \App\Models\Sparepart::with('category')->whereColumn('stock', '<=', 'minimum_stock')
             ->where('stock', '>', 0)
             ->orderBy('stock', 'asc')
             ->take(5)
@@ -163,7 +163,7 @@ class SuperAdminDashboardController extends Controller
                 'name' => $item->name,
                 'stock' => $item->stock,
                 'minimum_stock' => $item->minimum_stock,
-                'category_name' => $item->category ?? 'Unknown',
+                'category_name' => $item->category->name ?? 'Unknown',
             ];
         });
 

@@ -263,7 +263,7 @@ class ExcelExportService
         foreach ($items as $item) {
             $sheet->setCellValue("A{$row}", $item->part_number);
             $sheet->setCellValue("B{$row}", $item->name);
-            $sheet->setCellValue("C{$row}", $item->category);
+            $sheet->setCellValue("C{$row}", $item->category?->name ?? '-');
 
             // Status Logic: Handle both Enum object and string
             $statusText = ($item->status instanceof \BackedEnum) ? $item->status->value : (is_string($item->status) ? ucfirst($item->status) : $item->status);
@@ -284,7 +284,7 @@ class ExcelExportService
                 'font' => ['color' => ['argb' => $color], 'bold' => true],
             ]);
 
-            $sheet->setCellValue("E{$row}", $item->location);
+            $sheet->setCellValue("E{$row}", $item->location?->name ?? '-');
             $sheet->setCellValueExplicit("F{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
             $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode('#,##0');
             $row++;
@@ -332,7 +332,7 @@ class ExcelExportService
         $this->setupReportTitle($sheet, 'Laporan Harga & Mutasi Stok', $lastColumn);
 
         // Headers
-        $headers = ['Tanggal', 'Nomor Part', 'Nama Barang', 'Tipe Mutasi', 'Jumlah', 'Stok Akhir', 'Diproses Oleh', 'Keterangan'];
+        $headers = ['Tanggal', 'Nomor Part', 'Nama Barang', 'Tipe Mutasi', 'Jumlah', 'Diproses Oleh', 'Keterangan'];
         foreach ($headers as $index => $header) {
             $column = chr(ord('A') + $index);
             $sheet->setCellValue("{$column}{$headerRow}", $header);
@@ -349,25 +349,17 @@ class ExcelExportService
             $sheet->setCellValue("B{$row}", $log->sparepart->part_number ?? '-');
             $sheet->setCellValue("C{$row}", $log->sparepart->name ?? '-');
 
-            $typeLabel = $log->type === 'in' ? 'Masuk' : 'Keluar';
-            if ($log->type === 'borrow') {
-                $typeLabel = 'Dipinjam';
-            }
-            if ($log->type === 'return') {
-                $typeLabel = 'Dikembalikan';
-            }
+            $typeLabel = $log->type === 'masuk' ? 'Masuk' : 'Keluar';
 
             $sheet->setCellValue("D{$row}", $typeLabel);
 
             // Format quantity (+ / -)
-            $qtyPrefix = in_array($log->type, ['in', 'return']) ? '+' : '-';
+            $qtyPrefix = $log->type === 'masuk' ? '+' : '-';
             // Store as explicit string or number, keep format (+ / -)
             $sheet->setCellValueExplicit("E{$row}", $qtyPrefix.$log->quantity, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
 
-            $sheet->setCellValueExplicit("F{$row}", $log->balance, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-            $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode('#,##0');
-            $sheet->setCellValue("G{$row}", $log->user->name ?? '-');
-            $sheet->setCellValue("H{$row}", $log->remarks);
+            $sheet->setCellValue("F{$row}", $log->user->name ?? '-');
+            $sheet->setCellValue("G{$row}", $log->reason);
             $row++;
         }
 
@@ -504,8 +496,8 @@ class ExcelExportService
         foreach ($items as $item) {
             $sheet->setCellValue("A{$row}", $item->part_number);
             $sheet->setCellValue("B{$row}", $item->name);
-            $sheet->setCellValue("C{$row}", $item->category);
-            $sheet->setCellValue("D{$row}", $item->location);
+            $sheet->setCellValue("C{$row}", $item->category->name ?? '-');
+            $sheet->setCellValue("D{$row}", $item->location->name ?? '-');
             $sheet->setCellValueExplicit("E{$row}", $item->minimum_stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
             $sheet->setCellValueExplicit("F{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
             $sheet->getStyle("E{$row}:F{$row}")->getNumberFormat()->setFormatCode('#,##0');

@@ -1,7 +1,7 @@
 <script>
     console.log('Alpine Script Loaded');
     window.testGlobalClick = function() {
-        alert('Global JS is working!');
+        console.log('Global JS is working!');
     }
 
     document.addEventListener('alpine:init', () => {
@@ -194,12 +194,12 @@
                                 }
                             });
                         } else {
-                            alert(data.message || 'Terjadi kesalahan sistem.');
+                            window.showAlert('Error', data.message || 'Terjadi kesalahan sistem.', 'error');
                         }
                     }
                 } catch (error) {
                     console.error('Submission error:', error);
-                    alert('Gagal menghubungi server.');
+                    window.showAlert('Error', 'Gagal menghubungi server.', 'error');
                 } finally {
                     this.isSubmitting = false;
                 }

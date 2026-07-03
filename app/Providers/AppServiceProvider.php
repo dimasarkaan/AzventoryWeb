@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Sparepart;
 use App\Policies\SparepartPolicy;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -76,17 +77,18 @@ class AppServiceProvider extends ServiceProvider
             return (new \Illuminate\Notifications\Messages\MailMessage)
                 ->subject('🔐 Atur Ulang Kata Sandi - '.$firstName.' | '.config('app.name'))
                 ->greeting('Halo, '.$firstName.'!')
-                ->line('Kami menerima permintaan untuk mereset kata sandi akun Azventory Anda. Keamanan akun Anda adalah prioritas kami.')
+                ->line('Kami menerima permintaan untuk mengatur ulang kata sandi akun Azventory Anda.')
                 ->action('Atur Ulang Kata Sandi', $resetUrl)
-                ->line('Link atur ulang kata sandi ini akan kedaluwarsa dalam 60 menit.')
-                ->line('**🛡️ Keamanan Informasi**: Link ini dibuat khusus untuk Anda dan hanya bisa digunakan satu kali. Jika Anda tidak merasa melakukan permintaan ini, abaikan saja email ini.')
-                ->line('Jika tombol di atas tidak berfungsi, silakan salin dan tempel link berikut ke browser Anda:')
+                ->line('Tautan atur ulang kata sandi ini akan kedaluwarsa dalam 60 menit.')
+                ->line('**🛡️ Informasi**: Tautan ini dibuat khusus untuk Anda dan hanya bisa digunakan satu kali. Jika Anda tidak merasa melakukan permintaan ini, silakan abaikan email ini.')
+                ->line('Jika tombol di atas tidak berfungsi, silakan salin dan tempel tautan berikut ke browser Anda:')
                 ->line($resetUrl)
-                ->salutation('Salam Hangat,'.PHP_EOL.'**Tim Support Azventory**');
+                ->salutation('Salam hangat,<br>**Tim '.config('app.name').'**');
         });
 
         // Environment validation untuk production
         if (app()->environment('production')) {
+            URL::forceScheme('https');
             $this->validateCriticalEnvVariables();
         }
     }

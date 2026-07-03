@@ -118,14 +118,14 @@ class AdminDashboardController extends Controller
                 'user',
             ])
                 ->where('status', 'borrowed')
-                ->whereIn('user_id', function ($q) use ($user) {
-                    // Admin melihat peminjaman dirinya sendiri + semua Operator
+                ->whereIn('user_id', function ($q) {
+                    // Admin melihat peminjaman semua Admin dan Operator
                     $q->select('id')
                         ->from('users')
-                        ->where(fn ($inner) => $inner
-                            ->where('role', \App\Enums\UserRole::OPERATOR)
-                            ->orWhere('id', $user->id)
-                        );
+                        ->whereIn('role', [
+                            \App\Enums\UserRole::OPERATOR,
+                            \App\Enums\UserRole::ADMIN,
+                        ]);
                 })
                 ->latest()
                 ->take(5)
@@ -138,19 +138,19 @@ class AdminDashboardController extends Controller
             ])
                 ->where('status', 'borrowed')
                 ->where('expected_return_at', '<', now())
-                ->whereIn('user_id', function ($q) use ($user) {
+                ->whereIn('user_id', function ($q) {
                     $q->select('id')
                         ->from('users')
-                        ->where(fn ($inner) => $inner
-                            ->where('role', \App\Enums\UserRole::OPERATOR)
-                            ->orWhere('id', $user->id)
-                        );
+                        ->whereIn('role', [
+                            \App\Enums\UserRole::OPERATOR,
+                            \App\Enums\UserRole::ADMIN,
+                        ]);
                 })
                 ->orderBy('expected_return_at', 'asc')
                 ->take(5)
                 ->get();
 
-            $lowStockItemsRaw = \App\Models\Sparepart::whereColumn('stock', '<=', 'minimum_stock')
+            $lowStockItemsRaw = \App\Models\Sparepart::with('category')->whereColumn('stock', '<=', 'minimum_stock')
                 ->where('stock', '>', 0)
                 ->orderBy('stock', 'asc')
                 ->take(5)
@@ -162,7 +162,7 @@ class AdminDashboardController extends Controller
                     'name' => $item->name,
                     'stock' => $item->stock,
                     'minimum_stock' => $item->minimum_stock,
-                    'category_name' => $item->category ?? 'Unknown',
+                    'category_name' => $item->category->name ?? 'Unknown',
                 ];
             });
 

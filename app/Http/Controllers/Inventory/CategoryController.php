@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Models\Sparepart;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -21,12 +20,12 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::orderBy('name')->get()->map(function ($cat) {
+        $categories = Category::withCount('spareparts')->orderBy('name')->get()->map(function ($cat) {
             return [
                 'id' => $cat->id,
                 'name' => $cat->name,
                 'is_active' => (bool) $cat->is_active,
-                'items_count' => Sparepart::where('category', $cat->name)->count(),
+                'items_count' => $cat->spareparts_count,
             ];
         });
 
@@ -41,6 +40,7 @@ class CategoryController extends Controller
 
         $category = Category::create(['name' => $request->name]);
         Cache::forget('inventory_categories');
+        Cache::forget('inventory_category_options');
 
         $this->logActivity('Kategori Dibuat', "Kategori baru '{$category->name}' ditambahkan.");
 
@@ -65,20 +65,17 @@ class CategoryController extends Controller
 
         $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
-        DB::transaction(function () use ($category, $oldName, $newName, $request) {
+        DB::transaction(function () use ($category, $newName, $request) {
             $updateData = ['name' => $newName];
             if ($request->has('is_active')) {
                 $updateData['is_active'] = $request->is_active;
             }
             $category->update($updateData);
-
-            // Update all spareparts that use this category string
-            if ($oldName !== $newName) {
-                Sparepart::where('category', $oldName)->update(['category' => $newName]);
-            }
+            // Tidak perlu bulk-update spareparts lagi karena relasi via FK (id tetap sama)
         });
 
         Cache::forget('inventory_categories');
+        Cache::forget('inventory_category_options');
 
         if ($hasChanged) {
             $changes = [];
@@ -110,8 +107,8 @@ class CategoryController extends Controller
     {
         $category = Category::findOrFail($id);
 
-        // Check if category is in use
-        $count = Sparepart::where('category', $category->name)->count();
+        // Check if category is in use via relasi
+        $count = $category->spareparts()->count();
 
         if ($count > 0) {
             return response()->json([
@@ -121,6 +118,7 @@ class CategoryController extends Controller
 
         $category->delete();
         Cache::forget('inventory_categories');
+        Cache::forget('inventory_category_options');
 
         $this->logActivity('Kategori Dihapus', "Kategori '{$category->name}' dihapus.");
 

@@ -43,6 +43,9 @@
              <!-- Search & Filters -->
              <div class="mb-4 card p-4 overflow-visible" x-data="{ showFilters: false }">
                  <form method="GET" action="{{ route('users.index') }}">
+                     @if(request('trash'))
+                         <input type="hidden" name="trash" value="true">
+                     @endif
                      <!-- Top: Search Bar & Filter Toggle -->
                      <div class="mb-4 flex flex-col md:flex-row gap-4 items-center justify-between transition-all duration-300">
                         <div class="flex w-full gap-2 md:block">
@@ -158,7 +161,7 @@
                         <div class="flex items-center justify-end gap-2">
                             @if(request('trash'))
                                 @can('restore', $user)
-                                <form action="{{ route('users.restore', $user->id) }}" method="POST" class="w-full">
+                                <form action="{{ route('users.restore', $user->uuid) }}" method="POST" class="w-full">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-sm btn-success w-full justify-center flex items-center gap-2" onclick="confirmUserRestore(event)">

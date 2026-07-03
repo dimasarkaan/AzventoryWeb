@@ -7,7 +7,7 @@
         @csrf
         @method('patch')
 
-        <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-6 user-select-none mb-6" x-show="isEditing" x-transition style="display: none;">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-6 user-select-none mb-6">
             <!-- Avatar -->
             <div class="sm:col-span-6">
                 <label for="avatar" class="block text-sm font-medium text-secondary-700">{{ __('ui.profile_label_photo') }}</label>
@@ -92,7 +92,7 @@
             <!-- Email -->
             <div class="sm:col-span-3">
                  <label for="email" class="input-label">{{ __('ui.profile_label_email') }}</label>
-                @can('update', $user)
+                @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                     <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('email') ? '!border-red-500' : '' }}" value="{{ old('email', $user->email) }}" autocomplete="email" x-bind:disabled="!isEditing">
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
                 @else
@@ -102,15 +102,24 @@
                             <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
                      </div>
-                     <p class="mt-1 text-xs text-secondary-400">Hubungi superadmin untuk ganti email.</p>
-                @endcan
+                     <p class="mt-1 text-xs text-secondary-400">Hubungi Superadmin jika perlu merubah email.</p>
+                @endif
             </div>
 
              <!-- Name -->
              <div class="sm:col-span-3">
                 <label for="name" class="input-label">{{ __('ui.profile_label_name') }}</label>
+                @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
                 <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('name') ? '!border-red-500' : '' }}" value="{{ old('name', $user->name) }}" autocomplete="name" x-bind:disabled="!isEditing">
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
+                @else
+                    <div class="relative">
+                        <input type="text" name="name" id="name" class="input-field w-full bg-secondary-50 text-secondary-500 cursor-not-allowed" value="{{ $user->name }}" autocomplete="name" readonly>
+                        <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                            <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                    </div>
+                @endif
             </div>
 
              <!-- Phone -->

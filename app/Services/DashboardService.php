@@ -315,8 +315,10 @@ class DashboardService
         $borrowQuery = Borrowing::query();
 
         if ($user->role === \App\Enums\UserRole::ADMIN) {
-            $operatorIds = User::where('role', \App\Enums\UserRole::OPERATOR)->pluck('id');
-            $allowedUserIds = $operatorIds->push($user->id);
+            $allowedUserIds = User::whereIn('role', [
+                \App\Enums\UserRole::OPERATOR,
+                \App\Enums\UserRole::ADMIN,
+            ])->pluck('id');
             $borrowQuery->whereIn('user_id', $allowedUserIds);
         } elseif ($user->role === \App\Enums\UserRole::OPERATOR) {
             $borrowQuery->where('user_id', $user->id);
@@ -365,6 +367,16 @@ class DashboardService
      */
     public function getStockByAttribute(string $attribute): Collection
     {
+        if (in_array($attribute, ['category', 'brand', 'location'])) {
+            $table = $attribute === 'category' ? 'categories' : ($attribute === 'brand' ? 'brands' : 'locations');
+            $fk = $attribute.'_id';
+
+            return Sparepart::join($table, "spareparts.{$fk}", '=', "{$table}.id")
+                ->select("{$table}.name as label", DB::raw('sum(spareparts.stock) as total'))
+                ->groupBy("{$table}.name")
+                ->pluck('total', 'label');
+        }
+
         return Sparepart::select($attribute, DB::raw('sum(stock) as total'))
             ->groupBy($attribute)
             ->pluck('total', $attribute);

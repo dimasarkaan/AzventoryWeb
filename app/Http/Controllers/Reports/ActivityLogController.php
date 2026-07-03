@@ -103,11 +103,13 @@ class ActivityLogController extends Controller
             }
         }
 
-        $activityLogs = $query->latest()->paginate(10);
+        $activityLogs = $query->latest()->paginate(10)->withQueryString();
 
         $usersQuery = \App\Models\User::orderBy('name');
         if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
             $usersQuery->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+        } elseif ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
+            $usersQuery->where('id', $currentUser->id);
         }
         $users = $usersQuery->get();
 
@@ -116,6 +118,8 @@ class ActivityLogController extends Controller
             $actionsQuery->whereHas('user', function ($q) {
                 $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
             });
+        } elseif ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
+            $actionsQuery->where('user_id', $currentUser->id);
         }
         $actions = $actionsQuery->pluck('action');
 

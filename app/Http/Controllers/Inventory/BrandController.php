@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Brand;
-use App\Models\Sparepart;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -24,12 +23,12 @@ class BrandController extends Controller
      */
     public function index()
     {
-        $brands = Brand::orderBy('name')->get()->map(function ($brand) {
+        $brands = Brand::withCount('spareparts')->orderBy('name')->get()->map(function ($brand) {
             return [
                 'id' => $brand->id,
                 'name' => $brand->name,
                 'is_active' => (bool) $brand->is_active,
-                'items_count' => Sparepart::where('brand', $brand->name)->count(),
+                'items_count' => $brand->spareparts_count,
             ];
         });
 
@@ -44,6 +43,7 @@ class BrandController extends Controller
 
         $brand = Brand::create(['name' => $request->name]);
         Cache::forget('inventory_brands');
+        Cache::forget('inventory_brand_options');
 
         $this->logActivity('Merk Dibuat', "Merk baru '{$brand->name}' ditambahkan.");
 
@@ -70,21 +70,18 @@ class BrandController extends Controller
 
         $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
-        DB::transaction(function () use ($brand, $oldName, $newName, $request) {
+        DB::transaction(function () use ($brand, $newName, $request) {
             // Update master table
             $updateData = ['name' => $newName];
             if ($request->has('is_active')) {
                 $updateData['is_active'] = $request->is_active;
             }
             $brand->update($updateData);
-
-            // Bulk update spareparts table (the actual string)
-            if ($oldName !== $newName) {
-                Sparepart::where('brand', $oldName)->update(['brand' => $newName]);
-            }
+            // Tidak perlu bulk-update spareparts lagi karena relasi via FK (id tetap sama)
         });
 
         Cache::forget('inventory_brands');
+        Cache::forget('inventory_brand_options');
 
         if ($hasChanged) {
             $changes = [];
@@ -120,7 +117,7 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        $count = Sparepart::where('brand', $brand->name)->count();
+        $count = $brand->spareparts()->count();
 
         if ($count > 0) {
             return response()->json([
@@ -130,6 +127,7 @@ class BrandController extends Controller
 
         $brand->delete();
         Cache::forget('inventory_brands');
+        Cache::forget('inventory_brand_options');
 
         $this->logActivity('Merk Dihapus', "Merk '{$brand->name}' dihapus.");
 

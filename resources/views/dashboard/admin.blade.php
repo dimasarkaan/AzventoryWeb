@@ -72,12 +72,10 @@
                         <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-primary flex items-center gap-2 relative">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                             <span class="hidden sm:inline">{{ __('ui.approvals') }}</span>
-                            @if($pendingApprovalsCount > 0)
-                                <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-danger-500"></span>
-                                </span>
-                            @endif
+                            <span x-show="pendingApprovalsCount > 0" x-cloak class="absolute -top-2 -right-2 flex h-4 w-4">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-4 w-4 bg-danger-500 flex items-center justify-center text-[9px] font-bold text-white" x-text="pendingApprovalsCount"></span>
+                            </span>
                         </a>
                     </div>
                 </div>
@@ -1030,7 +1028,7 @@
                     if (toastEl) toastEl.remove();
                 }).catch(() => {
                     if (toastEl) toastEl.remove();
-                    alert('Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.');
+                    window.showAlert('Error', 'Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.', 'error');
                 });
         }
 

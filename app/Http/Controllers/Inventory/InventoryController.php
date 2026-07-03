@@ -98,6 +98,9 @@ class InventoryController extends Controller
      */
     public function show(Sparepart $inventory)
     {
+        // Eager load relasi untuk mencegah LazyLoadingViolation di Blade
+        $inventory->load(['category', 'brand', 'location']);
+
         $borrowingQuery = $inventory->borrowings()
             ->with(['user', 'returns'])
             ->withSum('returns', 'quantity')
@@ -111,7 +114,8 @@ class InventoryController extends Controller
         $borrowings = $borrowingQuery->paginate(5, ['*'], 'history_page');
 
         // Mengambil aset serupa (berdasarkan Part Number) untuk memudahkan manajemen stok
-        $similarItems = Sparepart::where('part_number', $inventory->part_number)
+        $similarItems = Sparepart::with(['brand', 'category', 'location'])
+            ->where('part_number', $inventory->part_number)
             ->where('id', '!=', $inventory->id)
             ->paginate(3, ['*'], 'similar_page');
 
@@ -128,6 +132,7 @@ class InventoryController extends Controller
     public function edit(Sparepart $inventory)
     {
         $this->authorize('update', $inventory);
+        $inventory->load(['category', 'brand', 'location']);
         $options = $this->inventoryService->getDropdownOptions();
 
         return view('inventory.edit', array_merge(['sparepart' => $inventory], $options));
@@ -149,20 +154,28 @@ class InventoryController extends Controller
             $duplicateItem = $this->inventoryService->checkUpdateDuplicate($inventory, $validated);
 
             if ($duplicateItem) {
+                $duplicateItem->load(['brand', 'category', 'location']);
+
                 // Return data duplikat untuk memicu modal konfirmasi di frontend
                 return redirect()->back()
                     ->withInput()
                     ->with('duplicate_detected', true)
                     ->with('duplicate_item', [
-                        'id' => $duplicateItem->id, 'name' => $duplicateItem->name,
-                        'part_number' => $duplicateItem->part_number, 'brand' => $duplicateItem->brand,
-                        'category' => $duplicateItem->category, 'condition' => $duplicateItem->condition,
-                        'location' => $duplicateItem->location, 'stock' => $duplicateItem->stock,
+                        'id' => $duplicateItem->id,
+                        'name' => $duplicateItem->name,
+                        'part_number' => $duplicateItem->part_number,
+                        'brand' => $duplicateItem->brand->name ?? '-',
+                        'category' => $duplicateItem->category->name ?? '-',
+                        'condition' => $duplicateItem->condition,
+                        'location' => $duplicateItem->location->name ?? '-',
+                        'stock' => $duplicateItem->stock,
                         'unit' => $duplicateItem->unit,
                     ])
                     ->with('current_item', [
-                        'id' => $inventory->id, 'name' => $inventory->name,
-                        'part_number' => $inventory->part_number, 'stock' => $inventory->stock,
+                        'id' => $inventory->id,
+                        'name' => $inventory->name,
+                        'part_number' => $inventory->part_number,
+                        'stock' => $inventory->stock,
                     ]);
             }
         }
@@ -186,9 +199,8 @@ class InventoryController extends Controller
     /**
      * Menghapus barang (Soft Delete).
      */
-    public function destroy($id)
+    public function destroy(Sparepart $inventory)
     {
-        $inventory = Sparepart::findOrFail($id);
         $this->authorize('delete', $inventory);
 
         if ($inventory->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
@@ -265,8 +277,8 @@ class InventoryController extends Controller
      */
     public function bulkDestroy(Request $request)
     {
-        if (auth()->user()->role === UserRole::OPERATOR) {
-            return response()->json(['message' => 'Operator tidak memiliki izin untuk menghapus barang.'], 403);
+        if ($request->user()->cannot('delete', new Sparepart)) {
+            return response()->json(['message' => __('Hanya Superadmin yang memiliki izin untuk menghapus barang.')], 403);
         }
 
         $ids = $request->input('ids', []);
@@ -327,17 +339,23 @@ class InventoryController extends Controller
     public function checkPartNumber(Request $request)
     {
         $partNumber = $request->query('part_number');
-        $sparepart = Sparepart::where('part_number', $partNumber)->first();
+        $sparepart = Sparepart::with(['brand', 'category', 'location'])->where('part_number', $partNumber)->first();
 
         if ($sparepart) {
             return response()->json([
                 'exists' => true,
                 'data' => [
-                    'name' => $sparepart->name, 'brand' => $sparepart->brand,
-                    'category' => $sparepart->category, 'type' => $sparepart->type,
-                    'unit' => $sparepart->unit, 'price' => $sparepart->price,
+                    'name' => $sparepart->name,
+                    'brand' => $sparepart->brand->name ?? '',
+                    'category' => $sparepart->category->name ?? '',
+                    'type' => $sparepart->type,
+                    'unit' => $sparepart->unit,
+                    'price' => $sparepart->price,
                     'image_url' => $sparepart->image ? Storage::url($sparepart->image) : null,
                     'image_path' => $sparepart->image,
+                    'brand_id' => $sparepart->brand_id,
+                    'category_id' => $sparepart->category_id,
+                    'location_id' => $sparepart->location_id,
                 ],
             ]);
         }
@@ -350,10 +368,10 @@ class InventoryController extends Controller
      */
     public function restore($id)
     {
-        $inventory = Sparepart::onlyTrashed()->findOrFail($id);
+        $inventory = Sparepart::onlyTrashed()->where('uuid', $id)->firstOrFail();
         $this->authorize('restore', $inventory);
 
-        $result = $this->inventoryService->restoreSparepart($id);
+        $result = $this->inventoryService->restoreSparepart($inventory->id);
 
         return redirect()->route('inventory.index', ['trash' => 'true'])->with('success', $result['message']);
     }
@@ -363,10 +381,10 @@ class InventoryController extends Controller
      */
     public function forceDelete($id)
     {
-        $inventory = Sparepart::onlyTrashed()->findOrFail($id);
+        $inventory = Sparepart::onlyTrashed()->where('uuid', $id)->firstOrFail();
         $this->authorize('forceDelete', $inventory);
 
-        $result = $this->inventoryService->forceDeleteSparepart($id);
+        $result = $this->inventoryService->forceDeleteSparepart($inventory->id);
 
         if ($result['status'] === 'error') {
             return redirect()->back()->with('error', $result['message']);

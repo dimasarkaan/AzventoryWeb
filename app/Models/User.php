@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -17,7 +18,7 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, HasUuids, Notifiable, SoftDeletes;
 
     /**
      * Atribut yang dapat diisi secara massal.
@@ -84,5 +85,21 @@ class User extends Authenticatable
     public function borrowings()
     {
         return $this->hasMany(Borrowing::class);
+    }
+
+    /**
+     * Menggunakan UUID sebagai Route Key.
+     */
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
+    /**
+     * Mendefinisikan kolom mana yang akan diisi UUID otomatis oleh Laravel.
+     */
+    public function uniqueIds()
+    {
+        return ['uuid'];
     }
 }

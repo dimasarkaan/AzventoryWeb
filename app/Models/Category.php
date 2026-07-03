@@ -10,4 +10,12 @@ class Category extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'is_default', 'is_active'];
+
+    /**
+     * Relasi ke daftar sparepart yang menggunakan kategori ini.
+     */
+    public function spareparts()
+    {
+        return $this->hasMany(Sparepart::class);
+    }
 }

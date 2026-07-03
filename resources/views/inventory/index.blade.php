@@ -66,7 +66,7 @@
                             </div>
                         </div>
                     </div>
-                    @if(in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
+                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                      <!-- Trash Toggle Button -->
                      <a href="{{ request('trash') ? route('inventory.index') : route('inventory.index', ['trash' => 'true']) }}" 
                         class="btn flex items-center justify-center p-2.5 {{ request('trash') ? 'btn-danger' : 'btn-secondary' }}" 
@@ -105,7 +105,7 @@
                 
                 <div class="flex items-center gap-3">
                     @if(request('trash'))
-                        @if(in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
+                        @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST">
                             @csrf
                             <div id="bulk-restore-inputs"></div>
@@ -135,10 +135,12 @@
                                 <span class="font-medium">Cetak Label</span>
                             </button>
 
+                            @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                             <button type="button" onclick="submitInventoryBulkDestroy()" class="btn btn-white text-danger-600 hover:text-danger-700 flex items-center gap-2 border-0 bg-transparent hover:bg-danger-50">
                                 <x-icon.trash class="w-5 h-5" />
                                 <span class="font-medium">Hapus Masal</span>
                             </button>
+                            @endif
                         </div>
                     @endif
                 </div>
@@ -207,9 +209,9 @@
                     <!-- Bottom: Filters & Sort -->
                     <div class="flex-col md:flex-row flex-wrap gap-3" :class="showFilters ? 'flex' : 'hidden md:flex'">
                         @php
-                            $categoryOptions = $categories->mapWithKeys(fn($item) => [$item => $item])->toArray();
-                            $brandOptions = $brands->mapWithKeys(fn($item) => [$item => $item])->toArray();
-                            $locationOptions = $locations->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $categoryOptions = $categoryOptions->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $brandOptions = $brandOptions->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                            $locationOptions = $locationOptions->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             $colorOptions = $colors->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             $conditionOptions = $conditions->mapWithKeys(fn($item) => [$item => $item])->toArray();
                         @endphp

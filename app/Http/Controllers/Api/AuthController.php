@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use App\Models\User;
 
 /**
  * @group Authentication
@@ -17,14 +17,14 @@ class AuthController extends Controller
 {
     /**
      * Login via API
-     * 
+     *
      * Endpoint ini digunakan untuk mendapatkan Bearer Token JWT/Sanctum melalui Email dan Password.
-     * 
+     *
      * @unauthenticated
-     * 
+     *
      * @bodyParam email string required Email milik pengguna (harus terdaftar dan aktif). Example: superadmin@example.com
      * @bodyParam password string required Password akun pengguna. Example: password
-     * 
+     *
      * @response 200 {
      *   "success": true,
      *   "message": "Login berhasil",
@@ -54,14 +54,14 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validasi gagal',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
-        if (!Auth::attempt($request->only('email', 'password'))) {
+        if (! Auth::attempt($request->only('email', 'password'))) {
             return response()->json([
                 'success' => false,
-                'message' => 'Email atau password salah'
+                'message' => 'Email atau password salah',
             ], 401);
         }
 
@@ -71,11 +71,11 @@ class AuthController extends Controller
         if (isset($user->status) && strtolower($user->status) != 'aktif') {
             return response()->json([
                 'success' => false,
-                'message' => 'Akun Anda tidak aktif'
+                'message' => 'Akun Anda tidak aktif',
             ], 403);
         }
 
-        $token = $user->createToken('API Token ' . $request->email)->plainTextToken;
+        $token = $user->createToken('API Token '.$request->email)->plainTextToken;
 
         return response()->json([
             'success' => true,
@@ -87,16 +87,16 @@ class AuthController extends Controller
                     'name' => $user->name,
                     'email' => $user->email,
                     'role' => $user->role->value ?? $user->role,
-                ]
-            ]
+                ],
+            ],
         ], 200);
     }
 
     /**
      * Logout via API
-     * 
+     *
      * Menghapus Bearer token (akses untuk perangkat saat ini).
-     * 
+     *
      * @response 200 {
      *   "success": true,
      *   "message": "Logout berhasil"
@@ -108,7 +108,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Logout berhasil'
+            'message' => 'Logout berhasil',
         ], 200);
     }
 }

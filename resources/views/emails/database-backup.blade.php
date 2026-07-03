@@ -1,26 +1,26 @@
 @component('mail::message')
-# Halo {{ $user->name }},
+# Backup Database Berhasil Dibuat
 
-Ini adalah file cadangan (**Database Backup**) otomatis untuk sistem **Azventory** Anda.
+Halo {{ $user->name }},
 
-File yang dilampirkan berformat `.sql` dan berisi seluruh data barang, stok, riwayat peminjaman, serta pengaturan sistem Anda saat ini.
+Berikut kami lampirkan file cadangan (**Database Backup**) otomatis untuk sistem **Azventory** Anda.
+
+File berformat `.sql` ini merupakan rekam jejak lengkap sistem Anda saat ini, mencakup seluruh data barang, stok, riwayat peminjaman, hingga pengaturan aplikasi.
 
 @component('mail::panel')
 **Informasi Backup:**
-- **Waktu Pelaksanaan:** {{ now()->format('d F Y H:i:s') }}
+- **Waktu Eksekusi:** {{ now()->format('d F Y H:i:s') }}
 - **Nama File:** `{{ $filename }}`
-- **Tujuan:** Arsip Keamanan (Disarankan untuk diunduh dan disimpan di tempat aman).
+- **Tindakan Lanjutan:** Silakan unduh dan simpan file ini di penyimpanan lokal atau *cloud drive* Anda sebagai langkah antisipasi.
 @endcomponent
 
-### 📝 Cara Menggunakan File Ini:
-Jika suatu saat sistem Anda mengalami kerusakan data atau Anda berpindah hosting, Anda bisa langsung mengimpor file ini melalui menu **"Import"** di **phpMyAdmin** atau database manager lainnya.
+### 📝 Panduan Pemulihan (Restore) Data:
+Jika suatu saat Anda perlu memulihkan sistem atau memindahkannya ke server baru, Anda cukup mengimpor file ini melalui menu **"Import"** di **phpMyAdmin** atau *database manager* pilihan Anda.
 
 @component('mail::button', ['url' => route('dashboard')])
 Buka Dashboard Azventory
 @endcomponent
 
-*Keamanan data Anda adalah prioritas kami.*
-
-Salam,<br>
-**Robot Keamanan {{ config('app.name') }}**
+Salam hangat,<br>
+**Tim {{ config('app.name') }}**
 @endcomponent

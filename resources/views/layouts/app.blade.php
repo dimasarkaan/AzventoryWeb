@@ -5,7 +5,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok</title>
+
+        <!-- Primary Meta Tags -->
+        <meta name="title" content="{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok">
+        <meta name="description" content="Aplikasi digitalisasi pencatatan masuk, keluar, dan peminjaman stok di CV Azzahra Computer.">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ request()->url() }}">
+        <meta property="og:title" content="{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok">
+        <meta property="og:description" content="Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.">
+        <meta property="og:image" content="{{ asset('images/bannerazventory.png') }}">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ request()->url() }}">
+        <meta property="twitter:title" content="{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok">
+        <meta property="twitter:description" content="Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.">
+        <meta property="twitter:image" content="{{ asset('images/bannerazventory.png') }}">
 
         <!-- PWA Meta Tags -->
         <meta name="theme-color" content="#2563eb">

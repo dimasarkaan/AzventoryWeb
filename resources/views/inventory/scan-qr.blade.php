@@ -373,6 +373,14 @@
 
         // Auto start
         startCamera();
+
+        // Handle BFCache (Back/Forward Cache) revival
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                // If user pressed back button, restart the camera
+                startCamera();
+            }
+        });
     </script>
     @endpush
 </x-app-layout>

@@ -8,7 +8,7 @@
                 <p class="mt-1 text-sm text-secondary-500">{{ __('ui.edit_inventory_subtitle') }}</p>
             </div>
 
-            <form action="{{ route('inventory.update', $sparepart) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('inventory.update', $sparepart) }}" method="POST" enctype="multipart/form-data" @submit="isSubmitting = true">
                 @csrf
                 @method('PUT')
                 
@@ -212,39 +212,51 @@
                                 <div class="relative" x-data="{
                                     open: false,
                                     search: '',
-                                    selected: '{{ old('brand', $sparepart->brand) }}',
+                                    selected: '{{ old('brand_id', $sparepart->brand_id) }}',
                                     options: {{ json_encode($brands) }},
                                     get filteredOptions() {
-                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
-                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                        if (this.search === '') return this.options;
+                                        return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                     },
-                                    select(value) {
-                                        this.selected = value;
-                                        this.search = value;
+                                    select(option) {
+                                        this.selected = option.id;
+                                        this.search = option.name;
                                         this.open = false;
                                     },
-                                    createNew() {
-                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-                                        this.select(newValue);
+                                    async createNew() {
+                                        let newName = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        try {
+                                            const res = await fetch('{{ route('brands.store') }}', {
+                                                method: 'POST',
+                                                headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                                                body: JSON.stringify({name: newName})
+                                            });
+                                            const data = await res.json();
+                                            if (data.brand) {
+                                                this.options.push({id: data.brand.id, name: data.brand.name});
+                                                this.select({id: data.brand.id, name: data.brand.name});
+                                            }
+                                        } catch(e) { this.search = newName; }
                                     },
                                     init() {
                                         if (this.selected) {
-                                            this.search = this.selected;
+                                            let found = this.options.find(o => o.id == this.selected);
+                                            if (found) this.search = found.name;
                                         }
                                         this.$watch('itemBrand', value => {
-                                             if (value !== this.selected) { this.selected = value; this.search = value; }
+                                             if (value != this.selected) { this.selected = value; let f = this.options.find(o => o.id == value); if(f) this.search = f.name; }
                                         });
                                     }
                                 }" @click.outside="open = false">
                                     <label for="brand" class="input-label">{{ __('ui.brand') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
-                                        <input type="hidden" name="brand" x-model="selected">
+                                        <input type="hidden" name="brand_id" x-model="selected">
                                         <input type="text" 
                                                id="brand"
                                                class="input-field w-full pr-10 cursor-text" 
                                                x-model="search" 
                                                @focus="open = true, $el.select()" 
-                                               @input="open = true, selected = search, itemBrand = search" 
+                                               @input="open = true" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_brand') }}" 
                                                autocomplete="off">
@@ -258,58 +270,70 @@
                                     <div x-show="open" 
                                          x-transition:leave="transition ease-in duration-100"
                                          class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in filteredOptions" :key="option">
+                                        <template x-for="option in filteredOptions" :key="option.id">
                                             <div @click="select(option)" 
                                                  class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                                <span x-text="option.name" class="block truncate" :class="{ 'font-semibold': selected == option.id, 'font-normal': selected != option.id }"></span>
                                             </div>
                                         </template>
-                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                        <div x-show="search.length > 0 && !options.some(o => o.name.toLowerCase() === search.toLowerCase())" 
                                              @click="createNew()"
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
                                             <span class="block truncate">{!! __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}</span>
                                         </div>
                                     </div>
-                                    <x-input-error :messages="$errors->get('brand')" class="mt-2" />
+                                    <x-input-error :messages="$errors->get('brand_id')" class="mt-2" />
                                 </div>
 
                                 <!-- Kategori (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
                                     search: '',
-                                    selected: '{{ old('category', $sparepart->category) }}',
+                                    selected: '{{ old('category_id', $sparepart->category_id) }}',
                                     options: {{ json_encode($categories) }},
                                     get filteredOptions() {
-                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
-                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                        if (this.search === '') return this.options;
+                                        return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                     },
-                                    select(value) {
-                                        this.selected = value;
-                                        this.search = value;
+                                    select(option) {
+                                        this.selected = option.id;
+                                        this.search = option.name;
                                         this.open = false;
                                     },
-                                    createNew() {
-                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-                                        this.select(newValue);
+                                    async createNew() {
+                                        let newName = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
+                                        try {
+                                            const res = await fetch('{{ route('categories.store') }}', {
+                                                method: 'POST',
+                                                headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                                                body: JSON.stringify({name: newName})
+                                            });
+                                            const data = await res.json();
+                                            if (data.category) {
+                                                this.options.push({id: data.category.id, name: data.category.name});
+                                                this.select({id: data.category.id, name: data.category.name});
+                                            }
+                                        } catch(e) { this.search = newName; }
                                     },
                                     init() {
                                         if (this.selected) {
-                                            this.search = this.selected;
+                                            let found = this.options.find(o => o.id == this.selected);
+                                            if (found) this.search = found.name;
                                         }
                                         this.$watch('itemCategory', value => {
-                                             if (value !== this.selected) { this.selected = value; this.search = value; }
+                                             if (value != this.selected) { this.selected = value; let f = this.options.find(o => o.id == value); if(f) this.search = f.name; }
                                         });
                                     }
                                 }" @click.outside="open = false">
                                     <label for="category" class="input-label">{{ __('ui.category') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
-                                        <input type="hidden" name="category" x-model="selected">
+                                        <input type="hidden" name="category_id" x-model="selected">
                                         <input type="text" 
                                                id="category"
                                                class="input-field w-full pr-10 cursor-text" 
                                                x-model="search" 
                                                @focus="open = true, $el.select()" 
-                                               @input="open = true, selected = search, itemCategory = search" 
+                                               @input="open = true" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_category') }}" 
                                                autocomplete="off">
@@ -323,19 +347,19 @@
                                     <div x-show="open" 
                                          x-transition:leave="transition ease-in duration-100"
                                          class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in filteredOptions" :key="option">
+                                        <template x-for="option in filteredOptions" :key="option.id">
                                             <div @click="select(option)" 
                                                  class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                                <span x-text="option.name" class="block truncate" :class="{ 'font-semibold': selected == option.id, 'font-normal': selected != option.id }"></span>
                                             </div>
                                         </template>
-                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                        <div x-show="search.length > 0 && !options.some(o => o.name.toLowerCase() === search.toLowerCase())" 
                                              @click="createNew()"
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
                                             <span class="block truncate">{!! __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}</span>
                                         </div>
                                     </div>
-                                    <x-input-error :messages="$errors->get('category')" class="mt-2" />
+                                    <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
                                 </div>
                             </div>
 
@@ -558,36 +582,48 @@
                             <div class="relative" x-data="{
                                 open: false,
                                 search: '',
-                                selected: '{{ old('location', $sparepart->location) }}',
+                                selected: '{{ old('location_id', $sparepart->location_id) }}',
                                 options: {{ json_encode($locations) }},
                                 get filteredOptions() {
-                                    if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
-                                    return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
+                                    if (this.search === '') return this.options;
+                                    return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                 },
-                                select(value) {
-                                    this.selected = value;
-                                    this.search = value;
+                                select(option) {
+                                    this.selected = option.id;
+                                    this.search = option.name;
                                     this.open = false;
                                 },
-                                createNew() {
-                                    let term = this.search;
-                                    this.select(term);
+                                async createNew() {
+                                    let newName = this.search;
+                                    try {
+                                        const res = await fetch('{{ route('locations.store') }}', {
+                                            method: 'POST',
+                                            headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
+                                            body: JSON.stringify({name: newName})
+                                        });
+                                        const data = await res.json();
+                                        if (data.location) {
+                                            this.options.push({id: data.location.id, name: data.location.name});
+                                            this.select({id: data.location.id, name: data.location.name});
+                                        }
+                                    } catch(e) { this.search = newName; }
                                 },
                                 init() {
                                     if (this.selected) {
-                                        this.search = this.selected;
+                                        let found = this.options.find(o => o.id == this.selected);
+                                        if (found) this.search = found.name;
                                     }
                                 }
                             }" @click.outside="open = false">
                                 <label for="location" class="input-label">{{ __('ui.location') }} <span class="text-danger-500">*</span></label>
                                 <div class="relative">
-                                    <input type="hidden" name="location" x-model="selected">
+                                    <input type="hidden" name="location_id" x-model="selected">
                                     <input type="text" 
                                            id="location"
                                            class="input-field w-full pr-10 cursor-text" 
                                            x-model="search" 
                                            @focus="open = true; $el.select()" 
-                                           @input="open = true; selected = search" @keydown.enter.prevent="createNew()" 
+                                           @input="open = true" @keydown.enter.prevent="createNew()" 
                                            placeholder="{{ __('ui.select_location') }}"  
                                            autocomplete="off">
                                     
@@ -605,12 +641,12 @@
                                      x-transition:leave-end="opacity-0"
                                     class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
                                     
-                                    <template x-for="option in filteredOptions" :key="option">
+                                    <template x-for="option in filteredOptions" :key="option.id">
                                         <div @click="select(option)" 
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                            <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
+                                            <span x-text="option.name" class="block truncate" :class="{ 'font-semibold': selected == option.id, 'font-normal': selected != option.id }"></span>
                                             
-                                            <span x-show="selected === option" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
+                                            <span x-show="selected == option.id" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
                                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                                                 </svg>
@@ -620,7 +656,7 @@
 
                                     <!-- Create New Option (Superadmin Only) -->
                                     @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
-                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
+                                        <div x-show="search.length > 0 && !options.some(o => o.name.toLowerCase() === search.toLowerCase())" 
                                              @click="createNew()"
                                              class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
                                             <span class="block truncate">
@@ -634,7 +670,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <x-input-error :messages="$errors->get('location')" class="mt-2" />
+                                <x-input-error :messages="$errors->get('location_id')" class="mt-2" />
                             </div>
 
                             <!-- Minimum Stok -->
@@ -818,8 +854,15 @@
                     <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
                         {{ __('ui.cancel') }}
                     </a>
-                    <button type="submit" class="btn btn-primary">
-                        {{ __('ui.save_changes') }}
+                    <button type="submit" class="btn btn-primary" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
+                        <span x-show="!isSubmitting">{{ __('ui.save_changes') }}</span>
+                        <span x-show="isSubmitting" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Menyimpan...
+                        </span>
                     </button>
                 </div>
             </form>
@@ -835,14 +878,15 @@
                 partNumber: '{{ old('part_number', $sparepart->part_number) }}',
                 isLocked: false,
                 itemName: '{{ old('name', $sparepart->name) }}',
-                itemBrand: '{{ old('brand', $sparepart->brand) }}',
-                itemCategory: '{{ old('category', $sparepart->category) }}',
+                itemBrand: '{{ old('brand_id', $sparepart->brand_id) }}',
+                itemCategory: '{{ old('category_id', $sparepart->category_id) }}',
                 itemColor: '{{ old('color', $sparepart->color) }}', 
                 itemUnit: '{{ old('unit', $sparepart->unit) }}',
                 itemPrice: '{{ old('price', $sparepart->price) }}',
                 imagePreview: null,
                 existingImage: '{{ $sparepart->image ? asset('storage/' . $sparepart->image) : '' }}',
                 isLoading: false,
+                isSubmitting: false,
 
                 init() {
                     // 1. Setup Global Trigger for Scan Modal

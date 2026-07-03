@@ -397,7 +397,7 @@
                 } else if (window.Swal) {
                     window.Swal.fire({ toast: true, position: 'top-end', icon: type, title: message, showConfirmButton: false, timer: 3000 });
                 } else {
-                    alert(message);
+                    window.showAlert('Info', message, 'info');
                 }
             },
 
@@ -463,7 +463,8 @@
                         this.fetchLocations();
                         this.refreshData();
                     } else {
-                        this.showToast('warning', data.message);
+                        const errorMsg = data.errors && Object.values(data.errors)[0][0] ? Object.values(data.errors)[0][0] : data.message;
+                        this.showToast('warning', errorMsg);
                     }
                 } catch (e) {
                     console.error('Add failed:', e);
@@ -496,6 +497,7 @@
 
             async saveEdit(id) {
                 if (!this.editingName || this.editingName.trim() === '') {
+                    this.showToast('warning', 'Nama lokasi tidak boleh kosong.');
                     this.cancelEdit();
                     return;
                 }
@@ -555,7 +557,8 @@
                         this.fetchCategories();
                         this.refreshData();
                     } else {
-                        this.showToast('warning', data.message);
+                        const errorMsg = data.errors && Object.values(data.errors)[0][0] ? Object.values(data.errors)[0][0] : data.message;
+                        this.showToast('warning', errorMsg);
                     }
                 } catch (e) {
                     console.error('Add failed:', e);
@@ -600,7 +603,11 @@
             },
 
             async saveCatEdit(id) {
-                if (!this.catEditingName.trim()) return;
+                if (!this.catEditingName || this.catEditingName.trim() === '') {
+                    this.showToast('warning', 'Nama kategori tidak boleh kosong.');
+                    this.cancelCatEdit();
+                    return;
+                }
 
                 // Cek jika tidak ada perubahan nama
                 const cat = this.categoriesList.find(c => c.id === id);
@@ -628,7 +635,8 @@
                         this.fetchCategories();
                         this.cancelCatEdit();
                     } else {
-                        this.showToast('warning', data.message);
+                        const errorMsg = data.errors && Object.values(data.errors)[0][0] ? Object.values(data.errors)[0][0] : data.message;
+                        this.showToast('warning', errorMsg);
                     }
                 } catch (e) {
                     console.error('Update failed:', e);
@@ -694,7 +702,8 @@
                         this.fetchBrands();
                         this.refreshData();
                     } else {
-                        if (window.showToast) window.showToast('warning', data.message);
+                        const errorMsg = data.errors && Object.values(data.errors)[0][0] ? Object.values(data.errors)[0][0] : data.message;
+                        if (window.showToast) window.showToast('warning', errorMsg);
                     }
                 } catch (e) {
                     console.error('Add failed:', e);
@@ -737,7 +746,11 @@
             },
 
             async saveBrandEdit(id) {
-                if (!this.brandEditingName.trim()) return;
+                if (!this.brandEditingName || this.brandEditingName.trim() === '') {
+                    if (window.showToast) window.showToast('warning', 'Nama merk tidak boleh kosong.');
+                    this.cancelBrandEdit();
+                    return;
+                }
 
                 // Cek jika tidak ada perubahan nama
                 const brand = this.brandsList.find(b => b.id === id);
@@ -765,7 +778,8 @@
                         this.fetchBrands();
                         this.cancelBrandEdit();
                     } else {
-                        if (window.showToast) window.showToast('warning', data.message);
+                        const errorMsg = data.errors && Object.values(data.errors)[0][0] ? Object.values(data.errors)[0][0] : data.message;
+                        if (window.showToast) window.showToast('warning', errorMsg);
                     }
                 } catch (e) {
                     console.error('Update failed:', e);
@@ -917,10 +931,12 @@
                         this.fetchLocations();
                         this.refreshData(); // Refresh counts on dashboard
                     } else {
-                        if (window.showToast) window.showToast('error', data.message);
+                        const errorMsg = data.errors && Object.values(data.errors)[0][0] ? Object.values(data.errors)[0][0] : data.message;
+                        if (window.showToast) window.showToast('error', errorMsg);
                     }
                 } catch (e) {
                     console.error('Update failed:', e);
+                    if (window.showToast) window.showToast('error', 'Koneksi terputus atau terjadi kesalahan sistem.');
                 }
             },
 
@@ -944,6 +960,7 @@
                     }
                 } catch (e) {
                     console.error('Toggle status failed:', e);
+                    if (window.showToast) window.showToast('error', 'Koneksi terputus atau terjadi kesalahan sistem.');
                 }
             },
 
@@ -1271,17 +1288,6 @@
                             </div>
                         </div>
 
-                        {{-- Tombol Approvals --}}
-                        <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-primary flex items-center gap-2 relative">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-                            <span class="hidden sm:inline">{{ __('ui.approvals') }}</span>
-                            @if($pendingApprovalsCount > 0)
-                                <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger-400 opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-danger-500"></span>
-                                </span>
-                            @endif
-                        </a>
                     </div>
                 </div>
 
@@ -2322,7 +2328,7 @@
                 }).catch(() => {
                     document.body.classList.remove('is-exporting');
                     if (toastEl) toastEl.remove();
-                    alert('Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.');
+                    window.showAlert('Error', 'Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.', 'error');
                 });
             }, 300);
         }
@@ -2916,6 +2922,7 @@
                                     yearInput.addEventListener('blur', function() {
                                         const val = parseInt(this.value);
                                         if (isNaN(val) || val < 2010) {
+                                            if (window.showToast) window.showToast('warning', 'Tahun tidak valid, dikembalikan ke tahun saat ini.');
                                             this.value = new Date().getFullYear();
                                             instance.changeYear(parseInt(this.value));
                                         }

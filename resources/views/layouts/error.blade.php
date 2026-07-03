@@ -8,10 +8,15 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+        <link rel="icon" href="{{ asset('logo.svg') }}?v=2" type="image/svg+xml">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-secondary-900 antialiased bg-secondary-50 flex items-center justify-center min-h-screen p-4">
-        <div class="relative w-full max-w-lg bg-white shadow-2xl rounded-3xl overflow-hidden border border-secondary-100">
+    <body class="font-sans text-secondary-900 antialiased bg-secondary-50 flex items-center justify-center min-h-screen p-4 relative">
+        
+        <!-- Grid/Dot Pattern Background -->
+        <div class="absolute inset-0 z-0 opacity-[0.3] pointer-events-none" style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 32px 32px;"></div>
+
+        <div class="relative w-full max-w-lg bg-white shadow-2xl rounded-3xl overflow-hidden border border-secondary-100 z-10">
             
             <!-- Top Pattern/Color Section -->
             <div class="relative h-40 bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center overflow-hidden">
@@ -47,17 +52,26 @@
                     @yield('description')
                 </p>
 
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full px-4">
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 text-base font-medium">
-                        <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <div class="flex items-center justify-center w-full px-4">
+                    @php
+                        $previous = url()->previous();
+                        $backUrl = ($previous === url()->current() || $previous === '') ? url('/') : $previous;
+                    @endphp
+                    <a href="{{ $backUrl }}" class="btn btn-primary w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-8 text-base font-medium shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-1 transition-all duration-300">
+                        <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                         {{ __('ui.error_btn_back') }}
                     </a>
-                    
-                    <a href="/" class="btn btn-primary w-full sm:w-auto flex items-center justify-center gap-2 py-3 px-6 text-base font-medium shadow-lg shadow-primary-500/30">
-                        <svg class="w-5 h-5 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        {{ __('ui.error_btn_home') }}
-                    </a>
                 </div>
+            </div>
+        </div>
+
+        <!-- Identitas Brand (Watermark Footer) -->
+        <div class="absolute bottom-6 w-full text-center pointer-events-none">
+            <div class="flex items-center justify-center gap-2 opacity-60">
+                <img src="{{ asset('logo.svg') }}" alt="Icon" class="h-5 w-auto grayscale" />
+                <span class="text-xs font-bold text-secondary-500 tracking-widest uppercase">
+                    Azzahra Computer
+                </span>
             </div>
         </div>
     </body>

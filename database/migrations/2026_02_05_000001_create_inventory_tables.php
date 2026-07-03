@@ -58,7 +58,7 @@ return new class extends Migration
         Schema::create('stock_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sparepart_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // User pengaju
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null'); // User pengaju
             $table->enum('type', ['masuk', 'keluar']);
             $table->unsignedInteger('quantity');
             $table->string('reason');

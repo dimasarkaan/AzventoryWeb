@@ -63,7 +63,7 @@
                     <div class="col-span-2 flex items-center justify-between">
                         <span class="text-secondary-500">{{ __('ui.brand') }} / {{ __('ui.category') }}</span>
                         <span class="font-medium text-secondary-900 text-right truncate pl-2">
-                            {{ $sparepart->brand ?? '-' }} <span class="text-secondary-300 mx-1">|</span> {{ $sparepart->category }}
+                            {{ $sparepart->brand->name ?? '-' }} <span class="text-secondary-300 mx-1">|</span> {{ $sparepart->category->name ?? '-' }}
                         </span>
                     </div>
                 @endif
@@ -87,7 +87,7 @@
 
                 <!-- Stock & Location -->
                 <div class="flex flex-col items-end text-right">
-                    <span class="text-xs text-secondary-500 mb-1">{{ __('ui.stock') }} di {{ $sparepart->location }}</span>
+                    <span class="text-xs text-secondary-500 mb-1">{{ __('ui.stock') }} di {{ $sparepart->location->name ?? '-' }}</span>
                     <div class="flex items-center gap-1.5">
                         @php
                             $isLowStock = $sparepart->stock <= $sparepart->minimum_stock && !in_array(strtolower($sparepart->condition), ['rusak', 'hilang']);
@@ -104,12 +104,22 @@
             <div class="flex items-center justify-end gap-2">
                 @if(request('trash'))
                     @can('restore', $sparepart)
-                    <form action="{{ route('inventory.restore', $sparepart->id) }}" method="POST" class="inline-block w-full sm:w-auto">
+                    <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="btn btn-sm btn-success w-full justify-center flex items-center gap-1" onclick="confirmInventoryRestore(event)">
                             <x-icon.restore class="w-4 h-4" />
                             {{ __('ui.restore') }}
+                        </button>
+                    </form>
+                    @endcan
+                    @can('forceDelete', $sparepart)
+                    <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto mt-2 sm:mt-0">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-danger w-full justify-center flex items-center gap-1" onclick="confirmInventoryForceDelete(event)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            {{ __('ui.force_delete') }}
                         </button>
                     </form>
                     @endcan

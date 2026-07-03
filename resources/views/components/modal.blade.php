@@ -1,7 +1,8 @@
 @props([
     'name',
     'show' => false,
-    'maxWidth' => '2xl'
+    'maxWidth' => '2xl',
+    'zIndex' => 'z-50'
 ])
 
 @php
@@ -46,7 +47,7 @@ $maxWidth = [
     x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
     x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
     x-show="show"
-    class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 z-50"
+    class="fixed inset-0 overflow-y-auto px-4 py-6 sm:px-0 {{ $zIndex }}"
     style="display: {{ $show ? 'block' : 'none' }};"
 >
     <div

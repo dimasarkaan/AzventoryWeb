@@ -30,6 +30,14 @@ class PasswordController extends Controller
                     }
                 },
             ],
+        ], [
+            'password.required' => 'Kata sandi baru wajib diisi.',
+            'password.min' => 'Kata sandi minimal harus 8 karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'password.letters' => 'Kata sandi harus mengandung kombinasi huruf dan angka (8-16 karakter).',
+            'password.numbers' => 'Kata sandi harus mengandung kombinasi huruf dan angka (8-16 karakter).',
+            'current_password.required' => 'Kata sandi saat ini wajib diisi.',
+            'current_password.current_password' => 'Kata sandi saat ini salah.',
         ]);
 
         $request->user()->update([

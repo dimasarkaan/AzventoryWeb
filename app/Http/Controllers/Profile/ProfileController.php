@@ -47,7 +47,15 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validatedData = $request->validated();
+
+        // Opsi B: Lockdown identitas Operator
+        if ($request->user()->role === \App\Enums\UserRole::OPERATOR) {
+            unset($validatedData['name']);
+            unset($validatedData['email']);
+        }
+
+        $request->user()->fill($validatedData);
 
         // Cek jika username sedang diubah (hanya sekali)
         if ($request->user()->isDirty('username')) {
@@ -95,6 +103,11 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        // Opsi A: Mencegah selain Superadmin menghapus akunnya sendiri (Anti-sabotage)
+        if ($user->role !== UserRole::SUPERADMIN) {
+            return back()->with('error', 'Penghapusan akun dinonaktifkan oleh kebijakan perusahaan. Hubungi Administrator jika ingin menonaktifkan akun.');
+        }
 
         // Mencegah Superadmin terakhir menghapus dirinya sendiri
         if ($user->role === UserRole::SUPERADMIN) {

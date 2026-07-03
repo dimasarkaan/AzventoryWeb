@@ -23,7 +23,7 @@ class OperatorDashboardController extends Controller
                         ->orWhere('remaining_quantity', '>', 0);
                 })
                 ->latest('borrowed_at')
-                ->take(5)
+                ->take(3)
                 ->get()
                 ->map(function ($borrowing) {
                     return [
@@ -47,6 +47,7 @@ class OperatorDashboardController extends Controller
                 ->where('status', 'pending')
                 ->with('sparepart')
                 ->latest()
+                ->take(3)
                 ->get()
                 ->map(function ($request) {
                     return [
@@ -68,7 +69,7 @@ class OperatorDashboardController extends Controller
                 ->select('sparepart_id', \Illuminate\Support\Facades\DB::raw('count(*) as total_borrows'))
                 ->groupBy('sparepart_id')
                 ->orderByDesc('total_borrows')
-                ->with('sparepart')
+                ->with(['sparepart', 'sparepart.category'])
                 ->take(3)
                 ->get()
                 ->map(function ($pick) {

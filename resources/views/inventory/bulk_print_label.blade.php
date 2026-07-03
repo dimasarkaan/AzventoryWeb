@@ -490,7 +490,11 @@
         if (savedPresets) {
             this.presets = JSON.parse(savedPresets);
         } else {
-            this.presets = [{ name: 'Standar A4', margin: { top: 10, bottom: 10, left: 10, right: 10 } }];
+            this.presets = [
+                { name: 'Standar A4 (Aman)', margin: { top: 10, bottom: 10, left: 10, right: 10 } },
+                { name: 'Margin Tipis (Banyak)', margin: { top: 5, bottom: 5, left: 5, right: 5 } },
+                { name: 'Margin Lebar', margin: { top: 15, bottom: 15, left: 15, right: 15 } }
+            ];
             this.saveToStorage();
         }
 
@@ -560,6 +564,22 @@
     saveCurrentAsPreset() {
         this.newPresetName = '';
         this.$dispatch('open-modal', 'save-preset-modal');
+    },
+
+    resetToFactoryPresets() {
+        this.$dispatch('open-modal', 'reset-preset-modal');
+    },
+
+    confirmResetPresets() {
+        this.presets = [
+            { name: 'Standar A4 (Aman)', margin: { top: 10, bottom: 10, left: 10, right: 10 } },
+            { name: 'Margin Tipis (Banyak)', margin: { top: 5, bottom: 5, left: 5, right: 5 } },
+            { name: 'Margin Lebar', margin: { top: 15, bottom: 15, left: 15, right: 15 } }
+        ];
+        this.saveToStorage();
+        this.selectedPresetIndex = -1;
+        this.margin = { top: 10, bottom: 10, left: 10, right: 10 };
+        this.$dispatch('close-modal', 'reset-preset-modal');
     },
 
     get totalLabels() {
@@ -695,8 +715,8 @@
     </nav>
 
     <!-- Sidebar -->
-    <div id="sidebar-ui" x-show="sidebarOpen" x-cloak class="fixed inset-0 z-[60] overflow-hidden">
-        <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-sm" @click="sidebarOpen = false"></div>
+    <div id="sidebar-ui" x-show="sidebarOpen" x-cloak class="fixed inset-0 z-[60] pointer-events-none">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm pointer-events-auto lg:bg-transparent lg:backdrop-blur-none lg:pointer-events-none" @click="sidebarOpen = false"></div>
         <div class="fixed inset-y-0 right-0 max-w-full flex">
             <div x-show="sidebarOpen" x-transition:enter="transform transition ease-in-out duration-500" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transform transition ease-in-out duration-500" class="w-screen max-w-sm pointer-events-auto">
                 <div class="flex h-full flex-col sidebar-glass shadow-2xl relative overflow-hidden">
@@ -781,7 +801,7 @@
                                                min="0"
                                                x-on:keydown="if(['e', 'E', '+', '-', '.'].includes($event.key)) $event.preventDefault()"
                                                @input.debounce.300ms="updatePreview()" 
-                                               class="w-12 bg-slate-100/80 border-slate-200 rounded-xl px-1 py-1.5 text-center text-[13px] font-black text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm">
+                                               class="w-14 bg-slate-100/80 border-slate-200 rounded-xl px-2 py-2.5 text-center text-[13px] font-black text-slate-800 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all shadow-sm">
                                     </div>
                                 </div>
                                 @endforeach
@@ -793,54 +813,56 @@
                              <section>
                                 <div class="flex items-center justify-between mb-4">
                                     <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest">Margin Kertas (mm)</span>
-                                    <button @click="margin = { top: 10, bottom: 10, left: 10, right: 10 }; selectedPresetIndex = -1;" class="text-[9px] font-black text-slate-400 hover:text-blue-600 transition-colors uppercase flex items-center gap-1 group" title="Kembalikan ke margin bawaan">
+                                    <button @click="margin = { top: 10, bottom: 10, left: 10, right: 10 }; selectedPresetIndex = -1;" class="text-[9px] p-2 -mr-2 font-black text-slate-400 hover:text-blue-600 transition-colors uppercase flex items-center gap-1 group" title="Kembalikan ke margin bawaan">
                                         <svg class="w-3 h-3 transition-transform group-hover:-rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                                         Bawaan
                                     </button>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 gap-5">
                                     <!-- Top -->
-                                    <div class="space-y-2">
-                                        <div class="flex justify-between"><label for="margin_top" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Atas</label><span class="text-[9px] font-black text-blue-600" x-text="margin.top"></span></div>
-                                        <input type="range" id="margin_top" name="margin_top" x-model="margin.top" min="0" max="50" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center"><label for="margin_top" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Atas</label><span class="text-[10px] font-black text-blue-600" x-text="margin.top"></span></div>
+                                        <div class="py-1"><input type="range" id="margin_top" name="margin_top" x-model="margin.top" min="0" max="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"></div>
                                     </div>
                                     <!-- Bottom -->
-                                    <div class="space-y-2">
-                                        <div class="flex justify-between"><label for="margin_bottom" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Bawah</label><span class="text-[9px] font-black text-blue-600" x-text="margin.bottom"></span></div>
-                                        <input type="range" id="margin_bottom" name="margin_bottom" x-model="margin.bottom" min="0" max="50" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center"><label for="margin_bottom" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Bawah</label><span class="text-[10px] font-black text-blue-600" x-text="margin.bottom"></span></div>
+                                        <div class="py-1"><input type="range" id="margin_bottom" name="margin_bottom" x-model="margin.bottom" min="0" max="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"></div>
                                     </div>
                                     <!-- Left -->
-                                    <div class="space-y-2">
-                                        <div class="flex justify-between"><label for="margin_left" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Kiri</label><span class="text-[9px] font-black text-blue-600" x-text="margin.left"></span></div>
-                                        <input type="range" id="margin_left" name="margin_left" x-model="margin.left" min="0" max="50" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center"><label for="margin_left" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Kiri</label><span class="text-[10px] font-black text-blue-600" x-text="margin.left"></span></div>
+                                        <div class="py-1"><input type="range" id="margin_left" name="margin_left" x-model="margin.left" min="0" max="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"></div>
                                     </div>
                                     <!-- Right -->
-                                    <div class="space-y-2">
-                                        <div class="flex justify-between"><label for="margin_right" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Kanan</label><span class="text-[9px] font-black text-blue-600" x-text="margin.right"></span></div>
-                                        <input type="range" id="margin_right" name="margin_right" x-model="margin.right" min="0" max="50" class="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                                    <div class="space-y-3">
+                                        <div class="flex justify-between items-center"><label for="margin_right" class="text-[9px] font-bold text-slate-500 uppercase cursor-pointer">Kanan</label><span class="text-[10px] font-black text-blue-600" x-text="margin.right"></span></div>
+                                        <div class="py-1"><input type="range" id="margin_right" name="margin_right" x-model="margin.right" min="0" max="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"></div>
                                     </div>
                                 </div>
                             </section>
 
                             </section>
 
-                            <!-- Presets Section -->
                             <section class="pt-4 border-t border-slate-100">
                                 <div class="flex items-center justify-between mb-3">
                                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Preset Printer</span>
-                                    <button @click="saveCurrentAsPreset()" class="px-2 py-1 bg-blue-50 text-blue-600 rounded-md text-[8px] font-black uppercase hover:bg-blue-100 transition-colors">+ Simpan Baru</button>
+                                    <div class="flex items-center gap-1">
+                                        <button @click="resetToFactoryPresets()" class="p-2 text-[8px] font-black uppercase text-slate-400 hover:text-red-500 transition-colors" title="Kembalikan Preset Bawaan Pabrik">Reset</button>
+                                        <button @click="saveCurrentAsPreset()" class="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-[9px] font-black uppercase hover:bg-blue-100 transition-colors">+ Simpan Baru</button>
+                                    </div>
                                 </div>
                                 <div class="space-y-1.5">
                                     <template x-for="(preset, index) in presets" :key="index">
                                         <div class="flex items-center gap-2 group">
                                             <button @click="loadPreset(index)" 
                                                     :class="selectedPresetIndex === index ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-900/10' : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-blue-400 hover:text-blue-600'"
-                                                    class="flex-1 flex items-center justify-between px-3 py-2 rounded-xl border text-[10px] font-black uppercase transition-all">
+                                                    class="flex-1 flex items-center justify-between px-4 py-3 rounded-xl border text-[10px] font-black uppercase transition-all">
                                                 <span x-text="preset.name"></span>
                                                 <span class="text-[8px] opacity-60" x-text="`${preset.margin.top}/${preset.margin.right}/${preset.margin.bottom}/${preset.margin.left}`"></span>
                                             </button>
-                                            <button @click="deletePreset(index)" class="p-2 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                                            <button @click="deletePreset(index)" class="p-3 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all focus:opacity-100">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
                                             </button>
                                         </div>
                                     </template>
@@ -927,7 +949,7 @@
 
 
     <!-- SAVE PRESET MODAL -->
-    <x-modal name="save-preset-modal" focusable>
+    <x-modal name="save-preset-modal" focusable zIndex="z-[70]">
         <div class="p-6">
             <h2 class="text-lg font-bold text-secondary-900">
                 Simpan Preset Baru
@@ -960,7 +982,7 @@
     </x-modal>
 
     <!-- DELETE PRESET MODAL -->
-    <x-modal name="delete-preset-modal">
+    <x-modal name="delete-preset-modal" zIndex="z-[70]">
         <div class="p-6">
             <h2 class="text-lg font-bold text-secondary-900">
                 Hapus Preset?
@@ -976,6 +998,28 @@
                 </button>
                 <button type="button" @click="confirmDeletePreset()" class="btn btn-danger">
                     Hapus
+                </button>
+            </div>
+        </div>
+    </x-modal>
+
+    <!-- RESET PRESET MODAL -->
+    <x-modal name="reset-preset-modal" zIndex="z-[70]">
+        <div class="p-6">
+            <h2 class="text-lg font-bold text-secondary-900">
+                Kembalikan ke Preset Bawaan?
+            </h2>
+
+            <p class="mt-2 text-sm text-secondary-600">
+                Apakah Anda yakin ingin menghapus semua preset tersimpan dan kembali ke template bawaan sistem?
+            </p>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" @click="$dispatch('close-modal', 'reset-preset-modal')" class="btn btn-secondary">
+                    Batal
+                </button>
+                <button type="button" @click="confirmResetPresets()" class="btn btn-primary">
+                    Ya, Reset
                 </button>
             </div>
         </div>

@@ -39,7 +39,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
 // Rute Autentikasi
 require __DIR__.'/auth.php';
 
@@ -92,8 +91,8 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
             ->middleware('throttle:10,1')
             ->name('check-part-number');
 
-        // Persetujuan Stok (Superadmin & Admin)
-        Route::middleware('role:superadmin,admin')->group(function () {
+        // Persetujuan Stok (Admin)
+        Route::middleware('role:admin')->group(function () {
             Route::post('stock-approvals-bulk', [StockApprovalController::class, 'bulkApprove'])->name('stock-approvals.bulk-approve');
             Route::resource('stock-approvals', StockApprovalController::class)
                 ->only(['index', 'update'])
@@ -131,15 +130,17 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
 
     // --- Laporan & Analitik ---
     Route::prefix('reports')->name('reports.')->group(function () {
-        // Laporan Umum (Superadmin & Admin)
-        Route::middleware('role:superadmin,admin')->group(function () {
+        // Laporan Umum (Superadmin Only)
+        Route::middleware('role:superadmin')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/download', [ReportController::class, 'download'])->name('download');
         });
 
-        // Log Aktivitas (Personal untuk Operator, Global untuk Superadmin/Admin)
+        // Log Aktivitas (Index untuk semua, Export hanya Superadmin)
         Route::middleware('role:superadmin,admin,operator')->group(function () {
             Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+        });
+        Route::middleware('role:superadmin')->group(function () {
             Route::get('/activity-logs/export', [ActivityLogController::class, 'export'])->name('activity-logs.export');
         });
     });
@@ -155,11 +156,18 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         Route::resource('/', UserController::class)->parameters(['' => 'user']);
     });
 
-    // Manajemen Lokasi (Master Data) - Superadmin Only
+    // Manajemen Master Data (Akses Dasar untuk Form Inventaris)
+    Route::middleware('role:superadmin,admin')->group(function () {
+        Route::resource('locations', \App\Http\Controllers\Inventory\LocationController::class)->only(['index', 'store']);
+        Route::resource('categories', \App\Http\Controllers\Inventory\CategoryController::class)->only(['index', 'store']);
+        Route::resource('brands', \App\Http\Controllers\Inventory\BrandController::class)->only(['index', 'store']);
+    });
+
+    // Manajemen Master Data Penuh (Edit/Hapus) - Superadmin Only
     Route::middleware('role:superadmin')->group(function () {
-        Route::resource('locations', \App\Http\Controllers\Inventory\LocationController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::resource('categories', \App\Http\Controllers\Inventory\CategoryController::class)->only(['index', 'store', 'update', 'destroy']);
-        Route::resource('brands', \App\Http\Controllers\Inventory\BrandController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('locations', \App\Http\Controllers\Inventory\LocationController::class)->only(['update', 'destroy']);
+        Route::resource('categories', \App\Http\Controllers\Inventory\CategoryController::class)->only(['update', 'destroy']);
+        Route::resource('brands', \App\Http\Controllers\Inventory\BrandController::class)->only(['update', 'destroy']);
     });
 
     // --- Profil & Pengaturan (Semua Terautentikasi) ---
@@ -173,8 +181,10 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         Route::get('/my-inventory', [ProfileController::class, 'myInventory'])->name('profile.inventory');
 
         // API Tokens
-        Route::post('/profile/api-tokens', [ApiTokenController::class, 'store'])->name('profile.api-tokens.store');
-        Route::delete('/profile/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])->name('profile.api-tokens.destroy');
+        Route::middleware('role:superadmin')->group(function () {
+            Route::post('/profile/api-tokens', [ApiTokenController::class, 'store'])->name('profile.api-tokens.store');
+            Route::delete('/profile/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])->name('profile.api-tokens.destroy');
+        });
 
         // Kembalikan item sendiri
         Route::post('/my-inventory/return/{borrowing}', [BorrowingController::class, 'returnItem'])->name('profile.inventory.return');

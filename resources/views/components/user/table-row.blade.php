@@ -54,7 +54,7 @@
         <div class="flex items-center justify-end gap-2">
             @if($trash)
                 @can('restore', $user)
-                    <form action="{{ route('users.restore', $user->id) }}" method="POST" class="inline-block">
+                    <form action="{{ route('users.restore', $user->uuid) }}" method="POST" class="inline-block">
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="btn btn-ghost p-2 text-success-600 hover:text-success-700 bg-success-50 hover:bg-success-100 rounded-lg transition-all" title="{{ __('ui.restore') }}" onclick="confirmUserRestore(event)">
@@ -63,7 +63,7 @@
                     </form>
                 @endcan
                 @can('forceDelete', $user)
-                    <form action="{{ route('users.force-delete', $user->id) }}" method="POST" class="inline-block">
+                    <form action="{{ route('users.force-delete', $user->uuid) }}" method="POST" class="inline-block">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-ghost p-2 text-danger-600 hover:text-danger-700 bg-danger-50 hover:bg-danger-100 rounded-lg transition-all" title="{{ __('ui.force_delete') }}" onclick="confirmUserForceDelete(event)">

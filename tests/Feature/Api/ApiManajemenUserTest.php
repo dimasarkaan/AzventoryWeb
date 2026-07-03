@@ -59,7 +59,7 @@ class ApiManajemenUserTest extends TestCase
         Sanctum::actingAs($this->makeUser('superadmin'));
         $targetUser = User::factory()->create(['password' => bcrypt('lama123')]);
 
-        $this->postJson("/api/v1/users/{$targetUser->id}/reset-password")
+        $this->postJson("/api/v1/users/{$targetUser->uuid}/reset-password")
             ->assertStatus(200)
             ->assertJson(['status' => 'success']);
     }
@@ -70,7 +70,7 @@ class ApiManajemenUserTest extends TestCase
         Sanctum::actingAs($this->makeUser('superadmin'));
         $targetUser = User::factory()->create();
 
-        $this->deleteJson("/api/v1/users/{$targetUser->id}")
+        $this->deleteJson("/api/v1/users/{$targetUser->uuid}")
             ->assertStatus(200);
 
         $this->assertSoftDeleted('users', ['id' => $targetUser->id]);

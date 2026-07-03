@@ -15,6 +15,7 @@ class SparepartCollection extends ResourceCollection
     {
         parent::__construct($resource);
     }
+
     /**
      * Transform resource collection ke array.
      *

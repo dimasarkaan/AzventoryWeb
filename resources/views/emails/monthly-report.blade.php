@@ -1,7 +1,9 @@
 @component('mail::message')
-# Halo {{ $user->name }},
+# Laporan Bulanan: {{ $monthName }}
 
-Berikut kami sampaikan laporan bulanan sistem **Azventory** untuk periode **{{ $monthName }}**.
+Halo {{ $user->name }},
+
+Berikut kami sampaikan laporan kinerja dan rekapitulasi sistem **Azventory** Anda untuk periode bulan **{{ $monthName }}**.
 
 @if(!empty($summary))
 @component('mail::panel')
@@ -28,16 +30,16 @@ Berikut kami sampaikan laporan bulanan sistem **Azventory** untuk periode **{{ $
 @endcomponent
 @endif
 
-Lampiran mencakup detail inventaris, mutasi stok, peminjaman, serta log aktivitas pengguna. Silakan lihat lampiran file Excel untuk detail lengkap.
+Untuk detail lebih mendalam terkait mutasi stok, riwayat peminjaman, dan log aktivitas pengguna, silakan merujuk pada file **Excel (.xlsx)** yang kami lampirkan pada email ini.
 
 @component('mail::button', ['url' => route('dashboard'), 'color' => 'primary'])
 Akses Dashboard Azventory
 @endcomponent
 
-Terima kasih.
+Semoga rekapitulasi ini membantu Anda dalam memantau inventaris dengan lebih optimal.
 
 <hr style="border:none; border-top:1px solid #e2e8f0; margin: 30px 0;">
 
-Salam,<br>
-**Tim Sistem {{ config('app.name') }}**
+Salam hangat,<br>
+**Tim {{ config('app.name') }}**
 @endcomponent

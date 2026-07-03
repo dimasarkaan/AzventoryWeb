@@ -3,7 +3,7 @@
         @csrf
         @method('put')
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" x-show="isEditing" x-transition style="display: none;">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div class="md:col-span-2">
                 <x-input-label for="update_password_current_password" :value="__('ui.profile_label_current_password')" />
                 <x-text-input id="update_password_current_password" name="current_password" type="password" 

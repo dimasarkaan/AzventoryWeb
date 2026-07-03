@@ -360,7 +360,13 @@ window.submitInventoryBulkDestroy = function () {
                 },
                 body: JSON.stringify({ ids: ids })
             })
-            .then(response => response.json())
+            .then(async response => {
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.message || 'Terjadi kesalahan saat menghapus data.');
+                }
+                return data;
+            })
             .then(data => {
                 Swal.fire({
                     icon: 'success',
@@ -386,7 +392,8 @@ window.submitInventoryBulkDestroy = function () {
                 Swal.fire({
                     icon: 'error',
                     title: 'Kesalahan',
-                    text: 'Terjadi kesalahan saat menghapus data.',
+                    text: error.message || 'Terjadi kesalahan saat menghapus data.',
+
                     customClass: {
                         popup: '!rounded-2xl !font-sans',
                         title: '!text-secondary-900 !text-xl !font-bold',

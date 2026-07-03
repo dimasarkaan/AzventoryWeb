@@ -27,9 +27,9 @@
                     <strong>{{ $item->name }}</strong><br>
                     <small style="color: #666;">PN: {{ $item->part_number }}</small>
                 </td>
-                <td>{{ $item->category }}</td>
-                <td>{{ $item->brand }}</td>
-                <td>{{ $item->location }}</td>
+                <td>{{ $item->category?->name ?? '-' }}</td>
+                <td>{{ $item->brand?->name ?? '-' }}</td>
+                <td>{{ $item->location?->name ?? '-' }}</td>
                 <td style="text-align: center;">{{ $item->stock }} {{ $item->unit }}</td>
                 <td>
                     @if($item->stock == 0)

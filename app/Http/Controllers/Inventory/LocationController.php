@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
-use App\Models\Sparepart;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -24,13 +23,13 @@ class LocationController extends Controller
      */
     public function index()
     {
-        $locations = Location::orderBy('name')->get()->map(function ($location) {
+        $locations = Location::withCount('spareparts')->orderBy('name')->get()->map(function ($location) {
             return [
                 'id' => $location->id,
                 'name' => $location->name,
                 'is_active' => (bool) $location->is_active,
                 'is_default' => $location->is_default,
-                'items_count' => Sparepart::where('location', $location->name)->count(),
+                'items_count' => $location->spareparts_count,
             ];
         });
 
@@ -39,12 +38,15 @@ class LocationController extends Controller
 
     public function store(Request $request)
     {
+        abort_if(auth()->user()->role !== \App\Enums\UserRole::SUPERADMIN, 403, 'Hanya Superadmin yang dapat menambah lokasi baru.');
+
         $request->validate([
             'name' => 'required|string|max:191|unique:locations,name',
         ]);
 
         $location = Location::create(['name' => $request->name]);
         Cache::forget('inventory_locations');
+        Cache::forget('inventory_location_options');
 
         $this->logActivity('Lokasi Dibuat', "Lokasi baru '{$location->name}' ditambahkan.");
 
@@ -69,23 +71,26 @@ class LocationController extends Controller
         $oldActive = (bool) $location->is_active;
         $newActive = $request->has('is_active') ? (bool) $request->is_active : $oldActive;
 
+        if ($location->is_default && ! $newActive) {
+            return response()->json([
+                'message' => 'Lokasi default tidak boleh dinonaktifkan.',
+            ], 422);
+        }
+
         $hasChanged = ($oldName !== $newName) || ($oldActive !== $newActive);
 
-        DB::transaction(function () use ($location, $oldName, $newName, $request) {
+        DB::transaction(function () use ($location, $newName, $request) {
             // Update master table
             $updateData = ['name' => $newName];
             if ($request->has('is_active')) {
                 $updateData['is_active'] = $request->is_active;
             }
             $location->update($updateData);
-
-            // Bulk update spareparts table (the actual string)
-            if ($oldName !== $newName) {
-                Sparepart::where('location', $oldName)->update(['location' => $newName]);
-            }
+            // Tidak perlu bulk-update spareparts lagi karena relasi via FK (id tetap sama)
         });
 
         Cache::forget('inventory_locations');
+        Cache::forget('inventory_location_options');
 
         if ($hasChanged) {
             $changes = [];
@@ -121,7 +126,13 @@ class LocationController extends Controller
      */
     public function destroy(Location $location)
     {
-        $count = Sparepart::where('location', $location->name)->count();
+        if ($location->is_default) {
+            return response()->json([
+                'message' => 'Tidak dapat menghapus lokasi default. Harap jadikan lokasi lain sebagai default terlebih dahulu.',
+            ], 422);
+        }
+
+        $count = $location->spareparts()->count();
 
         if ($count > 0) {
             return response()->json([
@@ -131,6 +142,7 @@ class LocationController extends Controller
 
         $location->delete();
         Cache::forget('inventory_locations');
+        Cache::forget('inventory_location_options');
 
         $this->logActivity('Lokasi Dihapus', "Lokasi '{$location->name}' dihapus.");
 

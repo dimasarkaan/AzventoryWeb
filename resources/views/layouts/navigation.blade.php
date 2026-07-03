@@ -77,7 +77,7 @@
                         {{ __('ui.scan_qr') }}
                     </a>
 
-                    @if(in_array(Auth::user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
+                    @if(Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <a href="{{ route('reports.index') }}" class="{{ $navClass }} {{ request()->routeIs('reports.index') ? $activeClass : $inactiveClass }}">
                              <x-icon.reports class="w-4 h-4" />
                             {{ __('ui.reports') }}
@@ -361,7 +361,7 @@
                 {{ __('ui.scan_qr') }}
             </a>
 
-            @if(in_array(Auth::user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
+            @if(Auth::user()->role === \App\Enums\UserRole::SUPERADMIN)
                 <a href="{{ route('reports.index') }}" class="{{ $resNavClass }} {{ request()->routeIs('reports.index') ? $resActiveClass : $resInactiveClass }}">
                     {{ __('ui.reports') }}
                 </a>

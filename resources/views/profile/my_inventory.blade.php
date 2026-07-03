@@ -87,12 +87,12 @@
                         if (response.status === 422) {
                             this.errors = data.errors;
                         } else {
-                            alert(data.message || 'Terjadi kesalahan sistem.');
+                            window.showAlert('Error', data.message || 'Terjadi kesalahan sistem.', 'error');
                         }
                     }
                 } catch (error) {
                     console.error('Submission error:', error);
-                    alert('Gagal menghubungi server.');
+                    window.showAlert('Error', 'Gagal menghubungi server.', 'error');
                 } finally {
                     this.isSubmitting = false;
                 }
@@ -513,7 +513,7 @@
             
                                             processFiles(newFiles) {
                                                 if (this.files.length + newFiles.length > 5) {
-                                                    alert('Maksimal 5 foto');
+                                                    window.showAlert('Peringatan', 'Maksimal 5 foto', 'warning');
                                                     return;
                                                 }
                                                 this.files = this.files.concat(newFiles);
@@ -554,7 +554,7 @@
                                                         else if (errStr.includes('NotFoundError')) msg = '{{ __('ui.camera_error_not_found') }}';
                                                         else if (errStr.includes('NotReadableError')) msg = '{{ __('ui.camera_error_not_readable') }}';
                                                         
-                                                        alert(msg);
+                                                        window.showAlert('Peringatan', msg, 'warning');
                                                         this.cameraOpen = false;
                                                     }
                                                 });

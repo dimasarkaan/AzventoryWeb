@@ -115,7 +115,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $user = User::withTrashed()->with(['borrowings.sparepart'])->find($id);
+        $user = User::withTrashed()->with(['borrowings.sparepart'])->where('uuid', $id)->first();
 
         if (! $user) {
             return response()->json(['message' => 'User tidak ditemukan'], 404);
@@ -132,7 +132,7 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $id)->firstOrFail();
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
@@ -157,7 +157,7 @@ class UserController extends Controller
      */
     public function resetPassword($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $id)->firstOrFail();
         $password = 'password123';
 
         $user->update([
@@ -179,7 +179,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $id)->firstOrFail();
 
         if (auth()->id() === $user->id) {
             return response()->json(['message' => 'Tidak dapat menghapus akun sendiri'], 400);

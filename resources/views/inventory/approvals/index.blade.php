@@ -98,6 +98,20 @@
                 </div>
             @endif
 
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-400 text-red-700 rounded-r-xl shadow-sm animate-shake">
+                    <p class="font-bold flex items-center gap-2 mb-2">
+                        <x-icon.warning class="w-5 h-5 text-red-500" />
+                        Validasi Gagal:
+                    </p>
+                    <ul class="list-disc list-inside text-sm space-y-1 ml-6">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div id="approvals-list-container">
                 <!-- Mobile Card View -->
                 <div class="md:hidden mb-4 flex items-center justify-between px-1">

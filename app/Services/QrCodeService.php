@@ -89,8 +89,9 @@ class QrCodeService
      */
     public function getLabelFilename(Sparepart $inventory)
     {
-        $cat = Str::title($inventory->category);
-        $brand = Str::title($inventory->brand);
+        $inventory->loadMissing(['category', 'brand']);
+        $cat = Str::title($inventory->category->name ?? '');
+        $brand = Str::title($inventory->brand->name ?? '');
         $pn = strtoupper($inventory->part_number);
 
         $catSlug = preg_replace('/[^A-Za-z0-9\-]/', '-', $cat);

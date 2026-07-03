@@ -70,6 +70,6 @@ class Borrowing extends Model
             return false;
         }
 
-        return $this->expected_return_at && $this->expected_return_at->startOfDay()->isPast();
+        return $this->expected_return_at && $this->expected_return_at->endOfDay()->isPast();
     }
 }

@@ -348,7 +348,7 @@
 
                                 processFiles(newFiles) {
                                     if (this.files.length + newFiles.length > 5) {
-                                        alert('Maksimal 5 foto');
+                                        window.showAlert('Peringatan', 'Maksimal 5 foto', 'warning');
                                         return;
                                     }
                                     this.files = this.files.concat(newFiles);
@@ -382,7 +382,7 @@
                                             this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                                             this.$refs.video.srcObject = this.stream;
                                         } catch (err) {
-                                            alert('Tidak dapat mengakses kamera: ' + err.message);
+                                            window.showAlert('Error', 'Tidak dapat mengakses kamera: ' + err.message, 'error');
                                             this.cameraOpen = false;
                                         }
                                     });

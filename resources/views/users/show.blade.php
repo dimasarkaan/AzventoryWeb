@@ -36,7 +36,7 @@
                                 @endif
                             </div>
                             <div class="absolute bottom-0 right-0 p-1.5 bg-white rounded-full shadow-sm">
-                                @if($user->status === 'active')
+                                @if($user->status === 'aktif')
                                     <div class="h-5 w-5 bg-success-500 rounded-full border-2 border-white" title="{{ __('ui.status_active') }}"></div>
                                 @else
                                     <div class="h-5 w-5 bg-danger-500 rounded-full border-2 border-white" title="{{ __('ui.status_inactive') }}"></div>

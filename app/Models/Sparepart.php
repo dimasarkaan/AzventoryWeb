@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -11,10 +12,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Sparepart extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'type', 'name', 'part_number', 'brand', 'category', 'location',
+        'uuid', 'type', 'name', 'part_number', 'brand_id', 'category_id', 'location_id',
         'age', 'condition', 'color', 'price', 'minimum_stock',
         'stock', 'unit', 'status', 'image', 'qr_code_path',
     ];
@@ -33,6 +34,30 @@ class Sparepart extends Model
     public function borrowings()
     {
         return $this->hasMany(Borrowing::class);
+    }
+
+    /**
+     * Relasi ke kategori barang.
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * Relasi ke merek barang.
+     */
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    /**
+     * Relasi ke lokasi penyimpanan.
+     */
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 
     /**
@@ -108,5 +133,21 @@ class Sparepart extends Model
         }
 
         return 'Tidak ada riwayat catatan.';
+    }
+
+    /**
+     * Menggunakan UUID sebagai Route Key.
+     */
+    public function getRouteKeyName()
+    {
+        return 'uuid';
+    }
+
+    /**
+     * Mendefinisikan kolom mana yang akan diisi UUID otomatis oleh Laravel.
+     */
+    public function uniqueIds()
+    {
+        return ['uuid'];
     }
 }

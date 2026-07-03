@@ -52,11 +52,8 @@ class SparepartPolicy
      */
     public function delete(User $user, Sparepart $sparepart): bool
     {
-        // Hanya Superadmin dan Admin yang bisa delete. Operator TIDAK BISA.
-        return in_array($user->role, [
-            \App\Enums\UserRole::SUPERADMIN,
-            \App\Enums\UserRole::ADMIN,
-        ]);
+        // Hanya Superadmin yang bisa delete. Admin dan Operator TIDAK BISA.
+        return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
 
     /**
