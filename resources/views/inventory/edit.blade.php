@@ -8,11 +8,11 @@
                 <p class="mt-1 text-sm text-secondary-500">{{ __('ui.edit_inventory_subtitle') }}</p>
             </div>
 
-            <form action="{{ route('inventory.update', $sparepart) }}" method="POST" enctype="multipart/form-data" @submit="isSubmitting = true">
+            <form action="{{ route('inventory.update', $sparepart) }}" method="POST" enctype="multipart/form-data" @submit="isSubmitting = true" x-data="inventoryForm()">
                 @csrf
                 @method('PUT')
                 
-                <div class="space-y-4" x-data="inventoryForm()">
+                <div class="space-y-4">
                     <!-- Section 1: Informasi Dasar -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">

@@ -10,15 +10,17 @@
 
 
 
-            <form action="{{ route('inventory.store') }}" method="POST" enctype="multipart/form-data" @submit="isSubmitting = true">
+            <form action="{{ route('inventory.store') }}" method="POST" enctype="multipart/form-data" 
+                  @submit="isSubmitting = true" 
+                  x-data="inventoryForm()"
+                  @trigger-check-pn="checkPN()"
+                  @update-pn="partNumber = $event.detail"
+                  @update-name="itemName = $event.detail"
+                  @update-brand="itemBrand = $event.detail"
+                  @update-category="itemCategory = $event.detail">
                 @csrf
                 
-                <div class="space-y-4" x-data="inventoryForm()"
-                     @trigger-check-pn="checkPN()"
-                     @update-pn="partNumber = $event.detail"
-                     @update-name="itemName = $event.detail"
-                     @update-brand="itemBrand = $event.detail"
-                     @update-category="itemCategory = $event.detail">
+                <div class="space-y-4">
                     <!-- Section 1: Informasi Dasar -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
