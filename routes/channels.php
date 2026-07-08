@@ -83,12 +83,12 @@ Broadcast::channel('borrowing-requests', function ($user) {
 /**
  * Stock Approval Channel
  * Use case: Real-time notification untuk approval requests (stock in/out)
- * Hanya Superadmin yang bisa approve
+ * Hanya Admin yang bisa approve
  */
 Broadcast::channel('stock-approvals', function ($user) {
     $role = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
 
-    return in_array($role, [UserRole::ADMIN->value, UserRole::SUPERADMIN->value]);
+    return $role === UserRole::ADMIN->value;
 });
 
 /**

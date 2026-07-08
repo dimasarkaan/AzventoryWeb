@@ -123,8 +123,8 @@ class StockRequestController extends Controller
                 } catch (\Exception $e) {
                 }
 
-                // Notify admins
-                $admins = User::whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::SUPERADMIN])->get();
+                // Notify admins (Hanya Admin yang menyetujui stok)
+                $admins = User::where('role', \App\Enums\UserRole::ADMIN)->get();
                 $type = $request->type == 'masuk' ? __('ui.type_in') : __('ui.type_out');
                 $message = __('ui.notification_new_stock_request', [
                     'type' => $type,
