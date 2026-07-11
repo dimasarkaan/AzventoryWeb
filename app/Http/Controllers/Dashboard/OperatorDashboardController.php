@@ -9,13 +9,17 @@ class OperatorDashboardController extends Controller
     /**
      * Menampilkan dashboard untuk Operator.
      */
+    /**
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
+     */
     public function index()
     {
         $userId = auth()->id();
         $lastUpdate = \Illuminate\Support\Facades\Cache::get('inventory_last_updated', now()->timestamp);
         $cacheKey = "operator_dashboard_{$userId}_{$lastUpdate}_".request('trend_period', '6_months');
 
-        $data = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($userId) {
+        /** @return array<string, mixed> */
+        $data = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($userId): array {
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart'])
                 ->where('user_id', $userId)
                 ->where(function ($query) {
@@ -25,10 +29,11 @@ class OperatorDashboardController extends Controller
                 ->latest('borrowed_at')
                 ->take(3)
                 ->get()
-                ->map(function ($borrowing) {
+                ->map(function (\App\Models\Borrowing $borrowing) {
                     return [
                         'id' => $borrowing->id,
                         'sparepart_id' => $borrowing->sparepart_id,
+                        'sparepart_uuid' => $borrowing->sparepart->uuid ?? null,
                         'sparepart_name' => $borrowing->sparepart->name ?? 'Unknown',
                         'remaining_quantity' => $borrowing->remaining_quantity,
                         'borrowed_at_formatted' => $borrowing->borrowed_at ? $borrowing->borrowed_at->format('d M Y') : '-',
@@ -49,10 +54,11 @@ class OperatorDashboardController extends Controller
                 ->latest()
                 ->take(3)
                 ->get()
-                ->map(function ($request) {
+                ->map(function (\App\Models\StockLog $request) {
                     return [
                         'id' => $request->id,
                         'sparepart_id' => $request->sparepart_id,
+                        'sparepart_uuid' => $request->sparepart->uuid ?? null,
                         'sparepart_name' => $request->sparepart->name ?? 'Unknown',
                         'type' => $request->type,
                         'quantity' => $request->quantity,
@@ -72,9 +78,10 @@ class OperatorDashboardController extends Controller
                 ->with(['sparepart', 'sparepart.category'])
                 ->take(3)
                 ->get()
-                ->map(function ($pick) {
+                ->map(function (\App\Models\Borrowing $pick) {
                     return [
                         'sparepart_id' => $pick->sparepart_id,
+                        'sparepart_uuid' => $pick->sparepart->uuid ?? null,
                         'sparepart_name' => $pick->sparepart->name ?? 'Unknown',
                         'category_name' => $pick->sparepart->category->name ?? '-',
                         'total_borrows' => $pick->total_borrows,
@@ -86,7 +93,7 @@ class OperatorDashboardController extends Controller
                 ->latest()
                 ->take(5)
                 ->get()
-                ->map(function ($log) {
+                ->map(function (\App\Models\ActivityLog $log) {
                     return [
                         'action' => $log->action,
                         'action_lower' => strtolower($log->action),
@@ -117,7 +124,7 @@ class OperatorDashboardController extends Controller
             $borrowingTrend = collect(range($config['count'] - 1, 0))->map(function ($offset) use ($config, $groupedTrend) {
                 $date = now()->{'sub'.ucfirst($config['unit'])}($offset);
                 $key = $date->format($config['format']);
-                $count = $groupedTrend->has($key) ? $groupedTrend->get($key)->count() : 0;
+                $count = $groupedTrend->has($key) ? count($groupedTrend->get($key)) : 0;
 
                 return [
                     'period' => $date->translatedFormat($config['label']),
@@ -147,7 +154,8 @@ class OperatorDashboardController extends Controller
             $totalLate = $stats->returned_late + $stats->active_overdue;
             $trustScore = $totalEvaluated > 0 ? round((($totalEvaluated - $totalLate) / $totalEvaluated) * 100) : 100;
 
-            return compact(
+            /** @var array<string, mixed> $result */
+            $result = compact(
                 'activeBorrowingsCount',
                 'pendingRequestsCount',
                 'activeBorrowingsList',
@@ -158,6 +166,7 @@ class OperatorDashboardController extends Controller
                 'topPicks',
                 'trustScore'
             );
+            return $result;
         });
 
         $data['trendPeriod'] = request('trend_period', '6_months');

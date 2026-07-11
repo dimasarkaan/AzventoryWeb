@@ -225,8 +225,8 @@ class DashboardService
             ->where('stock_logs.status', 'approved')
             ->where('stock_logs.type', $type)
             ->whereBetween('stock_logs.created_at', [$start, $end])
-            ->selectRaw('spareparts.name as sparepart_name, stock_logs.sparepart_id, SUM(stock_logs.quantity) as total_qty')
-            ->groupBy('stock_logs.sparepart_id', 'spareparts.name')
+            ->selectRaw('spareparts.name as sparepart_name, spareparts.uuid as sparepart_uuid, stock_logs.sparepart_id, SUM(stock_logs.quantity) as total_qty')
+            ->groupBy('stock_logs.sparepart_id', 'spareparts.name', 'spareparts.uuid')
             ->orderByDesc('total_qty')
             ->take(5)
             ->get();

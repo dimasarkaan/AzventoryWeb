@@ -22,7 +22,7 @@ class StockLogPolicy
     public function create(User $user): bool
     {
         // Semua role (Operator, Admin, Superadmin) bisa mengajukan.
-        // Namun Admin/Superadmin akan auto-approved di Controller/Service.
+        // Namun Admin akan auto-approved di Controller/Service.
         return true;
     }
 

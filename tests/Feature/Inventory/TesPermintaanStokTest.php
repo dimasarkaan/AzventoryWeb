@@ -12,7 +12,7 @@ use Tests\TestCase;
 /**
  * Test untuk StockRequestController.
  * Mencakup pengajuan perubahan stok oleh Operator (pending)
- * dan Admin/Superadmin (auto-approve).
+ * dan Admin (auto-approve).
  */
 class TesPermintaanStokTest extends TestCase
 {

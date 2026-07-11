@@ -137,7 +137,7 @@ class StockRequestController extends Controller
 
         $message = $isAutoApproved
             ? 'Stok berhasil diperbarui secara langsung.'
-            : 'Pengajuan perubahan stok berhasil dikirim, menunggu persetujuan Admin/Superadmin.';
+            : 'Pengajuan perubahan stok berhasil dikirim, menunggu persetujuan Admin.';
 
         return redirect()->route('inventory.show', $sparepart)
             ->with('success', $message);

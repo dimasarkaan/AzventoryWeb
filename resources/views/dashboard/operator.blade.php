@@ -280,7 +280,7 @@
                                         </thead>
                                         <tbody class="divide-y divide-secondary-100">
                                             <template x-for="borrowing in activeBorrowingsList" :key="borrowing.id">
-                                                <tr class="hover:bg-secondary-50/50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + borrowing.sparepart_id">
+                                                <tr class="hover:bg-secondary-50/50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + (borrowing.sparepart_uuid || borrowing.sparepart_id)">
                                                     <td>
                                                         <div class="font-medium text-secondary-900 line-clamp-1" :title="borrowing.sparepart_name" x-text="borrowing.sparepart_name"></div>
                                                     </td>
@@ -302,7 +302,7 @@
                                 <!-- Mobile view -->
                                 <div class="md:hidden divide-y divide-secondary-100">
                                     <template x-for="borrowing in activeBorrowingsList" :key="borrowing.id">
-                                        <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + borrowing.sparepart_id">
+                                        <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + (borrowing.sparepart_uuid || borrowing.sparepart_id)">
                                             <div class="flex justify-between items-start mb-2">
                                                 <div class="font-bold text-secondary-900 leading-tight pr-4" x-text="borrowing.sparepart_name"></div>
                                                 <span class="text-sm font-bold text-primary-600 bg-primary-50 px-2.5 py-1 rounded-full whitespace-nowrap"><span x-text="borrowing.remaining_quantity"></span> Unit</span>
@@ -354,7 +354,7 @@
                                         </thead>
                                         <tbody class="divide-y divide-secondary-100">
                                             <template x-for="request in pendingRequestsList" :key="request.id">
-                                                <tr class="hover:bg-secondary-50/50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + request.sparepart_id">
+                                                <tr class="hover:bg-secondary-50/50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + (request.sparepart_uuid || request.sparepart_id)">
                                                     <td>
                                                         <div class="font-medium text-secondary-900 line-clamp-1" :title="request.sparepart_name" x-text="request.sparepart_name"></div>
                                                         <div class="text-[10px] text-secondary-500" x-text="request.created_at_formatted"></div>
@@ -379,7 +379,7 @@
                                 <!-- Mobile view -->
                                 <div class="md:hidden divide-y divide-secondary-100">
                                     <template x-for="request in pendingRequestsList" :key="request.id">
-                                        <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + request.sparepart_id">
+                                        <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href='{{ route('inventory.index') }}/' + (request.sparepart_uuid || request.sparepart_id)">
                                             <div class="flex justify-between items-start mb-2">
                                                 <div class="font-bold text-secondary-900 leading-tight pr-4" x-text="request.sparepart_name"></div>
                                                 <span class="text-sm font-bold text-secondary-900 whitespace-nowrap"><span x-text="request.quantity"></span> <span class="text-[10px] text-secondary-500 font-normal" x-text="request.unit"></span></span>

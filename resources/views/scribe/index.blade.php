@@ -207,7 +207,7 @@
                                 <a href="#system-reports-GETapi-v1-activity-logs">Mendapatkan daftar log aktivitas global (Hanya Superadmin).</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="system-reports-GETapi-v1-activity-logs-user--id-">
-                                <a href="#system-reports-GETapi-v1-activity-logs-user--id-">Mendapatkan log aktivitas untuk pengguna tertentu (Bisa oleh Admin/Superadmin).</a>
+                                <a href="#system-reports-GETapi-v1-activity-logs-user--id-">Mendapatkan log aktivitas untuk pengguna tertentu (Bisa oleh Admin).</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="system-reports-GETapi-v1-stats">
                                 <a href="#system-reports-GETapi-v1-stats">Mendapatkan ringkasan statistik sistem.</a>
@@ -248,7 +248,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: April 11, 2026</li>
+        <li>Last updated: July 10, 2026</li>
     </ul>
 </div>
 
@@ -642,6 +642,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -757,17 +758,17 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"part_number\": \"consequatur\",
     \"name\": \"consequatur\",
-    \"brand\": \"consequatur\",
-    \"location\": \"consequatur\",
-    \"type\": \"sale\",
+    \"brand_id\": \"consequatur\",
+    \"location_id\": \"consequatur\",
+    \"type\": \"asset\",
     \"stock\": 45,
     \"price\": 56,
     \"unit\": \"consequatur\",
     \"minimum_stock\": 45,
-    \"category\": \"consequatur\",
+    \"category_id\": \"consequatur\",
     \"condition\": \"consequatur\",
     \"age\": \"mqeopfuudtdsufvyvddqa\",
-    \"status\": \"aktif\"
+    \"status\": \"nonaktif\"
 }"
 </code></pre></div>
 
@@ -786,17 +787,17 @@ const headers = {
 let body = {
     "part_number": "consequatur",
     "name": "consequatur",
-    "brand": "consequatur",
-    "location": "consequatur",
-    "type": "sale",
+    "brand_id": "consequatur",
+    "location_id": "consequatur",
+    "type": "asset",
     "stock": 45,
     "price": 56,
     "unit": "consequatur",
     "minimum_stock": 45,
-    "category": "consequatur",
+    "category_id": "consequatur",
     "condition": "consequatur",
     "age": "mqeopfuudtdsufvyvddqa",
-    "status": "aktif"
+    "status": "nonaktif"
 };
 
 fetch(url, {
@@ -822,6 +823,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -940,28 +942,28 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Example: <code>consequatur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>brand</code></b>&nbsp;&nbsp;
+            <b style="line-height: 2;"><code>brand_id</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
  &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="brand"                data-endpoint="POSTapi-v1-inventory"
+                              name="brand_id"                data-endpoint="POSTapi-v1-inventory"
                value="consequatur"
                data-component="body">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>The <code>id</code> of an existing record in the brands table. Example: <code>consequatur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>location</code></b>&nbsp;&nbsp;
+            <b style="line-height: 2;"><code>location_id</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
  &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="location"                data-endpoint="POSTapi-v1-inventory"
+                              name="location_id"                data-endpoint="POSTapi-v1-inventory"
                value="consequatur"
                data-component="body">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>The <code>id</code> of an existing record in the locations table. Example: <code>consequatur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
@@ -970,10 +972,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="type"                data-endpoint="POSTapi-v1-inventory"
-               value="sale"
+               value="asset"
                data-component="body">
     <br>
-<p>Example: <code>sale</code></p>
+<p>Example: <code>asset</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>sale</code></li> <li><code>asset</code></li></ul>
         </div>
@@ -1026,16 +1028,16 @@ Must be one of:
 <p>Kolom value harus minimal 0. Example: <code>45</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>category</code></b>&nbsp;&nbsp;
+            <b style="line-height: 2;"><code>category_id</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
  &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="category"                data-endpoint="POSTapi-v1-inventory"
+                              name="category_id"                data-endpoint="POSTapi-v1-inventory"
                value="consequatur"
                data-component="body">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>The <code>id</code> of an existing record in the categories table. Example: <code>consequatur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>condition</code></b>&nbsp;&nbsp;
@@ -1068,10 +1070,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="status"                data-endpoint="POSTapi-v1-inventory"
-               value="aktif"
+               value="nonaktif"
                data-component="body">
     <br>
-<p>Example: <code>aktif</code></p>
+<p>Example: <code>nonaktif</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>aktif</code></li> <li><code>nonaktif</code></li></ul>
         </div>
@@ -1131,6 +1133,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -1258,14 +1261,11 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"name\": \"consequatur\",
-    \"brand\": \"consequatur\",
-    \"location\": \"consequatur\",
-    \"type\": \"sale\",
+    \"type\": \"asset\",
     \"stock\": 45,
     \"price\": 56,
     \"unit\": \"consequatur\",
     \"minimum_stock\": 45,
-    \"category\": \"consequatur\",
     \"condition\": \"consequatur\",
     \"age\": \"mqeopfuudtdsufvyvddqa\",
     \"status\": \"aktif\"
@@ -1286,14 +1286,11 @@ const headers = {
 
 let body = {
     "name": "consequatur",
-    "brand": "consequatur",
-    "location": "consequatur",
-    "type": "sale",
+    "type": "asset",
     "stock": 45,
     "price": 56,
     "unit": "consequatur",
     "minimum_stock": 45,
-    "category": "consequatur",
     "condition": "consequatur",
     "age": "mqeopfuudtdsufvyvddqa",
     "status": "aktif"
@@ -1322,6 +1319,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -1457,28 +1455,28 @@ You can check the Dev Tools console for debugging information.</code></pre>
 <p>Example: <code>consequatur</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>brand</code></b>&nbsp;&nbsp;
+            <b style="line-height: 2;"><code>brand_id</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
 <i>optional</i> &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="brand"                data-endpoint="PUTapi-v1-inventory--id-"
-               value="consequatur"
+                              name="brand_id"                data-endpoint="PUTapi-v1-inventory--id-"
+               value=""
                data-component="body">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>The <code>id</code> of an existing record in the brands table.</p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>location</code></b>&nbsp;&nbsp;
+            <b style="line-height: 2;"><code>location_id</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
 <i>optional</i> &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="location"                data-endpoint="PUTapi-v1-inventory--id-"
-               value="consequatur"
+                              name="location_id"                data-endpoint="PUTapi-v1-inventory--id-"
+               value=""
                data-component="body">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>The <code>id</code> of an existing record in the locations table.</p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>type</code></b>&nbsp;&nbsp;
@@ -1487,10 +1485,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="type"                data-endpoint="PUTapi-v1-inventory--id-"
-               value="sale"
+               value="asset"
                data-component="body">
     <br>
-<p>Example: <code>sale</code></p>
+<p>Example: <code>asset</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>sale</code></li> <li><code>asset</code></li></ul>
         </div>
@@ -1543,16 +1541,16 @@ Must be one of:
 <p>Kolom value harus minimal 0. Example: <code>45</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>category</code></b>&nbsp;&nbsp;
+            <b style="line-height: 2;"><code>category_id</code></b>&nbsp;&nbsp;
 <small>string</small>&nbsp;
 <i>optional</i> &nbsp;
  &nbsp;
                 <input type="text" style="display: none"
-                              name="category"                data-endpoint="PUTapi-v1-inventory--id-"
-               value="consequatur"
+                              name="category_id"                data-endpoint="PUTapi-v1-inventory--id-"
+               value=""
                data-component="body">
     <br>
-<p>Example: <code>consequatur</code></p>
+<p>The <code>id</code> of an existing record in the categories table.</p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>condition</code></b>&nbsp;&nbsp;
@@ -1648,6 +1646,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -1809,6 +1808,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -1982,6 +1982,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -2186,6 +2187,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -2342,6 +2344,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -2511,6 +2514,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -2711,6 +2715,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -2872,6 +2877,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -3028,6 +3034,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -3197,6 +3204,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -3397,6 +3405,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -3558,6 +3567,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -3714,6 +3724,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -3883,6 +3894,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -4083,6 +4095,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -4248,6 +4261,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -4396,6 +4410,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -4557,6 +4572,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -4709,6 +4725,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -4825,7 +4842,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     \"sparepart_id\": \"consequatur\",
     \"quantity\": 45,
     \"borrower_name\": \"consequatur\",
-    \"expected_return_at\": \"2107-05-10\",
+    \"expected_return_at\": \"2107-08-09\",
     \"notes\": \"consequatur\"
 }"
 </code></pre></div>
@@ -4846,7 +4863,7 @@ let body = {
     "sparepart_id": "consequatur",
     "quantity": 45,
     "borrower_name": "consequatur",
-    "expected_return_at": "2107-05-10",
+    "expected_return_at": "2107-08-09",
     "notes": "consequatur"
 };
 
@@ -4873,6 +4890,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -5009,10 +5027,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="expected_return_at"                data-endpoint="POSTapi-v1-borrowings"
-               value="2107-05-10"
+               value="2107-08-09"
                data-component="body">
     <br>
-<p>Untuk catatan tambahan. Kolom value bukan tanggal yang valid. Must be a date after <code>now</code>. Example: <code>2107-05-10</code></p>
+<p>Untuk catatan tambahan. Kolom value bukan tanggal yang valid. Must be a date after <code>now</code>. Example: <code>2107-08-09</code></p>
         </div>
                 <div style=" padding-left: 28px;  clear: unset;">
             <b style="line-height: 2;"><code>notes</code></b>&nbsp;&nbsp;
@@ -5082,6 +5100,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -5253,6 +5272,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -5455,6 +5475,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -5611,6 +5632,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -5788,6 +5810,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -5882,7 +5905,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             </div>
                         </form>
 
-                    <h2 id="system-reports-GETapi-v1-activity-logs-user--id-">Mendapatkan log aktivitas untuk pengguna tertentu (Bisa oleh Admin/Superadmin).</h2>
+                    <h2 id="system-reports-GETapi-v1-activity-logs-user--id-">Mendapatkan log aktivitas untuk pengguna tertentu (Bisa oleh Admin).</h2>
 
 <p>
 <small class="badge badge-darkred">requires authentication</small>
@@ -5936,6 +5959,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -6097,6 +6121,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -6249,6 +6274,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -6413,6 +6439,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -6622,6 +6649,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -6797,6 +6825,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -7011,6 +7040,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>
@@ -7172,6 +7202,7 @@ x-content-type-options: nosniff
 x-xss-protection: 1; mode=block
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: unload=(self)
+strict-transport-security: max-age=31536000; includeSubDomains
 content-security-policy: default-src &#039;self&#039; http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src &#039;self&#039; blob: data:; script-src &#039;self&#039; &#039;unsafe-inline&#039; &#039;unsafe-eval&#039; https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src &#039;self&#039; &#039;unsafe-inline&#039; https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src &#039;self&#039; https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src &#039;self&#039; data: blob: storage: https://cdnjs.cloudflare.com; connect-src &#039;self&#039; data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;
 access-control-allow-origin: *
  </code></pre></details>         <pre>

@@ -45,15 +45,17 @@ class ActivityLogController extends Controller
     }
 
     /**
-     * Mendapatkan log aktivitas untuk pengguna tertentu (Bisa oleh Admin/Superadmin).
+     * Mendapatkan log aktivitas untuk pengguna tertentu (Bisa oleh Admin).
+     *
+     * @param int $userId ID pengguna
      */
     public function userLogs(Request $request, $userId)
     {
         $targetUser = \App\Models\User::findOrFail($userId);
 
-        // Proteksi: Admin hanya boleh lihat log user lain (bukan Superadmin lain?)
-        // Untuk sederhananya, kita batasi ke role Admin/Superadmin
-        if (! in_array($request->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
+        // Proteksi: Admin hanya boleh lihat log user lain
+        // Untuk sederhananya, kita batasi ke role Admin
+        if ($request->user()->role !== \App\Enums\UserRole::ADMIN) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

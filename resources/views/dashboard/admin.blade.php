@@ -73,8 +73,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                             <span class="hidden sm:inline">{{ __('ui.approvals') }}</span>
                             <span x-show="pendingApprovalsCount > 0" x-cloak class="absolute -top-2 -right-2 flex h-4 w-4">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-danger-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-4 w-4 bg-danger-500 flex items-center justify-center text-[9px] font-bold text-white" x-text="pendingApprovalsCount"></span>
+                                <span class="relative rounded-full h-4 w-4 bg-danger-500 flex items-center justify-center text-[9px] font-bold text-white" x-text="pendingApprovalsCount"></span>
                             </span>
                         </a>
                     </div>
@@ -545,9 +544,9 @@
                         </div>
                     </div>
                     <div class="flex-grow divide-y divide-secondary-100">
-                        <template x-for="(item, index) in topExited" :key="item.sparepart_id">
+                        <template x-for="(item, index) in topExited" :key="item.sparepart_uuid">
                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-danger-50/40 transition-all duration-150 cursor-pointer"
-                                 @click="window.location.href = '/inventory/' + item.sparepart_id">
+                                 @click="window.location.href = '/inventory/' + item.sparepart_uuid">
                                 <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110"
                                      :class="{
                                         'bg-amber-100 text-amber-700 shadow shadow-amber-200':  index === 0,
@@ -590,7 +589,7 @@
                                 };
                             @endphp
                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-emerald-50/50 transition-all duration-150 cursor-pointer"
-                                 onclick="window.location.href='{{ route('inventory.show', $item->sparepart_id) }}'">
+                                 onclick="window.location.href='{{ route('inventory.show', $item->sparepart_uuid ?? $item->sparepart_id) }}'">
                                 <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110 {{ $badgeClass }}">
                                     {{ $rank }}
                                 </div>
@@ -718,9 +717,9 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-secondary-100">
-                                <template x-for="item in lowStockItems" :key="item.id">
+                                <template x-for="item in lowStockItems" :key="item.uuid || item.id">
                                     <tr class="bg-white hover:bg-secondary-50 transition-colors cursor-pointer"
-                                        @click="window.location.href = '/inventory/' + item.id">
+                                        @click="window.location.href = '/inventory/' + (item.uuid || item.id)">
                                         <td class="px-4 py-3 font-medium text-secondary-800" x-text="item.name || 'Unknown'"></td>
                                         <td class="px-6 py-4 hidden md:table-cell" x-text="item.category || '-'"></td>
                                         <td class="px-6 py-4 text-center font-bold text-danger-600" x-text="item.stock"></td>
@@ -869,7 +868,7 @@
                         <template x-for="(item, index) in deadStockItems" :key="item.id">
                             <div class="group flex items-center gap-4 px-6 py-3.5 transition-all duration-150 cursor-pointer"
                                  :class="index % 2 === 0 ? 'bg-white hover:bg-amber-50/50' : 'bg-secondary-50/50 hover:bg-amber-50/50'"
-                                 @click="window.location.href = '/inventory/' + item.id">
+                                 @click="window.location.href = '/inventory/' + item.uuid">
                                 <div class="flex-shrink-0 w-2 h-2 rounded-full bg-amber-400"></div>
                                 <span class="flex-grow font-semibold text-secondary-800 text-sm group-hover:text-primary-700 transition-colors truncate" x-text="item.name"></span>
                                 <span class="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 font-bold text-xs tabular-nums">

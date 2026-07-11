@@ -352,7 +352,7 @@ return [
     'widget_dead_stock' => 'Dead Stock',
     'widget_top_contributors' => 'Top Kontributor',
     'widget_recent_activity' => 'Aktivitas Terbaru',
-    'approvals' => 'Persetujuan',
+    'approvals' => 'Pengajuan Stok',
     'forecasting_title' => 'Prediksi Kebutuhan (Bulan Depan)',
     'predicted_need' => 'Estimasi Kebutuhan',
     'current_stock_label' => 'Stok saat ini',

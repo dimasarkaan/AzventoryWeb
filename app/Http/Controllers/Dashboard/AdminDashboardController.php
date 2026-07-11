@@ -32,6 +32,9 @@ class AdminDashboardController extends Controller
      * Mendukung filter periode (hari ini, minggu ini, bulan ini, tahun ini, custom)
      * dan mengembalikan JSON jika request meminta format tersebut (untuk real-time refresh).
      */
+    /**
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         // 1. Validasi Input
@@ -78,7 +81,8 @@ class AdminDashboardController extends Controller
                      .'_'.$lastUpdated;
 
         // 3. Ambil data dengan cache 10 menit (600 detik)
-        $data = Cache::remember($cacheKey, 600, function () use ($start, $end, $period, $user) {
+        /** @return array<string, mixed> */
+        $data = Cache::remember($cacheKey, 600, function () use ($start, $end, $period, $user): array {
 
             // --- Snapshot: Statistik global inventaris (tidak difilter tanggal) ---
             $snapshots = $this->dashboardService->getStockSnapshots();
@@ -159,6 +163,7 @@ class AdminDashboardController extends Controller
             $lowStockItems = $lowStockItemsRaw->map(function ($item) {
                 return [
                     'id' => $item->id,
+                    'uuid' => $item->uuid ?? null,
                     'name' => $item->name,
                     'stock' => $item->stock,
                     'minimum_stock' => $item->minimum_stock,
@@ -170,6 +175,7 @@ class AdminDashboardController extends Controller
             $overdueBorrowingsList = $overdueRaw->map(function ($borrow) {
                 return [
                     'id' => $borrow->id,
+                    'sparepart_uuid' => $borrow->sparepart->uuid ?? null,
                     'user_name' => $borrow->user->name ?? $borrow->borrower_name,
                     'sparepart_name' => $borrow->sparepart->name ?? 'Unknown item',
                     'quantity' => $borrow->quantity,
@@ -182,7 +188,8 @@ class AdminDashboardController extends Controller
                 ];
             });
 
-            return array_merge(
+            /** @var array<string, mixed> $result */
+            $result = array_merge(
                 $snapshots,
                 [
                     'movementData' => $movementData,
@@ -199,6 +206,7 @@ class AdminDashboardController extends Controller
                 ],
                 $borrowingStats
             );
+            return $result;
         });
 
         // 4. Kembalikan JSON jika request dari AJAX (real-time refresh)

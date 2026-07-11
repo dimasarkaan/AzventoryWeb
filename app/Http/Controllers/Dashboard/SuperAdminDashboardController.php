@@ -22,6 +22,9 @@ class SuperAdminDashboardController extends Controller
      *
      * Menggunakan caching untuk performa dan filter berdasarkan tanggal.
      */
+    /**
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
+     */
     public function index(Request $request)
     {
         // 1. Validasi Input
@@ -63,7 +66,8 @@ class SuperAdminDashboardController extends Controller
         $cacheKey = 'dashboard_stats_'.$period.'_'.($year ?? 'nay').'_'.($month ?? 'nam').'_'.$user->id.'_'.$lastUpdated;
 
         // Simpan cache selama 10 menit (600 detik)
-        $data = Cache::remember($cacheKey, 600, function () use ($start, $end, $period, $user) {
+        /** @return array<string, mixed> */
+        $data = Cache::remember($cacheKey, 600, function () use ($start, $end, $period, $user): array {
 
             // --- Snapshot (Biasanya tidak difilter tanggal) ---
             $snapshots = $this->dashboardService->getStockSnapshots();
@@ -118,6 +122,7 @@ class SuperAdminDashboardController extends Controller
             $overdueBorrowingsList = $overdueBorrowingsListRaw->map(function ($borrow) {
                 return [
                     'id' => $borrow->id,
+                    'sparepart_uuid' => $borrow->sparepart->uuid ?? null,
                     'user_name' => $borrow->user->name ?? $borrow->borrower_name,
                     'sparepart_name' => $borrow->sparepart->name ?? 'Unknown item',
                     'quantity' => $borrow->quantity,
@@ -131,7 +136,8 @@ class SuperAdminDashboardController extends Controller
                 ];
             });
 
-            return array_merge(
+            /** @var array<string, mixed> $result */
+            $result = array_merge(
                 $snapshots,
                 [
                     'movementData' => $movementData,
@@ -148,6 +154,7 @@ class SuperAdminDashboardController extends Controller
                 ],
                 $borrowingStats
             );
+            return $result;
         });
 
         // --- Stok Menipis (max 5) ---
@@ -160,6 +167,7 @@ class SuperAdminDashboardController extends Controller
         $lowStockItems = $lowStockItemsRaw->map(function ($item) {
             return [
                 'id' => $item->id,
+                'uuid' => $item->uuid ?? null,
                 'name' => $item->name,
                 'stock' => $item->stock,
                 'minimum_stock' => $item->minimum_stock,
@@ -180,6 +188,7 @@ class SuperAdminDashboardController extends Controller
         $noPriceItems = $noPriceItemsRaw->map(function ($item) {
             return [
                 'id' => $item->id,
+                'uuid' => $item->uuid ?? null,
                 'name' => $item->name,
                 'part_number' => $item->part_number,
                 'price' => $item->price,

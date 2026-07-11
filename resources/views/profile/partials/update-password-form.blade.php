@@ -6,7 +6,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div class="md:col-span-2">
                 <x-input-label for="update_password_current_password" :value="__('ui.profile_label_current_password')" />
-                <x-text-input id="update_password_current_password" name="current_password" type="password" 
+                <x-password-input id="update_password_current_password" name="current_password" 
                               class="mt-1 block w-full {{ $errors->updatePassword->has('current_password') ? '!border-red-500' : '' }}" 
                               autocomplete="current-password" x-bind:disabled="!isEditing" />
                 <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
@@ -14,7 +14,7 @@
 
             <div>
                 <x-input-label for="update_password_password" :value="__('ui.profile_label_new_password')" />
-                <x-text-input id="update_password_password" name="password" type="password" 
+                <x-password-input id="update_password_password" name="password" 
                               class="mt-1 block w-full {{ $errors->updatePassword->has('password') ? '!border-red-500' : '' }}" 
                               autocomplete="new-password" x-bind:disabled="!isEditing" />
                 <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
@@ -22,7 +22,7 @@
 
             <div>
                 <x-input-label for="update_password_password_confirmation" :value="__('ui.profile_label_confirm_password')" />
-                <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" 
+                <x-password-input id="update_password_password_confirmation" name="password_confirmation" 
                               class="mt-1 block w-full {{ $errors->updatePassword->has('password_confirmation') ? '!border-red-500' : '' }}" 
                               autocomplete="new-password" x-bind:disabled="!isEditing" />
                 <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
