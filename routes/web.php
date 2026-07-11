@@ -134,6 +134,7 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         Route::middleware('role:superadmin')->group(function () {
             Route::get('/', [ReportController::class, 'index'])->name('index');
             Route::get('/download', [ReportController::class, 'download'])->name('download');
+            Route::get('/file/{filename}', [ReportController::class, 'downloadGeneratedFile'])->name('file');
         });
 
         // Log Aktivitas (Index untuk semua, Export hanya Superadmin)

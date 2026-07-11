@@ -65,10 +65,10 @@ class ExportActivityLogJob implements ShouldQueue
 
         // Save to Storage
         $path = 'reports/'.$filename;
-        Storage::disk('public')->put($path, $pdf->output());
+        Storage::disk('local')->put($path, $pdf->output());
 
         // Notify User
-        $url = Storage::url($path);
+        $url = route('reports.file', ['filename' => $filename]);
 
         $this->user->notify(new ReportReadyNotification('Laporan Aktivitas Sistem', $url));
     }

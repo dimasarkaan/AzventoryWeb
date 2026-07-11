@@ -31,18 +31,20 @@ class CleanupOldReports extends Command
         $now = now();
         $totalDeleted = 0;
 
-        // 1. Bersihkan Laporan di Disk Public
+        // 1. Bersihkan Laporan di Disk Local (Secure) & Public (Old)
         $reportDir = 'reports';
-        if (Storage::disk('public')->exists($reportDir)) {
-            $files = Storage::disk('public')->files($reportDir);
-            foreach ($files as $file) {
-                if (basename($file) === '.gitignore') {
-                    continue;
-                }
-                $lastModified = Carbon::createFromTimestamp(Storage::disk('public')->lastModified($file));
-                if ($lastModified->diffInDays($now) >= $days) {
-                    Storage::disk('public')->delete($file);
-                    $totalDeleted++;
+        foreach (['local', 'public'] as $disk) {
+            if (Storage::disk($disk)->exists($reportDir)) {
+                $files = Storage::disk($disk)->files($reportDir);
+                foreach ($files as $file) {
+                    if (basename($file) === '.gitignore') {
+                        continue;
+                    }
+                    $lastModified = Carbon::createFromTimestamp(Storage::disk($disk)->lastModified($file));
+                    if ($lastModified->diffInDays($now) >= $days) {
+                        Storage::disk($disk)->delete($file);
+                        $totalDeleted++;
+                    }
                 }
             }
         }

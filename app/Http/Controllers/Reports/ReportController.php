@@ -108,10 +108,10 @@ class ReportController extends Controller
                 $pdfOutput = $pdf->output();
                 $filenameWithExt = $filename.'.pdf';
                 $path = 'reports/'.$filenameWithExt;
-                Storage::disk('public')->put($path, $pdfOutput);
+                Storage::disk('local')->put($path, $pdfOutput);
 
                 // Kirim Notifikasi (History)
-                $url = Storage::url($path);
+                $url = route('reports.file', ['filename' => $filenameWithExt]);
                 $notifyTitle = match ($type) {
                     'inventory_list' => 'Laporan Inventaris',
                     'stock_mutation' => 'Laporan Mutasi Stok',
@@ -156,5 +156,28 @@ class ReportController extends Controller
             'low_stock' => $excelService->exportLowStock($query, $filename),
             default => back()->with('error', 'Tipe laporan tidak didukung untuk export Excel.'),
         };
+    }
+
+    /**
+     * Mengunduh file laporan yang telah dibuat secara aman.
+     */
+    public function downloadGeneratedFile(string $filename)
+    {
+        $path = 'reports/' . $filename;
+
+        // Cek disk local (terbaru / best practice)
+        if (Storage::disk('local')->exists($path)) {
+            $this->logActivity('Laporan Diunduh (Secure)', "Mengunduh file laporan secara aman: {$filename}");
+            return Storage::disk('local')->download($path);
+        }
+
+        // Fallback cek disk public (untuk kompatibilitas dengan file lama yang sudah terlanjur dibuat di public)
+        if (Storage::disk('public')->exists($path)) {
+            $this->logActivity('Laporan Diunduh (Fallback Public)', "Mengunduh file laporan dari disk public: {$filename}");
+            return Storage::disk('public')->download($path);
+        }
+
+        // Jika file sudah dihapus / tidak ditemukan
+        return redirect()->route('dashboard')->with('error', 'Laporan tersebut sudah kedaluwarsa atau telah dihapus oleh sistem.');
     }
 }

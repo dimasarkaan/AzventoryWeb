@@ -22,7 +22,7 @@ class TesLogikaJobTest extends TestCase
      */
     public function test_generate_report_job_menghasilkan_file_dan_notifikasi()
     {
-        Storage::fake('public');
+        Storage::fake('local');
         Notification::fake();
 
         $user = User::factory()->create(['role' => 'superadmin']);
@@ -51,7 +51,7 @@ class TesLogikaJobTest extends TestCase
         $job->handle();
 
         // Verifikasi file tersimpan di storage
-        $files = Storage::disk('public')->allFiles('reports');
+        $files = Storage::disk('local')->allFiles('reports');
         $this->assertNotEmpty($files);
         $this->assertStringContainsString('LaporanInventaris', $files[0]);
 
@@ -71,7 +71,7 @@ class TesLogikaJobTest extends TestCase
      */
     public function test_export_activity_log_job_menghasilkan_file_dan_notifikasi()
     {
-        Storage::fake('public');
+        Storage::fake('local');
         Notification::fake();
 
         $user = User::factory()->create(['role' => 'superadmin']);
@@ -90,7 +90,7 @@ class TesLogikaJobTest extends TestCase
         $job->handle();
 
         // Verifikasi file
-        $files = Storage::disk('public')->allFiles('reports');
+        $files = Storage::disk('local')->allFiles('reports');
         $this->assertNotEmpty($files);
         $this->assertStringContainsString('LogAktivitas', $files[0]);
 

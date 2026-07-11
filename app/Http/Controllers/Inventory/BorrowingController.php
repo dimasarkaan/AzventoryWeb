@@ -49,7 +49,7 @@ class BorrowingController extends Controller
         try {
             $this->inventoryService->createBorrowing($sparepart, $request->validated());
 
-            return redirect()->route('inventory.show', $sparepart->id)
+            return redirect()->route('inventory.show', $sparepart)
                 ->with('success', 'Peminjaman berhasil dicatat.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', $e->getMessage());

@@ -40,7 +40,7 @@ class ApproachingStockNotification extends Notification implements ShouldBroadca
         return [
             'title' => 'Stok Mendekati Batas',
             'message' => "Stok {$this->sparepart->name} tinggal {$this->sparepart->stock} {$this->sparepart->unit}. Segera lakukan pemesanan.",
-            'url' => route('inventory.show', $this->sparepart->id).'#stock-history',
+            'url' => route('inventory.show', $this->sparepart->uuid).'#stock-history',
             'type' => 'warning',
         ];
     }
@@ -53,7 +53,7 @@ class ApproachingStockNotification extends Notification implements ShouldBroadca
         return new BroadcastMessage([
             'title' => 'Stok Mendekati Batas',
             'message' => "Stok {$this->sparepart->name} tinggal {$this->sparepart->stock} {$this->sparepart->unit}. Segera lakukan pemesanan.",
-            'url' => route('inventory.show', $this->sparepart->id).'#stock-history',
+            'url' => route('inventory.show', $this->sparepart->uuid).'#stock-history',
             'type' => 'warning',
         ]);
     }
