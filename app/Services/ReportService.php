@@ -8,16 +8,11 @@ use App\Models\StockLog;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 
-/**
- * ReportService mengelola pengambilan data untuk generator laporan (PDF/Excel).
- */
+// Service (Pekerja Keras) khusus untuk mengumpulkan data dari database dan merakitnya menjadi Laporan (PDF/Excel).
+// Merupakan Otak di balik fitur "Cetak Laporan".
 class ReportService
 {
-    /**
-     * Mengambil dataset laporan berdasarkan tipe, lokasi, dan rentang tanggal.
-     *
-     * @return array ['data', 'title', 'view']
-     */
+    // Tahap Eksekusi: Mengeksekusi pencarian data ke database dan menyerahkan hasil akhirnya (Siap Cetak)
     public function getReportData($type, $location, $startDate, $endDate)
     {
         $queryResult = $this->getReportQuery($type, $location, $startDate, $endDate);
@@ -37,9 +32,7 @@ class ReportService
         ];
     }
 
-    /**
-     * Mendapatkan query builder untuk laporan (mendukung streaming data/lazy loading).
-     */
+    // Tahap Perencanaan: Menyusun strategi pencarian (Query Builder) tergantung jenis laporan apa yang diminta oleh pengguna
     public function getReportQuery($type, $location, $startDate, $endDate)
     {
         $query = null;
@@ -106,9 +99,7 @@ class ReportService
         ];
     }
 
-    /**
-     * Mengonversi string periode menjadi rentang objek Carbon.
-     */
+    // Menerjemahkan bahasa manusia (contoh: "Bulan Ini") menjadi bahasa kalender komputer (Tanggal awal - akhir)
     public function resolveDateRange($period, $customStart = null, $customEnd = null)
     {
         $startDate = null;
@@ -134,9 +125,7 @@ class ReportService
         return [$startDate, $endDate];
     }
 
-    /**
-     * Helper untuk menerapkan filter rentang tanggal pada query builder.
-     */
+    // Filter Tambahan: Membuang data yang terjadi di luar rentang tanggal yang diminta (Tanggal Mulai s.d Tanggal Selesai)
     private function applyDateRange(Builder $query, $column, $start, $end)
     {
         if ($start && $end) {

@@ -6,13 +6,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+// Middleware untuk mengecek apakah pengguna sudah melakukan aktivasi akun.
+// Jika mereka belum mengganti password bawaan sistem, paksa (redirect) mereka ke halaman "Ganti Password" sebelum mengizinkan akses ke halaman lain.
 class EnsurePasswordIsChanged
 {
-    /**
-     * Tangani permintaan yang masuk.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+    // Tangani setiap pergerakan/klik pengguna di website
     public function handle(Request $request, Closure $next): Response
     {
         if ($request->user() && ! $request->user()->password_changed_at && ! $request->routeIs('password.change', 'password.change.store', 'logout')) {

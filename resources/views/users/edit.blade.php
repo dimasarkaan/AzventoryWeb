@@ -23,7 +23,7 @@
                 <!-- Main Edit Form -->
                 <div class="lg:col-span-2">
                     <div class="bg-white rounded-xl border border-secondary-200 shadow-card p-6 overflow-visible" x-data="{ isSubmitting: false }">
-                        <form action="{{ route('users.update', $user) }}" method="POST" novalidate @submit="isSubmitting = true">
+                        <form action="{{ route('users.update', $user) }}" method="POST" @submit="isSubmitting = true" novalidate>
                             @csrf
                             @method('PUT')
         
@@ -36,7 +36,7 @@
                                 <!-- Nama Lengkap -->
                                 <div class="space-y-2">
                                     <label for="name" class="input-label">{{ __('ui.full_name') }} <span class="text-danger-500">*</span></label>
-                                    <input id="name" class="input-field" type="text" name="name" value="{{ old('name', $user->name) }}" autocomplete="name" required />
+                                    <input id="name" class="input-field" type="text" name="name" value="{{ old('name', $user->name) }}" autocomplete="name" pattern="^[a-zA-Z][a-zA-Z\s\.\'\-]*$" title="Nama lengkap harus diawali huruf dan hanya boleh berisi huruf, spasi, titik, koma atas, dan strip tanpa angka" minlength="3" maxlength="255" required />
                                     <x-input-error :messages="$errors->get('name')" class="mt-2" />
                                 </div>
 
@@ -49,14 +49,14 @@
                                 <!-- Email -->
                                 <div class="space-y-2">
                                     <label for="email" class="input-label">{{ __('ui.email_address') }} <span class="text-danger-500">*</span></label>
-                                    <input type="email" name="email" id="email" class="input-field w-full" value="{{ old('email', $user->email) }}" autocomplete="email" required>
+                                    <input type="email" name="email" id="email" class="input-field w-full" value="{{ old('email', $user->email) }}" autocomplete="email" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Format email tidak valid (contoh: nama@domain.com)" minlength="5" maxlength="255" required>
                                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                                 </div>
 
                                 <!-- Jabatan -->
                                 <div class="space-y-2">
                                     <label for="jabatan" class="input-label">{{ __('ui.job_position') }} <span class="text-danger-500">*</span></label>
-                                    <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" autocomplete="organization-title" required />
+                                    <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan', $user->jabatan) }}" autocomplete="organization-title" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'&quot;]*$" title="Jabatan harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/'&quot;)" minlength="3" maxlength="255" required />
                                     <x-input-error :messages="$errors->get('jabatan')" class="mt-2" />
                                 </div>
         
@@ -88,7 +88,10 @@
                                 </div>
                             </div>
         
-                            <div class="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-secondary-100">
+                            <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-secondary-100">
+                                <a href="{{ route('users.index') }}" class="btn btn-secondary">
+                                    {{ __('ui.cancel') }}
+                                </a>
                                 <button type="submit" id="submit-btn" class="btn btn-primary" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
                                     <span x-show="!isSubmitting">{{ __('ui.save_changes') }}</span>
                                     <span x-show="isSubmitting" class="flex items-center gap-2">
@@ -111,7 +114,7 @@
                         <p class="text-sm text-secondary-500 mb-4">
                             {{ __('ui.reset_password_desc') }} <code>password123</code>.
                         </p>
-                        <form action="{{ route('users.reset-password', $user) }}" method="POST">
+                        <form action="{{ route('users.reset-password', $user) }}" method="POST" novalidate>
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn btn-warning w-full justify-center" onclick="confirmReset(event)">
@@ -126,7 +129,7 @@
                         <p class="text-sm text-secondary-500 mb-4">
                             {{ __('ui.delete_user_warning') }}
                         </p>
-                         <form action="{{ route('users.destroy', $user) }}" method="POST">
+                         <form action="{{ route('users.destroy', $user) }}" method="POST" novalidate>
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger w-full justify-center" onclick="confirmDelete(event)">
@@ -173,3 +176,4 @@
     </script>
     @endpush
 </x-app-layout>
+

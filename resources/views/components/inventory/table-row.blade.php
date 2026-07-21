@@ -123,7 +123,7 @@
         <div class="flex items-center justify-center gap-2">
             @if($trash)
                 @can('restore', $sparepart)
-                <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="inline-block">
+                <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="inline-block" novalidate>
                     @csrf
                     @method('PATCH')
                     <button type="submit" class="btn btn-ghost p-2 text-success-600 hover:text-success-700 bg-success-50 hover:bg-success-100 rounded-lg transition-all" title="{{ __('ui.restore') }}" onclick="confirmInventoryRestore(event)">
@@ -132,7 +132,7 @@
                 </form>
                 @endcan
                 @can('forceDelete', $sparepart)
-                <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block">
+                <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block" novalidate>
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-ghost p-2 text-danger-600 hover:text-danger-700 bg-danger-50 hover:bg-danger-100 rounded-lg transition-all" title="{{ __('ui.force_delete') }}" onclick="confirmInventoryForceDelete(event)">
@@ -150,7 +150,7 @@
                 </a>
                 @endcan
                 @can('delete', $sparepart)
-                <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block">
+                <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block" novalidate>
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-ghost p-2 text-danger-600 hover:text-danger-700 hover:bg-danger-50 rounded-lg transition-all" title="{{ __('ui.delete') }}" onclick="confirmDelete(event)">
@@ -162,3 +162,7 @@
         </div>
     </td>
 </tr>
+
+
+
+

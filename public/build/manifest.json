@@ -4,7 +4,7 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BmcUEl8i.css",
+    "file": "assets/app-C1bX1C72.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -13,7 +13,7 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-BSMjK1uA.js",
+    "file": "assets/app-DfQJg92a.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -22,7 +22,7 @@
     ]
   },
   "resources/js/pages/superadmin/inventory/index.js": {
-    "file": "assets/index-BVMdeEZI.js",
+    "file": "assets/index-D52a8_n5.js",
     "name": "index",
     "src": "resources/js/pages/superadmin/inventory/index.js",
     "isEntry": true,

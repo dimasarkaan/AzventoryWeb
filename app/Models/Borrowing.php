@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Model Borrowing untuk mencatat setiap transaksi peminjaman barang oleh personil.
- */
+// Model (Blueprint Tabel Database) khusus untuk mencatat transaksi peminjaman barang.
+// Menyimpan jejak barang apa yang dipinjam, dipinjam oleh siapa, dan status pengembaliannya.
 class Borrowing extends Model
 {
     use HasFactory, SoftDeletes;
@@ -26,34 +25,26 @@ class Borrowing extends Model
         'return_photos' => 'array',
     ];
 
-    /**
-     * Relasi ke aset atau sparepart yang sedang dipinjam.
-     */
+    // Relasi Database: Menghubungkan catatan transaksi ini dengan fisik barang di gudang
     public function sparepart()
     {
         return $this->belongsTo(Sparepart::class);
     }
 
-    /**
-     * Relasi ke user (Staff/Admin) yang memvalidasi transaksi peminjaman ini.
-     */
+    // Relasi Database: Menghubungkan catatan ini dengan akun pengguna yang bertanggung jawab
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Relasi ke detail riwayat pengembalian barang (mendukung pengembalian bertahap).
-     */
+    // Relasi Database: Menarik semua riwayat pengembalian (termasuk yang dicicil sedikit-sedikit)
     public function returns()
     {
         return $this->hasMany(BorrowingReturn::class);
     }
 
-    /**
-     * Attribut virtual untuk menghitung sisa barang yang belum dikembalikan ke gudang.
-     * Menggunakan returns_sum_quantity jika di-eager load untuk mencegah N+1 query.
-     */
+    // Atribut Virtual: Kolom jadi-jadian (tidak ada di database) untuk menghitung sisa barang pinjaman.
+    // Menghitung otomatis: Total Pinjam dikurangi Total yang sudah Dikembalikan.
     public function getRemainingQuantityAttribute()
     {
         $returned = $this->attributes['returns_sum_quantity'] ?? $this->returns()->sum('quantity');
@@ -61,9 +52,7 @@ class Borrowing extends Model
         return $this->quantity - $returned;
     }
 
-    /**
-     * Mengecek apakah peminjaman telah melewati batas waktu estimasi pengembalian.
-     */
+    // Fitur Pengecek Status: Memastikan apakah si peminjam sudah telat mengembalikan barang (Lewat Jatuh Tempo)
     public function isOverdue()
     {
         if ($this->status === 'returned' || $this->remaining_quantity <= 0) {

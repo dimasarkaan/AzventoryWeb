@@ -6,33 +6,26 @@ use App\Enums\UserRole;
 use App\Models\StockLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class StockRequestNotification extends Notification implements ShouldBroadcast, ShouldQueue
+class StockRequestNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
-    /**
-     * Inisialisasi notifikasi permintaan perubahan stok (In/Out/Adjustment).
-     */
+    // Tahap Persiapan: Menerima data pengajuan pergerakan stok dan pesan balasannya (Setuju/Tolak).
     public function __construct(public StockLog $stockLog, public string $message)
     {
         //
     }
 
-    /**
-     * Tentukan channel transmisi notifikasi: Database untuk persistence, Broadcast untuk real-time.
-     */
+    // Saluran Pengiriman: Disimpan ke database (ikon lonceng) dan dikirim Pop-up (Real-Time).
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Struktur data notifikasi untuk disimpan di database.
-     */
+    // Merakit informasi lengkap pengajuan (termasuk alasan penolakan jika ada) untuk disimpan permanen.
     public function toArray(object $notifiable): array
     {
         $url = route('inventory.stock-approvals.index', ['search' => $this->stockLog->sparepart->name]);
@@ -49,9 +42,7 @@ class StockRequestNotification extends Notification implements ShouldBroadcast, 
         ];
     }
 
-    /**
-     * Konten pesan untuk siaran real-time via WebSocket.
-     */
+    // Merakit pesan pengumuman hasil persetujuan yang akan muncul mendadak (Pop-up/Toast) di layar.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         $url = route('inventory.stock-approvals.index', ['search' => $this->stockLog->sparepart->name]);

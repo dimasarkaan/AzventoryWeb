@@ -4,7 +4,7 @@
             {{ __('ui.auth_reset_title') }}
         </x-slot>
 
-        <form method="POST" action="{{ route('password.store') }}">
+        <form method="POST" action="{{ route('password.store') }}" novalidate>
             @csrf
 
             <!-- Password Reset Token -->
@@ -20,14 +20,14 @@
             <!-- Password -->
             <div class="mt-4">
                 <x-input-label for="password" :value="__('ui.auth_label_new_password')" />
-                <x-password-input id="password" class="block mt-1 w-full" name="password" required autocomplete="new-password" />
+                <x-password-input id="password" class="block mt-1 w-full" name="password" required autocomplete="new-password" minlength="8" maxlength="16" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,16}" title="Kata sandi harus 8-16 karakter dan mengandung kombinasi huruf dan angka" />
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
             <!-- Confirm Password -->
             <div class="mt-4">
                 <x-input-label for="password_confirmation" :value="__('ui.auth_label_new_password_confirmation')" />
-                <x-password-input id="password_confirmation" class="block mt-1 w-full" name="password_confirmation" required autocomplete="new-password" />
+                <x-password-input id="password_confirmation" class="block mt-1 w-full" name="password_confirmation" required autocomplete="new-password" minlength="8" maxlength="16" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,16}" title="Konfirmasi kata sandi harus sama dengan kata sandi baru" />
                 <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
             </div>
 
@@ -39,3 +39,4 @@
         </form>
     </x-card>
 </x-guest-layout>
+

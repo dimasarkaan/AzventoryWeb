@@ -106,7 +106,7 @@
                 <div class="flex items-center gap-3">
                     @if(request('trash'))
                         @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
-                        <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST">
+                        <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST" novalidate>
                             @csrf
                             <div id="bulk-restore-inputs"></div>
                             <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
@@ -117,7 +117,7 @@
                         @endif
 
                         @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
-                        <form id="bulk-delete-form" action="{{ route('inventory.bulk-force-delete') }}" method="POST">
+                        <form id="bulk-delete-form" action="{{ route('inventory.bulk-force-delete') }}" method="POST" novalidate>
                             @csrf
                             @method('DELETE')
                             <div id="bulk-delete-inputs"></div>
@@ -168,7 +168,7 @@
 
             <!-- Filters & Search -->
             <div class="mb-4 card p-4 overflow-visible" x-data="{ showFilters: false }">
-                    <form id="inventory-filter-form" method="GET" action="{{ route('inventory.index') }}">
+                    <form id="inventory-filter-form" method="GET" action="{{ route('inventory.index') }}" novalidate>
                     <input type="hidden" name="trash" value="{{ request('trash') }}">
                     <input type="hidden" name="filter" value="{{ request('filter') }}">
 
@@ -199,7 +199,7 @@
                              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <x-icon.search class="w-5 h-5 text-secondary-400" />
                             </div>
-                            <input type="text" name="search" value="{{ request('search') }}" class="input-field pl-10 w-full" placeholder="{{ __('ui.search_inventory_placeholder') }}" onchange="this.form.submit()">
+                            <input type="text" name="search" value="{{ request('search') }}" class="input-field pl-10 w-full" placeholder="{{ __('ui.search_inventory_placeholder') }}" onchange="this.form.submit()" maxlength="255">
                         </div>
                         <button type="button" @click="showFilters = !showFilters" class="btn btn-secondary md:hidden flex items-center justify-center w-12 flex-shrink-0" title="{{ __('ui.show_filter') }}">
                             <x-icon.filter class="w-5 h-5" />
@@ -285,3 +285,4 @@
         </div>
     </div>
 </x-app-layout>
+

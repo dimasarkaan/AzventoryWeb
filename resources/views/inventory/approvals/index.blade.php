@@ -13,7 +13,7 @@
 
             <!-- Modern Search & Filter Bar -->
             <div class="mb-6 card p-4 overflow-visible">
-                <form method="GET" action="{{ route('inventory.stock-approvals.index') }}" id="approval-filter-form">
+                <form method="GET" action="{{ route('inventory.stock-approvals.index') }}" id="approval-filter-form" novalidate>
                     <div class="flex flex-col lg:flex-row gap-4 items-center">
                         <div class="relative flex-1 w-full">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -160,7 +160,7 @@
                 </div>
 
                 {{-- Standalone Bulk Form (Outside table to avoid nesting) --}}
-                <form id="bulk-approval-form" action="{{ route('inventory.stock-approvals.bulk-approve') }}" method="POST" class="hidden">
+                <form id="bulk-approval-form" action="{{ route('inventory.stock-approvals.bulk-approve') }}" method="POST" class="hidden" novalidate>
                     @csrf
                     <input type="hidden" name="status" id="bulk-status" value="approved">
                     <input type="hidden" name="rejection_reason" id="bulk-rejection-reason" value="">
@@ -281,21 +281,20 @@
                 cancelButtonText: '{{ __('ui.btn_cancel') }}',
                 reverseButtons: true,
                 customClass: {
-                    popup: '!rounded-2xl !font-sans !p-8 !flex !flex-col',
-                    icon: '!mb-4 !mx-auto',
-                    title: '!text-secondary-900 !text-xl !font-bold !m-0 !mb-2 !text-center',
-                    htmlContainer: '!text-secondary-500 !text-sm !m-0 !mb-8 !text-center',
-                    inputLabel: '!text-secondary-700 !text-sm !font-semibold !m-0 !mb-3 !text-center !block !w-full',
-                    input: '!m-0 !mb-6 !w-full !rounded-xl !border-secondary-200 !p-4 !text-sm focus:!ring-primary-500 focus:!border-primary-500 !shadow-sm transition-all',
-                    validationMessage: '!bg-danger-50 !text-danger-600 !border !border-danger-100 !rounded-xl !p-3 !text-xs !mt-[-1rem] !mb-6 !flex !items-center !justify-center !gap-2 !w-full !font-medium !shadow-sm !mx-0',
-                    actions: '!flex !justify-end !gap-3 !m-0 !mt-2 !w-full',
-                    confirmButton: 'btn btn-danger !px-8 !py-2.5 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500 !m-0',
-                    cancelButton: 'btn btn-secondary !px-8 !py-2.5 rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm !m-0'
+                    popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+                    title: '!text-secondary-900 !text-xl !font-bold !mt-2',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    inputLabel: '!text-secondary-700 !text-sm !font-bold !mt-4 !mb-2 !text-left !block',
+                    input: '!rounded-xl !border-secondary-300 !p-3 !text-sm focus:!ring-primary-500 focus:!border-primary-500 !shadow-sm transition-all',
+                    validationMessage: '!bg-danger-50 !text-danger-600 !border !border-danger-100 !rounded-xl !p-3 !text-xs !mt-2 !mb-0 !flex !items-center !justify-center !gap-2 !w-full !font-medium',
+                    actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+                    confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
+                    cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
                 },
                 buttonsStyling: false,
                 iconColor: '#ef4444',
-                padding: '2em',
-                backdrop: `rgba(0,0,0,0.4)`
+                width: '28em',
+                backdrop: `rgba(15, 23, 42, 0.5)`
             }).then((result) => {
                 if (result.isConfirmed) {
                     const reasonInput = form.querySelector('.rejection-reason-input');
@@ -321,18 +320,17 @@
                 cancelButtonText: '{{ __('ui.btn_cancel') }}',
                 reverseButtons: true,
                 customClass: {
-                    popup: '!rounded-2xl !font-sans !p-8 !flex !flex-col',
-                    icon: '!mb-4 !mx-auto',
-                    title: '!text-secondary-900 !text-xl !font-bold !m-0 !mb-2 !text-center',
-                    htmlContainer: '!text-secondary-500 !text-sm !m-0 !mb-6 !text-center',
-                    actions: '!flex !justify-end !gap-3 !m-0 !w-full',
-                    confirmButton: 'btn btn-success !px-8 !py-2.5 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-success-500 !m-0',
-                    cancelButton: 'btn btn-secondary !px-8 !py-2.5 rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm !m-0'
+                    popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+                    title: '!text-secondary-900 !text-xl !font-bold !mt-2',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+                    confirmButton: 'btn btn-success !px-6 !py-2.5 !m-0 !rounded-xl',
+                    cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
                 },
                 buttonsStyling: false,
                 iconColor: '#10b981',
-                padding: '2em',
-                backdrop: `rgba(0,0,0,0.4)`
+                width: '26em',
+                backdrop: `rgba(15, 23, 42, 0.5)`
             }).then((result) => {
                 if (result.isConfirmed) {
                     button.disabled = true;
@@ -477,20 +475,20 @@
                 cancelButtonText: '{{ __('ui.btn_cancel') }}',
                 reverseButtons: true,
                 customClass: {
-                    popup: '!rounded-2xl !font-sans !p-8 !flex !flex-col',
-                    icon: '!mb-4 !mx-auto',
-                    title: '!text-secondary-900 !text-xl !font-bold !m-0 !mb-2 !text-center',
-                    htmlContainer: '!text-secondary-500 !text-sm !m-0 !mb-8 !text-center',
-                    inputLabel: '!text-secondary-700 !text-sm !font-semibold !m-0 !mb-3 !text-center !block !w-full',
-                    input: '!m-0 !mb-6 !w-full !rounded-xl !border-secondary-200 !p-4 !text-sm focus:!ring-primary-500 focus:!border-primary-500 !shadow-sm transition-all',
-                    validationMessage: '!bg-danger-50 !text-danger-600 !border !border-danger-100 !rounded-xl !p-3 !text-xs !mt-[-1rem] !mb-6 !flex !items-center !justify-center !gap-2 !w-full !font-medium !shadow-sm !mx-0',
-                    actions: '!flex !justify-end !gap-3 !m-0 !mt-2 !w-full',
-                    confirmButton: `${btnClass} !px-8 !py-2.5 rounded-xl shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ${ringColor} !m-0`,
-                    cancelButton: 'btn btn-secondary !px-8 !py-2.5 rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm !m-0'
+                    popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+                    title: '!text-secondary-900 !text-xl !font-bold !mt-2',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                    inputLabel: '!text-secondary-700 !text-sm !font-bold !mt-4 !mb-2 !text-left !block',
+                    input: '!rounded-xl !border-secondary-300 !p-3 !text-sm focus:!ring-primary-500 focus:!border-primary-500 !shadow-sm transition-all',
+                    validationMessage: '!bg-danger-50 !text-danger-600 !border !border-danger-100 !rounded-xl !p-3 !text-xs !mt-2 !mb-0 !flex !items-center !justify-center !gap-2 !w-full !font-medium',
+                    actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+                    confirmButton: `${btnClass} !px-6 !py-2.5 !m-0 !rounded-xl`,
+                    cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
                 },
                 buttonsStyling: false,
                 iconColor: iconColor,
-                backdrop: `rgba(0,0,0,0.4)`
+                width: '28em',
+                backdrop: `rgba(15, 23, 42, 0.5)`
             };
 
             if (status === 'approved') {
@@ -526,3 +524,4 @@
     </script>
     @endpush
 </x-app-layout>
+

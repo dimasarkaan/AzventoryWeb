@@ -10,7 +10,7 @@
     @endif
 
     <div class="mt-4 flex items-center justify-between">
-        <form method="POST" action="{{ route('verification.send') }}">
+        <form method="POST" action="{{ route('verification.send') }}" novalidate>
             @csrf
 
             <div>
@@ -20,7 +20,7 @@
             </div>
         </form>
 
-        <form method="POST" action="{{ route('logout') }}">
+        <form method="POST" action="{{ route('logout') }}" novalidate>
             @csrf
 
             <button type="submit" class="underline text-sm text-secondary-600 hover:text-secondary-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
@@ -29,3 +29,4 @@
         </form>
     </div>
 </x-guest-layout>
+

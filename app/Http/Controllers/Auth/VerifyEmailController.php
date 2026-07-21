@@ -7,11 +7,11 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\RedirectResponse;
 
+// Controller untuk memproses klik pada tautan (link) verifikasi di kotak masuk email pengguna.
+// Jika tautan valid, akun tersebut resmi disahkan (Verified).
 class VerifyEmailController extends Controller
 {
-    /**
-     * Menandai alamat email pengguna yang terautentikasi sebagai terverifikasi.
-     */
+    // Menangkap klik dari email, memvalidasi keasliannya, dan mengubah status akun di database
     public function __invoke(EmailVerificationRequest $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {

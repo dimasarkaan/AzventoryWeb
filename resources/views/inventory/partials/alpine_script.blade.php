@@ -62,6 +62,7 @@
                         });
 
                     // Listener untuk Persetujuan Stok (khusus untuk perpindahan status request)
+                    @if(auth()->check() && auth()->user()->role === \App\Enums\UserRole::ADMIN)
                     window.Echo.private('stock-approvals')
                         .listen('.StockApprovalUpdated', (e) => {
                             console.log('✅ Stock Approval Update received:', e);
@@ -69,6 +70,7 @@
                                 this.refreshHistory();
                             }
                         });
+                    @endif
                 }
             },
 

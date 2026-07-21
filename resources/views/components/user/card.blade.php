@@ -54,7 +54,7 @@
     <!-- Actions -->
     <div class="flex items-center justify-end gap-2 pt-1 border-t border-secondary-50">
         @if($trash)
-            <form action="{{ route('users.restore', $user->uuid) }}" method="POST" class="w-full">
+            <form action="{{ route('users.restore', $user->uuid) }}" method="POST" class="w-full" novalidate>
                 @csrf
                 @method('PATCH')
                 <button type="submit" class="btn btn-sm btn-success w-full justify-center flex items-center gap-2 h-8 text-xs" onclick="confirmUserRestore(event)">
@@ -66,7 +66,7 @@
             <a href="{{ route('users.show', $user) }}" class="btn btn-ghost text-xs p-2 h-8 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-colors">{{ __('ui.detail') }}</a>
             <a href="{{ route('users.edit', $user) }}" class="btn btn-white text-xs p-2 h-8 border border-secondary-200 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-all">{{ __('ui.edit') }}</a>
             @if(auth()->id() !== $user->id)
-                <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline-block">
+                <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline-block" novalidate>
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger text-xs p-2 h-8 bg-danger-50 text-danger-600 hover:bg-danger-600 hover:text-white border-transparent transition-all" onclick="confirmDelete(event)">{{ __('ui.delete') }}</button>
@@ -75,3 +75,7 @@
         @endif
     </div>
 </div>
+
+
+
+

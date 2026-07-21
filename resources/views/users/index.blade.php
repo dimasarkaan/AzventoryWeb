@@ -42,7 +42,7 @@
 
              <!-- Search & Filters -->
              <div class="mb-4 card p-4 overflow-visible" x-data="{ showFilters: false }">
-                 <form method="GET" action="{{ route('users.index') }}">
+                 <form method="GET" action="{{ route('users.index') }}" novalidate>
                      @if(request('trash'))
                          <input type="hidden" name="trash" value="true">
                      @endif
@@ -53,7 +53,7 @@
                                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                      <svg class="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                  </div>
-                                 <input type="text" name="search" value="{{ request('search') }}" class="input-field pl-10 w-full" placeholder="{{ __('ui.search_user_placeholder') }}" onchange="this.form.submit()">
+                                 <input type="text" name="search" value="{{ request('search') }}" class="input-field pl-10 w-full" placeholder="{{ __('ui.search_user_placeholder') }}" onchange="this.form.submit()" maxlength="255">
                              </div>
                             <button type="button" @click="showFilters = !showFilters" class="btn btn-secondary md:hidden flex items-center justify-center w-12 flex-shrink-0" title="{{ __('ui.show_filter') }}">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
@@ -161,7 +161,7 @@
                         <div class="flex items-center justify-end gap-2">
                             @if(request('trash'))
                                 @can('restore', $user)
-                                <form action="{{ route('users.restore', $user->uuid) }}" method="POST" class="w-full">
+                                <form action="{{ route('users.restore', $user->uuid) }}" method="POST" class="w-full" novalidate>
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-sm btn-success w-full justify-center flex items-center gap-2" onclick="confirmUserRestore(event)">
@@ -178,7 +178,7 @@
                                     </a>
                                 @endcan
                                 @can('delete', $user)
-                                    <form action="{{ route('users.destroy', $user) }}" method="POST" class="flex-1">
+                                    <form action="{{ route('users.destroy', $user) }}" method="POST" class="flex-1" novalidate>
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-danger w-full justify-center flex items-center gap-2" onclick="confirmDelete(event)">
@@ -368,7 +368,7 @@
             </div>
             
             <div class="flex items-center gap-3">
-                <form action="{{ route('users.bulk-restore') }}" method="POST" id="bulk-restore-form">
+                <form action="{{ route('users.bulk-restore') }}" method="POST" id="bulk-restore-form" novalidate>
                     @csrf
                     <button type="button" onclick="submitBulkRestore()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
@@ -376,7 +376,7 @@
                     </button>
                 </form>
 
-                <form action="{{ route('users.bulk-force-delete') }}" method="POST" id="bulk-delete-form">
+                <form action="{{ route('users.bulk-force-delete') }}" method="POST" id="bulk-delete-form" novalidate>
                     @csrf
                     @method('DELETE')
                     <button type="button" onclick="submitBulkDelete()" class="btn btn-danger flex items-center gap-2 px-4 py-2 rounded-lg">
@@ -681,7 +681,7 @@
                     const newPagination = doc.querySelector('.mt-6');
                     if (newPagination && paginationContainer) {
                         paginationContainer.innerHTML = newPagination.innerHTML;
-                        attachPaginationListeners(); // Re-attach
+                        // Event delegation handles pagination listeners automatically.
                     } else if (newPagination && !paginationContainer) {
                           if (tableContainer) {
                              tableContainer.insertAdjacentHTML('afterend', newPagination.outerHTML);
@@ -701,24 +701,20 @@
                 });
             }
 
-            function attachPaginationListeners() {
-                const links = document.querySelectorAll('.mt-6 a'); 
-                links.forEach(link => {
-                    link.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        const url = new URL(this.href);
-                        const page = url.searchParams.get('page');
-                        if (page) {
-                            const currentFormData = new FormData(filterForm);
-                            currentFormData.set('page', page);
-                            fetchData(currentFormData);
-                        }
-                    });
-                });
-            }
-            
-            // Initial Attach for Pagination
-            attachPaginationListeners();
+            // --- Pagination Event Delegation ---
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('.mt-6 a');
+                if (link) {
+                    e.preventDefault();
+                    const url = new URL(link.href);
+                    const page = url.searchParams.get('page');
+                    if (page) {
+                        const currentFormData = new FormData(filterForm);
+                        currentFormData.set('page', page);
+                        fetchData(currentFormData);
+                    }
+                }
+            });
         });
     </script>
     @endpush
@@ -730,3 +726,6 @@
         </div>
     </div>
 </x-app-layout>
+
+
+

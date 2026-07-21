@@ -7,11 +7,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+// Controller penjaga gerbang khusus (Bouncer) untuk mengecek status verifikasi.
+// Mengurung pengguna yang belum verifikasi agar tidak bisa kelayapan masuk ke dashboard.
 class EmailVerificationPromptController extends Controller
 {
-    /**
-     * Menampilkan prompt verifikasi email.
-     */
+    // Menentukan nasib pengguna: Lanjut ke Dashboard atau dilempar ke halaman "Tolong Cek Email"
     public function __invoke(Request $request): RedirectResponse|View
     {
         return $request->user()->hasVerifiedEmail()

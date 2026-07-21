@@ -6,11 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Prunable;
 
-/**
- * Model ActivityLog untuk mencatat riwayat aktivitas pengguna.
- *
- * Menggunakan fitur Prunable untuk otomatis menghapus log lama.
- */
+// Model (Representasi Tabel Database) khusus untuk menyimpan Riwayat Aktivitas pengguna.
+// Dilengkapi fitur "Prunable" yang akan otomatis membuang log usang agar database tidak cepat penuh.
 class ActivityLog extends Model
 {
     use HasFactory, Prunable;
@@ -26,11 +23,8 @@ class ActivityLog extends Model
         'properties' => 'array',
     ];
 
-    /**
-     * Query untuk pruning (pembersihan otomatis) model.
-     *
-     * Menghapus log yang lebih tua dari 1 tahun.
-     */
+    // Fitur Pembersih Otomatis (Pruning)
+    // Akan otomatis menghapus catatan yang usianya sudah lebih dari 1 tahun (365 hari)
     public function prunable()
     {
         // Hapus log yang lebih tua dari 1 tahun (365 hari)

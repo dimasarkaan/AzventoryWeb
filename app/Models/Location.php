@@ -11,9 +11,7 @@ class Location extends Model
 
     protected $fillable = ['name', 'is_default', 'is_active'];
 
-    /**
-     * Relasi ke daftar sparepart yang disimpan di lokasi ini.
-     */
+    // Relasi Database: Mengambil semua daftar barang (Sparepart) yang tersimpan di lokasi ini
     public function spareparts()
     {
         return $this->hasMany(Sparepart::class);

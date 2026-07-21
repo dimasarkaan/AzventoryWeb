@@ -55,7 +55,7 @@
 
             {{-- ================================================================
                  HEADER DASHBOARD
-                 Baris 1: Judul + Tombol Pengaturan & Approvals
+                 Baris 1: Judul + Tombol Approvals
                  Baris 2: Tab Filter Periode Global
                  ================================================================ --}}
             <div class="mb-6">
@@ -147,7 +147,7 @@
                             $activeMonthLabel = $bulanList[$month ?? ''] ?? 'Semua Bulan';
                         @endphp
                         <form method="GET" action="{{ route('dashboard.admin') }}"
-                              class="bg-white border border-secondary-200 rounded-xl p-4 flex flex-wrap items-end gap-3 shadow-sm">
+                              class="bg-white border border-secondary-200 rounded-xl p-4 flex flex-wrap items-end gap-3 shadow-sm" novalidate>
                             <input type="hidden" name="period" value="custom">
 
                             {{-- Dropdown Tahun --}}
@@ -1419,3 +1419,4 @@
     @endpush
 
 </x-app-layout>
+

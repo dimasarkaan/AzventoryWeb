@@ -17,26 +17,20 @@ class ReportReadyNotification extends Notification implements ShouldBroadcast, S
 
     protected $downloadUrl;
 
-    /**
-     * Inisialisasi notifikasi untuk laporan yang telah selesai di-generate.
-     */
+    // Tahap Persiapan: Menerima judul laporan dan alamat link download-nya.
     public function __construct($title, $downloadUrl)
     {
         $this->title = $title;
         $this->downloadUrl = $downloadUrl;
     }
 
-    /**
-     * Channel pengiriman: Database dan Real-time Broadcast.
-     */
+    // Saluran Pengiriman: Disimpan ke database (ikon lonceng) dan dikirim Pop-up (Real-Time).
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Konten email notifikasi laporan siap unduh.
-     */
+    // Merakit kerangka dan isi pesan (Subjek, Sapaan, Link) yang akan dikirim ke Email pengguna.
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
@@ -48,9 +42,7 @@ class ReportReadyNotification extends Notification implements ShouldBroadcast, S
             ->salutation('Salam hangat,<br>**Tim '.config('app.name').'**');
     }
 
-    /**
-     * Data persistensi notifikasi dalam database.
-     */
+    // Merakit notifikasi "Sukses" untuk disimpan permanen di database.
     public function toArray(object $notifiable): array
     {
         return [
@@ -62,9 +54,7 @@ class ReportReadyNotification extends Notification implements ShouldBroadcast, S
         ];
     }
 
-    /**
-     * Pesan siaran real-time.
-     */
+    // Merakit pesan notifikasi yang akan muncul secara seketika saat laporan selesai dicetak.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

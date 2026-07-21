@@ -15,14 +15,11 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-/**
- * DashboardService menyediakan logika agregasi data untuk ringkasan dan statistik dashboard.
- */
+// Service (Pekerja Keras) khusus untuk menghitung, merangkum, dan menyajikan data statistik ke halaman Dashboard.
+// Otak di balik semua angka, grafik, dan tabel leaderboard yang ada di beranda.
 class DashboardService
 {
-    /**
-     * Mengurai rentang tanggal dari input periode (today, this_week, etc) atau custom range.
-     */
+    // Alat Penerjemah Waktu: Mengubah pilihan rentang waktu (misal: "Bulan Ini") menjadi tanggal pasti untuk dimengerti oleh database.
     public function getDateRange(?string $period, ?string $year, ?string $month, ?string $startDate = null, ?string $endDate = null): array
     {
         // Default period is now 'this_month' (monthly overview)
@@ -76,9 +73,8 @@ class DashboardService
         return [$start, $end, $period];
     }
 
-    /**
-     * Mengambil ringkasan statistik stok barang saat ini.
-     */
+    // Menghitung ringkasan cepat: Total Barang, Kategori, Merek, Lokasi, dan Peringatan Stok Menipis.
+    // Menggunakan teknik penyimpanan sementara (Cache) agar loading dashboard terasa sangat cepat (Ngebut).
     public function getStockSnapshots(): array
     {
         $lastUpdate = Cache::get('inventory_last_updated', now()->timestamp);
@@ -100,9 +96,8 @@ class DashboardService
         });
     }
 
-    /**
-     * Mengambil statistik pergerakan stok dengan perbandingan persentase periode sebelumnya.
-     */
+    // Mengambil data pergerakan barang (Berapa banyak yang Masuk vs Keluar).
+    // Sekaligus membandingkannya dengan periode sebelumnya (Untuk memunculkan persentase Naik/Turun berwarna hijau/merah).
     public function getStockMovements(Carbon $start, Carbon $end): array
     {
         $days = $start->diffInDays($end);
@@ -216,9 +211,7 @@ class DashboardService
         return round((($new - $old) / abs($old)) * 100, 1);
     }
 
-    /**
-     * Mendapatkan daftar barang dengan pergerakan tertinggi (Top Items).
-     */
+    // Fitur Peringkat (Top Items): Mencari 5 Barang yang paling populer atau paling sering terjadi pergerakan.
     public function getTopItems(Carbon $start, Carbon $end, string $type): Collection
     {
         return StockLog::join('spareparts', 'stock_logs.sparepart_id', '=', 'spareparts.id')
@@ -232,9 +225,7 @@ class DashboardService
             ->get();
     }
 
-    /**
-     * Mendapatkan daftar barang yang tidak terjual/terpakai dalam kurun waktu lama (Dead Stock).
-     */
+    // Fitur Evaluasi (Dead Stock): Mencari barang yang "Mati" alias mengendap membusuk di gudang karena tidak pernah keluar dalam 3 bulan terakhir.
     public function getDeadStock(Carbon $start, Carbon $end, string $period): Collection
     {
         $deadStockStart = $start;
@@ -254,9 +245,7 @@ class DashboardService
             ->get();
     }
 
-    /**
-     * Mendapatkan leaderboard pengguna berdasarkan jumlah aktivitas penyesuaian stok.
-     */
+    // Fitur Kompetisi: Membuat klasemen (Leaderboard) 5 karyawan yang paling rajin memproses pergerakan stok.
     public function getUserLeaderboard(Carbon $start, Carbon $end): Collection
     {
         return StockLog::select('user_id', DB::raw('count(*) as total_actions'))
@@ -268,9 +257,8 @@ class DashboardService
             ->get();
     }
 
-    /**
-     * Menghitung prediksi kebutuhan stok berdasarkan rata-rata penggunaan 3 bulan terakhir.
-     */
+    // Fitur Cerdas (Forecast): Memprediksi (meramal) berapa jumlah barang yang harus dibeli bulan depan.
+    // Berdasarkan rumus rata-rata barang yang keluar selama 3 bulan terakhir.
     public function getForecasts(Collection $topExitedItems): array
     {
         $forecasts = [];
@@ -307,9 +295,8 @@ class DashboardService
         return $forecasts;
     }
 
-    /**
-     * Mendapatkan statistik peminjaman (aktif & terlambat) berdasarkan hak akses pengguna.
-     */
+    // Menghitung jumlah barang yang sedang dipinjam dan yang sudah telat/lewat jatuh tempo (Overdue).
+    // Menampilkan data sesuai jabatan: Superadmin melihat semua, Operator hanya melihat miliknya sendiri.
     public function getBorrowingStats(User $user): array
     {
         $borrowQuery = Borrowing::query();
@@ -341,10 +328,7 @@ class DashboardService
         return compact('activeBorrowingsCount', 'totalOverdueCount', 'overdueBorrowings');
     }
 
-    /**
-     * Menampilkan daftar log aktivitas sistem terbaru.
-     * Tidak dibatasi oleh filter tanggal agar selalu menampilkan update terkini.
-     */
+    // Menampilkan 3 daftar riwayat kegiatan (Log) terbaru yang terjadi di dalam aplikasi secara Real-Time.
     public function getRecentActivities(?User $user = null, int $limit = 3): Collection
     {
         $query = ActivityLog::with('user');
@@ -362,9 +346,8 @@ class DashboardService
         return $query->latest()->take($limit)->get();
     }
 
-    /**
-     * Agregasi total stok berdasarkan atribut tertentu (kategori/lokasi).
-     */
+    // Mengelompokkan total stok barang (Untuk diubah jadi Grafik Bulat / Pie Chart).
+    // Contoh: Total stok berdasarkan Kategorinya, atau berdasarkan Lokasi rak penyimpanannya.
     public function getStockByAttribute(string $attribute): Collection
     {
         if (in_array($attribute, ['category', 'brand', 'location'])) {
@@ -382,9 +365,7 @@ class DashboardService
             ->pluck('total', $attribute);
     }
 
-    /**
-     * Mendapatkan daftar tahun unik yang memiliki data riwayat untuk filter dinamis.
-     */
+    // Mengambil daftar "Tahun" dari riwayat database (misal: 2023, 2024) untuk ditampilkan di menu dropdown filter Dashboard.
     public function getAvailableYears(): array
     {
         return Cache::remember('dashboard_available_years', 3600, function () {

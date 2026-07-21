@@ -5,12 +5,10 @@ namespace Database\Factories;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ActivityLog>
- */
+// Pabrik Data: Cetakan otomatis untuk membuat data dummy Log Aktivitas (Jejak Digital) saat testing/seeding.
 class ActivityLogFactory extends Factory
 {
-    // Definisikan state default model.
+    // Cetakan Dasar: Membuat rekayasa alamat IP, aksi, dan deskripsi sistem secara acak (Faker).
     public function definition(): array
     {
         return [

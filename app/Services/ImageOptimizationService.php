@@ -6,16 +6,14 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/**
- * ImageOptimizationService menangani kompresi, resize, dan konversi gambar ke format WebP.
- */
+// Service (Pekerja Keras) khusus untuk mengurus foto/gambar yang diunggah pengguna.
+// Bertugas mengecilkan ukuran gambar (kompresi) dan mengubah formatnya ke WebP agar memori server tidak cepat penuh.
 class ImageOptimizationService
 {
     protected $manager;
 
-    /**
-     * Inisialisasi ImageManager dengan driver GD (lazy, agar tidak crash saat boot).
-     */
+    // Tahap Persiapan: Menyiapkan alat pemroses gambar (GD Library).
+    // Menggunakan teknik panggil-saat-butuh (Lazy Load) agar aplikasi tidak berat saat pertama kali dijalankan.
     protected function getManager()
     {
         if (! $this->manager) {
@@ -28,11 +26,8 @@ class ImageOptimizationService
         return $this->manager;
     }
 
-    /**
-     * Mengoptimasi, mengubah ukuran, dan menyimpan gambar hasil upload sebagai file WebP.
-     *
-     * @return string Path relatif file yang disimpan di storage.
-     */
+    // Proses Inti: Memotong ukuran jika terlalu besar, memadatkan file, lalu menyimpan sebagai file WebP.
+    // Mengembalikan alamat letak file tersebut disimpan.
     public function optimizeAndSave(UploadedFile $file, string $folder, int $maxWidth = 1000, int $quality = 80): string
     {
         if (! Storage::disk('public')->exists($folder)) {

@@ -88,10 +88,11 @@
     <div class="flex items-center justify-end gap-2 pt-1 border-t border-secondary-100">
          <a href="{{ route('inventory.show', $sparepart) }}" class="btn btn-ghost text-xs p-2 h-8 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-colors">{{ __('ui.detail') }}</a>
          <a href="{{ route('inventory.edit', $sparepart) }}" class="btn btn-white text-xs p-2 h-8 border border-secondary-200 text-secondary-600 font-medium hover:bg-secondary-50 rounded-lg transition-all">{{ __('ui.edit') }}</a>
-         <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block">
+         <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block" novalidate>
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-danger text-xs p-2 h-8 bg-danger-50 text-danger-600 hover:bg-danger-600 hover:text-white border-transparent transition-all" onclick="confirmDelete(event)">{{ __('ui.delete') }}</button>
         </form>
     </div>
 </div>
+

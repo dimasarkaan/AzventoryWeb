@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
+// Controller khusus untuk menangani fitur "Kirim Ulang Email Verifikasi".
+// Dipakai kalau pengguna merasa tidak pernah menerima email aktivasi di kotak masuknya.
 class EmailVerificationNotificationController extends Controller
 {
-    /**
-     * Mengirim notifikasi verifikasi email baru.
-     */
+    // Mengeksekusi pengiriman ulang email berisi link aktivasi
     public function store(Request $request): RedirectResponse
     {
         if ($request->user()->hasVerifiedEmail()) {

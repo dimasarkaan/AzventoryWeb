@@ -25,7 +25,7 @@
                     </div>
                 
                     @if(auth()->user()->unreadNotifications()->count() > 0)
-                        <form action="{{ route('notifications.markAllRead') }}" method="POST" id="mark-all-read-form" class="w-full sm:w-auto">
+                        <form action="{{ route('notifications.markAllRead') }}" method="POST" id="mark-all-read-form" class="w-full sm:w-auto" novalidate>
                             @csrf
                             @method('PATCH')
                             <button type="button" onclick="confirmMarkAllRead()" class="btn btn-secondary text-[11px] whitespace-nowrap w-full sm:w-auto justify-center shadow-sm hover:shadow-md transition-all">
@@ -214,3 +214,4 @@
     </script>
     @endpush
 </x-app-layout>
+

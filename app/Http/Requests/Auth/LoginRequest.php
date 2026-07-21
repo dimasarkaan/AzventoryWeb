@@ -11,19 +11,13 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
-    /**
-     * Tentukan apakah user diizinkan untuk membuat request ini.
-     */
+    // Menentukan apakah form login ini terbuka untuk umum (true)
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Dapatkan aturan validasi yang berlaku untuk request ini.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    // Syarat mutlak yang harus diisi pengguna (Kolom login dan password tidak boleh kosong)
     public function rules(): array
     {
         return [
@@ -32,11 +26,16 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    /**
-     * Mencoba mengautentikasi kredensial request.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    // Terjemahan pesan peringatan jika pengguna lupa mengisi salah satu kolom
+    public function messages(): array
+    {
+        return [
+            'login.required' => 'Email atau Username wajib diisi.',
+            'password.required' => 'Kata sandi wajib diisi.',
+        ];
+    }
+
+    // Proses inti: Mengecek kecocokan email/username dan password ke dalam database
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
@@ -84,11 +83,7 @@ class LoginRequest extends FormRequest
         RateLimiter::clear($this->throttleKey());
     }
 
-    /**
-     * Pastikan request login tidak terkena rate limit.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    // Sistem Keamanan: Mencegah serangan "Brute Force" (Spam percobaan login terus-menerus)
     public function ensureIsNotRateLimited(): void
     {
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
@@ -107,9 +102,7 @@ class LoginRequest extends FormRequest
         ]);
     }
 
-    /**
-     * Dapatkan throttle key untuk rate limiting request ini.
-     */
+    // Membuat kunci unik berdasarkan alamat IP pengguna untuk membatasi jumlah percobaan login mereka
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->string('login')).'|'.$this->ip());

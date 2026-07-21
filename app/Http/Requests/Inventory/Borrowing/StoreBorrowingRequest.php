@@ -7,19 +7,13 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBorrowingRequest extends FormRequest
 {
-    /**
-     * Tentukan apakah user diizinkan untuk membuat request ini.
-     */
+    // Mengecek apakah pengguna berhak mengajukan pinjaman (selalu true karena sudah diurus oleh Route/Policy)
     public function authorize(): bool
     {
         return true; // Main auth handled by Policy/Route
     }
 
-    /**
-     * Dapatkan aturan validasi yang berlaku untuk request ini.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    // Syarat wajib formulir Peminjaman Barang (Harus isi jumlah pinjam dan tanggal target kembali)
     public function rules(): array
     {
         return [
@@ -29,6 +23,8 @@ class StoreBorrowingRequest extends FormRequest
         ];
     }
 
+    // Aturan Tambahan: Menjalankan pengecekan ganda secara langsung ke database
+    // Memastikan jumlah stok fisik mencukupi untuk dipinjam sebelum membiarkan formulir lolos
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -43,5 +39,15 @@ class StoreBorrowingRequest extends FormRequest
                 }
             }
         });
+    }
+
+    // Memberikan nama samaran (Alias) agar pesan error lebih enak dibaca (contoh: 'quantity' jadi 'Jumlah Pinjam')
+    public function attributes(): array
+    {
+        return [
+            'quantity' => 'Jumlah Pinjam',
+            'notes' => 'Catatan',
+            'expected_return_at' => 'Rencana Tanggal Pengembalian',
+        ];
     }
 }

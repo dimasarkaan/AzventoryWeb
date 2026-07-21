@@ -14,25 +14,19 @@ class OverdueBorrowingNotification extends Notification implements ShouldBroadca
 
     public $borrowing;
 
-    /**
-     * Inisialisasi notifikasi untuk keterlambatan pengembalian barang.
-     */
+    // Tahap Persiapan: Menerima data transaksi peminjaman yang sudah telat/lewat jatuh tempo.
     public function __construct(Borrowing $borrowing)
     {
         $this->borrowing = $borrowing;
     }
 
-    /**
-     * Channel pengiriman: Database dan Real-time Broadcast.
-     */
+    // Saluran Pengiriman: Disimpan ke database (ikon lonceng) dan dikirim Pop-up (Real-Time).
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Data persistensi notifikasi dalam database.
-     */
+    // Merakit pesan peringatan telat (Overdue) untuk disimpan permanen di database.
     public function toArray(object $notifiable): array
     {
         return [
@@ -43,9 +37,7 @@ class OverdueBorrowingNotification extends Notification implements ShouldBroadca
         ];
     }
 
-    /**
-     * Pesan siaran real-time.
-     */
+    // Merakit pesan peringatan telat yang akan muncul langsung (Toast) di layar.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

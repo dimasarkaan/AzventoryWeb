@@ -26,7 +26,7 @@
     </div>
 
     <!-- Form Pembuatan Token (Mode Edit) -->
-    <form x-show="isEditing" method="post" action="{{ route('profile.api-tokens.store') }}" class="space-y-4" novalidate style="display: none;">
+    <form x-show="isEditing" method="post" action="{{ route('profile.api-tokens.store') }}" class="space-y-4" style="display: none;" novalidate>
         @csrf
 
         <div>
@@ -148,7 +148,7 @@
     </div>
     <!-- Modal Konfirmasi Cabut Akses -->
     <x-modal name="confirm-token-revocation" focusable>
-        <form method="post" :action="'{{ url('/profile/api-tokens') }}/' + tokenIdToDelete" class="p-6">
+        <form method="post" :action="'{{ url('/profile/api-tokens') }}/' + tokenIdToDelete" class="p-6" novalidate>
             @csrf
             @method('delete')
 
@@ -173,3 +173,4 @@
         </form>
     </x-modal>
 </section>
+

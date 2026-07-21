@@ -15,7 +15,7 @@
             </div>
 
             <div class="bg-white rounded-xl border border-secondary-200 shadow-card p-8 overflow-visible" x-data="{ isSubmitting: false }">
-                <form action="{{ route('users.store') }}" method="POST" novalidate @submit="isSubmitting = true">
+                <form action="{{ route('users.store') }}" method="POST" @submit="isSubmitting = true" novalidate>
                     @csrf
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-6">
@@ -32,7 +32,7 @@
                         <!-- Nama Lengkap -->
                         <div class="space-y-2">
                             <label for="name" class="input-label">{{ __('ui.full_name') }} <span class="text-danger-500">*</span></label>
-                            <input id="name" class="input-field" type="text" name="name" value="{{ old('name') }}" placeholder="{{ __('ui.placeholder_full_name') }}" autocomplete="name" autofocus />
+                            <input id="name" class="input-field" type="text" name="name" value="{{ old('name') }}" placeholder="{{ __('ui.placeholder_full_name') }}" autocomplete="name" autofocus pattern="^[a-zA-Z][a-zA-Z\s\.\'\-]*$" title="Nama lengkap harus diawali huruf dan hanya boleh berisi huruf, spasi, titik, koma atas, dan strip tanpa angka" minlength="3" maxlength="255" required />
                             <x-input-error :messages="$errors->get('name')" class="mt-2" />
                         </div>
 
@@ -54,14 +54,14 @@
                         <!-- Email -->
                         <div class="space-y-2">
                             <label for="email" class="input-label">{{ __('ui.email_address') }} <span class="text-danger-500">*</span></label>
-                            <input id="email" class="input-field" type="email" name="email" value="{{ old('email') }}" placeholder="contoh@gmail.com" autocomplete="email" />
+                            <input id="email" class="input-field" type="email" name="email" value="{{ old('email') }}" placeholder="contoh@gmail.com" autocomplete="email" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$" title="Format email tidak valid (contoh: nama@domain.com)" minlength="5" maxlength="255" required />
                             <x-input-error :messages="$errors->get('email')" class="mt-2" />
                         </div>
 
                         <!-- Jabatan -->
                         <div class="space-y-2">
                             <label for="jabatan" class="input-label">{{ __('ui.job_position') }} <span class="text-danger-500">*</span></label>
-                            <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan') }}" placeholder="{{ __('ui.placeholder_job') }}" autocomplete="organization-title" />
+                            <input id="jabatan" class="input-field" type="text" name="jabatan" value="{{ old('jabatan') }}" placeholder="{{ __('ui.placeholder_job') }}" autocomplete="organization-title" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'&quot;]*$" title="Jabatan harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/'&quot;)" minlength="3" maxlength="255" required />
                             <x-input-error :messages="$errors->get('jabatan')" class="mt-2" />
                         </div>
 
@@ -114,3 +114,4 @@
     @push('scripts')
     @endpush
 </x-app-layout>
+

@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Model Sparepart merepresentasikan barang inventaris (Unit Sparepart, Aset, atau Barang Jual).
- */
+// Model (Blueprint Tabel Database) utama yang mewakili fisik Barang di gudang.
+// Bisa berupa Aset Perusahaan atau Barang Jualan (Sale).
 class Sparepart extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
@@ -20,67 +19,49 @@ class Sparepart extends Model
         'stock', 'unit', 'status', 'image', 'qr_code_path',
     ];
 
-    /**
-     * Relasi ke riwayat perubahan stok (StockLog).
-     */
+    // Relasi Database: Mengambil seluruh riwayat pergerakan (keluar/masuk/penyesuaian) stok untuk barang ini
     public function stockLogs()
     {
         return $this->hasMany(StockLog::class);
     }
 
-    /**
-     * Relasi ke data transaksi peminjaman.
-     */
+    // Relasi Database: Mengambil semua riwayat peminjaman yang melibatkan barang ini
     public function borrowings()
     {
         return $this->hasMany(Borrowing::class);
     }
 
-    /**
-     * Relasi ke kategori barang.
-     */
+    // Relasi Database: Menghubungkan barang ini dengan data Kategorinya
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Relasi ke merek barang.
-     */
+    // Relasi Database: Menghubungkan barang ini dengan data Mereknya
     public function brand()
     {
         return $this->belongsTo(Brand::class);
     }
 
-    /**
-     * Relasi ke lokasi penyimpanan.
-     */
+    // Relasi Database: Menghubungkan barang ini dengan lokasi rak penyimpanannya
     public function location()
     {
         return $this->belongsTo(Location::class);
     }
 
-    /**
-     * Predikat untuk mengecek apakah barang masuk kategori aset perusahaan.
-     */
+    // Fitur Pengecek (Helper): Mengecek apakah barang ini berstatus "Aset"
     public function isAsset()
     {
         return $this->type === 'asset';
     }
 
-    /**
-     * Predikat untuk mengecek apakah barang tersebut diperjualbelikan.
-     */
+    // Fitur Pengecek (Helper): Mengecek apakah barang ini berstatus untuk dijual ("Sale")
     public function isSaleable()
     {
         return $this->type === 'sale';
     }
 
-    /**
-     * Validasi kelayakan barang untuk dipinjam berdasarkan kondisi dan ketersediaan stok fisik.
-     *
-     * @return bool|string True jika layak, pesan error jika tidak memenuhi kriteria.
-     */
+    // Sistem Validasi Cerdas: Mencegah barang yang rusak atau stoknya habis agar tidak bisa dipinjam
     public function canBeBorrowed(int $quantity)
     {
         if ($this->condition !== 'Baik') {
@@ -94,9 +75,7 @@ class Sparepart extends Model
         return true;
     }
 
-    /**
-     * Mendapatkan kronologi kejadian untuk barang bermasalah (Rusak/Hilang)
-     */
+    // Fitur Penyelidik (Detektif): Mencari tahu riwayat atau kronologi kejadian jika barang dilaporkan Rusak/Hilang
     public function getProblemChronologyAttribute()
     {
         if (! in_array($this->condition, ['Rusak', 'Hilang'])) {
@@ -135,17 +114,25 @@ class Sparepart extends Model
         return 'Tidak ada riwayat catatan.';
     }
 
-    /**
-     * Menggunakan UUID sebagai Route Key.
-     */
+    // Keamanan URL: Menggunakan huruf acak (UUID) di URL Profil barang agar ID aslinya tidak mudah ditebak peretas
     public function getRouteKeyName()
     {
         return 'uuid';
     }
 
-    /**
-     * Mendefinisikan kolom mana yang akan diisi UUID otomatis oleh Laravel.
-     */
+    // Kompatibilitas URL: Memastikan tautan/link lama yang masih menggunakan angka ID biasa tetap berfungsi normal
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $field = $field ?? $this->getRouteKeyName();
+
+        if ($field === 'uuid' && is_numeric($value)) {
+            return $this->where('id', $value)->first();
+        }
+
+        return $this->where($field, $value)->first();
+    }
+
+    // Mendaftarkan kolom 'uuid' agar otomatis diisi gabungan angka/huruf acak oleh sistem saat barang baru masuk
     public function uniqueIds()
     {
         return ['uuid'];

@@ -1,5 +1,5 @@
 <section x-data="{ isEditing: false, isSubmitting: false }">
-    <form id="send-verification" method="post" action="{{ route('verification.send') }}">
+    <form id="send-verification" method="post" action="{{ route('verification.send') }}" novalidate>
         @csrf
     </form>
 
@@ -93,7 +93,7 @@
             <div class="sm:col-span-3">
                  <label for="email" class="input-label">{{ __('ui.profile_label_email') }}</label>
                 @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
-                    <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('email') ? '!border-red-500' : '' }}" value="{{ old('email', $user->email) }}" autocomplete="email" x-bind:disabled="!isEditing">
+                    <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('email') ? '!border-red-500' : '' }}" value="{{ old('email', $user->email) }}" autocomplete="email" x-bind:disabled="!isEditing" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" title="Format email tidak valid (contoh: nama@domain.com)" minlength="5" maxlength="255" required>
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
                 @else
                      <div class="relative">
@@ -110,7 +110,7 @@
              <div class="sm:col-span-3">
                 <label for="name" class="input-label">{{ __('ui.profile_label_name') }}</label>
                 @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
-                <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('name') ? '!border-red-500' : '' }}" value="{{ old('name', $user->name) }}" autocomplete="name" x-bind:disabled="!isEditing">
+                <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('name') ? '!border-red-500' : '' }}" value="{{ old('name', $user->name) }}" autocomplete="name" x-bind:disabled="!isEditing" pattern="^[a-zA-Z][a-zA-Z\s\.\'\-]*$" title="Nama lengkap harus diawali huruf dan hanya boleh berisi huruf, spasi, titik, koma atas, dan strip tanpa angka" minlength="3" maxlength="255" required>
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
                 @else
                     <div class="relative">
@@ -125,14 +125,14 @@
              <!-- Phone -->
              <div class="sm:col-span-3">
                 <label for="phone" class="input-label">{{ __('ui.profile_label_phone') }}</label>
-                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('phone') ? '!border-red-500' : '' }}" value="{{ old('phone', $user->phone) }}" placeholder="{{ __('ui.profile_placeholder_phone') }}" autocomplete="tel" x-bind:disabled="!isEditing">
+                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('phone') ? '!border-red-500' : '' }}" value="{{ old('phone', $user->phone) }}" placeholder="{{ __('ui.profile_placeholder_phone') }}" autocomplete="tel" x-bind:disabled="!isEditing" pattern="^(\+62|08)[0-9]{8,13}$" title="Format Nomor WhatsApp tidak valid. Gunakan format Indonesia (misal: 08... atau +62...)" minlength="10" maxlength="20">
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
             </div>
 
             <!-- Address -->
             <div class="sm:col-span-6">
                  <label for="address" class="input-label">{{ __('ui.profile_label_address') }}</label>
-                 <textarea id="address" name="address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('address') ? '!border-red-500' : '' }}" autocomplete="street-address" x-bind:disabled="!isEditing">{{ old('address', $user->address) }}</textarea>
+                 <textarea id="address" name="address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('address') ? '!border-red-500' : '' }}" autocomplete="street-address" x-bind:disabled="!isEditing" maxlength="500">{{ old('address', $user->address) }}</textarea>
                  <x-input-error class="mt-2" :messages="$errors->get('address')" />
             </div>
         </div>
@@ -172,7 +172,7 @@
         </div>
     </form>
 
-    <form id="delete-avatar-form" method="POST" action="{{ route('profile.avatar.delete') }}" class="hidden">
+    <form id="delete-avatar-form" method="POST" action="{{ route('profile.avatar.delete') }}" class="hidden" novalidate>
         @csrf
         @method('DELETE')
     </form>
@@ -201,3 +201,4 @@
         </div>
     </x-modal>
 </section>
+

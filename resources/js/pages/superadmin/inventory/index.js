@@ -62,10 +62,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to handle fetching data
     function fetchData(formData) {
+        // Fetch current DOM elements dynamically since they might have been replaced
+        const currentRealBody = document.querySelector('#inventory-desktop-body');
+        const currentSkeletonBody = document.getElementById('skeleton-body');
+
         // 1. Show Skeleton
-        if (realBody && skeletonBody) {
-            realBody.classList.add('hidden');
-            skeletonBody.classList.remove('hidden');
+        if (currentRealBody && currentSkeletonBody) {
+            currentRealBody.classList.add('hidden');
+            currentSkeletonBody.classList.remove('hidden');
         }
 
         // 2. Build Query String
@@ -111,8 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // 7. Pagination sudah ter-include di dalam data.desktop dan data.mobile
                 // (tidak perlu inject terpisah — akan menimpa wrapper styling yang benar)
 
-                // 8. Re-attach Pagination Listeners
-                attachPaginationListeners();
+                // 8. Event delegation handles pagination listeners automatically.
 
                 // 9. Re-initialize Bulk Actions
                 if (window.resetBulkActions) {
@@ -128,8 +131,9 @@ document.addEventListener('DOMContentLoaded', function () {
             .finally(() => {
                 // 10. Hide Skeleton
                 setTimeout(() => {
-                    if (skeletonBody) {
-                        skeletonBody.classList.add('hidden');
+                    const currentSkeletonBody = document.getElementById('skeleton-body');
+                    if (currentSkeletonBody) {
+                        currentSkeletonBody.classList.add('hidden');
                     }
                     const freshBody = document.getElementById('inventory-desktop-body');
                     if (freshBody) freshBody.classList.remove('hidden');
@@ -138,24 +142,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-    // Function to attach listeners to dynamic pagination links
-    function attachPaginationListeners() {
-        const paginationLinks = document.querySelectorAll('.inventory-pagination-desktop a, .inventory-pagination-mobile a, .pagination a, .page-link');
-        paginationLinks.forEach(link => {
-            link.addEventListener('click', function (e) {
-                e.preventDefault();
-                const url = new URL(this.href);
-                // Get current form data to keep filters
-                const formData = new FormData(form);
-                // Update page param
-                formData.set('page', url.searchParams.get('page'));
-                fetchData(formData);
-            });
-        });
-    }
-
-    // Initial attachment
-    attachPaginationListeners();
+    // --- Pagination Event Delegation ---
+    document.addEventListener('click', function (e) {
+        const link = e.target.closest('.inventory-pagination-desktop a, .inventory-pagination-mobile a, .pagination a, .page-link');
+        if (link) {
+            e.preventDefault();
+            const url = new URL(link.href);
+            // Get current form data to keep filters
+            const formData = new FormData(form);
+            // Update page param (default to 1 if not present)
+            const page = url.searchParams.get('page') || 1;
+            formData.set('page', page);
+            fetchData(formData);
+        }
+    });
 
     // --- Bulk Action Logic (Event Delegation) ---
     function updateBulkActionBar() {
@@ -255,17 +255,17 @@ window.submitInventoryBulkRestore = function () {
         cancelButtonText: 'Batal',
         reverseButtons: true,
         customClass: {
-            popup: '!rounded-2xl !font-sans',
-            title: '!text-secondary-900 !text-xl !font-bold',
+            popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+            title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
-            confirmButton: 'btn btn-success px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-success-500',
-            cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+            actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+            confirmButton: 'btn btn-success !px-6 !py-2.5 !m-0 !rounded-xl',
+            cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
-        width: '24em',
+        width: '26em',
         iconColor: '#10b981',
-        padding: '2em',
-        backdrop: `rgba(0,0,0,0.4)`
+        backdrop: `rgba(15, 23, 42, 0.5)`
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById('bulk-restore-form').submit();
@@ -286,17 +286,17 @@ window.submitInventoryBulkDelete = function () {
         cancelButtonText: 'Batal',
         reverseButtons: true,
         customClass: {
-            popup: '!rounded-2xl !font-sans',
-            title: '!text-secondary-900 !text-xl !font-bold',
+            popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+            title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
-            confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
-            cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+            actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+            confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
+            cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
-        width: '24em',
+        width: '26em',
         iconColor: '#ef4444',
-        padding: '2em',
-        backdrop: `rgba(0,0,0,0.4)`
+        backdrop: `rgba(15, 23, 42, 0.5)`
     }).then((result) => {
         if (result.isConfirmed) {
             document.getElementById('bulk-delete-form').submit();
@@ -336,17 +336,17 @@ window.submitInventoryBulkDestroy = function () {
         cancelButtonText: 'Batal',
         reverseButtons: true,
         customClass: {
-            popup: '!rounded-2xl !font-sans',
-            title: '!text-secondary-900 !text-xl !font-bold',
+            popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+            title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
-            confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
-            cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+            actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+            confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
+            cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
-        width: '24em',
+        width: '26em',
         iconColor: '#ef4444',
-        padding: '2em',
-        backdrop: `rgba(0,0,0,0.4)`
+        backdrop: `rgba(15, 23, 42, 0.5)`
     }).then((result) => {
         if (result.isConfirmed) {
             const ids = Array.from(selected).map(cb => cb.value);
@@ -424,17 +424,17 @@ window.confirmInventoryRestore = function (event) {
         cancelButtonText: 'Batal',
         reverseButtons: true,
         customClass: {
-            popup: '!rounded-2xl !font-sans',
-            title: '!text-secondary-900 !text-xl !font-bold',
+            popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+            title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
-            confirmButton: 'btn btn-success px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-success-500',
-            cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+            actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+            confirmButton: 'btn btn-success !px-6 !py-2.5 !m-0 !rounded-xl',
+            cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
-        width: '24em',
+        width: '26em',
         iconColor: '#10b981',
-        padding: '2em',
-        backdrop: `rgba(0,0,0,0.4)`
+        backdrop: `rgba(15, 23, 42, 0.5)`
     }).then((result) => {
         if (result.isConfirmed) {
             form.submit();
@@ -454,17 +454,17 @@ window.confirmInventoryForceDelete = function (event) {
         cancelButtonText: 'Batal',
         reverseButtons: true,
         customClass: {
-            popup: '!rounded-2xl !font-sans',
-            title: '!text-secondary-900 !text-xl !font-bold',
+            popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
+            title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
-            confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
-            cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+            actions: '!flex !justify-center !gap-3 !w-full !mt-6',
+            confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
+            cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
-        width: '24em',
+        width: '26em',
         iconColor: '#ef4444',
-        padding: '2em',
-        backdrop: `rgba(0,0,0,0.4)`
+        backdrop: `rgba(15, 23, 42, 0.5)`
     }).then((result) => {
         if (result.isConfirmed) {
             form.submit();

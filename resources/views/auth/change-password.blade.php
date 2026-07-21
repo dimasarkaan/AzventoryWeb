@@ -11,14 +11,14 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('password.change.store') }}">
+            <form method="POST" action="{{ route('password.change.store') }}" novalidate>
                 @csrf
 
                 <!-- Username (Hanya saat Login Pertama / Aktivasi) -->
                 @if(is_null(auth()->user()->password_changed_at))
                     <div class="mb-4">
                         <x-input-label for="username" :value="__('ui.auth_label_username_optional')" />
-                        <x-text-input id="username" class="block mt-1 w-full bg-secondary-50" type="text" name="username" :value="old('username', auth()->user()->username)" required autocomplete="username" autofocus />
+                        <x-text-input id="username" class="block mt-1 w-full bg-secondary-50" type="text" name="username" :value="old('username', auth()->user()->username)" required autocomplete="username" autofocus minlength="3" maxlength="255" pattern="[a-zA-Z0-9\-\_]+" title="Username hanya boleh berisi huruf, angka, strip, dan underscore" />
                         <x-input-error :messages="$errors->get('username')" class="mt-2" />
                         <p class="mt-1 text-xs text-secondary-500">
                             {{ __('ui.auth_username_hint') }}
@@ -30,7 +30,7 @@
                 @if(!is_null(auth()->user()->password_changed_at))
                     <div>
                         <x-input-label for="current_password" :value="__('ui.auth_label_current_password')" />
-                        <x-password-input id="current_password" class="block mt-1 w-full" name="current_password" required autocomplete="current-password" />
+                        <x-password-input id="current_password" class="block mt-1 w-full" name="current_password" required autocomplete="current-password" maxlength="255" />
                         <x-input-error :messages="$errors->get('current_password')" class="mt-2" />
                     </div>
                 @endif
@@ -38,14 +38,14 @@
                 <!-- Password Baru -->
                 <div class="mt-4">
                     <x-input-label for="password" :value="__('ui.auth_label_new_password')" />
-                    <x-password-input id="password" class="block mt-1 w-full" name="password" required autocomplete="new-password" />
+                    <x-password-input id="password" class="block mt-1 w-full" name="password" required autocomplete="new-password" minlength="8" maxlength="255" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka" />
                     <x-input-error :messages="$errors->get('password')" class="mt-2" />
                 </div>
 
                 <!-- Konfirmasi Password Baru -->
                 <div class="mt-4">
                     <x-input-label for="password_confirmation" :value="__('ui.auth_label_new_password_confirmation')" />
-                    <x-password-input id="password_confirmation" class="block mt-1 w-full" name="password_confirmation" required autocomplete="new-password" />
+                    <x-password-input id="password_confirmation" class="block mt-1 w-full" name="password_confirmation" required autocomplete="new-password" minlength="8" maxlength="255" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password harus minimal 8 karakter, mengandung huruf besar, huruf kecil, dan angka" />
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
                 </div>
 
@@ -58,3 +58,4 @@
         </x-card>
     </div>
 </x-guest-layout>
+

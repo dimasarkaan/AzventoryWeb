@@ -7,16 +7,14 @@ use App\Models\ActivityLog;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 
-/**
- * ActivityLogController mengelola tampilan dan penyaringan riwayat aktivitas sistem.
- */
+// Controller untuk mengelola halaman "Riwayat Aktivitas" (Audit Trail).
+// Ini adalah "CCTV" sistem. Semua gerak-gerik pengguna (Login, Tambah Barang, ACC Stok) terekam di sini dan bisa dilacak.
 class ActivityLogController extends Controller
 {
     use ActivityLogger;
 
-    /**
-     * Menampilkan daftar log aktivitas dengan fitur filter berdasarkan role, user, aksi, dan rentang tanggal.
-     */
+    // Menampilkan daftar catatan riwayat aktivitas secara lengkap
+    // Dilengkapi fitur penyaringan tingkat tinggi (Filter berdasarkan Role, User, Aksi, dan Tanggal)
     public function index(Request $request)
     {
         $query = ActivityLog::with('user');
@@ -133,9 +131,7 @@ class ActivityLogController extends Controller
         return view('reports.activity_logs.index', compact('activityLogs', 'users', 'actions'));
     }
 
-    /**
-     * Memproses permintaan export log ke dalam format PDF (melalui simulasi background) atau Excel.
-     */
+    // Mengunduh (Export) data riwayat aktivitas ke dalam bentuk Laporan PDF atau file Excel
     public function export(Request $request)
     {
         $query = ActivityLog::with('user');

@@ -8,7 +8,7 @@
     <div class="py-12">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-visible shadow-sm sm:rounded-lg p-6">
-                <form action="{{ route('inventory.stock.request.store', $sparepart) }}" method="POST">
+                <form action="{{ route('inventory.stock.request.store', $sparepart) }}" method="POST" novalidate>
                     @csrf
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Tipe Transaksi -->
@@ -56,3 +56,4 @@
         </div>
     </div>
 </x-app-layout>
+

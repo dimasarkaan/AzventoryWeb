@@ -13,9 +13,10 @@ class PasswordController extends Controller
 {
     use ActivityLogger;
 
-    /**
-     * Memperbarui password pengguna.
-     */
+    // Controller untuk mengurus pembaruan/penggantian kata sandi (Password) milik pengguna.
+    // Menjalankan validasi ketat dan memastikan password lama yang dimasukkan benar sebelum menggantinya.
+
+    // Memproses form ganti password dan menyimpannya (Hash) ke database
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validateWithBag('updatePassword', [

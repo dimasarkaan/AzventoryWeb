@@ -9,10 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-/**
- * Notifikasi peringatan stok mendekati minimum (antara 100%—150% dari minimum_stock).
- * Dikirim lebih awal dari LowStockNotification agar admin bisa bertindak sebelum kritis.
- */
+// Pengumuman Sistem: Peringatan Dini saat stok barang hampir menyentuh batas minimum (masih sisa 100-150% dari minimum).
+// Berguna agar Admin bisa membeli/menyiapkan stok tambahan sebelum benar-benar habis.
 class ApproachingStockNotification extends Notification implements ShouldBroadcast, ShouldQueue
 {
     use Queueable;
@@ -24,17 +22,13 @@ class ApproachingStockNotification extends Notification implements ShouldBroadca
         $this->sparepart = $sparepart;
     }
 
-    /**
-     * Channel pengiriman: Database dan Broadcast realtime.
-     */
+    // Saluran Pengiriman: Disimpan ke database (muncul di ikon lonceng) dan dikirim langsung (Real-Time) ke layar pengguna.
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Data yang disimpan di tabel notifications.
-     */
+    // Merakit isi pesan notifikasi untuk disimpan permanen di database.
     public function toArray(object $notifiable): array
     {
         return [
@@ -45,9 +39,7 @@ class ApproachingStockNotification extends Notification implements ShouldBroadca
         ];
     }
 
-    /**
-     * Pesan siaran real-time.
-     */
+    // Merakit isi pesan yang akan muncul mendadak (Pop-up/Toast) di layar pengguna.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

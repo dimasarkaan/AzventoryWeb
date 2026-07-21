@@ -60,7 +60,7 @@
     <td class="px-2 py-3 text-right w-24">
         @if($approval->status === 'pending')
             <div class="flex items-center justify-end gap-1.5">
-                <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST">
+                <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" novalidate>
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="status" value="approved">
@@ -68,7 +68,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                     </button>
                 </form>
-                <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="reject-form">
+                <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="reject-form" novalidate>
                     @csrf
                     @method('PATCH')
                     <input type="hidden" name="status" value="rejected">
@@ -91,3 +91,4 @@
         @endif
     </td>
 </tr>
+

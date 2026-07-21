@@ -104,7 +104,7 @@
             <div class="flex items-center justify-end gap-2">
                 @if(request('trash'))
                     @can('restore', $sparepart)
-                    <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto">
+                    <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto" novalidate>
                         @csrf
                         @method('PATCH')
                         <button type="submit" class="btn btn-sm btn-success w-full justify-center flex items-center gap-1" onclick="confirmInventoryRestore(event)">
@@ -114,7 +114,7 @@
                     </form>
                     @endcan
                     @can('forceDelete', $sparepart)
-                    <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto mt-2 sm:mt-0">
+                    <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto mt-2 sm:mt-0" novalidate>
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-danger w-full justify-center flex items-center gap-1" onclick="confirmInventoryForceDelete(event)">
@@ -133,7 +133,7 @@
                     </a>
                     @endcan
                     @can('delete', $sparepart)
-                    <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block flex-1">
+                    <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block flex-1" novalidate>
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-danger w-full justify-center" onclick="confirmDelete(event)">
@@ -193,3 +193,6 @@
         {{ $spareparts->links() }}
     </div>
 </div>
+
+
+

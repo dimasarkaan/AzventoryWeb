@@ -83,7 +83,7 @@ window.confirmDelete = function (event) {
 };
 
 // Handle Flash Messages from Global Variable (Menggunakan Native Alpine Toast)
-document.addEventListener('DOMContentLoaded', () => {
+const initFlashes = () => {
     if (window.flashMessages) {
         if (window.flashMessages.success) {
             window.showToast('success', window.flashMessages.success);
@@ -101,4 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
             window.showToast('info', window.flashMessages.info);
         }
     }
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initFlashes, 150));
+} else {
+    setTimeout(initFlashes, 150);
+}

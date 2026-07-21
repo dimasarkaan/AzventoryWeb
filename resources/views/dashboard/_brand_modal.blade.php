@@ -16,7 +16,7 @@
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-3xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-secondary-100"
+        <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-3xl shadow-2xl sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-secondary-100 relative"
              x-transition:enter="transition ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
@@ -50,18 +50,22 @@
                         <x-icon.plus class="w-3 h-3" />
                         Tambah Merk Baru
                     </h4>
-                    <div class="flex gap-2">
+                    <form @submit.prevent="addBrand()" class="flex gap-2" novalidate>
                         <div class="relative flex-grow">
                             <label for="new_brand_name" class="sr-only">Nama Merk Baru</label>
                             <input type="text" 
                                    id="new_brand_name"
                                    name="brand_name"
                                    x-model="newBrandName"
-                                   @keydown.enter="addBrand()"
                                    placeholder="Masukkan Nama Merk Di Sini" 
-                                   class="w-full bg-secondary-50 border border-secondary-200 rounded-xl px-4 py-2.5 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 transition-all outline-none">
+                                   class="w-full bg-secondary-50 border border-secondary-200 rounded-xl px-4 py-2.5 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 transition-all outline-none"
+                                   required
+                                   minlength="2"
+                                   maxlength="100"
+                                   pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-]*$"
+                                   title="Nama merk harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)">
                         </div>
-                        <button @click="addBrand()" 
+                        <button type="submit" 
                                 :disabled="isAddingBrand || !newBrandName.trim()"
                                 class="btn btn-primary px-5 rounded-xl flex items-center gap-2 shadow-lg shadow-primary-200/50 disabled:opacity-50 disabled:shadow-none transition-all">
                             <template x-if="isAddingBrand">
@@ -72,7 +76,8 @@
                             </template>
                             <span class="font-bold text-sm" x-text="isAddingBrand ? 'Menyimpan...' : 'Tambah'"></span>
                         </button>
-                    </div>
+                        </button>
+                    </form>
                 </div>
 
                 <div class="flex items-center justify-between mb-3 px-1">
@@ -108,18 +113,23 @@
                                         </p>
                                     </div>
 
-                                    <div x-show="brandEditingId === brand.id" x-cloak>
+                                    <form x-show="brandEditingId === brand.id" @submit.prevent="saveBrandEdit(brand.id)" x-cloak novalidate>
                                         <label :for="'brand-edit-input-' + brand.id" class="sr-only">Ubah Nama Merk</label>
                                         <input type="text" 
                                                :id="'brand-edit-input-' + brand.id"
                                                name="edit_brand_name"
                                                x-model="brandEditingName" 
-                                               @keydown.enter="saveBrandEdit(brand.id)"
                                                @keydown.escape="cancelBrandEdit()"
                                                class="w-full bg-white border border-pink-300 rounded-xl px-3 py-2 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 transition-all outline-none"
-                                               placeholder="Nama merk...">
+                                               required
+                                               placeholder="Nama merk..."
+                                               minlength="2"
+                                               maxlength="100"
+                                               pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-]*$"
+                                               title="Nama merk harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)">
                                         <p class="text-[10px] text-secondary-400 mt-1 ml-1 font-medium italic">Tekan Enter untuk simpan, Esc untuk batal</p>
-                                    </div>
+                                        <button type="submit" class="hidden"></button>
+                                    </form>
                                 </div>
 
                                 {{-- Actions View --}}
@@ -165,48 +175,7 @@
                         </template>
                     </div>
 
-                    {{-- Custom Delete Confirmation Overlay --}}
-                    <div x-show="brandConfirmDeleteId" 
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100"
-                         x-transition:leave-end="opacity-0"
-                         class="absolute inset-x-0 -inset-y-4 bg-white/95 backdrop-blur-[2px] z-[20] flex items-center justify-center p-6 text-center"
-                         x-cloak>
-                        <div class="w-full max-w-sm">
-                            <div class="w-16 h-16 bg-danger-50 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-danger-100">
-                                <x-icon.trash class="w-8 h-8" />
-                            </div>
-                            <h4 class="text-secondary-900 font-bold text-lg mb-1">Hapus Merk?</h4>
-                            <p class="text-sm text-secondary-500 mb-4">
-                                Anda yakin ingin menghapus merk <span class="font-bold text-secondary-900" x-text="brandConfirmDeleteName"></span>? Tindakan ini tidak dapat dibatalkan.
-                            </p>
-                            {{-- Inline error message saat hapus gagal --}}
-                            <div x-show="deleteBrandError" x-cloak
-                                 class="mb-4 flex items-start gap-2 bg-danger-50 border border-danger-200 text-danger-700 rounded-xl px-4 py-3 text-sm font-medium text-left">
-                                <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <span x-text="deleteBrandError"></span>
-                            </div>
-                            <div class="flex items-center justify-center gap-3">
-                                <button @click="cancelBrandDelete()" 
-                                        :disabled="isDeletingBrand"
-                                        class="btn btn-secondary px-6 py-2.5 rounded-2xl font-bold disabled:opacity-50 transition-all">Batal</button>
-                                <button @click="deleteBrand(brandConfirmDeleteId)" 
-                                        :disabled="isDeletingBrand"
-                                        class="btn btn-danger px-6 py-2.5 rounded-2xl font-bold shadow-lg shadow-danger-200 disabled:opacity-50 transition-all flex items-center gap-2">
-                                    <template x-if="isDeletingBrand">
-                                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                    </template>
-                                    <span x-text="isDeletingBrand ? 'Menghapus...' : 'Ya, Hapus'"></span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+
 
                     <div x-show="brandsList.length === 0" class="text-center py-12">
                         <div class="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4 text-secondary-400">
@@ -217,6 +186,50 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Custom Delete Confirmation Overlay --}}
+            <div x-show="brandConfirmDeleteId" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="absolute inset-0 bg-white/95 backdrop-blur-[2px] z-[50] flex items-center justify-center p-6 text-center rounded-3xl"
+                 x-cloak>
+                <div class="w-full max-w-sm">
+                    <div class="w-16 h-16 bg-danger-50 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-danger-100">
+                        <x-icon.trash class="w-8 h-8" />
+                    </div>
+                    <h4 class="text-secondary-900 font-bold text-lg mb-1">Hapus Merk?</h4>
+                    <p class="text-sm text-secondary-500 mb-4">
+                        Anda yakin ingin menghapus merk <span class="font-bold text-secondary-900" x-text="brandConfirmDeleteName"></span>? Tindakan ini tidak dapat dibatalkan.
+                    </p>
+                    {{-- Inline error message saat hapus gagal --}}
+                    <div x-show="deleteBrandError" x-cloak
+                         class="mb-4 flex items-start gap-2 bg-danger-50 border border-danger-200 text-danger-700 rounded-xl px-4 py-3 text-sm font-medium text-left">
+                        <svg class="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span x-text="deleteBrandError"></span>
+                    </div>
+                    <div class="flex items-center justify-center gap-3">
+                        <button @click="cancelBrandDelete()" 
+                                :disabled="isDeletingBrand"
+                                class="btn btn-secondary px-6 py-2.5 rounded-2xl font-bold disabled:opacity-50 transition-all">Batal</button>
+                        <button @click="deleteBrand(brandConfirmDeleteId)" 
+                                :disabled="isDeletingBrand"
+                                class="btn btn-danger px-6 py-2.5 rounded-2xl font-bold shadow-lg shadow-danger-200 disabled:opacity-50 transition-all flex items-center gap-2">
+                            <template x-if="isDeletingBrand">
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </template>
+                            <span x-text="isDeletingBrand ? 'Menghapus...' : 'Ya, Hapus'"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+

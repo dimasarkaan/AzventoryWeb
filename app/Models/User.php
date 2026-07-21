@@ -10,21 +10,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-/**
- * Model User sebagai representasi pengguna dalam sistem.
- *
- * Mengatur autentikasi, otorisasi role, dan relasi ke data lain.
- */
+// Model (Blueprint Tabel Database) Induk untuk mengurus akun Pengguna (User).
+// Berperan penuh mengatur Login (Autentikasi), Hak Akses (Otorisasi), dan Data Profil.
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasUuids, Notifiable, SoftDeletes;
 
-    /**
-     * Atribut yang dapat diisi secara massal.
-     *
-     * @var list<string>
-     */
+    // Atribut (Kolom) yang diizinkan untuk diisi data secara bebas ke dalam database
     protected $fillable = [
         'name',
         'username',
@@ -41,11 +34,7 @@ class User extends Authenticatable
         'settings',
     ];
 
-    /**
-     * Mendapatkan URL avatar pengguna.
-     *
-     * Jika tidak ada avatar, akan menggunakan layanan UI Avatars.
-     */
+    // Fitur Cerdas: Menyediakan foto profil bawaan (Inisial Nama) jika pengguna belum mengunggah foto sendiri
     protected function avatarUrl(): \Illuminate\Database\Eloquent\Casts\Attribute
     {
         return \Illuminate\Database\Eloquent\Casts\Attribute::make(
@@ -55,21 +44,13 @@ class User extends Authenticatable
         );
     }
 
-    /**
-     * Atribut yang harus disembunyikan saat serialisasi.
-     *
-     * @var list<string>
-     */
+    // Atribut Rahasia: Kolom yang diharamkan ikut terbawa/tampil saat data user dipanggil (Demi Keamanan)
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Definisi casting tipe data atribut.
-     *
-     * @return array<string, string>
-     */
+    // Konversi Tipe Data: Memaksa format data agar selalu benar (Contoh: teks diubah paksa jadi format Tanggal/Waktu)
     protected function casts(): array
     {
         return [
@@ -87,17 +68,25 @@ class User extends Authenticatable
         return $this->hasMany(Borrowing::class);
     }
 
-    /**
-     * Menggunakan UUID sebagai Route Key.
-     */
+    // Keamanan URL: Menggunakan gabungan huruf acak (UUID) di URL Profil alih-alih angka berurutan (agar tidak mudah ditebak)
     public function getRouteKeyName()
     {
         return 'uuid';
     }
 
-    /**
-     * Mendefinisikan kolom mana yang akan diisi UUID otomatis oleh Laravel.
-     */
+    // Kompatibilitas URL: Menjaga agar link URL versi lama (yang masih pakai angka ID biasa) tetap bisa diakses dan tidak error
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $field = $field ?? $this->getRouteKeyName();
+
+        if ($field === 'uuid' && is_numeric($value)) {
+            return $this->where('id', $value)->first();
+        }
+
+        return $this->where($field, $value)->first();
+    }
+
+    // Mendaftarkan kolom 'uuid' agar otomatis diisi gabungan angka/huruf acak oleh sistem saat user baru diciptakan
     public function uniqueIds()
     {
         return ['uuid'];

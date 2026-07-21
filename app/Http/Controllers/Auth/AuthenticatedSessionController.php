@@ -10,21 +10,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+// Controller krusial yang mengurus proses keluar masuk (Login & Logout) pengguna di website.
+// Menangani pencocokan email & password, pembuatan sesi (Session), hingga melempar (Redirect) pengguna ke halaman Dashboard yang sesuai dengan pangkat/jabatannya.
 class AuthenticatedSessionController extends Controller
 {
     use ActivityLogger;
 
-    /**
-     * Menampilkan halaman login.
-     */
+    // Menampilkan halaman antarmuka form Login kepada pengguna
     public function create(): View
     {
         return view('auth.login');
     }
 
-    /**
-     * Menangani permintaan autentikasi (Login).
-     */
+    // Memproses data email & password yang dikirim dari form Login
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
@@ -44,9 +42,7 @@ class AuthenticatedSessionController extends Controller
         return redirect()->intended($redirectPath);
     }
 
-    /**
-     * Menghapus sesi autentikasi (Logout).
-     */
+    // Memproses aksi Logout saat pengguna mengklik tombol "Keluar"
     public function destroy(Request $request): RedirectResponse
     {
         $this->logActivity('Logout', 'Pengguna keluar dari sistem.');

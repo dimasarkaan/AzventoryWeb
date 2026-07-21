@@ -8,21 +8,19 @@ use App\Models\User;
 use App\Traits\ActivityLogger;
 use Illuminate\Support\Facades\Hash;
 
+// Controller untuk mengurus pengguna yang baru pertama kali login (Aktivasi Akun).
+// Mewajibkan mereka mengganti kata sandi bawaan pabrik dengan kata sandi rahasia mereka sendiri.
 class ChangePasswordController extends Controller
 {
     use ActivityLogger;
 
-    /**
-     * Menampilkan halaman ganti password.
-     */
+    // Menampilkan halaman "Wajib Ganti Password" bagi pengguna baru
     public function create()
     {
         return view('auth.change-password');
     }
 
-    /**
-     * Memproses penggantian password pengguna (Aktivasi Pertama).
-     */
+    // Memproses data formulir pergantian password (dan username) saat aktivasi pertama
     public function store(ChangePasswordRequest $request)
     {
         $user = $request->user();

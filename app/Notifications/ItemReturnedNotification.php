@@ -8,34 +8,26 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-/**
- * Notifikasi yang dikirim ke Admin/Superadmin saat barang pinjaman dikembalikan.
- * Membantu Admin mengetahui status ketersediaan barang secara real-time.
- */
+// Pengumuman Sistem: Memberitahu Admin bahwa ada karyawan yang baru saja memulangkan barang pinjamannya.
+// Membantu Admin mengetahui update status ketersediaan barang secara real-time.
 class ItemReturnedNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
-    /**
-     * Inisialisasi notifikasi pengembalian barang.
-     */
+    // Tahap Persiapan: Menerima data transaksi peminjaman, jumlah yang dikembalikan, dan kondisinya (Baik/Rusak/Hilang).
     public function __construct(
         public Borrowing $borrowing,
         public int $quantity,
         public string $condition
     ) {}
 
-    /**
-     * Channel pengiriman: Database dan Real-time Broadcast.
-     */
+    // Saluran Pengiriman: Disimpan ke database (ikon lonceng) dan dikirim Pop-up (Real-Time).
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Data persistensi notifikasi dalam database.
-     */
+    // Merakit isi pesan notifikasi untuk disimpan permanen di database.
     public function toArray(object $notifiable): array
     {
         return [
@@ -46,9 +38,7 @@ class ItemReturnedNotification extends Notification implements ShouldBroadcast
         ];
     }
 
-    /**
-     * Pesan siaran real-time.
-     */
+    // Merakit isi pesan yang akan melayang (Toast) secara seketika di layar Admin.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

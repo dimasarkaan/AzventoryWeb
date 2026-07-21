@@ -84,7 +84,7 @@
                                 confirmButtonColor: '#3b82f6'
                             });
                         }
-                      ">
+                      " novalidate>
                     <div class="grid grid-cols-1 sm:grid-cols-2 {{ auth()->user()->role === \App\Enums\UserRole::OPERATOR ? 'lg:grid-cols-5' : 'lg:grid-cols-4' }} gap-4 items-end">
                         
                         <!-- Search -->
@@ -690,3 +690,6 @@
         </div>
     </div>
 </x-app-layout>
+
+
+

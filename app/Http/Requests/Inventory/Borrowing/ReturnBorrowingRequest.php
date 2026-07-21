@@ -6,19 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class ReturnBorrowingRequest extends FormRequest
 {
-    /**
-     * Tentukan apakah user diizinkan untuk membuat request ini.
-     */
+    // Mengecek apakah pengguna berhak mengembalikan barang (diatur true)
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Dapatkan aturan validasi yang berlaku untuk request ini.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    // Syarat wajib formulir Pengembalian Barang
+    // Mengecek sisa barang yang belum dikembalikan, dan mewajibkan upload foto bukti fisik barang!
     public function rules(): array
     {
         $borrowing = $this->route('borrowing');
@@ -38,6 +33,7 @@ class ReturnBorrowingRequest extends FormRequest
         ];
     }
 
+    // Mengubah pesan peringatan menjadi bahasa Indonesia yang luwes (POV Manusia)
     public function messages()
     {
         return [
@@ -47,6 +43,7 @@ class ReturnBorrowingRequest extends FormRequest
             'return_quantity.max' => 'Jumlah tidak boleh melebihi sisa pinjaman (:max).',
             'return_condition.required' => 'Kondisi barang wajib dipilih.',
             'return_condition.in' => 'Kondisi tidak valid.',
+            'return_photos.required_if' => 'Foto bukti kondisi barang wajib diunggah (minimal 1 foto).',
             'return_photos.array' => 'Format foto tidak valid.',
             'return_photos.min' => 'Minimal unggah :min foto.',
             'return_photos.max' => 'Maksimal unggah :max foto.',

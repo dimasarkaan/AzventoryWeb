@@ -59,7 +59,7 @@
 
     @if($approval->status === 'pending')
         <div class="grid grid-cols-2 gap-3 pt-1 mt-auto">
-            <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="w-full reject-form">
+            <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="w-full reject-form" novalidate>
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="status" value="rejected">
@@ -68,7 +68,7 @@
                     {{ __('ui.btn_reject') }}
                 </button>
             </form>
-            <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="w-full">
+            <form action="{{ route('inventory.stock-approvals.update', $approval) }}" method="POST" class="w-full" novalidate>
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="status" value="approved">
@@ -84,3 +84,4 @@
         </div>
     @endif
 </div>
+

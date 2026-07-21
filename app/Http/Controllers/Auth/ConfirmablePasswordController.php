@@ -9,19 +9,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
+// Controller untuk benteng keamanan ganda (Double-Check Security).
+// Bertugas memaksa pengguna mengetik ulang password mereka sebelum diizinkan mengakses menu/tindakan yang sangat sensitif.
 class ConfirmablePasswordController extends Controller
 {
-    /**
-     * Menampilkan halaman konfirmasi password.
-     */
+    // Menampilkan halaman pop-up atau form "Harap Konfirmasi Password Anda"
     public function show(): View
     {
         return view('auth.confirm-password');
     }
 
-    /**
-     * Mengonfirmasi password pengguna.
-     */
+    // Mencocokkan password yang diketik dengan yang ada di database
+    // Jika cocok, pengguna diberi waktu bebas akses (tanpa konfirmasi lagi) selama beberapa saat
     public function store(Request $request): RedirectResponse
     {
         if (! Auth::guard('web')->validate([

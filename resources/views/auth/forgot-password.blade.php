@@ -10,13 +10,13 @@
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
-        <form method="POST" action="{{ route('password.email') }}" class="space-y-5">
+        <form method="POST" action="{{ route('password.email') }}" class="space-y-5" novalidate>
             @csrf
 
             <!-- Email Address -->
             <div>
                 <label for="email" class="input-label">{{ __('ui.auth_label_email_registered') }}</label>
-                <input id="email" type="email" name="email" class="input-field w-full" value="{{ old('email') }}" required autofocus placeholder="nama@email.com">
+                <input id="email" type="email" name="email" class="input-field w-full" value="{{ old('email') }}" required autofocus placeholder="nama@email.com" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" title="Format email tidak valid (contoh: nama@domain.com)" maxlength="255">
                 <x-input-error :messages="$errors->get('email')" class="mt-2" />
             </div>
 
@@ -33,3 +33,4 @@
         </form>
     </div>
 </x-guest-layout>
+

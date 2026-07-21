@@ -5,16 +5,11 @@ namespace App\Http\Controllers\Notifications;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-/**
- * @group Notifications
- *
- * API endpoints interaksi sistem pemberitahuan *real-time*.
- */
+// Controller khusus untuk mengurus lonceng notifikasi (pemberitahuan waktu-nyata / real-time).
+// Menangani fitur buka notifikasi, tandai sudah dibaca (Mark as Read), hingga baca semua (Mark All As Read).
 class NotificationController extends Controller
 {
-    /**
-     * Menampilkan daftar notifikasi user.
-     */
+    // Menampilkan halaman daftar riwayat notifikasi milik pengguna yang sedang login
     public function index(Request $request)
     {
         if ($request->wantsJson()) {
@@ -33,9 +28,7 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications'));
     }
 
-    /**
-     * Menandai notifikasi spesifik sebagai sudah dibaca.
-     */
+    // Menandai satu notifikasi tertentu sebagai "Sudah Dibaca" ketika diklik oleh user
     public function markAsRead(Request $request, $id)
     {
         $notification = $request->user()->notifications()->findOrFail($id);
@@ -62,9 +55,7 @@ class NotificationController extends Controller
             : back();
     }
 
-    /**
-     * Menandai semua notifikasi sebagai sudah dibaca.
-     */
+    // Tombol sapu jagat: Menandai SEMUA notifikasi yang belum dibaca menjadi "Sudah Dibaca" sekaligus
     public function markAllAsRead(Request $request)
     {
         // Gunakan query builder untuk update langsung (lebih cepat & andal)

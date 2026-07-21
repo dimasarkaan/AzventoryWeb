@@ -295,7 +295,7 @@
 
                     <div class="border-t border-secondary-100 my-1"></div>
 
-                    <form method="POST" action="{{ route('logout') }}" onsubmit="clearDashboardPeriod()">
+                    <form method="POST" action="{{ route('logout') }}" onsubmit="clearDashboardPeriod()" novalidate>
                         @csrf
                         <x-dropdown-link :href="route('logout')"
                                 onclick="event.preventDefault(); clearDashboardPeriod(); this.closest('form').submit();" 
@@ -399,7 +399,7 @@
                 <a href="{{ route('profile.edit') }}" class="{{ $resNavClass }} {{ $resInactiveClass }}">
                     {{ __('ui.profile') }}
                 </a>
-                <form method="POST" action="{{ route('logout') }}" onsubmit="clearDashboardPeriod()">
+                <form method="POST" action="{{ route('logout') }}" onsubmit="clearDashboardPeriod()" novalidate>
                     @csrf
                     <a href="{{ route('logout') }}" onclick="event.preventDefault(); clearDashboardPeriod(); this.closest('form').submit();" class="{{ $resNavClass }} {{ $resInactiveClass }} text-danger-600">
                         {{ __('ui.logout') }}
@@ -409,3 +409,4 @@
         </div>
     </div>
 </nav>
+

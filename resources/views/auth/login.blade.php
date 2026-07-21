@@ -5,13 +5,13 @@
             <p class="text-secondary-500 mt-2">{{ __('ui.auth_welcome_desc') }}</p>
         </div>
 
-        <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ loading: false }" @submit="loading = true">
+        <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ loading: false }" @submit="loading = true" novalidate>
             @csrf
 
             <!-- Field Login -->
             <div>
                 <label for="login" class="input-label">{{ __('ui.auth_label_login') }}</label>
-                <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autocomplete="username" autofocus tabindex="1">
+                <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autocomplete="username" autofocus tabindex="1" minlength="3" maxlength="255" title="Silakan masukkan username atau email yang valid">
                 <x-input-error :messages="$errors->get('login')" class="mt-2" />
             </div>
 
@@ -26,7 +26,7 @@
                     @endif
                 </div>
                 <div class="relative">
-                    <input id="password" type="password" name="password" class="input-field w-full pr-10" required autocomplete="current-password" tabindex="2">
+                    <input id="password" type="password" name="password" class="input-field w-full pr-10" required autocomplete="current-password" tabindex="2" maxlength="255">
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-secondary-600 focus:outline-none" tabindex="-1">
                         <svg id="eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -89,3 +89,4 @@
         }
     </script>
 </x-guest-layout>
+

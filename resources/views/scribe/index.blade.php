@@ -371,7 +371,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-login', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-login', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -520,7 +520,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-logout', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-logout', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -673,7 +673,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-inventory', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-inventory', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -854,7 +854,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-inventory', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-inventory', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -1164,7 +1164,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-inventory--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-inventory--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -1350,7 +1350,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-inventory--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-inventory--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -1677,7 +1677,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-inventory--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-inventory--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -1839,7 +1839,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-inventory--id--logs', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-inventory--id--logs', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -2013,7 +2013,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-inventory--id--adjust-stock', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-inventory--id--adjust-stock', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -2218,7 +2218,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-brands', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-brands', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -2375,7 +2375,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-brands', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-brands', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -2545,7 +2545,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-brands--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-brands--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -2746,7 +2746,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-brands--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-brands--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -2908,7 +2908,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-categories', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-categories', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -3065,7 +3065,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-categories', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-categories', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -3235,7 +3235,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-categories--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-categories--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -3436,7 +3436,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-categories--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-categories--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -3598,7 +3598,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-locations', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-locations', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -3755,7 +3755,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-locations', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-locations', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -3925,7 +3925,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-locations--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-locations--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -4126,7 +4126,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-locations--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-locations--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -4292,7 +4292,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-notifications', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-notifications', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -4441,7 +4441,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-notifications--id--read', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-notifications--id--read', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -4603,7 +4603,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-notifications-mark-all-read', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-notifications-mark-all-read', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -4756,7 +4756,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-borrowings', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-borrowings', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -4921,7 +4921,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-borrowings', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-borrowings', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -5131,7 +5131,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-borrowings--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-borrowings--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -5303,7 +5303,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-borrowings--id--return', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-borrowings--id--return', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -5506,7 +5506,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-me', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-me', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -5663,7 +5663,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-me', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-me', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -5841,7 +5841,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-activity-logs', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-activity-logs', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -5990,7 +5990,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-activity-logs-user--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-activity-logs-user--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -6152,7 +6152,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-stats', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-stats', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -6305,7 +6305,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-users', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-users', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -6470,7 +6470,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-users', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-users', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -6680,7 +6680,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-users--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-v1-users--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -6856,7 +6856,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-users--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('PUTapi-v1-users--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -7071,7 +7071,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-users--id-', this);">
+      onsubmit="event.preventDefault(); executeTryOut('DELETEapi-v1-users--id-', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -7233,7 +7233,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
       data-hasfiles="0"
       data-isarraybody="0"
       autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-users--id--reset-password', this);">
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-v1-users--id--reset-password', this);" novalidate>
     <h3>
         Request&nbsp;&nbsp;&nbsp;
                     <button type="button"
@@ -7323,3 +7323,4 @@ You can check the Dev Tools console for debugging information.</code></pre>
 </div>
 </body>
 </html>
+

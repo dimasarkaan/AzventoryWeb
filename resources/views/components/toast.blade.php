@@ -14,7 +14,7 @@
         }
     }"
     @notify.window="add($event)"
-    class="fixed top-4 right-4 z-[9999] flex flex-col gap-3 w-full max-w-sm pointer-events-none"
+    class="fixed top-4 left-1/2 -translate-x-1/2 sm:left-auto sm:-translate-x-0 sm:right-4 z-[9999] flex flex-col gap-3 w-[calc(100%-2rem)] sm:w-full max-w-sm pointer-events-none"
 >
     <template x-for="notification in notifications" :key="notification.id">
         <div x-show="true"
@@ -24,7 +24,13 @@
              x-transition:leave="ease-in duration-200 transition-all pointer-events-auto"
              x-transition:leave-start="opacity-100 translate-y-0 sm:translate-x-0"
              x-transition:leave-end="opacity-0 translate-y-[-10px] sm:translate-y-0 sm:translate-x-4"
-             class="pointer-events-auto w-full bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-xl flex items-start p-4 gap-3 relative overflow-hidden group">
+             class="pointer-events-auto w-full bg-white border border-gray-100 border-l-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-r-xl rounded-l-md flex items-start p-4 gap-3 relative overflow-hidden group"
+             :class="{
+                 'border-l-success-500': ['success', 'created', 'returned'].includes(notification.type),
+                 'border-l-danger-500': ['error', 'danger'].includes(notification.type),
+                 'border-l-warning-500': ['warning', 'deleted'].includes(notification.type),
+                 'border-l-primary-500': ['info', 'borrowing', 'updated'].includes(notification.type) || !['success', 'created', 'returned', 'error', 'danger', 'warning', 'deleted'].includes(notification.type)
+             }">
              
              <!-- Icon mapping -->
              <div class="flex-shrink-0 mt-0.5" 

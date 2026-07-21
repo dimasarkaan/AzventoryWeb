@@ -5,17 +5,13 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
- */
+// Pabrik Data: Mesin pembuat data dummy Akun Karyawan untuk keperluan testing atau seeding awal.
 class UserFactory extends Factory
 {
-    /**
-     * Password saat ini yang digunakan oleh factory.
-     */
+    // Enkripsi Password: Menyimpan password sementara agar tidak perlu di-hash berulang kali (Menghemat memori saat generate).
     protected static ?string $password;
 
-    // Definisikan state default model.
+    // Cetakan Dasar: Membuat profil user acak (Nama, Email unik, dan Role default: 'operator').
     public function definition(): array
     {
         return [
@@ -32,7 +28,7 @@ class UserFactory extends Factory
         ];
     }
 
-    // Indikasikan bahwa alamat email model belum diverifikasi.
+    // Cetakan Khusus (State): Memalsukan akun yang alamat emailnya belum divalidasi (email_verified_at = null).
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [

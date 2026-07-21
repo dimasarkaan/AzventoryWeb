@@ -1352,7 +1352,7 @@
                          x-cloak
                          class="mt-4">
                         <form method="GET" action="{{ route('dashboard.superadmin') }}"
-                              class="bg-white border border-secondary-100 rounded-[24px] p-5 shadow-xl shadow-secondary-900/5 flex flex-col md:flex-row items-stretch md:items-end gap-6 transition-all">
+                              class="bg-white border border-secondary-100 rounded-[24px] p-5 shadow-xl shadow-secondary-900/5 flex flex-col md:flex-row items-stretch md:items-end gap-6 transition-all" novalidate>
                             <input type="hidden" name="period" id="superadmin_period_input" value="custom">
 
                             {{-- Form Group: Date Range --}}
@@ -2989,3 +2989,4 @@
     </div>
 </div>
 </x-app-layout>
+

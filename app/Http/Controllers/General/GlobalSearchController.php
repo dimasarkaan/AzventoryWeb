@@ -8,11 +8,11 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Controller pintar untuk fitur Pencarian Global (Global Search) yang ada di kotak atas navigasi.
+// Controller ini bertugas mencari kecocokan kata secara serentak di 3 tempat sekaligus: Menu, Data Barang, dan Pengguna.
 class GlobalSearchController extends Controller
 {
-    /**
-     * Menangani pencarian global (Menu, Sparepart, User).
-     */
+    // Mengeksekusi pencarian otomatis saat user mengetikkan sesuatu (minimal 2 huruf)
     public function __invoke(Request $request)
     {
         $query = $request->input('query');
@@ -95,9 +95,8 @@ class GlobalSearchController extends Controller
         ]);
     }
 
-    /**
-     * Mendapatkan daftar menu berdasarkan role user.
-     */
+    // Fungsi pembantu (Helper) untuk mendata menu apa saja yang boleh dicari oleh user
+    // (Beda kasta/jabatan, beda pula menu yang muncul di hasil pencarian)
     private function getMenusForRole($role)
     {
         $common = [

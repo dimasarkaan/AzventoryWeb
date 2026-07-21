@@ -7,6 +7,8 @@ use App\Models\StockLog;
 use App\Traits\ActivityLogger;
 use Illuminate\Http\Request;
 
+// Controller khusus bagi Admin untuk mengecek dan merespons (Menyetujui/Menolak) permohonan stok dari Operator.
+// Mengatur tampilan halaman antrean (Pending), logika penyaringan data (Filter), hingga eksekusi persetujuan massal.
 class StockApprovalController extends Controller
 {
     use ActivityLogger;
@@ -18,9 +20,8 @@ class StockApprovalController extends Controller
         $this->inventoryService = $inventoryService;
     }
 
-    /**
-     * Menampilkan daftar persetujuan stok yang pending (dengan search & filter).
-     */
+    // Menampilkan daftar antrean pengajuan stok yang menunggu keputusan
+    // Dilengkapi fitur pencarian (Search) nama barang/user dan penyaringan status (Filter)
     public function index(Request $request)
     {
         $query = StockLog::with(['sparepart', 'user', 'approver']);
@@ -51,10 +52,10 @@ class StockApprovalController extends Controller
             $query->where('type', $filterType);
         }
 
-        // Best Practice Sorting:
-        // 1. Pending First
-        // 2. Pending: Urutkan dari yang Terlama (agar tidak ada antrean basi)
-        // 3. Selesai (Approved/Rejected): Urutkan dari yang Terbaru
+        // Algoritma Pengurutan (Sorting) Data Terbaik:
+        // 1. Munculkan status 'Pending' di posisi paling atas tabel
+        // 2. Jika statusnya 'Pending', urutkan dari permohonan Terlama (agar tidak ada antrean menumpuk/basi)
+        // 3. Jika statusnya sudah selesai (Di-ACC/Ditolak), urutkan dari riwayat aksi yang Terbaru
         $pendingApprovals = $query->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END ASC")
             ->orderByRaw("CASE WHEN status = 'pending' THEN created_at END ASC")
             ->orderByRaw("CASE WHEN status != 'pending' THEN created_at END DESC")
@@ -64,28 +65,30 @@ class StockApprovalController extends Controller
         return view('inventory.approvals.index', compact('pendingApprovals'));
     }
 
-    /**
-     * Memperbarui status persetujuan stok (Setujui/Tolak).
-     */
+    // Memproses keputusan Admin (Setuju / Tolak) atas SATU pengajuan stok
     public function update(Request $request, StockLog $stock_log)
     {
+        // Pengecekan keamanan: Pastikan hanya orang dengan peran 'Admin' yang boleh merespons form ini
         $this->authorize('update', $stock_log);
 
         $stock_log->load(['sparepart', 'user']);
+        
+        // Aturan validasi yang sangat ketat:
+        // Jika Admin mengeklik 'Tolak', sistem mewajibkan mereka mengetik 'Alasan Penolakan'
         $request->validate([
             'status' => 'required|in:approved,rejected',
-            // Gap 1: wajib isi alasan jika menolak
             'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
         ]);
 
         try {
+            // Kita lemparkan logika penambahan stok aslinya dan notifikasinya ke file InventoryService biar Controller tetap ramping
             $this->inventoryService->approveStockRequest(
                 $stock_log,
                 $request->status,
                 $request->rejection_reason
             );
 
-            // Gap 4: Bedakan flash message approve vs reject
+            // Bedakan kata-kata pesan pop-up (Toast) sesuai tombol yang ditekan Admin
             $message = $request->status === 'approved'
                 ? 'Pengajuan berhasil disetujui.'
                 : 'Pengajuan berhasil ditolak.';
@@ -97,18 +100,16 @@ class StockApprovalController extends Controller
         }
     }
 
-    /**
-     * Setujui banyak pengajuan sekaligus.
-     */
+    // Mengeksekusi banyak pengajuan stok sekaligus dalam sekali klik (Bulk Action / Centang Kotak)
     public function bulkApprove(Request $request)
     {
         $this->authorize('update', new StockLog);
 
+        // Validasi massal: Pastikan ada ID yang dicentang, dan jika ditolak wajib memberi 1 alasan yang sama untuk semuanya
         $request->validate([
             'ids' => 'required|array',
             'ids.*' => 'exists:stock_logs,id',
             'status' => 'required|in:approved,rejected',
-            // Gap 1: wajib isi alasan jika bulk reject
             'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
         ]);
 
@@ -137,7 +138,7 @@ class StockApprovalController extends Controller
             }
         }
 
-        // Gap 4: Bedakan flash message bulk approve vs reject
+        // Hitung kalimat pesan pop-up (Alert) secara dinamis sesuai status yang dipilih
         $actionText = $request->status === 'approved' ? 'disetujui' : 'ditolak';
         $message = "Berhasil {$actionText} {$successCount} pengajuan.";
 

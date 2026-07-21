@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
+// Controller utama penggerak halaman Dashboard khusus SuperAdmin (Petinggi Tertinggi).
+// Menangani penarikan data metrik berskala besar (Big Data) dari InventoryService dan menyajikannya ke dalam grafik/tabel.
 class SuperAdminDashboardController extends Controller
 {
     protected $dashboardService;
@@ -17,14 +19,8 @@ class SuperAdminDashboardController extends Controller
         $this->dashboardService = $dashboardService;
     }
 
-    /**
-     * Menampilkan dashboard utama SuperAdmin dengan statistik lengkap.
-     *
-     * Menggunakan caching untuk performa dan filter berdasarkan tanggal.
-     */
-    /**
-     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
-     */
+    // Menampilkan halaman utama Dashboard SuperAdmin beserta semua panel grafiknya
+    // Dilengkapi dengan sistem Cache (Penyimpanan Sementara) agar halaman tidak lemot (timeout) saat data inventaris sudah sangat banyak
     public function index(Request $request)
     {
         // 1. Validasi Input
@@ -65,7 +61,8 @@ class SuperAdminDashboardController extends Controller
         $lastUpdated = Cache::get('inventory_last_updated', 'init');
         $cacheKey = 'dashboard_stats_'.$period.'_'.($year ?? 'nay').'_'.($month ?? 'nam').'_'.$user->id.'_'.$lastUpdated;
 
-        // Simpan cache selama 10 menit (600 detik)
+        // Simpan hasil hitungan berat ini ke Cache selama 10 menit (600 detik)
+        // (Catatan: tipe kembalian dideklarasikan untuk mencegah error intelephense PHP6613)
         /** @return array<string, mixed> */
         $data = Cache::remember($cacheKey, 600, function () use ($start, $end, $period, $user): array {
 
@@ -136,6 +133,7 @@ class SuperAdminDashboardController extends Controller
                 ];
             });
 
+            // Deklarasi array untuk menghindari error penggabungan data di Editor (PHP6613)
             /** @var array<string, mixed> $result */
             $result = array_merge(
                 $snapshots,
@@ -214,14 +212,8 @@ class SuperAdminDashboardController extends Controller
         ]));
     }
 
-    /**
-     * Endpoint AJAX ringan untuk quick-filter per-widget "Pergerakan Stok".
-     *
-     * Dipanggil oleh tombol [7 Hari] [30 Hari] [3 Bulan] di widget chart.
-     * Hanya menghitung data movement — jauh lebih cepat dari endpoint utama.
-     *
-     * Query param: ?range=7|30|90 (hari)
-     */
+    // Fitur 'Jalur Cepat' (Endpoint AJAX) khusus untuk memperbarui data grafik "Pergerakan Stok"
+    // Dipanggil saat pengguna mengeklik tombol filter [7 Hari] atau [30 Hari] di atas grafik, sehingga tidak perlu me-refresh satu halaman penuh.
     public function movementData(Request $request)
     {
         $range = (int) $request->input('range', 7);

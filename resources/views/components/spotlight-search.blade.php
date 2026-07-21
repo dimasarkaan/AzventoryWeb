@@ -109,7 +109,9 @@
                        placeholder="{{ __('ui.search_placeholder') }}" 
                        role="combobox" 
                        aria-expanded="false" 
-                       aria-controls="options">
+                       aria-controls="options"
+                       minlength="2"
+                       maxlength="255">
                 <div class="absolute right-3 inset-y-0 flex items-center gap-1">
                     <span class="hidden sm:inline-block rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-500 border border-gray-200">ESC</span>
                     <button @click="open = false" class="sm:hidden p-1 text-gray-400 hover:text-gray-600">

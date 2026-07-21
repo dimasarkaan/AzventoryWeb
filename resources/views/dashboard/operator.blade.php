@@ -178,7 +178,7 @@
                             <h2 class="font-bold text-secondary-900 truncate">Tren Peminjaman</h2>
                         </div>
                         <div x-data="{ open: false }" class="relative z-20">
-                            <form method="GET" action="{{ route('dashboard.operator') }}" x-ref="trendForm">
+                            <form method="GET" action="{{ route('dashboard.operator') }}" x-ref="trendForm" novalidate>
                                 <input type="hidden" name="trend_period" id="trend_period_input" value="{{ $trendPeriod }}">
                                 
                                 <button type="button" @click="open = !open" @click.away="open = false" class="flex-shrink-0 flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-secondary-700 bg-white border border-secondary-200 rounded-lg hover:bg-secondary-50 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 shadow-sm transition-all duration-200">
@@ -1139,3 +1139,4 @@
     </script>
     @endpush
 </x-app-layout>
+

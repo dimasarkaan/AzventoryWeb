@@ -258,7 +258,7 @@
                     </div>
 
                     <!-- Form -->
-                    <form :action="`/inventory/borrow/${selectedBorrowing}/return`" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0" @submit.prevent="submitReturn">
+                    <form :action="`/inventory/borrow/${selectedBorrowing}/return`" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0" @submit.prevent="submitReturn" novalidate>
                         @csrf
                         
                         <!-- Scrollable Content -->
@@ -542,3 +542,4 @@
     </script>
     @endpush
 </x-app-layout>
+

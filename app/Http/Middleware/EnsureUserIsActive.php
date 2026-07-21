@@ -7,13 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
+// Middleware untuk menyaring akun yang sedang terkena sanksi/dinonaktifkan.
+// Jika status mereka bukan "aktif", langsung tendang (logout) mereka keluar dari sistem seketika.
 class EnsureUserIsActive
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+    // Tangani setiap pergerakan/klik pengguna di website
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->status !== 'aktif') {

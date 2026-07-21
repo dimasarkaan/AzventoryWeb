@@ -5,35 +5,28 @@ namespace App\Notifications;
 use App\Models\Sparepart;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-class LowStockNotification extends Notification implements ShouldBroadcast, ShouldQueue
+class LowStockNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
     public $sparepart;
 
-    /**
-     * Inisialisasi notifikasi peringatan stok menipis.
-     */
+    // Tahap Persiapan: Menerima data barang yang stoknya sedang menipis atau sudah habis tak tersisa.
     public function __construct(Sparepart $sparepart)
     {
         $this->sparepart = $sparepart;
     }
 
-    /**
-     * Channel pengiriman: Database dan Real-time Broadcast.
-     */
+    // Saluran Pengiriman: Disimpan ke database (ikon lonceng) dan dikirim Pop-up (Real-Time).
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Data persistensi notifikasi dalam database.
-     */
+    // Merakit pesan peringatan darurat (Habis/Menipis) untuk disimpan permanen di database.
     public function toArray(object $notifiable): array
     {
         $isDepleted = $this->sparepart->stock <= 0;
@@ -45,15 +38,13 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
         return [
             'title' => $title,
             'message' => $message,
-            'url' => route('inventory.show', $this->sparepart->uuid).'#stock-history',
+            'url' => route('inventory.show', $this->sparepart->uuid) . '#stock-history',
             'type' => $isDepleted ? 'danger' : 'warning',
             'sparepart_id' => $this->sparepart->id,
         ];
     }
 
-    /**
-     * Pesan siaran real-time.
-     */
+    // Merakit isi pesan darurat yang akan muncul tiba-tiba (Pop-up/Toast) di layar Admin.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         $isDepleted = $this->sparepart->stock <= 0;
@@ -64,7 +55,7 @@ class LowStockNotification extends Notification implements ShouldBroadcast, Shou
             'message' => $isDepleted
                 ? "Stok {$this->sparepart->name} telah HABIS (0)!"
                 : "Stok {$this->sparepart->name} berada di bawah batas minimum ({$this->sparepart->stock} / {$this->sparepart->minimum_stock}).",
-            'url' => route('inventory.show', $this->sparepart->uuid).'#stock-history',
+            'url' => route('inventory.show', $this->sparepart->uuid) . '#stock-history',
             'type' => $isDepleted ? 'danger' : 'warning',
         ]);
     }

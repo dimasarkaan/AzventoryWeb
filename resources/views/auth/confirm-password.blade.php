@@ -3,7 +3,7 @@
         {{ __('ui.auth_confirm_password_desc') }}
     </div>
 
-    <form method="POST" action="{{ route('password.confirm') }}">
+    <form method="POST" action="{{ route('password.confirm') }}" novalidate>
         @csrf
 
         <!-- Password -->
@@ -12,7 +12,7 @@
 
             <x-password-input id="password" class="block mt-1 w-full"
                             name="password"
-                            required autocomplete="current-password" />
+                            required autocomplete="current-password" maxlength="255" />
 
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
@@ -24,3 +24,4 @@
         </div>
     </form>
 </x-guest-layout>
+

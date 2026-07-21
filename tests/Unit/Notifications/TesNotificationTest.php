@@ -93,7 +93,7 @@ class TesNotificationTest extends TestCase
 
         $data = $notification->toArray($notifiable);
 
-        $this->assertStringContainsString('/inventory/'.$sparepart->id.'/edit', $data['url']);
+        $this->assertStringContainsString('/inventory/'.$sparepart->uuid.'/edit', $data['url']);
         $this->assertStringContainsString('?focus=price', $data['url']);
     }
 

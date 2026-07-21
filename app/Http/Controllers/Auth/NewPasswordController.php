@@ -13,21 +13,17 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 
+// Controller yang bertugas mengurus pengguna yang lupa kata sandinya.
+// Menangani alur pengisian password baru setelah pengguna mengklik link reset yang dikirim via Email.
 class NewPasswordController extends Controller
 {
-    /**
-     * Menampilkan halaman reset password.
-     */
+    // Menampilkan halaman formulir pembuatan kata sandi baru (Reset Password)
     public function create(Request $request): View
     {
         return view('auth.reset-password', ['request' => $request]);
     }
 
-    /**
-     * Menangani permintaan password baru.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    // Memvalidasi Token dari email dan menyimpan kata sandi baru tersebut secara permanen ke database
     public function store(Request $request): RedirectResponse
     {
         $request->validate([

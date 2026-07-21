@@ -7,25 +7,19 @@ use App\Models\User;
 
 class SparepartPolicy
 {
-    /**
-     * Tentukan apakah user bisa melihat daftar inventaris.
-     */
+    // Izin: Menentukan siapa saja yang boleh melihat daftar seluruh barang di gudang.
     public function viewAny(User $user): bool
     {
         return true; // Semua user terautentikasi bisa melihat inventory
     }
 
-    /**
-     * Tentukan apakah user bisa melihat detail barang.
-     */
+    // Izin: Menentukan siapa saja yang berhak melihat profil lengkap sebuah barang (stok, foto, deskripsi).
     public function view(User $user, Sparepart $sparepart): bool
     {
         return true; // Semua user user terautentikasi bisa melihat detail
     }
 
-    /**
-     * Tentukan apakah user bisa menambahkan barang baru.
-     */
+    // Izin: Menentukan siapa yang punya hak untuk menambahkan data barang baru ke dalam sistem.
     public function create(User $user): bool
     {
         // Hanya Superadmin dan Admin yang bisa membuat. Operator TIDAK BISA.
@@ -35,9 +29,7 @@ class SparepartPolicy
         ]);
     }
 
-    /**
-     * Tentukan apakah user bisa mengubah data barang.
-     */
+    // Izin: Menentukan siapa yang berhak mengedit nama, deskripsi, atau atribut barang lainnya.
     public function update(User $user, Sparepart $sparepart): bool
     {
         // Hanya Superadmin dan Admin yang bisa update. Operator TIDAK BISA.
@@ -47,36 +39,28 @@ class SparepartPolicy
         ]);
     }
 
-    /**
-     * Tentukan apakah user bisa menghapus barang (Soft Delete).
-     */
+    // Izin: Menentukan siapa yang boleh membuang barang ke tong sampah (Hapus Sementara).
     public function delete(User $user, Sparepart $sparepart): bool
     {
         // Hanya Superadmin yang bisa delete. Admin dan Operator TIDAK BISA.
         return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
 
-    /**
-     * Tentukan apakah user bisa memulihkan barang (Restore).
-     */
+    // Izin: Menentukan siapa yang berhak memungut kembali barang dari tong sampah (Pemulihan).
     public function restore(User $user, Sparepart $sparepart): bool
     {
         // Hanya Superadmin
         return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
 
-    /**
-     * Tentukan apakah user bisa menghapus permanen barang.
-     */
+    // Izin Hak Asasi: Menentukan siapa yang memegang kendali penuh untuk memusnahkan data barang secara permanen.
     public function forceDelete(User $user, Sparepart $sparepart): bool
     {
         // Hanya Superadmin
         return $user->role === \App\Enums\UserRole::SUPERADMIN;
     }
 
-    /**
-     * Tentukan apakah user bisa mengubah harga barang.
-     */
+    // Izin Khusus (Keuangan): Hanya penguasa sistem (Superadmin) yang diizinkan mengutak-atik nominal harga barang.
     public function updatePrice(User $user, Sparepart $sparepart): bool
     {
         return $user->role === \App\Enums\UserRole::SUPERADMIN;

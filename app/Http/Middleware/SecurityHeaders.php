@@ -6,13 +6,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+// Middleware yang bertugas memasang "sabuk pengaman" tambahan pada website (HTTP Headers).
+// Ampuh untuk menangkis serangan peretasan dasar seperti XSS (Cross-Site Scripting) dan Clickjacking.
 class SecurityHeaders
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+    // Tangani setiap pergerakan/klik pengguna di website
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);

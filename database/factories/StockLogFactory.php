@@ -6,12 +6,10 @@ use App\Models\Sparepart;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\StockLog>
- */
+// Pabrik Data: Cetakan otomatis untuk merekayasa data riwayat keluar-masuk barang di gudang.
 class StockLogFactory extends Factory
 {
-    // Definisikan state default model.
+    // Cetakan Dasar: Memilih acak tipe mutasi ('masuk'/'keluar') dengan status 'approved'.
     public function definition(): array
     {
         return [

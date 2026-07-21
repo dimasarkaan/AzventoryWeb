@@ -11,9 +11,7 @@ class Brand extends Model
 
     protected $fillable = ['name', 'is_active'];
 
-    /**
-     * Relasi ke daftar sparepart yang menggunakan merek ini.
-     */
+    // Relasi Database: Mengambil semua daftar barang (Sparepart) yang menggunakan merek ini
     public function spareparts()
     {
         return $this->hasMany(Sparepart::class);

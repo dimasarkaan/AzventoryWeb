@@ -5,14 +5,11 @@ namespace App\Http\Controllers;
 use App\Enums\UserRole;
 use Illuminate\Http\Request;
 
+// Controller khusus untuk urusan tingkat lanjut: Pembuatan Kunci Akses (API Token).
+// Token ini berguna kalau nanti aplikasi ini mau dihubungkan ke aplikasi Mobile atau sistem luar.
 class ApiTokenController extends Controller
 {
-    /**
-     * Memproses pembuatan API token baru bagi pengguna.
-     * Hanya diberikan hak akses apabila user saat ini adalah Superadmin.
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    // Memproses pembuatan token/kunci rahasia baru (Hanya Superadmin yang berhak)
     public function store(Request $request)
     {
         // Validasi Role
@@ -34,12 +31,7 @@ class ApiTokenController extends Controller
             ->with('success', 'API Token berhasil dibuat. Harap salin token tersebut.');
     }
 
-    /**
-     * Mencabut dan menghapus API token yang sudah ada.
-     *
-     * @param  string|int  $tokenId
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    // Mencabut dan menghanguskan token yang sudah tidak dipakai agar tidak bisa disalahgunakan
     public function destroy(Request $request, $tokenId)
     {
         // Validasi Role

@@ -46,7 +46,7 @@ Broadcast::channel('stock-alerts', function () {
  * Hanya user dengan ID yang sesuai yang bisa listen
  */
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+    return (string) $user->id === (string) $id;
 });
 
 /**

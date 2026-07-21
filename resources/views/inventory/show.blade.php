@@ -247,18 +247,21 @@
                                                             <div>
                                                                 <label for="quantity" class="block text-sm font-medium text-gray-700">{{ __('ui.quantity') }} <span class="text-danger-500">*</span></label>
                                                                 <div class="relative mt-1 rounded-md shadow-sm">
-                                                                    <input type="number" name="quantity" id="quantity" x-model="quantity" min="1" class="form-input block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" placeholder="Contoh: 10">
+                                                                    <input type="number" name="quantity" id="quantity" x-model="quantity" min="1" class="form-input block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" placeholder="Contoh: 10" required>
                                                                 </div>
                                                                 <p x-show="isStockError" x-transition class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
                                                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                                                     {{ __('ui.quantity_exceeds_stock') }} (<span x-text="currentStock"></span>).
+                                                                </p>
+                                                                <p x-show="!isStockError" class="text-secondary-400 text-xs mt-1">
+                                                                    {{ __('ui.stock_available') }}: <span x-text="currentStock"></span> {{ $sparepart->unit ?? 'Pcs' }}
                                                                 </p>
                                                             </div>
 
                                                             <div>
                                                                 <label for="reason" class="block text-sm font-medium text-gray-700">{{ __('ui.reason') }} <span class="text-danger-500">*</span></label>
                                                                 <div class="mt-1">
-                                                                    <textarea name="reason" id="reason" x-model="reason" rows="3" class="form-textarea block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: Barang rusak, Stok opname, Pembelian baru..."></textarea>
+                                                                    <textarea name="reason" id="reason" x-model="reason" rows="3" class="form-textarea block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: Barang rusak, Stok opname, Pembelian baru..." required></textarea>
                                                                 </div>
                                                             </div>
                                             </div>
@@ -803,7 +806,7 @@
 
                         <!-- Form (Scrollable Body) -->
                         <!-- Form (Scrollable Body) -->
-                        <form :action="`/inventory/borrow/${selectedBorrowing}/return`" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0" @submit.prevent="submitReturn">
+                        <form :action="`/inventory/borrow/${selectedBorrowing}/return`" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0" @submit.prevent="submitReturn" novalidate>
                             @csrf
                             
                             <!-- Scrollable Content -->
@@ -1159,3 +1162,4 @@
     </div>
     @include('inventory.partials.alpine_script')
 </x-app-layout>
+

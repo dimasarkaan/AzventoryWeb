@@ -8,14 +8,11 @@ use chillerlan\QRCode\QROptions;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-/**
- * QrCodeService menangani pembuatan QR Code standar dan label SVG siap cetak.
- */
+// Service (Pekerja Keras) khusus untuk melukis kode QR (QR Code).
+// Berfungsi ganda: Membuat QR murni, atau membuat desain Stiker Label siap cetak yang ada teksnya.
 class QrCodeService
 {
-    /**
-     * Membuat dan menyimpan file QR Code (SVG) yang mengarah ke halaman detail barang.
-     */
+    // Membuat file gambar QR Code standar yang jika di-scan oleh HP akan langsung membuka halaman profil barang tersebut.
     public function generate(Sparepart $sparepart)
     {
         $options = new QROptions([
@@ -34,9 +31,8 @@ class QrCodeService
         return $qrCodePath;
     }
 
-    /**
-     * Membuat label SVG kustom (33mm x 15mm) yang menggabungkan QR code dan info teks barang.
-     */
+    // Desain Grafis: Menggambar stiker label siap cetak (ukuran 33x15mm).
+    // Menggabungkan gambar QR Code di sebelah kiri, dan teks (Part Number, Nama) di sebelah kanan.
     public function generateLabelSvg(Sparepart $inventory)
     {
         if (! $inventory->qr_code_path || ! Storage::disk('public')->exists($inventory->qr_code_path)) {
@@ -84,9 +80,7 @@ class QrCodeService
         return $svg;
     }
 
-    /**
-     * Membuat nama file label yang deskriptif dan ramah sistem file (slugified).
-     */
+    // Membersihkan nama file stiker dari spasi atau simbol aneh (Slugify) agar tidak error saat disimpan di Windows/Linux
     public function getLabelFilename(Sparepart $inventory)
     {
         $inventory->loadMissing(['category', 'brand']);

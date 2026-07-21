@@ -17,7 +17,7 @@
                   @update-pn="partNumber = $event.detail"
                   @update-name="itemName = $event.detail"
                   @update-brand="itemBrand = $event.detail"
-                  @update-category="itemCategory = $event.detail">
+                  @update-category="itemCategory = $event.detail" novalidate>
                 @csrf
                 
                 <div class="space-y-4">
@@ -61,7 +61,7 @@
                                     <label for="part_number" class="input-label">{{ __('ui.part_number') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative flex gap-2" x-data="{
                                         open: false,
-                                        search: '',
+                                        search: '{!! old('part_number', '') !!}',
                                         selected: '{{ old('part_number') }}',
                                         options: {{ json_encode($partNumbers) }} || [],
                                         get filteredOptions() {
@@ -102,7 +102,7 @@
                                                    @change="checkPN"
                                                    @keydown.enter.prevent="createNew()" 
                                                    placeholder="{{ __('ui.placeholder_pn') }}" 
-                                                   autocomplete="off" />
+                                                   autocomplete="off" minlength="3" maxlength="255" pattern="[a-zA-Z0-9\-\_\/]+" title="Part Number hanya boleh berisi huruf, angka, strip (-), dan underscore (_)" required />
                                             
                                             <!-- Chevron Button -->
                                             <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
@@ -167,7 +167,7 @@
                                 <!-- Nama Barang (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '',
+                                    search: '{!! old('name', '') !!}',
                                     selected: '{{ old('name') }}',
                                     options: {{ json_encode($names) }} || [],
                                     get filteredOptions() {
@@ -214,7 +214,7 @@
                                                @input="!isLocked && (open = true, selected = search, itemName = search)" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_name') }}" 
-                                               autocomplete="off">
+                                               autocomplete="off" minlength="3" maxlength="255" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
                                         
                                         <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -260,7 +260,7 @@
                                 <!-- Merk (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '',
+                                    search: '{!! old('brand_name', '') !!}',
                                     selected: '{{ old('brand_id') }}',
                                     options: {{ json_encode($brands) }},
                                     get filteredOptions() {
@@ -313,6 +313,7 @@
                                         <input type="hidden" name="brand_id" x-model="selected">
                                         <input type="text" 
                                                id="brand"
+                                               name="brand_name"
                                                class="input-field w-full pr-10 cursor-text" 
                                                :class="{'bg-secondary-100 text-secondary-500': isLocked}"
                                                x-model="search" 
@@ -321,7 +322,7 @@
                                                @input="open = true" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_brand') }}" 
-                                               autocomplete="off">
+                                               autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama merk harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
                                         
                                         <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -364,7 +365,7 @@
                                 <!-- Kategori (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '',
+                                    search: '{!! old('category_name', '') !!}',
                                     selected: '{{ old('category_id') }}',
                                     options: {{ json_encode($categories) }},
                                     get filteredOptions() {
@@ -417,6 +418,7 @@
                                         <input type="hidden" name="category_id" x-model="selected">
                                         <input type="text" 
                                                id="category"
+                                               name="category_name"
                                                class="input-field w-full pr-10 cursor-text" 
                                                :class="{'bg-secondary-100 text-secondary-500': isLocked}"
                                                x-model="search" 
@@ -425,7 +427,7 @@
                                                @input="open = true" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_category') }}" 
-                                               autocomplete="off">
+                                               autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama kategori harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
                                         
                                         <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -474,7 +476,7 @@
                                 <!-- Warna (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '',
+                                    search: '{!! old('color', '') !!}',
                                     selected: '',
                                     options: {{ json_encode($colors) }},
                                     get filteredOptions() {
@@ -510,7 +512,7 @@
                                                @input="open = true; selected = search; itemColor = search" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_color') }}" 
-                                               autocomplete="off">
+                                               autocomplete="off" minlength="2" maxlength="50" pattern="[a-zA-Z\s\-]+" title="Warna hanya boleh berisi huruf, spasi, dan strip">
                                         
                                         <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -710,7 +712,7 @@
                             <!-- Lokasi Gudang (Creatable Select) -->
                             <div class="relative" x-data="{
                                 open: false,
-                                search: '',
+                                search: '{!! old('location_name', '') !!}',
                                 selected: '{{ old('location_id') }}',
                                 options: {{ json_encode($locations) }},
                                 get filteredOptions() {
@@ -749,12 +751,13 @@
                                     <input type="hidden" name="location_id" x-model="selected">
                                     <input type="text" 
                                            id="location"
+                                           name="location_name"
                                            class="input-field w-full pr-10 cursor-text" 
                                            x-model="search" 
                                            @focus="open = true; $el.select()" 
                                            @input="open = true" @keydown.enter.prevent="createNew()" 
                                            placeholder="{{ __('ui.select_location') }}" 
-                                           autocomplete="off">
+                                           autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama lokasi harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)">
                                     
                                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
                                         <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -813,14 +816,14 @@
                             <!-- Stok Saat Ini -->
                             <div>
                                 <label for="stock" class="input-label">{{ __('ui.current_stock') }} <span class="text-danger-500">*</span></label>
-                                <input id="stock" class="input-field" type="number" name="stock" value="{{ old('stock') }}" min="0" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" />
+                                <input id="stock" class="input-field" type="number" name="stock" value="{{ old('stock') }}" min="0" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" required />
                                 <x-input-error :messages="$errors->get('stock')" class="mt-2" />
                             </div>
                             
                             <!-- Satuan (Creatable Select) -->
                             <div class="relative" x-data="{
                                 open: false,
-                                search: '',
+                                search: '{!! old('unit', '') !!}',
                                 selected: 'Pcs',
                                 options: {{ json_encode($units) }},
                                 get filteredOptions() {
@@ -861,7 +864,7 @@
                                            @input="open = true; selected = search; itemUnit = search" 
                                            @keydown.enter.prevent="createNew()"
                                            placeholder="{{ __('ui.placeholder_unit') }}" 
-                                           autocomplete="off">
+                                           autocomplete="off" minlength="1" maxlength="20" pattern="[a-zA-Z0-9\s]+" title="Satuan hanya boleh berisi huruf, angka, dan spasi">
                                     
                                     <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
                                         <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -929,7 +932,7 @@
                                         if (value != null && value.toString() !== this.rawPrice) {
                                             const numVal = parseInt(value) || 0;
                                             this.rawPrice = numVal.toString();
-                                            this.displayPrice = numVal > 0 ? numVal.toLocaleString('id-ID') : '';
+                                            this.displayPrice = !isNaN(numVal) ? numVal.toLocaleString('id-ID') : '';
                                         }
                                     });
                                     
@@ -1417,3 +1420,4 @@
     </script>
     @endpush
 </x-app-layout>
+

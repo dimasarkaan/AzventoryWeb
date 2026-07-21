@@ -15,7 +15,7 @@
                     id="reportForm"
                     class="bg-white rounded-xl border border-secondary-200 shadow-card p-6 overflow-visible" 
                     x-data="reportManager"
-                    @submit="downloadReport($event)">
+                    @submit="downloadReport($event)" novalidate>
                     @csrf
                     
                     <!-- Report Categories -->
@@ -343,3 +343,4 @@
     </script>
     @endpush
 </x-app-layout>
+

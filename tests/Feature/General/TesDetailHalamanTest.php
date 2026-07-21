@@ -276,4 +276,22 @@ class TesDetailHalamanTest extends TestCase
         $response = $this->get(route('users.show', $this->targetUser));
         $response->assertRedirect(route('login'));
     }
+
+    #[Test]
+    public function rute_inventaris_mendukung_fallback_integer_id()
+    {
+        $response = $this->actingAs($this->admin)
+            ->get("/inventory/{$this->sparepart->id}");
+        $response->assertStatus(200);
+        $response->assertSee($this->sparepart->name);
+    }
+
+    #[Test]
+    public function rute_user_mendukung_fallback_integer_id()
+    {
+        $response = $this->actingAs($this->superadmin)
+            ->get("/users/{$this->targetUser->id}");
+        $response->assertStatus(200);
+        $response->assertSee($this->targetUser->name);
+    }
 }

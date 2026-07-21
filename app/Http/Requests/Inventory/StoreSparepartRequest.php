@@ -6,18 +6,14 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSparepartRequest extends FormRequest
 {
-    /**
-     * Tentukan apakah user diizinkan untuk membuat request ini.
-     */
+    // Mengecek apakah jabatan pengguna saat ini diizinkan untuk menambah barang baru
     public function authorize(): bool
     {
         return $this->user()->can('create', \App\Models\Sparepart::class);
     }
 
-    /**
-     * Siapkan data untuk validasi.
-     * Mencegah Admin mengatur harga via by-pass HTTP Request (Postman / Inspect Element).
-     */
+    // Tahap Persiapan: Mencegat data sebelum divalidasi
+    // Berfungsi mengamankan celah (bypass) jika ada Admin yang nekat mengubah harga lewat Inspect Element (Postman)
     protected function prepareForValidation(): void
     {
         if ($this->user()->role === \App\Enums\UserRole::ADMIN) {
@@ -25,38 +21,105 @@ class StoreSparepartRequest extends FormRequest
                 'price' => $this->input('type') === 'sale' ? 0 : null,
             ]);
         }
+
+        $categoryName = trim((string) $this->input('category_name'));
+        if ($categoryName !== '') {
+            $validator = \Illuminate\Support\Facades\Validator::make(
+                ['category_name' => $categoryName],
+                ['category_name' => ['required', 'string', 'min:2', 'max:100', 'regex:/^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'"]*$/']],
+                [
+                    'category_name.regex' => 'Format Nama Kategori tidak valid. Harus diawali huruf/angka dan mengandung huruf.',
+                    'category_name.min' => 'Nama kategori minimal 2 karakter.',
+                    'category_name.max' => 'Nama kategori maksimal 100 karakter.',
+                ]
+            );
+            if ($validator->fails()) throw new \Illuminate\Validation\ValidationException($validator);
+
+            $category = \App\Models\Category::whereRaw('LOWER(name) = ?', [strtolower($categoryName)])->first();
+            if (!$category) {
+                $category = \App\Models\Category::create([
+                    'name' => $categoryName,
+                    'is_active' => true
+                ]);
+            }
+            $this->merge(['category_id' => $category->id]);
+        }
+
+        $brandName = trim((string) $this->input('brand_name'));
+        if ($brandName !== '') {
+            $validator = \Illuminate\Support\Facades\Validator::make(
+                ['brand_name' => $brandName],
+                ['brand_name' => ['required', 'string', 'min:2', 'max:100', 'regex:/^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'"]*$/']],
+                [
+                    'brand_name.regex' => 'Format Nama Merk tidak valid. Harus diawali huruf/angka dan mengandung huruf.',
+                    'brand_name.min' => 'Nama merk minimal 2 karakter.',
+                    'brand_name.max' => 'Nama merk maksimal 100 karakter.',
+                ]
+            );
+            if ($validator->fails()) throw new \Illuminate\Validation\ValidationException($validator);
+
+            $brand = \App\Models\Brand::whereRaw('LOWER(name) = ?', [strtolower($brandName)])->first();
+            if (!$brand) {
+                $brand = \App\Models\Brand::create([
+                    'name' => $brandName,
+                    'is_active' => true
+                ]);
+            }
+            $this->merge(['brand_id' => $brand->id]);
+        }
+
+        $locationName = trim((string) $this->input('location_name'));
+        if ($locationName !== '') {
+            $validator = \Illuminate\Support\Facades\Validator::make(
+                ['location_name' => $locationName],
+                ['location_name' => ['required', 'string', 'min:2', 'max:100', 'regex:/^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'"]*$/']],
+                [
+                    'location_name.regex' => 'Format Nama Lokasi tidak valid. Harus diawali huruf/angka dan mengandung huruf.',
+                    'location_name.min' => 'Nama lokasi minimal 2 karakter.',
+                    'location_name.max' => 'Nama lokasi maksimal 100 karakter.',
+                ]
+            );
+            if ($validator->fails()) throw new \Illuminate\Validation\ValidationException($validator);
+
+            $location = \App\Models\Location::whereRaw('LOWER(name) = ?', [strtolower($locationName)])->first();
+            if (!$location) {
+                if ($this->user()->role === \App\Enums\UserRole::SUPERADMIN) {
+                    $location = \App\Models\Location::create([
+                        'name' => $locationName,
+                        'is_active' => true
+                    ]);
+                    $this->merge(['location_id' => $location->id]);
+                }
+            } else {
+                $this->merge(['location_id' => $location->id]);
+            }
+        }
     }
 
-    /**
-     * Dapatkan aturan validasi yang berlaku untuk request ini.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
+    // Aturan ketat untuk setiap kolom di form tambah barang (Banyak Regex untuk mencegah input simbol berbahaya)
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'part_number' => 'required|string|max:255',
+            'name' => ['required', 'string', 'min:3', 'max:255', 'regex:/^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'"]*$/'],
+            'part_number' => ['required', 'string', 'min:3', 'max:255', 'regex:/^[a-zA-Z0-9][a-zA-Z0-9\-\_\/]*$/'],
             'brand_id' => 'required|exists:brands,id',
             'category_id' => 'required|exists:categories,id',
             'location_id' => 'required|exists:locations,id',
             'age' => 'required|in:Baru,Pernah Dipakai (Bekas)',
-            'condition' => 'required|string|max:255',
-            'color' => 'nullable|string|max:50',
+            'condition' => ['required', 'string', 'min:3', 'max:255', 'regex:/^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'"]*$/'],
+            'color' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z][a-zA-Z\s\-]*$/'],
             'type' => 'required|in:sale,asset',
-            'price' => 'required_if:type,sale|nullable|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'minimum_stock' => 'nullable|integer|min:0',
-            'unit' => 'nullable|string|max:50',
+            'price' => 'required_if:type,sale|nullable|numeric|min:0|max:9999999999999',
+            'stock' => 'required|integer|min:0|max:2147483647',
+            'minimum_stock' => 'nullable|integer|min:0|max:2147483647',
+            'unit' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\s]*$/'],
             'status' => 'required|in:aktif,nonaktif',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // Max 5MB untuk foto HP
             'existing_image' => 'nullable|string',
         ];
     }
 
-    /**
-     * Dapatkan atribut kustom untuk pesan error validator.
-     */
+    // Mengganti nama variabel bahasa Inggris menjadi bahasa Indonesia yang sopan untuk ditampilkan di layar (Alias)
     public function attributes(): array
     {
         return [
@@ -78,18 +141,33 @@ class StoreSparepartRequest extends FormRequest
         ];
     }
 
-    /**
-     * Dapatkan pesan validasi kustom.
-     */
+    // Kumpulan pesan error berbahasa Indonesia jika aturan di atas dilanggar
     public function messages(): array
     {
         return [
-            'age.required' => 'Kolom Status Pemakaian wajib diisi.',
+            'name.required' => 'Nama Barang wajib diisi.',
+            'name.min' => 'Nama Barang minimal 3 karakter.',
+            'part_number.required' => 'Part Number wajib diisi.',
+            'part_number.min' => 'Part Number minimal 3 karakter.',
+            'brand_id.required' => 'Merk wajib dipilih.',
+            'category_id.required' => 'Kategori wajib dipilih.',
+            'location_id.required' => 'Lokasi Penyimpanan wajib dipilih.',
+            'age.required' => 'Status Pemakaian wajib dipilih.',
             'age.in' => 'Status Pemakaian harus berisi "Baru" atau "Pernah Dipakai (Bekas)".',
-            'price.required_if' => 'Kolom Harga Satuan wajib diisi.',
-            'image.image' => 'Kolom Gambar harus berupa file gambar.',
-            'image.mimes' => 'Format file Gambar harus berupa jpeg, png, jpg, atau webp.',
+            'condition.required' => 'Kondisi Barang wajib diisi.',
+            'condition.min' => 'Kondisi Barang minimal 3 karakter.',
+            'type.required' => 'Tipe Barang wajib dipilih.',
+            'price.required_if' => 'Harga Satuan wajib diisi untuk barang bertipe Sale.',
+            'stock.required' => 'Stok Saat Ini wajib diisi.',
+            'stock.min' => 'Stok tidak boleh kurang dari 0.',
+            'status.required' => 'Status wajib dipilih.',
+            'image.image' => 'File harus berupa gambar.',
+            'image.mimes' => 'Format file Gambar harus jpeg, png, jpg, atau webp.',
             'image.max' => 'Ukuran file Gambar maksimal 5MB.',
+            'name.regex' => 'Nama barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
+            'part_number.regex' => 'Format Part Number tidak valid. Hanya boleh berisi huruf, angka, strip, garis miring, dan underscore.',
+            'condition.regex' => 'Kondisi barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
+            'color.regex' => 'Format Warna tidak valid. Hanya boleh berisi huruf dan strip.',
         ];
     }
 }

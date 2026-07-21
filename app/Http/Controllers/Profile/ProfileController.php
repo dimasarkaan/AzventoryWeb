@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+// Controller yang mengurus halaman Profil Pengguna (My Profile).
+// Menangani fitur ganti nama, ubah password, upload/hapus avatar (foto profil), serta melihat riwayat peminjaman barang sendiri.
 class ProfileController extends Controller
 {
     use ActivityLogger;
@@ -25,9 +27,7 @@ class ProfileController extends Controller
         $this->imageOptimizer = $imageOptimizer;
     }
 
-    /**
-     * Menampilkan form edit profil user.
-     */
+    // Menampilkan halaman form untuk mengubah data profil pengguna
     public function edit(Request $request): View
     {
         $user = $request->user();
@@ -42,9 +42,7 @@ class ProfileController extends Controller
         ]);
     }
 
-    /**
-     * Memperbarui informasi profil user.
-     */
+    // Memproses form penyimpanan saat pengguna mengubah Nama, Email, Username, atau mengunggah Foto Profil
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $validatedData = $request->validated();
@@ -93,9 +91,7 @@ class ProfileController extends Controller
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
-    /**
-     * Menghapus akun user.
-     */
+    // Menghapus akun pengguna dari database (Self-Deletion)
     public function destroy(Request $request): RedirectResponse
     {
         $request->validateWithBag('userDeletion', [
@@ -133,9 +129,7 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    /**
-     * Memperbarui pengaturan user (JSON settings).
-     */
+    // Menyimpan preferensi/pengaturan tambahan user (seperti mode tema gelap/terang) ke dalam kolom setting berformat JSON
     public function updateSettings(Request $request)
     {
         $request->validate([
@@ -151,9 +145,7 @@ class ProfileController extends Controller
         return response()->json(['status' => 'success', 'settings' => $user->settings]);
     }
 
-    /**
-     * Menghapus foto profil (avatar) user.
-     */
+    // Menghapus foto profil (Avatar) yang sedang dipakai agar kembali menjadi kosong/default
     public function deleteAvatar(Request $request): RedirectResponse
     {
         $user = $request->user();
@@ -174,9 +166,7 @@ class ProfileController extends Controller
         return back();
     }
 
-    /**
-     * Menampilkan riwayat peminjaman user.
-     */
+    // Menampilkan halaman "Barang Saya", berisi daftar seluruh barang yang SEDANG maupun PERNAH dipinjam oleh user ini
     public function myInventory(Request $request): View
     {
         $user = $request->user();

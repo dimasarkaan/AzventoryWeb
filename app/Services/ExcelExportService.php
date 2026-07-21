@@ -11,9 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExcelExportService
 {
-    /**
-     * Set up a majestic title for the report
-     */
+    // Desain Grafis Excel: Mengatur judul laporan (Title) agar terlihat mewah dan profesional
     protected function setupReportTitle($sheet, $title, $lastColumn)
     {
         $sheet->mergeCells("A1:{$lastColumn}2");
@@ -54,9 +52,7 @@ class ExcelExportService
         ]);
     }
 
-    /**
-     * Set up common styles for the spreadsheet header
-     */
+    // Desain Grafis Excel: Memberikan warna dan gaya tebal (Bold) pada baris judul kolom (Header Tabel)
     protected function setupHeaderStyle($sheet, $headerRow, $lastColumn)
     {
         $headerRange = "A{$headerRow}:{$lastColumn}{$headerRow}";
@@ -92,9 +88,7 @@ class ExcelExportService
         $sheet->setAutoFilter($headerRange);
     }
 
-    /**
-     * Auto size all columns in a given range
-     */
+    // Format Otomatis: Melebarkan ukuran kolom secara otomatis agar teks panjang tidak terpotong
     protected function autoSizeColumns($sheet, $lastColumn)
     {
         foreach (range('A', $lastColumn) as $columnID) {
@@ -102,9 +96,7 @@ class ExcelExportService
         }
     }
 
-    /**
-     * Apply border to the entire data range
-     */
+    // Desain Grafis Excel: Memberikan garis batas (Border) atau tabel pada seluruh baris data
     protected function applyDataBorders($sheet, $headerRow, $lastColumn, $lastRow)
     {
         $startRow = $headerRow + 1;
@@ -124,10 +116,8 @@ class ExcelExportService
         }
     }
 
-    /**
-     * Apply alternating background colors to data rows (Zebra striping)
-     * White and very light blue.
-     */
+    // Desain Grafis Excel: Memberikan warna belang-belang (Zebra) pada baris data (Putih dan Biru Muda)
+    // Tujuannya agar mata pengguna tidak lelah saat membaca ratusan baris data
     protected function applyAlternatingRowColors($sheet, $headerRow, $lastColumn, $lastRow)
     {
         $startRow = $headerRow + 1;
@@ -144,9 +134,7 @@ class ExcelExportService
         }
     }
 
-    /**
-     * Helper to save the spreadsheet to a temporary file
-     */
+    // Tahap Penyimpanan: Menyimpan sementara file Excel ke dalam folder server sebelum dikirimkan ke komputer pengguna
     public function saveToFile($spreadsheet, $filename)
     {
         $writer = new Xlsx($spreadsheet);
@@ -162,9 +150,8 @@ class ExcelExportService
         return $path;
     }
 
-    /**
-     * Helper to download the spreadsheet
-     */
+    // Tahap Unduhan: Memulai proses download otomatis ke komputer pengguna.
+    // Setelah file sukses di-download, file sementara di server akan langsung dihapus agar tidak menjadi sampah.
     protected function downloadResponse($spreadsheet, $filename)
     {
         $path = $this->saveToFile($spreadsheet, $filename);
@@ -174,9 +161,7 @@ class ExcelExportService
         ])->deleteFileAfterSend(true);
     }
 
-    /**
-     * Generate Excel for Activity Logs
-     */
+    // Fitur Utama: Membuat laporan Excel untuk Riwayat Aktivitas Sistem
     public function exportActivityLogs($logs, $filename)
     {
         $spreadsheet = $this->generateActivityLogsSpreadsheet($logs);
@@ -225,9 +210,7 @@ class ExcelExportService
         return $spreadsheet;
     }
 
-    /**
-     * Generate Excel for Inventory List
-     */
+    // Fitur Utama: Membuat laporan Excel untuk Daftar Barang (Aset & Sparepart)
     public function exportInventoryList($data, $filename)
     {
         $spreadsheet = $this->generateInventoryListSpreadsheet($data);
@@ -309,9 +292,7 @@ class ExcelExportService
         return $spreadsheet;
     }
 
-    /**
-     * Generate Excel for Stock Mutation
-     */
+    // Fitur Utama: Membuat laporan Excel untuk Riwayat Mutasi (Keluar/Masuk) Stok Barang
     public function exportStockMutation($data, $filename)
     {
         $spreadsheet = $this->generateStockMutationSpreadsheet($data);
@@ -370,9 +351,7 @@ class ExcelExportService
         return $spreadsheet;
     }
 
-    /**
-     * Generate Excel for Borrowing History
-     */
+    // Fitur Utama: Membuat laporan Excel untuk Riwayat Peminjaman Barang
     public function exportBorrowingHistory($data, $filename)
     {
         $spreadsheet = $this->generateBorrowingHistorySpreadsheet($data);
@@ -458,9 +437,7 @@ class ExcelExportService
         return $spreadsheet;
     }
 
-    /**
-     * Generate Excel for Low Stock
-     */
+    // Fitur Utama: Membuat laporan Excel untuk Barang yang Stoknya Menipis (Butuh Restock Cepat)
     public function exportLowStock($data, $filename)
     {
         $spreadsheet = $this->generateLowStockSpreadsheet($data);

@@ -9,33 +9,25 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
-/**
- * Notifikasi yang dikirim ke Superadmin ketika Admin menginput
- * barang bertipe 'sale' tanpa mengisi harga (harga = 0).
- */
+// Pengumuman Keamanan: Melaporkan ke Superadmin jika ada Admin yang lupa (atau sengaja) menginput barang jualan tanpa mencantumkan harga jualnya.
+// (Mencegah peretasan "Bypass Harga" yang lolos dari Form Validasi).
 class MissingPriceNotification extends Notification implements ShouldBroadcast
 {
     use Queueable;
 
-    /**
-     * Inisialisasi notifikasi peringatan harga kosong untuk barang bertipe 'sale'.
-     */
+    // Tahap Persiapan: Menerima data barang bermasalah dan nama pelaku (Admin) yang menginputnya.
     public function __construct(
         public Sparepart $sparepart,
         public User $addedBy
     ) {}
 
-    /**
-     * Channel pengiriman: Database dan Real-time Broadcast.
-     */
+    // Saluran Pengiriman: Disimpan ke database (ikon lonceng) dan dikirim Pop-up (Real-Time).
     public function via(object $notifiable): array
     {
         return ['database', 'broadcast'];
     }
 
-    /**
-     * Data persistensi notifikasi dalam database.
-     */
+    // Merakit isi pesan peringatan keamanan tingkat tinggi untuk disimpan permanen di database.
     public function toArray(object $notifiable): array
     {
         return [
@@ -51,9 +43,7 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
         ];
     }
 
-    /**
-     * Pesan siaran real-time.
-     */
+    // Merakit peringatan seketika (Toast) yang muncul nyaring di layar Superadmin.
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage([

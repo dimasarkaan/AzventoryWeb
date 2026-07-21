@@ -8,7 +8,7 @@
                 <x-input-label for="update_password_current_password" :value="__('ui.profile_label_current_password')" />
                 <x-password-input id="update_password_current_password" name="current_password" 
                               class="mt-1 block w-full {{ $errors->updatePassword->has('current_password') ? '!border-red-500' : '' }}" 
-                              autocomplete="current-password" x-bind:disabled="!isEditing" />
+                              autocomplete="current-password" x-bind:disabled="!isEditing" required />
                 <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
             </div>
 
@@ -16,7 +16,7 @@
                 <x-input-label for="update_password_password" :value="__('ui.profile_label_new_password')" />
                 <x-password-input id="update_password_password" name="password" 
                               class="mt-1 block w-full {{ $errors->updatePassword->has('password') ? '!border-red-500' : '' }}" 
-                              autocomplete="new-password" x-bind:disabled="!isEditing" />
+                              autocomplete="new-password" x-bind:disabled="!isEditing" minlength="8" maxlength="16" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,16}" title="Kata sandi harus 8-16 karakter dan mengandung kombinasi huruf dan angka" required />
                 <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
             </div>
 
@@ -24,7 +24,7 @@
                 <x-input-label for="update_password_password_confirmation" :value="__('ui.profile_label_confirm_password')" />
                 <x-password-input id="update_password_password_confirmation" name="password_confirmation" 
                               class="mt-1 block w-full {{ $errors->updatePassword->has('password_confirmation') ? '!border-red-500' : '' }}" 
-                              autocomplete="new-password" x-bind:disabled="!isEditing" />
+                              autocomplete="new-password" x-bind:disabled="!isEditing" minlength="8" maxlength="16" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,16}" title="Konfirmasi kata sandi harus sama dengan kata sandi baru" required />
                 <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
             </div>
         </div>
@@ -64,3 +64,4 @@
         </div>
     </form>
 </section>
+

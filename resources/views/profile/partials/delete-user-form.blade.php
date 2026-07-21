@@ -45,6 +45,7 @@
                         class="input-field w-full pr-10 {{ $errors->userDeletion->has('password') ? '!border-red-500' : '' }}"
                         placeholder="{{ __('ui.profile_placeholder_password') }}"
                         autocomplete="current-password"
+                        maxlength="255"
                     />
                     <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-secondary-600 focus:outline-none" tabindex="-1">
                         <svg x-show="!show" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -71,3 +72,4 @@
         </form>
     </x-modal>
 </section>
+

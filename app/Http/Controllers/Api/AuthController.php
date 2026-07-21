@@ -8,41 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-/**
- * @group Authentication
- *
- * Endpoint untuk autentikasi API.
- */
+// Controller khusus untuk menangani proses Login & Logout lewat jalur API (biasanya untuk aplikasi Mobile/pihak ketiga).
+// Berkomunikasi murni menggunakan teks JSON dan menggunakan sistem Token (Sanctum) sebagai pengganti Session.
 class AuthController extends Controller
 {
-    /**
-     * Login via API
-     *
-     * Endpoint ini digunakan untuk mendapatkan Bearer Token JWT/Sanctum melalui Email dan Password.
-     *
-     * @unauthenticated
-     *
-     * @bodyParam email string required Email milik pengguna (harus terdaftar dan aktif). Example: superadmin@example.com
-     * @bodyParam password string required Password akun pengguna. Example: password
-     *
-     * @response 200 {
-     *   "success": true,
-     *   "message": "Login berhasil",
-     *   "data": {
-     *     "token": "1|abcdef1234567890",
-     *     "user": {
-     *       "id": 1,
-     *       "name": "Super Admin",
-     *       "email": "superadmin@example.com",
-     *       "role": "superadmin"
-     *     }
-     *   }
-     * }
-     * @response 401 {
-     *   "success": false,
-     *   "message": "Email atau password salah"
-     * }
-     */
+    // Memproses percobaan Login via API
+    // Jika email & password benar, sistem akan membuatkan dan memberikan 'Kunci Akses' (Bearer Token)
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -92,16 +63,8 @@ class AuthController extends Controller
         ], 200);
     }
 
-    /**
-     * Logout via API
-     *
-     * Menghapus Bearer token (akses untuk perangkat saat ini).
-     *
-     * @response 200 {
-     *   "success": true,
-     *   "message": "Logout berhasil"
-     * }
-     */
+    // Memproses Logout via API
+    // Caranya dengan menghancurkan 'Kunci Akses' (Token) yang sedang dipakai oleh HP/perangkat tersebut
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();

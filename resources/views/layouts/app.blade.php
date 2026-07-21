@@ -188,16 +188,16 @@
             // Teruskan Pesan Flash ke JS Kustom
             window.flashMessages = {
                 @if(session('success'))
-                    success: "{{ session('success') }}",
+                    success: @json(session('success')),
                 @endif
                 @if(session('error'))
-                    error: "{{ session('error') }}",
+                    error: @json(session('error')),
                 @endif
                 @if(session('warning'))
-                    warning: "{{ session('warning') }}",
+                    warning: @json(session('warning')),
                 @endif
                 @if(session('info'))
-                    info: "{{ session('info') }}",
+                    info: @json(session('info')),
                 @endif
             };
 

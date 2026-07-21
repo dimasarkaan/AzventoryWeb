@@ -6,16 +6,10 @@ use App\Models\Sparepart;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Borrowing>
- */
+// Pabrik Data: Cetakan otomatis untuk memproduksi data dummy Transaksi Peminjaman secara instan.
 class BorrowingFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    // Cetakan Dasar: Menyimulasikan peminjam, mengatur status 'borrowed', dan menyetel tenggat waktu 7 hari ke depan.
     public function definition(): array
     {
         return [

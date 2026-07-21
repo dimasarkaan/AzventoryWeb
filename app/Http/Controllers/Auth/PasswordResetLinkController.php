@@ -13,19 +13,16 @@ class PasswordResetLinkController extends Controller
 {
     use ActivityLogger;
 
-    /**
-     * Menampilkan halaman permintaan link reset password.
-     */
+    // Controller untuk menangani fitur "Lupa Kata Sandi" (Forgot Password).
+    // Bertugas mengecek email dan mengirimkan tautan (link) rahasia ke kotak masuk pengguna.
+
+    // Menampilkan halaman tempat pengguna memasukkan email mereka yang lupa password
     public function create(): View
     {
         return view('auth.forgot-password');
     }
 
-    /**
-     * Menangani permintaan link reset password yang masuk.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
+    // Memproses email yang diinput dan mengirimkan link reset jika emailnya valid
     public function store(Request $request): RedirectResponse
     {
         $request->validate([

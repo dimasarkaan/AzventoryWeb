@@ -1,5 +1,7 @@
 <?php
 
+// "Otak" utama (Service Layer) di balik semua logika bisnis Inventaris.
+// Bertugas memproses pencarian data, eksekusi penyimpanan barang, penggabungan stok, transaksi peminjaman, hingga manajemen file.
 namespace App\Services;
 
 use App\Models\Borrowing;
@@ -32,19 +34,18 @@ class InventoryService
         $this->qrCodeService = $qrCodeService;
     }
 
-    /**
-     * Mengambil daftar sparepart dengan filter dan pagination.
-     */
+    // Mengambil daftar sparepart dari database berdasarkan filter pencarian dan membaginya per halaman
     public function getFilteredSpareparts(array $filters, int $perPage = 10)
     {
+        // Membuka query awal beserta relasi datanya agar tidak lambat saat ditampilkan (Eager Loading)
         $query = Sparepart::with(['brand', 'category', 'location']);
 
-        // Filter untuk item yang dihapus (trash)
+        // Jika filter tempat sampah aktif, hanya ambil data yang sudah terhapus sementara (soft delete)
         if (($filters['trash'] ?? '') === 'true') {
             $query->onlyTrashed();
         }
 
-        // Pencarian berdasarkan nama, part number, atau brand
+        // Jika user mengetik sesuatu di kolom pencarian, cari di kolom nama, part number, atau nama brand
         if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', '%'.$filters['search'].'%')
@@ -55,7 +56,7 @@ class InventoryService
             });
         }
 
-        // Penerapan filter eksak via relasi
+        // Menerapkan filter dropdown jika user memilih opsi spesifik (kategori, brand, lokasi, tipe, dsb)
         $this->applyRelationFilter($query, 'category', $filters['category'] ?? null, __('messages.all_categories'));
         $this->applyRelationFilter($query, 'brand', $filters['brand'] ?? null, __('messages.all_brands'));
         $this->applyRelationFilter($query, 'location', $filters['location'] ?? null, __('messages.all_locations'));
@@ -63,45 +64,50 @@ class InventoryService
         $this->applyExactFilter($query, 'type', $filters['type'] ?? null, __('messages.all_types'));
         $this->applyExactFilter($query, 'condition', $filters['condition'] ?? null, __('messages.all_conditions'));
 
-        // Filter kategori khusus (stok rendah, jatuh tempo, tanpa harga)
+        // Filter tab khusus yang ada di dashboard (seperti tab 'stok menipis' atau 'barang bermasalah')
         if (($filters['filter'] ?? '') === 'low_stock') {
-            // Perhatian: NULL atau 0 pada minimum_stock dianggap tidak dipantau.
+            // Hanya mencari barang yang nilai stok-nya sudah menyentuh atau kurang dari minimum_stock
             $query->where('minimum_stock', '>', 0)
                 ->whereColumn('stock', '<=', 'minimum_stock')
                 ->where('condition', 'Baik');
         } elseif (($filters['filter'] ?? '') === 'overdue') {
+            // Mencari barang yang sedang dipinjam tapi sudah melewati batas waktu kembalinya
             $query->whereHas('borrowings', function ($q) {
                 $q->where('status', 'borrowed')
                     ->where('expected_return_at', '<', now());
             });
         } elseif (($filters['filter'] ?? '') === 'borrowed') {
+            // Mencari barang apa saja yang saat ini statusnya sedang dipinjam
             $query->whereHas('borrowings', function ($q) {
                 $q->where('status', 'borrowed');
             });
         } elseif (($filters['filter'] ?? '') === 'no_price') {
+            // Mencari barang yang belum memiliki harga atau harganya 0
             $query->where(function ($q) {
                 $q->whereNull('price')->orWhere('price', '<=', 0);
             });
         } elseif (($filters['filter'] ?? '') === 'problematic') {
-            // Filter barang yang rusak atau hilang (Hanya Superadmin & Admin)
+            // Menampilkan barang dengan kondisi Rusak/Hilang (Hanya dapat dilihat oleh Admin/Superadmin)
             if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
                 $query->whereIn('condition', ['Rusak', 'Hilang'])
                     ->with(['stockLogs' => fn ($q) => $q->latest()]);
             } else {
-                $query->whereRaw('1 = 0');
+                $query->whereRaw('1 = 0'); // Sengaja dibuat query salah jika rolenya bukan admin (menyembunyikan data)
             }
         }
 
+        // Terapkan pengurutan data sesuai opsi sort (A-Z, Termurah, Terbaru, dll)
         $this->applySorting($query, $filters['sort'] ?? null);
 
+        // Kembalikan hasilnya dalam bentuk pagination (halaman) dan menempelkan parameter filter pada URL-nya
         return $query->paginate($perPage)->appends($filters);
     }
 
-    /**
-     * Membuat sparepart baru. Jika ditemukan aset yang identik, stok akan digabungkan.
-     */
+    // Membuat barang (sparepart) baru ke database. Jika ketemu barang identik, stoknya digabung (merge).
     public function createSparepart(array $data)
     {
+        // Membuat kunci gembok (lock) unik berdasarkan identitas detail barang
+        // Ini berguna untuk menghindari error ketika user ngeklik tombol 'Simpan' dua kali (Double Submit)
         $lockKey = 'create_sparepart_'.md5(
             ($data['part_number'] ?? '').
             ($data['name'] ?? '').
@@ -112,18 +118,23 @@ class InventoryService
             ($data['type'] ?? '')
         );
 
-        $lock = Cache::lock($lockKey, 5); // 5 seconds lock
+        // Kunci proses pembuatan barang ini maksimal selama 5 detik
+        $lock = Cache::lock($lockKey, 5); 
 
+        // Jika lock sedang dipakai (artinya ada request yg sedang diproses), tolak request yang baru masuk
         if (! $lock->get()) {
             return ['status' => 'error_zero_stock', 'message' => __('Sistem mendeteksi proses ganda. Silakan tunggu sebentar.'), 'data' => null];
         }
 
         try {
+            // Memulai transaksi DB agar jika error di tengah jalan, semua dibatalkan (Rollback) agar data tidak berantakan
             return DB::transaction(function () use ($data) {
+                
+                // Mengecek ke database apakah ada barang yang atributnya sama persis
                 $existingItem = $this->findExactDuplicate($data);
 
                 if ($existingItem) {
-                    // Jika aset identik ditemukan, lakukan penggabungan stok (merging)
+                    // Jika ketemu barang identik, jangan buat data baru. Tambahkan saja stoknya!
                     if ($data['stock'] > 0) {
                         $existingItem->stock += $data['stock'];
                         $existingItem->save();
@@ -133,6 +144,7 @@ class InventoryService
                             'part_number' => $existingItem->part_number,
                         ]);
 
+                        // Catat log persediaan bahwa ada stok masuk hasil dari penggabungan
                         StockLog::create([
                             'sparepart_id' => $existingItem->id,
                             'user_id' => auth()->id(),
@@ -143,17 +155,21 @@ class InventoryService
                             'approved_by' => auth()->id(),
                         ]);
 
+                        // Catat jejak aktivitas user
                         $this->logActivity('Stok Diupdate', $message, [
                             'stock' => [
                                 'old' => $existingItem->stock - $data['stock'],
                                 'new' => $existingItem->stock,
                             ],
                         ]);
+                        
+                        // Hapus cache memori lama & tembak websocket agar layar device lain ter-update otomatis
                         $this->clearCache();
                         $this->broadcastUpdate($existingItem, 'updated');
 
                         return ['status' => 'merged', 'message' => $message, 'data' => $existingItem];
                     } else {
+                        // Jika mau menggabung barang tapi input stoknya 0, kita tolak prosesnya
                         $message = __('messages.stock_zero_duplicate', [
                             'name' => $existingItem->name,
                             'part_number' => $existingItem->part_number,
@@ -163,10 +179,13 @@ class InventoryService
                     }
                 }
 
-                // Proses pembuatan item baru
+                // --- Jika barang benar-benar baru, lanjut buat entri datanya ---
+
+                // Jika user mengunggah foto, optimalkan ukurannya dulu sebelum disimpan
                 if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
                     $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
                 } elseif (! empty($data['existing_image'])) {
+                    // Jika memanfaatkan foto dari riwayat sebelumnya, gandakan file fisiknya
                     $existingPath = $data['existing_image'];
                     if (Storage::disk('public')->exists($existingPath)) {
                         $extension = pathinfo($existingPath, PATHINFO_EXTENSION);
@@ -176,10 +195,16 @@ class InventoryService
                     }
                 }
 
+                // Simpan barang baru ke database
                 $sparepart = Sparepart::create($data);
-                $sparepart->refresh(); // PASTIKAN UUID dimuat dari database
+                
+                // Panggil ulang dari DB agar mendapatkan UUID hasil generate
+                $sparepart->refresh(); 
+                
+                // Secara otomatis membuat gambar label QR Code untuk ditempel di barang
                 $this->qrCodeService->generate($sparepart);
 
+                // Jika saat dibuat langsung ada isi stoknya, catat log stok awal
                 if ($sparepart->stock > 0) {
                     StockLog::create([
                         'sparepart_id' => $sparepart->id,
@@ -197,6 +222,7 @@ class InventoryService
                     'part_number' => $sparepart->part_number,
                 ]);
 
+                // Simpan aktivitas log, bersihkan cache aplikasi, & broadcast event ke frontend
                 $this->logActivity('Sparepart Dibuat', $message);
                 $this->clearCache();
                 $this->broadcastUpdate($sparepart, 'created');
@@ -204,13 +230,12 @@ class InventoryService
                 return ['status' => 'created', 'message' => $message, 'data' => $sparepart];
             });
         } finally {
+            // Setelah semua aksi DB selesai atau pun error, cabut perlindungan lock-nya
             $lock->release();
         }
     }
 
-    /**
-     * Memperbarui data sparepart dan mengelola regenerasi QR jika identitas berubah.
-     */
+    // Fitur Pembaruan: Menyimpan perubahan data barang dan otomatis mencetak ulang stiker QR jika nama atau nomor serinya berubah.
     public function updateSparepart(Sparepart $sparepart, array $data)
     {
         return DB::transaction(function () use ($sparepart, $data) {
@@ -277,9 +302,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Menghapus sparepart secara lunak (Soft Delete).
-     */
+    // Fitur Hapus Sementara: Membuang barang ke tong sampah (Soft Delete) agar bisa dikembalikan lagi jika salah klik.
     public function deleteSparepart(Sparepart $sparepart)
     {
         return DB::transaction(function () use ($sparepart) {
@@ -297,9 +320,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Memulihkan sparepart yang sebelumnya dihapus secara lunak.
-     */
+    // Fitur Pemulihan: Mengembalikan barang dari dalam tong sampah agar bisa digunakan lagi di gudang.
     public function restoreSparepart($id)
     {
         return DB::transaction(function () use ($id) {
@@ -313,9 +334,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Menghapus sparepart secara permanen beserta file asetnya.
-     */
+    // Fitur Hapus Permanen: Menghancurkan data barang seutuhnya dari database beserta seluruh jejak fotonya.
     public function forceDeleteSparepart($id)
     {
         return DB::transaction(function () use ($id) {
@@ -341,9 +360,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Mengosongkan seluruh isi tong sampah.
-     */
+    // Fitur Bersih-Bersih: Mengosongkan seluruh isi tong sampah dalam satu kali klik.
     public function forceDeleteAllSpareparts()
     {
         return DB::transaction(function () {
@@ -371,9 +388,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Memulihkan banyak item sekaligus dari tong sampah.
-     */
+    // Fitur Pulihkan Massal: Mengembalikan banyak barang dari tong sampah sekaligus tanpa perlu klik satu per satu.
     public function bulkRestore(array $ids)
     {
         return DB::transaction(function () use ($ids) {
@@ -391,9 +406,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Menghapus banyak item secara permanen sekaligus.
-     */
+    // Fitur Hapus Permanen Massal: Menghancurkan banyak data barang sekaligus secara permanen (Tidak bisa dikembalikan).
     public function bulkForceDelete(array $ids)
     {
         return DB::transaction(function () use ($ids) {
@@ -420,9 +433,8 @@ class InventoryService
         });
     }
 
-    /**
-     * Mengambil opsi filter dropdown yang tersedia (dengan sistem caching).
-     */
+    // Fitur Pengumpul Pilihan: Menyiapkan daftar opsi (Kategori, Merek, Lokasi) untuk menu dropdown.
+    // Disimpan di memori sementara (Cache) agar form tambah barang bisa dimuat secepat kilat.
     public function getDropdownOptions()
     {
         return [
@@ -454,9 +466,7 @@ class InventoryService
         ];
     }
 
-    /**
-     * Invalidasi seluruh cache terkait inventaris dan dashboard.
-     */
+    // Fitur Pembersih Memori (Cache): Menghapus data ingatan lama agar aplikasi mengambil data terbaru dari database.
     public function clearCache()
     {
         Cache::forget('inventory_categories');
@@ -483,9 +493,7 @@ class InventoryService
         }
     }
 
-    /**
-     * Menerapkan filter berdasarkan nama relasi (category, brand, location).
-     */
+    // Filter Cerdas: Membantu mencari barang berdasarkan data yang terhubung (Contoh: Mencari nama Kategorinya, bukan angka ID-nya).
     private function applyRelationFilter(Builder $query, string $relation, ?string $value, string $ignoreValue)
     {
         if ($value && $value !== $ignoreValue) {
@@ -523,9 +531,7 @@ class InventoryService
         }
     }
 
-    /**
-     * Memeriksa apakah pembaruan data akan menyebabkan duplikasi dengan aset lain.
-     */
+    // Sistem Detektif: Mengecek apakah barang yang sedang diedit ini nantinya akan sama persis 100% dengan barang lain di gudang.
     public function checkUpdateDuplicate(Sparepart $currentItem, array $data)
     {
         $checkData = array_merge($currentItem->toArray(), $data);
@@ -550,9 +556,7 @@ class InventoryService
         return $query->first();
     }
 
-    /**
-     * Menggabungkan dua sparepart identik (misal setelah pembaruan lokasi/kondisi).
-     */
+    // Fitur Penggabungan (Merge): Menyatukan dua barang yang identik kembar menjadi satu kesatuan agar data tidak berceceran ganda.
     public function mergeSpareparts(Sparepart $source, Sparepart $target)
     {
         return DB::transaction(function () use ($source, $target) {
@@ -601,9 +605,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Mencari duplikat aset yang benar-benar identik di database.
-     */
+    // Fitur Pendeteksi Kembaran: Memastikan tidak ada barang dengan spesifikasi yang persis sama 100% dibuat secara tidak sengaja.
     private function findExactDuplicate(array $data)
     {
         $existingItemQuery = Sparepart::where('part_number', $data['part_number'])
@@ -626,9 +628,7 @@ class InventoryService
         return $existingItemQuery->lockForUpdate()->first();
     }
 
-    /**
-     * Membuat data peminjaman baru dan melakukan pengurangan stok secara aman.
-     */
+    // Fitur Peminjaman: Memproses keluarnya barang, mencatat siapa yang pinjam, dan otomatis memotong sisa stok di database.
     public function createBorrowing(Sparepart $sparepart, array $data)
     {
         return DB::transaction(function () use ($sparepart, $data) {
@@ -690,9 +690,8 @@ class InventoryService
         });
     }
 
-    /**
-     * Memproses pengembalian barang dan menyesuaikan kondisi stok aset.
-     */
+    // Fitur Pengembalian: Mencatat barang yang dikembalikan dan memulihkan stoknya.
+    // Jika barang rusak/hilang, sistem akan memisahkan barang tersebut ke dalam entitas tersendiri secara cerdas.
     public function returnBorrowing(Borrowing $borrowing, array $data, array $photos = [])
     {
         return DB::transaction(function () use ($borrowing, $data, $photos) {
@@ -783,9 +782,7 @@ class InventoryService
         });
     }
 
-    /**
-     * Menyetujui atau menolak permohonan penyesuaian stok (Approval Flow).
-     */
+    // Fitur Validasi Atasan (Approval Flow): Memproses izin (Terima/Tolak) untuk setiap pergerakan stok yang diajukan oleh staf.
     public function approveStockRequest(StockLog $stockLog, string $status, ?string $rejectionReason = null)
     {
         return DB::transaction(function () use ($stockLog, $status, $rejectionReason) {
@@ -886,9 +883,8 @@ class InventoryService
         });
     }
 
-    /**
-     * Melakukan broadcast perubahan data ke seluruh client yang terhubung secara real-time.
-     */
+    // Fitur Real-Time (Websocket): Mengumumkan ke semua layar pengguna lain bahwa ada perubahan data.
+    // Tujuannya agar layar mereka ikut ter-update otomatis secara "Gaib" tanpa perlu menekan tombol refresh.
     public function broadcastUpdate(Sparepart $sparepart, string $action, ?string $customMessage = null)
     {
         try {

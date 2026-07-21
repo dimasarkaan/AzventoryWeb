@@ -9,18 +9,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-/**
- * @group Master Data
- *
- * API endpoints untuk kelola merek barang / vendor.
- */
+// Controller khusus untuk mengelola Master Data Merek (Merk Barang/Vendor).
+// Berperan sebagai jembatan API untuk melayani aksi Tambah, Edit, dan Hapus dari tampilan web.
 class BrandController extends Controller
 {
     use ActivityLogger;
 
-    /**
-     * Display a listing of the resource.
-     */
+    // Menampilkan seluruh daftar Merek yang ada beserta hitungan jumlah barang di tiap Mereknya
     public function index()
     {
         $brands = Brand::withCount('spareparts')->orderBy('name')->get()->map(function ($brand) {
@@ -35,6 +30,7 @@ class BrandController extends Controller
         return response()->json($brands);
     }
 
+    // Menyimpan data Merek baru ke dalam database
     public function store(Request $request)
     {
         $request->validate([
@@ -53,9 +49,7 @@ class BrandController extends Controller
         ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // Mengedit/Memperbarui informasi nama Merek atau mengganti statusnya (Aktif/Non-aktif)
     public function update(Request $request, Brand $brand)
     {
         $request->validate([
@@ -112,9 +106,7 @@ class BrandController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Menghapus data Merek selamanya dari sistem
     public function destroy(Brand $brand)
     {
         $count = $brand->spareparts()->count();
