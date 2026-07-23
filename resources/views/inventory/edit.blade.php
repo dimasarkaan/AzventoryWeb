@@ -244,7 +244,15 @@
                                             if (found) this.search = found.name;
                                         }
                                         this.$watch('itemBrand', value => {
-                                             if (value != this.selected) { this.selected = value; let f = this.options.find(o => o.id == value); if(f) this.search = f.name; }
+                                             if (value != this.selected) {
+                                                this.selected = value;
+                                                let f = this.options.find(o => o.id == value);
+                                                if(f) {
+                                                    this.search = f.name;
+                                                } else if (value && isNaN(value)) {
+                                                    this.search = value;
+                                                }
+                                             }
                                         });
                                     }
                                 }" @click.outside="open = false">
@@ -322,7 +330,15 @@
                                             if (found) this.search = found.name;
                                         }
                                         this.$watch('itemCategory', value => {
-                                             if (value != this.selected) { this.selected = value; let f = this.options.find(o => o.id == value); if(f) this.search = f.name; }
+                                             if (value != this.selected) {
+                                                this.selected = value;
+                                                let f = this.options.find(o => o.id == value);
+                                                if(f) {
+                                                    this.search = f.name;
+                                                } else if (value && isNaN(value)) {
+                                                    this.search = value;
+                                                }
+                                             }
                                         });
                                     }
                                 }" @click.outside="open = false">

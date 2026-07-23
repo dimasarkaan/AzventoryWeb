@@ -1,4 +1,5 @@
-<section x-data="{ isEditing: {{ $errors->any() ? 'true' : 'false' }}, tokenIdToDelete: null, tokenNameToDelete: '' }">
+<section x-data="{ isEditing: {{ $errors->has('token_name') ? 'true' : 'false' }}, tokenIdToDelete: null, tokenNameToDelete: '' }"
+         x-init="if ({{ session('new_api_token') || session('api_token_deleted') || $errors->has('token_name') ? 'true' : 'false' }}) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }">
 
     @if (session('new_api_token'))
         <div class="mt-4 p-4 border border-success-200 bg-success-50 rounded-lg shadow-sm" x-data="{ copied: false }">

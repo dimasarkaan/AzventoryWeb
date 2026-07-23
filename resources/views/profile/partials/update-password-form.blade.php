@@ -1,4 +1,5 @@
-<section x-data="{ isEditing: {{ $errors->updatePassword->any() ? 'true' : 'false' }}, isSubmitting: false }">
+<section x-data="{ isEditing: {{ $errors->updatePassword->any() ? 'true' : 'false' }}, isSubmitting: false }"
+         x-init="if ({{ session('status') === 'password-updated' || $errors->updatePassword->any() ? 'true' : 'false' }}) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }">
     <form method="post" action="{{ route('password.update') }}" @submit="isSubmitting = true" novalidate>
         @csrf
         @method('put')

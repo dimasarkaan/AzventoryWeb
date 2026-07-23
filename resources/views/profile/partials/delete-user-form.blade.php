@@ -1,4 +1,5 @@
-<section class="space-y-4">
+<section class="space-y-4" x-data="{}" 
+         x-init="if ({{ session('error') || $errors->userDeletion->isNotEmpty() ? 'true' : 'false' }}) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }">
     <div class="flex items-start gap-4">
         <div class="flex-shrink-0">
              <div class="h-10 w-10 rounded-full bg-danger-100 flex items-center justify-center text-danger-600">

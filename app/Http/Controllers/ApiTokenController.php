@@ -42,6 +42,6 @@ class ApiTokenController extends Controller
         // Cari dan hapus token yang cocok milik user bersangkutan (mencegah hapus token user lain)
         $request->user()->tokens()->where('id', $tokenId)->delete();
 
-        return back()->with('success', 'Akses API Token berhasil dicabut secara permanen.');
+        return back()->with('api_token_deleted', true)->with('success', 'Akses API Token berhasil dicabut secara permanen.');
     }
 }

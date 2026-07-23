@@ -1,4 +1,5 @@
-<section x-data="{ isEditing: false, isSubmitting: false }">
+<section x-data="{ isEditing: {{ $errors->hasAny(['name', 'email', 'username', 'phone', 'address', 'avatar']) ? 'true' : 'false' }}, isSubmitting: false }"
+         x-init="if ({{ session('status') === 'profile-updated' || session('status') === 'avatar-deleted' || $errors->hasAny(['name', 'email', 'username', 'phone', 'address', 'avatar']) ? 'true' : 'false' }}) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }">
     <form id="send-verification" method="post" action="{{ route('verification.send') }}" novalidate>
         @csrf
     </form>

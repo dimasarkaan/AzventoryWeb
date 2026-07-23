@@ -298,13 +298,21 @@
                                             if (value != this.selected) {
                                                 this.selected = value;
                                                 let found = this.options.find(o => o.id == value);
-                                                if (found) this.search = found.name;
+                                                if (found) {
+                                                    this.search = found.name;
+                                                } else if (value && isNaN(value)) {
+                                                    this.search = value;
+                                                }
                                             }
                                         });
                                         if (this.itemBrand) {
                                             this.selected = this.itemBrand;
                                             let found = this.options.find(o => o.id == this.itemBrand);
-                                            if (found) this.search = found.name;
+                                            if (found) {
+                                                this.search = found.name;
+                                            } else if (isNaN(this.itemBrand)) {
+                                                this.search = this.itemBrand;
+                                            }
                                         }
                                     }
                                 }" @click.outside="open = false">
@@ -403,13 +411,21 @@
                                             if (value != this.selected) {
                                                 this.selected = value;
                                                 let found = this.options.find(o => o.id == value);
-                                                if (found) this.search = found.name;
+                                                if (found) {
+                                                    this.search = found.name;
+                                                } else if (value && isNaN(value)) {
+                                                    this.search = value;
+                                                }
                                             }
                                         });
                                         if (this.itemCategory) {
                                             this.selected = this.itemCategory;
                                             let found = this.options.find(o => o.id == this.itemCategory);
-                                            if (found) this.search = found.name;
+                                            if (found) {
+                                                this.search = found.name;
+                                            } else if (isNaN(this.itemCategory)) {
+                                                this.search = this.itemCategory;
+                                            }
                                         }
                                     }
                                 }" @click.outside="open = false">
@@ -1011,8 +1027,8 @@
                 partNumber: '{{ old('part_number') }}',
                 isLocked: false,
                 itemName: '{{ old('name') }}',
-                itemBrand: '{{ old('brand') }}',
-                itemCategory: '{{ old('category') }}',
+                itemBrand: '{{ old('brand_id') }}',
+                itemCategory: '{{ old('category_id') }}',
                 itemColor: '{{ old('color') }}', 
                 itemUnit: '{{ old('unit', 'Pcs') }}',
                 itemPrice: '{{ old('price') }}',
@@ -1072,8 +1088,8 @@
                         if (response.data.exists) {
                             const data = response.data.data;
                             this.itemName = data.name;
-                            this.itemBrand = data.brand;
-                            this.itemCategory = data.category;
+                            this.itemBrand = data.brand_id;
+                            this.itemCategory = data.category_id;
                             this.type = data.type;
                             this.itemUnit = data.unit;
                             this.itemPrice = data.price; // Auto-fill price

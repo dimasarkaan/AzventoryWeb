@@ -150,8 +150,11 @@ class UpdateSparepartRequest extends FormRequest
             'part_number.required' => 'Part Number wajib diisi.',
             'part_number.min' => 'Part Number minimal 3 karakter.',
             'brand_id.required' => 'Merk wajib dipilih.',
+            'brand_id.exists' => 'Merk yang dipilih tidak valid atau tidak ditemukan.',
             'category_id.required' => 'Kategori wajib dipilih.',
+            'category_id.exists' => 'Kategori yang dipilih tidak valid atau tidak ditemukan.',
             'location_id.required' => 'Lokasi Penyimpanan wajib dipilih.',
+            'location_id.exists' => 'Lokasi Penyimpanan yang dipilih tidak valid atau tidak ditemukan.',
             'age.required' => 'Status Pemakaian wajib dipilih.',
             'age.in' => 'Status Pemakaian harus berisi "Baru" atau "Pernah Dipakai (Bekas)".',
             'condition.required' => 'Kondisi Barang wajib diisi.',
@@ -164,10 +167,13 @@ class UpdateSparepartRequest extends FormRequest
             'image.image' => 'File harus berupa gambar.',
             'image.mimes' => 'Format file Gambar harus jpeg, png, jpg, atau webp.',
             'image.max' => 'Ukuran file Gambar maksimal 5MB.',
+            
+            // Regex error messages
             'name.regex' => 'Nama barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
-            'part_number.regex' => 'Format Part Number tidak valid. Hanya boleh berisi huruf, angka, strip, garis miring, dan underscore.',
-            'condition.regex' => 'Kondisi barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
-            'color.regex' => 'Format Warna tidak valid. Hanya boleh berisi huruf dan strip.',
+            'part_number.regex' => 'Part Number hanya boleh berisi huruf, angka, strip (-), garis miring (/), dan underscore (_).',
+            'condition.regex' => 'Kondisi Barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
+            'color.regex' => 'Warna hanya boleh berisi huruf, spasi, dan strip (-).',
+            'unit.regex' => 'Satuan hanya boleh berisi huruf, angka, dan spasi.',
         ];
     }
 }
