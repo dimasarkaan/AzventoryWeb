@@ -23,13 +23,12 @@ class ExportActivityLogJob implements ShouldQueue
     protected $logs;
 
     /**
-     * Buat instance job baru dengan snapshot data real-time.
+     * Buat instance job baru dengan parameter pencarian.
      */
-    public function __construct(User $user, array $params, $logs)
+    public function __construct(User $user, array $params)
     {
         $this->user = $user;
         $this->params = $params;
-        $this->logs = $logs;
     }
 
     /**
@@ -37,11 +36,50 @@ class ExportActivityLogJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // Fetch snapshot from constructor memory, immune to delayed data drift
-        $logs = $this->logs;
+        // Rebuild query dynamically to avoid Payload Too Large exception in Queue
+        $query = \App\Models\ActivityLog::with('user');
+        $currentUser = $this->user;
 
-        // Eager load relationships that might have been lost during job serialization
-        $logs->loadMissing('user');
+        if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
+            $query->where('user_id', $currentUser->id);
+        } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
+            $query->whereHas('user', function ($q) {
+                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            });
+        }
+
+        if (isset($this->params['role']) && $this->params['role'] && $this->params['role'] !== 'Semua Role') {
+            $role = $this->params['role'];
+            $query->whereHas('user', function ($q) use ($role) {
+                $q->where('role', $role);
+            });
+        }
+
+        if (isset($this->params['user_id']) && $this->params['user_id']) {
+            $query->where('user_id', $this->params['user_id']);
+        }
+
+        if (isset($this->params['action']) && $this->params['action']) {
+            $query->where('action', $this->params['action']);
+        }
+
+        if (isset($this->params['search']) && $this->params['search']) {
+            $search = $this->params['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('description', 'like', "%{$search}%")
+                    ->orWhere('action', 'like', "%{$search}%");
+            });
+        }
+
+        if (isset($this->params['start_date']) && $this->params['start_date']) {
+            $query->whereDate('created_at', '>=', $this->params['start_date']);
+        }
+
+        if (isset($this->params['end_date']) && $this->params['end_date']) {
+            $query->whereDate('created_at', '<=', $this->params['end_date']);
+        }
+
+        $logs = $query->latest()->get();
 
         // Generate PDF using a fresh resolved instance, bypassing Facade static caching in Queue Worker
         $pdf = app()->make('dompdf.wrapper')->loadView('reports.activity_logs.pdf', [

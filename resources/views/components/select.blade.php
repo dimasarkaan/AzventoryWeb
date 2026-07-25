@@ -17,11 +17,11 @@
              this.selectedLabel = this.placeholder;
         }
         
-        $watch('selected', value => {
+        this.$watch('selected', value => {
              if ({{ $submitOnChange ? 'true' : 'false' }}) {
                  // Gunakan timeout kecil agar nilai input terupdate sebelum submit
                  setTimeout(() => {
-                    const form = $el.closest('form');
+                    const form = this.$el.closest('form');
                     if (form) {
                         if (typeof form.requestSubmit === 'function') {
                             form.requestSubmit();

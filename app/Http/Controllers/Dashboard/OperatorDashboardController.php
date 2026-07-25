@@ -26,10 +26,7 @@ class OperatorDashboardController extends Controller
             // --- Menarik maksimal 3 barang teratas yang sedang dipinjam oleh user ini ---
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart'])
                 ->where('user_id', $userId)
-                ->where(function ($query) {
-                    $query->where('status', 'borrowed')
-                        ->orWhere('remaining_quantity', '>', 0);
-                })
+                ->where('status', 'borrowed')
                 ->latest('borrowed_at') // Urutkan dari barang yang paling baru dipinjam
                 ->take(3)
                 ->get()
@@ -49,10 +46,8 @@ class OperatorDashboardController extends Controller
 
             // Menghitung angka pasti jumlah keseluruhan barang yang sedang dipinjam
             $activeBorrowingsCount = \App\Models\Borrowing::where('user_id', $userId)
-                ->where(function ($query) {
-                    $query->where('status', 'borrowed')
-                        ->orWhere('remaining_quantity', '>', 0);
-                })->count();
+                ->where('status', 'borrowed')
+                ->count();
 
             // --- Menarik maksimal 3 pengajuan penambahan stok (Stock Request) yang belum di-Acc Admin ---
             $pendingRequestsList = \App\Models\StockLog::where('user_id', $userId)

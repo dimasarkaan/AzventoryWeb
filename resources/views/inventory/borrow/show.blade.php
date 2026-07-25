@@ -358,20 +358,20 @@
                                         reader.onload = (e) => { this.previews.push(e.target.result); };
                                         reader.readAsDataURL(file);
                                     });
-                                    $dispatch('file-change', this.files.length);
+                                    this.$dispatch('file-change', this.files.length);
                                 },
 
                                 removeFile(index) {
                                     this.files.splice(index, 1);
                                     this.previews.splice(index, 1);
                                     this.updateInput();
-                                    $dispatch('file-change', this.files.length);
+                                    this.$dispatch('file-change', this.files.length);
                                 },
 
                                 updateInput() {
                                     const dt = new DataTransfer();
                                     this.files.forEach(file => dt.items.add(file));
-                                    $refs.fileInput.files = dt.files;
+                                    this.$refs.fileInput.files = dt.files;
                                 },
 
                                 // Camera Logic
@@ -412,7 +412,7 @@
                                 },
 
                                 triggerGallery() {
-                                    $refs.galleryInput.click();
+                                    this.$refs.galleryInput.click();
                                 }
                             }">
                                 <span class="block text-sm font-medium text-gray-700 mb-2">Bukti Foto <span class="text-danger-500">*</span></span>

@@ -34,10 +34,14 @@
                 <td>
                     @if($item->stock == 0)
                         <span class="badge badge-danger">{{ __('ui.status_out_of_stock') }}</span>
-                    @elseif($item->minimum_stock > 0 && $item->stock <= $item->minimum_stock)
-                        <span class="badge badge-warning">{{ __('ui.stock_low') }}</span>
-                    @elseif($item->minimum_stock > 0 && $item->stock <= round($item->minimum_stock * 1.5))
-                        <span class="badge badge-warning" style="background:#fff7ed;color:#92400e;border-color:#fbbf24;">Mendekati Minimum</span>
+                    @elseif($item->minimum_stock > 0 && strtolower($item->condition) === 'baik')
+                        @if($item->stock <= $item->minimum_stock)
+                            <span class="badge badge-warning">{{ __('ui.stock_low') }}</span>
+                        @elseif($item->stock <= round($item->minimum_stock * 1.5))
+                            <span class="badge badge-warning" style="background:#fff7ed;color:#92400e;border-color:#fbbf24;">{{ __('ui.approaching_stock') }}</span>
+                        @else
+                            <span class="badge badge-success">{{ __('ui.stock_safe') }}</span>
+                        @endif
                     @else
                         <span class="badge badge-success">{{ __('ui.stock_safe') }}</span>
                     @endif

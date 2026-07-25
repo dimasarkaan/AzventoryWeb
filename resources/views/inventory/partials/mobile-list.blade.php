@@ -90,7 +90,7 @@
                     <span class="text-xs text-secondary-500 mb-1">{{ __('ui.stock') }} di {{ $sparepart->location->name ?? '-' }}</span>
                     <div class="flex items-center gap-1.5">
                         @php
-                            $isLowStock = $sparepart->stock <= $sparepart->minimum_stock && !in_array(strtolower($sparepart->condition), ['rusak', 'hilang']);
+                            $isLowStock = $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && strtolower($sparepart->condition) === 'baik';
                         @endphp
                         <span class="text-lg font-bold {{ $isLowStock ? 'text-danger-600' : 'text-secondary-900' }}">
                             {{ $sparepart->stock }}

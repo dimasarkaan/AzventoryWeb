@@ -31,9 +31,8 @@ class ReportController extends Controller
     // Menampilkan halaman utama menu Laporan (tempat pengguna memilih form filter seperti bulan, tahun, dll)
     public function index()
     {
-        // Mengambil daftar lokasi gudang untuk ditampilkan sebagai opsi dropdown
         $options = $this->inventoryService->getDropdownOptions();
-        $locations = $options['locations'];
+        $locations = $options['locationOptions'];
 
         return view('reports.index', compact('locations'));
     }
@@ -83,6 +82,9 @@ class ReportController extends Controller
             $start = $startDate->format('d-m-Y');
             $end = $endDate->format('d-m-Y');
             $filename = "{$prefix}_{$start}sd{$end}";
+        } elseif ($startDate) {
+            $start = $startDate->format('d-m-Y');
+            $filename = "{$prefix}_Sejak{$start}";
         } else {
             $filename = "{$prefix}SemuaRiwayat_".now()->format('d-m-Y');
         }
@@ -132,7 +134,7 @@ class ReportController extends Controller
 
             // Jika ukuran datanya RAKSASA (>1000 row), akan bahaya jika diproses langsung karena bisa bikin error 504 Timeout
             // Maka pembuatannya kita lemparkan ke 'pekerja belakang layar' (Queue / Background Job)
-            GenerateReportJob::dispatch($request->user(), $reportData, $startDate, $endDate, $location, $type);
+            GenerateReportJob::dispatch($request->user(), $startDate, $endDate, $location, $type);
 
             $this->logActivity('Laporan Diproses', "Meminta antrean laporan PDF tipe: {$type}");
 

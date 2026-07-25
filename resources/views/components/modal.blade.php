@@ -19,10 +19,8 @@ $maxWidth = [
     x-data="{
         show: @js($show),
         focusables() {
-            // Semua tipe elemen yang bisa difokuskan...
             let selector = 'a, button, input:not([type=\'hidden\']), textarea, select, details, [tabindex]:not([tabindex=\'-1\'])'
-            return [...$el.querySelectorAll(selector)]
-                // Semua elemen yang tidak dinonaktifkan...
+            return [...this.$el.querySelectorAll(selector)]
                 .filter(el => ! el.hasAttribute('disabled'))
         },
         firstFocusable() { return this.focusables()[0] },

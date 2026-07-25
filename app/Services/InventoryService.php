@@ -280,7 +280,7 @@ class InventoryService
             $this->broadcastUpdate($sparepart, 'updated');
 
             // Notifikasi stok rendah — hanya kirim jika nilai stok benar-benar berubah di save ini
-            if ($sparepart->wasChanged('stock')) {
+            if ($sparepart->wasChanged('stock') && strtolower($sparepart->condition) === 'baik') {
                 if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
                     $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                     Notification::send($admins, new LowStockNotification($sparepart));
@@ -662,19 +662,21 @@ class InventoryService
             ]);
 
             $sparepart->refresh();
-            if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
-                $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                Notification::send($admins, new LowStockNotification($sparepart));
+            if (strtolower($sparepart->condition) === 'baik') {
+                if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
+                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+                    Notification::send($admins, new LowStockNotification($sparepart));
 
-                $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
-                try {
-                    broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
-                } catch (\Throwable $e) {
+                    $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
+                    try {
+                        broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                    } catch (\Throwable $e) {
+                    }
+
+                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
+                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+                    Notification::send($admins, new ApproachingStockNotification($sparepart));
                 }
-
-            } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
-                $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                Notification::send($admins, new ApproachingStockNotification($sparepart));
             }
 
             $this->logActivity('Peminjaman Barang', "Meminjam {$data['quantity']} {$sparepart->unit} '{$sparepart->name}'.", [

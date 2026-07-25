@@ -34,7 +34,7 @@ class InventoryController extends Controller
     {
         // Mengecek apakah user mengakses fitur tempat sampah (trash)
         // Jika bukan Superadmin, maka akses ditolak (403)
-        if ($request->has('trash') && auth()->user()->role !== UserRole::SUPERADMIN) {
+        if ($request->boolean('trash') && auth()->user()->role !== UserRole::SUPERADMIN) {
             abort(403, __('Akses tong sampah dibatasi untuk Superadmin.'));
         }
 

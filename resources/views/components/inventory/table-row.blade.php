@@ -105,7 +105,7 @@
     <td class="px-4 py-3">
         <div class="flex items-baseline justify-center gap-1">
             @php
-                $isLowStock = $sparepart->stock <= $sparepart->minimum_stock && !in_array(strtolower($sparepart->condition), ['rusak', 'hilang']);
+                $isLowStock = $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && strtolower($sparepart->condition) === 'baik';
             @endphp
             
             @if($isLowStock)

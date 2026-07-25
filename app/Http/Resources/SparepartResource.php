@@ -40,7 +40,7 @@ class SparepartResource extends JsonResource
                 // Kirim null jika tidak dipantau — klien API bisa bedakan '0 minimum' vs 'tidak dipantau'
                 'minimum' => $this->minimum_stock > 0 ? (int) $this->minimum_stock : null,
                 'unit' => $this->unit,
-                'is_low' => $this->minimum_stock > 0 && $this->stock <= $this->minimum_stock,
+                'is_low' => $this->minimum_stock > 0 && $this->stock <= $this->minimum_stock && strtolower($this->condition) === 'baik',
             ],
             'location' => $this->location?->name,
             'location_id' => $this->location_id,

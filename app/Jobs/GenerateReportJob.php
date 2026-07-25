@@ -30,12 +30,11 @@ class GenerateReportJob implements ShouldQueue
     protected $type;
 
     /**
-     * Buat instance job baru dengan data snapshot real-time.
+     * Buat instance job baru dengan parameter filter.
      */
-    public function __construct(User $user, array $reportData, $startDate, $endDate, $location, $type)
+    public function __construct(User $user, $startDate, $endDate, $location, $type)
     {
         $this->user = $user;
-        $this->reportData = $reportData;
         $this->startDate = $startDate;
         $this->endDate = $endDate;
         $this->location = $location;
@@ -45,23 +44,16 @@ class GenerateReportJob implements ShouldQueue
     /**
      * Eksekusi job.
      */
-    public function handle(): void
+    public function handle(\App\Services\ReportService $reportService): void
     {
         Log::info('GenerateReportJob: Starting delayed PDF generation for user '.$this->user->id);
 
-        // Fetch Data from the constructor snapshot
-        $data = $this->reportData['data'];
-        $title = $this->reportData['title'];
-        $view = $this->reportData['view'];
-
-        // Restore relations and aggregates that are dropped by SerializesModels
-        if ($this->type === 'stock_mutation') {
-            $data->loadMissing(['sparepart', 'user']);
-        } elseif ($this->type === 'borrowing_history') {
-            $data->loadMissing(['sparepart', 'user']);
-            // Must reload the sum manually as load() doesn't restore withSum() aggregates
-            $data->loadSum('returns', 'quantity');
-        }
+        // Fetch Data dynamically to avoid Payload Too Large exception in Queue
+        $reportData = $reportService->getReportData($this->type, $this->location, $this->startDate, $this->endDate);
+        
+        $data = $reportData['data'];
+        $title = $reportData['title'];
+        $view = $reportData['view'];
 
         // Assign to local variables for the view
         $startDate = $this->startDate;
@@ -92,6 +84,9 @@ class GenerateReportJob implements ShouldQueue
                 $start = $startDate->format('d-m-Y');
                 $end = $endDate->format('d-m-Y');
                 $filename = "{$prefix}_{$start}sd{$end}.pdf";
+            } elseif ($startDate) {
+                $start = $startDate->format('d-m-Y');
+                $filename = "{$prefix}_Sejak{$start}.pdf";
             } else {
                 $filename = "{$prefix}SemuaRiwayat_".now()->format('d-m-Y').'.pdf';
             }

@@ -251,7 +251,7 @@ class ExcelExportService
             // Status Logic: Handle both Enum object and string
             $statusText = ($item->status instanceof \BackedEnum) ? $item->status->value : (is_string($item->status) ? ucfirst($item->status) : $item->status);
 
-            if ($item->stock <= 0 && (strtolower($item->status) === 'aktif')) {
+            if ($item->stock <= 0 && (strtolower($statusText) === 'aktif')) {
                 $statusText = 'Habis';
             }
             $sheet->setCellValue("D{$row}", $statusText);

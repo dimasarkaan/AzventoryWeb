@@ -203,7 +203,7 @@ class ActivityLogController extends Controller
                 return $pdf->download($filename.'.pdf');
             }
 
-            \App\Jobs\ExportActivityLogJob::dispatch($request->user(), $request->all(), $logs);
+            \App\Jobs\ExportActivityLogJob::dispatch($request->user(), $request->all());
             $this->logActivity('Export Log Aktivitas', 'Meminta antrean export log aktivitas (PDF).');
 
             return back()->with('success', 'Laporan PDF sedang diproses di latar belakang. Silakan cek menu Notifikasi dalam beberapa saat.');

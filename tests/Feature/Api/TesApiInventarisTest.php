@@ -38,6 +38,7 @@ class TesApiInventarisTest extends TestCase
             'stock' => 10,
             'minimum_stock' => 2,
             'status' => 'aktif',
+            'condition' => 'Baik',
         ], $override));
     }
 

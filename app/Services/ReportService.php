@@ -50,7 +50,8 @@ class ReportService
             $view = 'reports.pdf_inventory_list';
 
         } elseif ($type == 'stock_mutation') {
-            $query = StockLog::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user']);
+            $query = StockLog::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user'])
+                ->where('status', 'approved');
             $this->applyDateRange($query, 'created_at', $startDate, $endDate);
 
             if ($location !== 'all' && $location) {
@@ -68,6 +69,14 @@ class ReportService
             $query = Borrowing::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user'])->withSum('returns', 'quantity');
             $this->applyDateRange($query, 'borrowed_at', $startDate, $endDate);
 
+            if ($location !== 'all' && $location) {
+                $query->whereHas('sparepart', function ($q) use ($location) {
+                    $q->whereHas('location', function ($lq) use ($location) {
+                        $lq->where('name', $location);
+                    });
+                });
+            }
+
             $query->latest();
             $title = 'Laporan Riwayat Peminjaman';
             $view = 'reports.pdf_borrowing_history';
@@ -76,6 +85,7 @@ class ReportService
             $query = Sparepart::with(['brand', 'category', 'location'])
                 ->where('minimum_stock', '>', 0)
                 ->whereColumn('stock', '<=', 'minimum_stock')
+                ->where('condition', 'Baik')
                 ->orderBy('stock', 'asc');
             if ($location !== 'all' && $location) {
                 $query->whereHas('location', function ($q) use ($location) {
@@ -130,6 +140,10 @@ class ReportService
     {
         if ($start && $end) {
             $query->whereBetween($column, [$start, $end]);
+        } elseif ($start) {
+            $query->where($column, '>=', $start);
+        } elseif ($end) {
+            $query->where($column, '<=', $end);
         }
     }
 }

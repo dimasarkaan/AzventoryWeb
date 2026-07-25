@@ -73,7 +73,7 @@
             <span class="text-secondary-400 block mb-0.5 text-[10px] uppercase tracking-wider">{{ __('ui.stock') }}</span>
             <div class="flex items-center justify-end gap-1.5">
                 @php
-                    $isLowStockMobile = $sparepart->stock <= $sparepart->minimum_stock && !in_array(strtolower($sparepart->condition), ['rusak', 'hilang']);
+                    $isLowStockMobile = $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && strtolower($sparepart->condition) === 'baik';
                 @endphp
                 
                 @if($isLowStockMobile)

@@ -240,6 +240,7 @@ class DashboardService
             ->unique();
 
         return Sparepart::where('stock', '>', 0)
+            ->where('condition', 'Baik')
             ->whereNotIn('id', $activeItemIds)
             ->take(5)
             ->get();

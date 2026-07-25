@@ -146,8 +146,10 @@ class AdminDashboardController extends Controller
                 ->get();
 
             // --- Menarik maksimal 5 jenis barang yang sisa stoknya sangat kritis (kritis = di bawah minimum) ---
-            $lowStockItemsRaw = \App\Models\Sparepart::with('category')->whereColumn('stock', '<=', 'minimum_stock')
-                ->where('stock', '>', 0)
+            $lowStockItemsRaw = \App\Models\Sparepart::with('category')
+                ->where('minimum_stock', '>', 0)
+                ->whereColumn('stock', '<=', 'minimum_stock')
+                ->where('condition', 'Baik')
                 ->orderBy('stock', 'asc')
                 ->take(5)
                 ->get();
