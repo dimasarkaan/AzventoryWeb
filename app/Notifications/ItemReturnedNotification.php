@@ -34,7 +34,11 @@ class ItemReturnedNotification extends Notification implements ShouldBroadcast
             'title' => 'Barang Dikembalikan',
             'message' => "{$this->borrowing->borrower_name} mengembalikan {$this->quantity} {$this->borrowing->sparepart->unit} '{$this->borrowing->sparepart->name}' dalam kondisi {$this->condition}.",
             'url' => route('inventory.borrow.show', $this->borrowing->id),
-            'type' => 'success',
+            'type' => match(strtolower($this->condition)) {
+                'rusak' => 'warning',
+                'hilang' => 'danger',
+                default => 'success',
+            },
         ];
     }
 
@@ -45,7 +49,11 @@ class ItemReturnedNotification extends Notification implements ShouldBroadcast
             'title' => 'Barang Dikembalikan',
             'message' => "{$this->borrowing->borrower_name} mengembalikan {$this->quantity} {$this->borrowing->sparepart->unit} '{$this->borrowing->sparepart->name}' dalam kondisi {$this->condition}.",
             'url' => route('inventory.borrow.show', $this->borrowing->id),
-            'type' => 'success',
+            'type' => match(strtolower($this->condition)) {
+                'rusak' => 'warning',
+                'hilang' => 'danger',
+                default => 'success',
+            },
         ]);
     }
 }

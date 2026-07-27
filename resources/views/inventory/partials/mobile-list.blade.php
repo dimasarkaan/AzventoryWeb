@@ -91,8 +91,9 @@
                     <div class="flex items-center gap-1.5">
                         @php
                             $isLowStock = $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && strtolower($sparepart->condition) === 'baik';
+                            $isApproaching = $sparepart->minimum_stock > 0 && $sparepart->stock > $sparepart->minimum_stock && $sparepart->stock <= ($sparepart->minimum_stock + 5) && strtolower($sparepart->condition) === 'baik';
                         @endphp
-                        <span class="text-lg font-bold {{ $isLowStock ? 'text-danger-600' : 'text-secondary-900' }}">
+                        <span class="text-lg font-bold {{ $isLowStock ? 'text-danger-600' : ($isApproaching ? 'text-warning-600' : 'text-secondary-900') }}">
                             {{ $sparepart->stock }}
                         </span>
                         <span class="text-xs text-secondary-500">{{ $sparepart->unit ?? 'Pcs' }}</span>

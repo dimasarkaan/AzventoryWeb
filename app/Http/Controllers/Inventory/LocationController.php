@@ -39,7 +39,7 @@ class LocationController extends Controller
     {
         // Pengecekan Keamanan Ekstra (Otorisasi): 
         // Hanya petinggi tertinggi (Superadmin) yang diizinkan membangun ruangan/gudang baru
-        abort_if(auth()->user()->role !== \App\Enums\UserRole::SUPERADMIN, 403, 'Hanya Superadmin yang dapat menambah lokasi baru.');
+        $this->authorize('create', Location::class);
 
         // Validasi: Nama harus ada dan tidak boleh kembar dengan lokasi yang sudah ada
         $request->validate([
@@ -65,6 +65,8 @@ class LocationController extends Controller
     // Menyimpan perubahan data lokasi (mengganti nama atau status aktifnya)
     public function update(Request $request, Location $location)
     {
+        $this->authorize('update', $location);
+
         // Validasi: Nama tidak boleh sama dengan ruangan lain KECUALI namanya sendiri
         $request->validate([
             'name' => 'required|string|max:191|unique:locations,name,'.$location->id,
@@ -135,6 +137,8 @@ class LocationController extends Controller
     // Menghapus data lokasi/gudang dari sistem selamanya
     public function destroy(Location $location)
     {
+        $this->authorize('delete', $location);
+
         // Aturan Ketat Bisnis: Gudang utama (Default) yang menjadi sandaran aplikasi tidak boleh dihapus sama sekali
         if ($location->is_default) {
             return response()->json([

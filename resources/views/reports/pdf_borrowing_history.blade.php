@@ -60,10 +60,18 @@
                     @php
                         $conditionLabels = [
                             'good' => __('ui.condition_good'),
-                            'broken' => __('ui.condition_broken'),
+                            'bad' => __('ui.condition_broken'),
                             'lost' => __('ui.condition_lost'),
                         ];
-                        $conditionLabel = $row->return_condition ? ($conditionLabels[$row->return_condition] ?? ucfirst($row->return_condition)) : '-';
+                        // Mengumpulkan semua kondisi pengembalian jika ada parsial
+                        $conditions = $row->returns->pluck('condition')->unique()->filter();
+                        
+                        if ($conditions->isEmpty()) {
+                            $conditionLabel = '-';
+                        } else {
+                            $mappedConditions = $conditions->map(fn($c) => $conditionLabels[$c] ?? ucfirst($c))->toArray();
+                            $conditionLabel = implode(', ', $mappedConditions);
+                        }
                     @endphp
                     {{ $conditionLabel }}
                 </td>

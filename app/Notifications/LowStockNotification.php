@@ -39,7 +39,7 @@ class LowStockNotification extends Notification implements ShouldBroadcast
             'title' => $title,
             'message' => $message,
             'url' => route('inventory.show', $this->sparepart->uuid) . '#stock-history',
-            'type' => $isDepleted ? 'danger' : 'warning',
+            'type' => 'danger',
             'sparepart_id' => $this->sparepart->id,
         ];
     }
@@ -56,7 +56,7 @@ class LowStockNotification extends Notification implements ShouldBroadcast
                 ? "Stok {$this->sparepart->name} telah HABIS (0)!"
                 : "Stok {$this->sparepart->name} berada di bawah batas minimum ({$this->sparepart->stock} / {$this->sparepart->minimum_stock}).",
             'url' => route('inventory.show', $this->sparepart->uuid) . '#stock-history',
-            'type' => $isDepleted ? 'danger' : 'warning',
+            'type' => 'danger',
         ]);
     }
 }

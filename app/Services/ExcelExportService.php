@@ -224,14 +224,14 @@ class ExcelExportService
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Daftar Inventaris');
 
-        $lastColumn = 'F';
+        $lastColumn = 'G';
         $headerRow = 5;
 
         // Setup Title
         $this->setupReportTitle($sheet, 'Laporan Daftar Inventaris (Sparepart & Aset)', $lastColumn);
 
         // Headers
-        $headers = ['Nomor Part', 'Nama Barang', 'Kategori', 'Status', 'Lokasi', 'Stok Saat Ini'];
+        $headers = ['Nomor Part', 'Nama Barang', 'Kategori', 'Kondisi', 'Status', 'Lokasi', 'Stok Saat Ini'];
         foreach ($headers as $index => $header) {
             $column = chr(ord('A') + $index);
             $sheet->setCellValue("{$column}{$headerRow}", $header);
@@ -248,39 +248,72 @@ class ExcelExportService
             $sheet->setCellValue("B{$row}", $item->name);
             $sheet->setCellValue("C{$row}", $item->category?->name ?? '-');
 
-            // Status Logic: Handle both Enum object and string
-            $statusText = ($item->status instanceof \BackedEnum) ? $item->status->value : (is_string($item->status) ? ucfirst($item->status) : $item->status);
+            // Kolom Baru: Kondisi
+            $sheet->setCellValue("D{$row}", $item->condition ?? '-');
+            $conditionColor = match(strtolower($item->condition ?? '')) {
+                'baik' => 'FF059669', // Emerald
+                'rusak' => 'FFDC2626', // Red
+                'hilang' => 'FF64748B', // Slate
+                default => 'FF000000',
+            };
+            $sheet->getStyle("D{$row}")->applyFromArray(['font' => ['color' => ['argb' => $conditionColor], 'bold' => true]]);
 
-            if ($item->stock <= 0 && (strtolower($statusText) === 'aktif')) {
-                $statusText = 'Habis';
+            // Status Logic: Synchronized with PDF report logic and Localization
+            $rawStatusKey = 'aman';
+            if (strtolower($item->condition) === 'rusak') {
+                $statusText = 'Rusak';
+                $rawStatusKey = 'rusak';
+            } elseif (strtolower($item->condition) === 'hilang') {
+                $statusText = 'Hilang';
+                $rawStatusKey = 'hilang';
+            } elseif ($item->stock <= 0) {
+                $statusText = __('ui.status_out_of_stock'); // e.g. "Habis"
+                $rawStatusKey = 'habis';
+            } elseif ($item->minimum_stock > 0) {
+                if ($item->stock <= $item->minimum_stock) {
+                    $statusText = __('ui.stock_low'); // Translates to "Menipis" (not Kritis)
+                    $rawStatusKey = 'kritis';
+                } elseif ($item->stock <= ($item->minimum_stock + 5)) {
+                    $statusText = __('ui.approaching_stock'); // Translates to "Hampir Menipis"
+                    $rawStatusKey = 'menipis';
+                } else {
+                    $statusText = __('ui.stock_safe');
+                    $rawStatusKey = 'aman';
+                }
+            } else {
+                $statusText = __('ui.stock_safe');
+                $rawStatusKey = 'aman';
             }
-            $sheet->setCellValue("D{$row}", $statusText);
+
+            $sheet->setCellValue("E{$row}", $statusText);
 
             // Status Color Coding
-            $color = match (strtolower($statusText ?? '')) {
-                'aman', 'aktif' => 'FF059669', // Emerald-600
-                'menipis' => 'FFD97706', // Amber-600
-                'habis', 'rusak', 'nonaktif', 'hilang' => 'FFDC2626', // Red-600
-                default => 'FF64748B', // Slate-500
+            $color = match ($rawStatusKey) {
+                'aman' => 'FF059669', // Emerald-600 (Green)
+                'menipis' => 'FFD97706', // Amber-600 (Orange)
+                'kritis' => 'FFEA580C', // Orange-600 (Warning)
+                'habis', 'rusak' => 'FFDC2626', // Red-600
+                'hilang' => 'FF64748B', // Slate-500
+                default => 'FF000000',
             };
-            $sheet->getStyle("D{$row}")->applyFromArray([
+            $sheet->getStyle("E{$row}")->applyFromArray([
                 'font' => ['color' => ['argb' => $color], 'bold' => true],
             ]);
 
-            $sheet->setCellValue("E{$row}", $item->location?->name ?? '-');
-            $sheet->setCellValueExplicit("F{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
-            $sheet->getStyle("F{$row}")->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->setCellValue("F{$row}", $item->location?->name ?? '-');
+            $sheet->setCellValueExplicit("G{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+            $sheet->getStyle("G{$row}")->getNumberFormat()->setFormatCode('#,##0');
             $row++;
         }
 
         // Add Total Formula
         if ($row > ($headerRow + 1)) {
-            $sheet->setCellValue("E{$row}", 'TOTAL STOK KESELURUHAN:');
-            $sheet->getStyle("E{$row}")->applyFromArray(['font' => ['bold' => true], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]]);
+            $sheet->setCellValue("F{$row}", 'TOTAL STOK KESELURUHAN:');
+            $sheet->getStyle("F{$row}")->applyFromArray(['font' => ['bold' => true], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_RIGHT]]);
 
             $lastDataRow = $row - 1;
-            $sheet->setCellValue("F{$row}", '=SUM(F'.($headerRow + 1).":F{$lastDataRow})");
-            $sheet->getStyle("F{$row}")->applyFromArray(['font' => ['bold' => true]]);
+            $sheet->setCellValue("G{$row}", '=SUM(G'.($headerRow + 1).":G{$lastDataRow})");
+            $sheet->getStyle("G{$row}")->applyFromArray(['font' => ['bold' => true]]);
 
             $row++; // Increment so borders cover this
         }
@@ -365,14 +398,14 @@ class ExcelExportService
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Riwayat Peminjaman');
 
-        $lastColumn = 'G';
+        $lastColumn = 'H';
         $headerRow = 5;
 
         // Setup Title
         $this->setupReportTitle($sheet, 'Laporan Riwayat Peminjaman Barang', $lastColumn);
 
         // Headers
-        $headers = ['Nama Peminjam', 'Nama Barang', 'Jumlah', 'Tgl Pinjam', 'Tenggat Waktu', 'Tgl Kembali', 'Status'];
+        $headers = ['Nama Peminjam', 'Nama Barang', 'Jumlah', 'Tgl Pinjam', 'Tenggat Waktu', 'Tgl Kembali', 'Status', 'Kondisi'];
         foreach ($headers as $index => $header) {
             $column = chr(ord('A') + $index);
             $sheet->setCellValue("{$column}{$headerRow}", $header);
@@ -398,19 +431,48 @@ class ExcelExportService
             $sheet->setCellValue("F{$row}", $returnedAt);
 
             // Handle Enum or String for Borrowing Status
-            $statusText = ($borrowing->status instanceof \BackedEnum) ? $borrowing->status->value : (is_string($borrowing->status) ? ucfirst($borrowing->status) : $borrowing->status);
+            $rawStatus = ($borrowing->status instanceof \BackedEnum) ? $borrowing->status->value : (is_string($borrowing->status) ? $borrowing->status : '');
+            
+            $statusLabels = [
+                'borrowed' => __('ui.status_borrowed'),
+                'returned' => __('ui.status_returned'),
+                'lost' => __('ui.status_lost'),
+            ];
+            $statusText = $statusLabels[strtolower($rawStatus)] ?? ucfirst($rawStatus);
+            
             $sheet->setCellValue("G{$row}", $statusText);
 
             // Status Color Coding
-            $color = match (strtolower($statusText ?? '')) {
-                'dikembalikan', 'selesai', 'disetujui' => 'FF059669', // Emerald-600
-                'dipinjam', 'menunggu', 'pending' => 'FFD97706', // Amber-600
-                'terlambat', 'ditolak', 'hilang' => 'FFDC2626', // Red-600
+            $color = match (strtolower($rawStatus)) {
+                'returned', 'selesai', 'disetujui' => 'FF059669', // Emerald-600
+                'borrowed', 'menunggu', 'pending' => 'FFD97706', // Amber-600
+                'terlambat', 'ditolak', 'lost' => 'FFDC2626', // Red-600
                 default => 'FF64748B', // Slate-500
             };
             $sheet->getStyle("G{$row}")->applyFromArray([
                 'font' => ['color' => ['argb' => $color], 'bold' => true],
             ]);
+
+            // Hitung kondisi berdasarkan returns
+            $conditions = collect();
+            if ($borrowing->relationLoaded('returns')) {
+                $conditions = $borrowing->returns->pluck('condition')->unique()->filter();
+            } else {
+                $conditions = $borrowing->returns()->pluck('condition')->unique()->filter();
+            }
+
+            $conditionLabel = '-';
+            if ($conditions->isNotEmpty()) {
+                $conditionLabels = [
+                    'good' => __('ui.condition_good'),
+                    'bad' => __('ui.condition_broken'),
+                    'lost' => __('ui.condition_lost'),
+                ];
+                $mappedConditions = $conditions->map(fn($c) => $conditionLabels[$c] ?? ucfirst($c))->toArray();
+                $conditionLabel = implode(', ', $mappedConditions);
+            }
+
+            $sheet->setCellValue("H{$row}", $conditionLabel);
 
             // Format Quantity Column
             $sheet->getStyle("C{$row}")->getNumberFormat()->setFormatCode('#,##0');
@@ -479,8 +541,8 @@ class ExcelExportService
             $sheet->setCellValueExplicit("F{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
             $sheet->getStyle("E{$row}:F{$row}")->getNumberFormat()->setFormatCode('#,##0');
 
-            // Highlight low stock
-            if ($item->stock <= 0) {
+            // Highlight low stock (Red for critical, Amber for approaching)
+            if ($item->stock <= $item->minimum_stock) {
                 $sheet->getStyle("F{$row}")->applyFromArray([
                     'font' => ['color' => ['argb' => 'FFDC2626'], 'bold' => true], // Red-600
                 ]);

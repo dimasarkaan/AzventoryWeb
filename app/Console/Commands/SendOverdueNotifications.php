@@ -29,8 +29,7 @@ class SendOverdueNotifications extends Command
     {
         $this->info('Memeriksa peminjaman yang terlambat...');
 
-        $overdueBorrowings = Borrowing::where('status', 'borrowed')
-            ->where('expected_return_at', '<', now())
+        $overdueBorrowings = Borrowing::overdue()
             ->with('user', 'sparepart')
             ->get();
 

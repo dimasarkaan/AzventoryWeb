@@ -44,11 +44,7 @@
         </span>
     </td>
     <td class="px-4 py-3">
-        @if($user->status === 'aktif')
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-success-100 text-success-700 tracking-wide uppercase">{{ __('ui.active') }}</span>
-        @else
-            <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-secondary-100 text-secondary-600 tracking-wide uppercase">{{ __('ui.inactive') }}</span>
-        @endif
+        <x-status-badge :status="$user->status" type="pill" class="text-[10px] uppercase tracking-wide" />
     </td>
     <td class="px-4 py-3">
         <div class="flex items-center justify-end gap-2">

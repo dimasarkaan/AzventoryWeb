@@ -8,7 +8,14 @@
                 <p class="mt-1 text-sm text-secondary-500">{{ __('ui.edit_inventory_subtitle') }}</p>
             </div>
 
-            <form action="{{ route('inventory.update', $sparepart) }}" method="POST" enctype="multipart/form-data" @submit="isSubmitting = true" x-data="inventoryForm()" novalidate>
+            <form action="{{ route('inventory.update', $sparepart) }}" method="POST" enctype="multipart/form-data" 
+                  @submit="isSubmitting = true" 
+                  x-data="inventoryForm()"
+                  @trigger-check-pn="checkPN()"
+                  @update-pn="partNumber = $event.detail"
+                  @update-name="itemName = $event.detail"
+                  @update-brand="itemBrand = $event.detail"
+                  @update-category="itemCategory = $event.detail" novalidate>
                 @csrf
                 @method('PUT')
                 
@@ -63,7 +70,9 @@
                                         select(value) {
                                             this.selected = value;
                                             this.search = value;
+                                            this.$dispatch('update-pn', value);
                                             this.open = false;
+                                            this.$dispatch('trigger-check-pn');
                                         },
                                         createNew() {
                                             let term = this.search.toUpperCase();
@@ -71,26 +80,43 @@
                                         },
                                         init() {
                                             if (this.selected) {
+                                                this.$dispatch('update-pn', this.selected);
+                                                this.$dispatch('trigger-check-pn');
                                                 this.search = this.selected;
                                             }
+                                            this.$watch('partNumber', value => {
+                                                if (value !== this.selected) {
+                                                    this.selected = value;
+                                                    this.search = value;
+                                                }
+                                            });
                                         }
                                     }" @click.outside="open = false">
                                         <div class="relative w-full">
                                             <input type="hidden" name="part_number" x-model="selected">
                                             <input id="part_number" class="input-field pr-10 w-full" type="text" 
                                                    x-model="search" 
-                                                   @focus="open = true, $el.select()"
-                                                   @input="open = true, selected = search, partNumber = search.toUpperCase(), search = search.toUpperCase()"
+                                                   @focus="!isLocked && (open = true, $el.select())"
+                                                   @input="!isLocked && (open = true, selected = search, partNumber = search.toUpperCase(), search = search.toUpperCase())"
+                                                   @change="checkPN"
                                                    @keydown.enter.prevent="createNew()" 
                                                    placeholder="{{ __('ui.placeholder_pn') }}" 
                                                    autocomplete="off" minlength="3" maxlength="255" pattern="[a-zA-Z0-9\-\_\/]+" title="Part Number hanya boleh berisi huruf, angka, strip (-), dan underscore (_)" required />
                                             
                                             <!-- Chevron Button -->
-                                            <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                            <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
                                                 <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                                                 </svg>
                                             </button>
+
+                                            <!-- Loading Spinner -->
+                                            <div x-show="isLoading" class="absolute right-10 top-3">
+                                                <svg class="animate-spin h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            </div>
 
                                             <!-- Dropdown -->
                                             <div x-show="open" 
@@ -145,6 +171,7 @@
                                         this.selected = value;
                                         this.search = value;
                                         this.itemName = value;
+                                        this.$dispatch('update-name', value);
                                         this.open = false;
                                     },
                                     createNew() {
@@ -155,6 +182,7 @@
                                         if (this.selected) {
                                             this.search = this.selected;
                                             this.itemName = this.selected;
+                                            this.$dispatch('update-name', this.selected);
                                         }
                                         this.$watch('itemName', value => {
                                              if (value !== this.selected) { this.selected = value; this.search = value; }
@@ -167,14 +195,16 @@
                                         <input type="text" 
                                                id="name"
                                                class="input-field w-full pr-10 cursor-text" 
+                                               :class="{'bg-secondary-100 text-secondary-500': isLocked}"
                                                x-model="search" 
-                                               @focus="open = true, $el.select()" 
-                                               @input="open = true, selected = search, itemName = search" 
+                                               :readonly="isLocked"
+                                               @focus="!isLocked && (open = true, $el.select())" 
+                                               @input="!isLocked && (open = true, selected = search, itemName = search)" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_name') }}" 
                                                autocomplete="off" minlength="3" maxlength="255" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
                                         
-                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
@@ -215,12 +245,14 @@
                                     selected: '{{ old('brand_id', $sparepart->brand_id) }}',
                                     options: {{ json_encode($brands) }},
                                     get filteredOptions() {
-                                        if (this.search === '') return this.options;
+                                        let found = this.options.find(o => o.id == this.selected);
+                                        if (this.search === '' || (found && this.search === found.name)) return this.options;
                                         return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                     },
                                     select(option) {
                                         this.selected = option.id;
                                         this.search = option.name;
+                                        this.$dispatch('update-brand', option.id);
                                         this.open = false;
                                     },
                                     async createNew() {
@@ -242,6 +274,7 @@
                                         if (this.selected) {
                                             let found = this.options.find(o => o.id == this.selected);
                                             if (found) this.search = found.name;
+                                            this.$dispatch('update-brand', this.selected);
                                         }
                                         this.$watch('itemBrand', value => {
                                              if (value != this.selected) {
@@ -263,14 +296,16 @@
                                                id="brand"
                                                name="brand_name"
                                                class="input-field w-full pr-10 cursor-text" 
+                                               :class="{'bg-secondary-100 text-secondary-500': isLocked}"
                                                x-model="search" 
-                                               @focus="open = true, $el.select()" 
+                                               :readonly="isLocked"
+                                               @focus="!isLocked && (open = true, $el.select())" 
                                                @input="open = true" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_brand') }}" 
                                                autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama merk harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
                                         
-                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
@@ -301,12 +336,14 @@
                                     selected: '{{ old('category_id', $sparepart->category_id) }}',
                                     options: {{ json_encode($categories) }},
                                     get filteredOptions() {
-                                        if (this.search === '') return this.options;
+                                        let found = this.options.find(o => o.id == this.selected);
+                                        if (this.search === '' || (found && this.search === found.name)) return this.options;
                                         return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                     },
                                     select(option) {
                                         this.selected = option.id;
                                         this.search = option.name;
+                                        this.$dispatch('update-category', option.id);
                                         this.open = false;
                                     },
                                     async createNew() {
@@ -328,6 +365,7 @@
                                         if (this.selected) {
                                             let found = this.options.find(o => o.id == this.selected);
                                             if (found) this.search = found.name;
+                                            this.$dispatch('update-category', this.selected);
                                         }
                                         this.$watch('itemCategory', value => {
                                              if (value != this.selected) {
@@ -349,14 +387,16 @@
                                                id="category"
                                                name="category_name"
                                                class="input-field w-full pr-10 cursor-text" 
+                                               :class="{'bg-secondary-100 text-secondary-500': isLocked}"
                                                x-model="search" 
-                                               @focus="open = true, $el.select()" 
+                                               :readonly="isLocked"
+                                               @focus="!isLocked && (open = true, $el.select())" 
                                                @input="open = true" 
                                                @keydown.enter.prevent="createNew()"
                                                placeholder="{{ __('ui.placeholder_category') }}" 
                                                autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama kategori harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
                                         
-                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
+                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
                                             <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                                                 <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
                                             </svg>
@@ -603,7 +643,8 @@
                                 selected: '{{ old('location_id', $sparepart->location_id) }}',
                                 options: {{ json_encode($locations) }},
                                 get filteredOptions() {
-                                    if (this.search === '') return this.options;
+                                    let found = this.options.find(o => o.id == this.selected);
+                                    if (this.search === '' || (found && this.search === found.name)) return this.options;
                                     return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                 },
                                 select(option) {
@@ -914,6 +955,11 @@
                         this.openScanModal();
                     }
 
+                    // 2. Check for Pre-filled PN
+                    if (this.partNumber) {
+                         this.checkPN();
+                    }
+
                     // Pre-fill image preview if existing
                     if (this.existingImage) {
                         this.imagePreview = this.existingImage;
@@ -941,6 +987,44 @@
                         }
                     } else {
                         localStorage.removeItem('temp_inventory_image');
+                    }
+                },
+
+                // Auto-fill Logic
+                async checkPN() {
+                    if (!this.partNumber) return;
+                    
+                    this.isLoading = true;
+                    try {
+                        const response = await axios.get('{{ route("inventory.check-part-number") }}', {
+                            params: { part_number: this.partNumber }
+                        });
+
+                        if (response.data.exists) {
+                            const data = response.data.data;
+                            this.itemName = data.name;
+                            this.itemBrand = data.brand_id;
+                            this.itemCategory = data.category_id;
+                            this.type = data.type;
+                            this.itemUnit = data.unit;
+                            this.itemPrice = data.price; // Auto-fill price
+                            
+                            // Handle Image
+                            if (data.image_url) {
+                                this.imagePreview = data.image_url;
+                                this.existingImage = data.image_path;
+                            }
+
+                            this.isLocked = true;
+                            console.log('Produk ditemukan, data diisi otomatis.');
+                        } else {
+                            // PN baru (belum ada di database): unlock semua field
+                            this.isLocked = false;
+                        }
+                    } catch (error) {
+                        console.error('Error checking PN:', error);
+                    } finally {
+                        this.isLoading = false;
                     }
                 },
 

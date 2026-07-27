@@ -112,7 +112,7 @@ class AdminDashboardController extends Controller
                 'sparepart' => fn ($q) => $q->withTrashed(), // Tetap tampilkan meski barang aslinya sudah di-soft delete
                 'user',
             ])
-                ->where('status', 'borrowed')
+                ->active()
                 ->whereIn('user_id', function ($q) {
                     // Admin hanya bisa mengawasi peminjaman dari Admin lain dan Operator
                     $q->select('id')
@@ -131,8 +131,7 @@ class AdminDashboardController extends Controller
                 'sparepart' => fn ($q) => $q->withTrashed(),
                 'user',
             ])
-                ->where('status', 'borrowed')
-                ->where('expected_return_at', '<', now())
+                ->overdue()
                 ->whereIn('user_id', function ($q) {
                     $q->select('id')
                         ->from('users')
@@ -147,9 +146,7 @@ class AdminDashboardController extends Controller
 
             // --- Menarik maksimal 5 jenis barang yang sisa stoknya sangat kritis (kritis = di bawah minimum) ---
             $lowStockItemsRaw = \App\Models\Sparepart::with('category')
-                ->where('minimum_stock', '>', 0)
-                ->whereColumn('stock', '<=', 'minimum_stock')
-                ->where('condition', 'Baik')
+                ->lowStock()
                 ->orderBy('stock', 'asc')
                 ->take(5)
                 ->get();
@@ -162,6 +159,7 @@ class AdminDashboardController extends Controller
                     'name' => $item->name,
                     'stock' => $item->stock,
                     'minimum_stock' => $item->minimum_stock,
+                    'category' => ['name' => $item->category->name ?? 'Unknown'],
                     'category_name' => $item->category->name ?? 'Unknown',
                 ];
             });

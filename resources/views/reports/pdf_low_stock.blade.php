@@ -4,12 +4,11 @@
     <title>{{ $title }}</title>
     @include('reports.partials.pdf_style')
     <style>
-        /* Low-stock specific overrides (supplement pdf_header partial) */
-        .pdf-company-header { border-bottom-color: #dc2626 !important; }
-        .pdf-report-title h1 { color: #dc2626 !important; }
-        th { background-color: #991b1b !important; } /* Dark Red header */
-        tr:nth-child(even) { background-color: #fef2f2; }
+        /* Low-stock specific styles - Emergency Red Injection */
         .critical { color: #dc2626; font-weight: bold; }
+        .pdf-company-name { color: #991b1b !important; border-bottom-color: #991b1b !important; }
+        th { background-color: #991b1b !important; border-color: #7f1d1d !important; }
+        .pdf-company-header { border-bottom-color: #991b1b !important; }
     </style>
 </head>
 <body>
@@ -36,7 +35,13 @@
                 <td>{{ $row->location?->name ?? '-' }}</td>
                 <td class="critical" style="text-align: center; font-size: 11pt;">{{ $row->stock }}</td>
                 <td style="text-align: center;">{{ $row->minimum_stock }}</td>
-                <td class="critical">{{ strtoupper(__('ui.status_critical')) }}</td>
+                <td>
+                    @if($row->stock <= $row->minimum_stock)
+                        <span class="critical" style="color: #dc2626; font-weight: bold;">{{ strtoupper(__('ui.status_critical')) }}</span>
+                    @else
+                        <span style="color: #ea580c; font-weight: bold;">{{ strtoupper(__('ui.approaching_stock')) }}</span>
+                    @endif
+                </td>
             </tr>
             @endforeach
         </tbody>

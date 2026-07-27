@@ -67,29 +67,24 @@ class InventoryService
         // Filter tab khusus yang ada di dashboard (seperti tab 'stok menipis' atau 'barang bermasalah')
         if (($filters['filter'] ?? '') === 'low_stock') {
             // Hanya mencari barang yang nilai stok-nya sudah menyentuh atau kurang dari minimum_stock
-            $query->where('minimum_stock', '>', 0)
-                ->whereColumn('stock', '<=', 'minimum_stock')
-                ->where('condition', 'Baik');
+            $query->lowStock();
         } elseif (($filters['filter'] ?? '') === 'overdue') {
             // Mencari barang yang sedang dipinjam tapi sudah melewati batas waktu kembalinya
             $query->whereHas('borrowings', function ($q) {
-                $q->where('status', 'borrowed')
-                    ->where('expected_return_at', '<', now());
+                $q->overdue();
             });
         } elseif (($filters['filter'] ?? '') === 'borrowed') {
             // Mencari barang apa saja yang saat ini statusnya sedang dipinjam
             $query->whereHas('borrowings', function ($q) {
-                $q->where('status', 'borrowed');
+                $q->active();
             });
         } elseif (($filters['filter'] ?? '') === 'no_price') {
             // Mencari barang yang belum memiliki harga atau harganya 0
-            $query->where(function ($q) {
-                $q->whereNull('price')->orWhere('price', '<=', 0);
-            });
+            $query->noPrice();
         } elseif (($filters['filter'] ?? '') === 'problematic') {
             // Menampilkan barang dengan kondisi Rusak/Hilang (Hanya dapat dilihat oleh Admin/Superadmin)
             if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
-                $query->whereIn('condition', ['Rusak', 'Hilang'])
+                $query->problematic()
                     ->with(['stockLogs' => fn ($q) => $q->latest()]);
             } else {
                 $query->whereRaw('1 = 0'); // Sengaja dibuat query salah jika rolenya bukan admin (menyembunyikan data)
@@ -291,8 +286,8 @@ class InventoryService
                     } catch (\Throwable $e) {
                     }
 
-                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
-                    // Notifikasi approaching: stok menuju minimum (antara 100%-150% dari minimum)
+                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= ($sparepart->minimum_stock + 5)) {
+                    // Notifikasi approaching: stok menuju minimum (selisih <= 5 dari minimum)
                     $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                     Notification::send($admins, new ApproachingStockNotification($sparepart));
                 }
@@ -673,7 +668,7 @@ class InventoryService
                     } catch (\Throwable $e) {
                     }
 
-                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
+                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= ($sparepart->minimum_stock + 5)) {
                     $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                     Notification::send($admins, new ApproachingStockNotification($sparepart));
                 }
@@ -829,7 +824,7 @@ class InventoryService
                         broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
                     } catch (\Throwable $e) {
                     }
-                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= (int) round($sparepart->minimum_stock * 1.5)) {
+                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= ($sparepart->minimum_stock + 5)) {
                     $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                     Notification::send($admins, new ApproachingStockNotification($sparepart));
                 }

@@ -66,7 +66,7 @@ class ReportService
             $view = 'reports.pdf_stock_mutation';
 
         } elseif ($type == 'borrowing_history') {
-            $query = Borrowing::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user'])->withSum('returns', 'quantity');
+            $query = Borrowing::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user', 'returns'])->withSum('returns', 'quantity');
             $this->applyDateRange($query, 'borrowed_at', $startDate, $endDate);
 
             if ($location !== 'all' && $location) {
@@ -82,10 +82,7 @@ class ReportService
             $view = 'reports.pdf_borrowing_history';
 
         } elseif ($type == 'low_stock') {
-            $query = Sparepart::with(['brand', 'category', 'location'])
-                ->where('minimum_stock', '>', 0)
-                ->whereColumn('stock', '<=', 'minimum_stock')
-                ->where('condition', 'Baik')
+            $query = Sparepart::with(['brand', 'category', 'location'])->lowStock()
                 ->orderBy('stock', 'asc');
             if ($location !== 'all' && $location) {
                 $query->whereHas('location', function ($q) use ($location) {
@@ -99,7 +96,7 @@ class ReportService
             $this->applyDateRange($query, 'created_at', $startDate, $endDate);
             $query->latest();
             $title = 'Laporan Riwayat Aktivitas';
-            $view = 'reports.pdf_activity_log';
+            $view = 'reports.activity_logs.pdf';
         }
 
         return [

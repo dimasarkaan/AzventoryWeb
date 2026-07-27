@@ -88,9 +88,8 @@ class DashboardService
                 'totalBrands' => Brand::count(),
                 'totalLocations' => Location::count(),
                 'pendingApprovalsCount' => StockLog::where('status', 'pending')->count(),
-                'lowStockItems' => Sparepart::where('minimum_stock', '>', 0)
-                    ->whereColumn('stock', '<=', 'minimum_stock')
-                    ->where('condition', 'Baik')
+                'lowStockItems' => Sparepart::with('category')
+                    ->lowStock()
                     ->take(5)->get(),
             ];
         });
@@ -258,43 +257,6 @@ class DashboardService
             ->get();
     }
 
-    // Fitur Cerdas (Forecast): Memprediksi (meramal) berapa jumlah barang yang harus dibeli bulan depan.
-    // Berdasarkan rumus rata-rata barang yang keluar selama 3 bulan terakhir.
-    public function getForecasts(Collection $topExitedItems): array
-    {
-        $forecasts = [];
-        if ($topExitedItems->isEmpty()) {
-            return $forecasts;
-        }
-
-        $itemIds = $topExitedItems->pluck('sparepart_id')->toArray();
-        $forecastStart = Carbon::now()->subMonths(3);
-        $forecastEnd = Carbon::now();
-
-        $usageStats = StockLog::whereIn('sparepart_id', $itemIds)
-            ->where('type', 'keluar')
-            ->where('status', 'approved')
-            ->whereBetween('created_at', [$forecastStart, $forecastEnd])
-            ->selectRaw('sparepart_id, SUM(quantity) as total_usage')
-            ->groupBy('sparepart_id')
-            ->pluck('total_usage', 'sparepart_id');
-
-        $currentStocks = Sparepart::whereIn('id', $itemIds)->pluck('stock', 'id');
-
-        foreach ($topExitedItems as $item) {
-            $totalUsage = $usageStats[$item->sparepart_id] ?? 0;
-            $avgMonthly = round($totalUsage / 3);
-
-            $forecasts[] = [
-                'name' => $item->sparepart_name,
-                'current_stock' => $currentStocks[$item->sparepart_id] ?? 0,
-                'avg_usage' => $avgMonthly,
-                'predicted_need' => $avgMonthly,
-            ];
-        }
-
-        return $forecasts;
-    }
 
     // Menghitung jumlah barang yang sedang dipinjam dan yang sudah telat/lewat jatuh tempo (Overdue).
     // Menampilkan data sesuai jabatan: Superadmin melihat semua, Operator hanya melihat miliknya sendiri.
@@ -312,10 +274,9 @@ class DashboardService
             $borrowQuery->where('user_id', $user->id);
         }
 
-        $activeBorrowingsCount = (clone $borrowQuery)->where('status', 'borrowed')->count();
+        $activeBorrowingsCount = (clone $borrowQuery)->active()->count();
 
-        $overdueBaseQuery = (clone $borrowQuery)->where('status', 'borrowed')
-            ->where('expected_return_at', '<', now());
+        $overdueBaseQuery = (clone $borrowQuery)->overdue();
 
         $totalOverdueCount = $overdueBaseQuery->count();
 

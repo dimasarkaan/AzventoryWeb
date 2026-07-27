@@ -85,6 +85,7 @@ class Sparepart extends Model
         $conditionMap = ['Rusak' => 'bad', 'Hilang' => 'lost'];
         $returnCondition = $conditionMap[$this->condition] ?? null;
 
+        // Lapis 1: Cek dari Riwayat Pengembalian Peminjaman (Peminjam)
         if ($returnCondition) {
             // Cari riwayat return terakhir untuk part_number ini yang kondisinya bad/lost
             $latestReturn = \App\Models\BorrowingReturn::where('condition', $returnCondition)
@@ -99,19 +100,63 @@ class Sparepart extends Model
                 $date = $latestReturn->created_at->format('d M Y');
                 $note = $latestReturn->notes ? " - Catatan: {$latestReturn->notes}" : '';
 
-                return "Dikembalikan oleh {$userName} pada {$date}{$note}";
+                return "Dikembalikan ({$this->condition}) oleh {$userName} pada {$date}{$note}";
             }
         }
 
-        // Fallback: check latest stock log
+        // Lapis 2: Cek dari Log Aktivitas (Admin Edit Manual via Dashboard)
+        $latestActivity = \App\Models\ActivityLog::where('action', 'Sparepart Diperbarui')
+            ->where('description', 'like', '%' . $this->part_number . '%')
+            ->where('properties->condition->new', $this->condition)
+            ->latest()
+            ->first();
+
+        if ($latestActivity) {
+            $userName = $latestActivity->user->name ?? 'Admin';
+            $date = $latestActivity->created_at->format('d M Y');
+            return "Status diubah manual menjadi {$this->condition} oleh {$userName} pada {$date}";
+        }
+
+        // Lapis 3: Fallback check latest stock log (Penyesuaian Fisik Gudang)
         $latestLog = $this->stockLogs->first();
         if ($latestLog && $latestLog->reason) {
             $date = $latestLog->created_at->format('d M Y');
 
-            return "Update log pada {$date} - {$latestLog->reason}";
+            return "Update stok pada {$date} - {$latestLog->reason}";
         }
 
-        return 'Tidak ada riwayat catatan.';
+        return 'Tidak ada riwayat catatan spesifik.';
+    }
+
+    // Scope (Standarisasi Global): Mengambil data barang yang stoknya sudah Menuju Kritis (<= 150%) atau Habis
+    public function scopeLowStock($query)
+    {
+        return $query->where('minimum_stock', '>', 0)
+                     ->whereRaw('stock <= (minimum_stock + 5)')
+                     ->where('condition', 'Baik');
+    }
+
+    // Scope (Standarisasi Global): Mengambil data barang yang bermasalah (kondisi Rusak atau Hilang)
+    public function scopeProblematic($query)
+    {
+        return $query->whereIn('condition', ['Rusak', 'Hilang']);
+    }
+
+    // Scope (Standarisasi Global): Mengambil data barang jualan (Sale) yang belum diatur harganya
+    public function scopeNoPrice($query)
+    {
+        return $query->where('type', 'sale')
+                     ->where(function ($q) {
+                         $q->whereNull('price')->orWhere('price', '<=', 0);
+                     });
+    }
+
+    // Helper (Standarisasi Global): Mengecek apakah SATU barang spesifik ini sedang menipis
+    public function isLowStock()
+    {
+        return $this->minimum_stock > 0 
+            && $this->stock <= ($this->minimum_stock + 5) 
+            && strtolower($this->condition) === 'baik';
     }
 
     // Keamanan URL: Menggunakan huruf acak (UUID) di URL Profil barang agar ID aslinya tidak mudah ditebak peretas

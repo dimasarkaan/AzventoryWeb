@@ -40,10 +40,10 @@
                     $age = $sparepart->age === 'Pernah Dipakai (Bekas)' ? 'Bekas' : ($sparepart->age ?? '-');
                     
                     $conditionColor = match(strtolower($condition)) {
-                        'baik' => 'text-success-600 bg-success-50/50 border-success-100',
-                        'rusak' => 'text-danger-600 bg-danger-50/50 border-danger-100',
-                        'hilang' => 'text-secondary-600 bg-secondary-100 border-secondary-200',
-                        default => 'text-secondary-600 bg-secondary-50 border-secondary-100'
+                        'baik' => 'text-success-700 bg-success-50 border-success-200',
+                        'rusak' => 'text-danger-700 bg-danger-50 border-danger-200',
+                        'hilang' => 'text-secondary-700 bg-secondary-100 border-secondary-200',
+                        default => 'text-secondary-700 bg-secondary-50 border-secondary-200'
                     };
                 @endphp
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border {{ $conditionColor }}">
@@ -78,10 +78,10 @@
                     $age = $sparepart->age === 'Pernah Dipakai (Bekas)' ? 'Bekas' : ($sparepart->age ?? '-');
                     
                     $conditionColor = match(strtolower($condition)) {
-                        'baik' => 'text-success-600 bg-success-50/50 border-success-100',
-                        'rusak' => 'text-danger-600 bg-danger-50/50 border-danger-100',
-                        'hilang' => 'text-secondary-600 bg-secondary-100 border-secondary-200',
-                        default => 'text-secondary-600 bg-secondary-50 border-secondary-100'
+                        'baik' => 'text-success-700 bg-success-50 border-success-200',
+                        'rusak' => 'text-danger-700 bg-danger-50 border-danger-200',
+                        'hilang' => 'text-secondary-700 bg-secondary-100 border-secondary-200',
+                        default => 'text-secondary-700 bg-secondary-50 border-secondary-200'
                     };
                 @endphp
                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border {{ $conditionColor }}">
@@ -106,14 +106,19 @@
         <div class="flex items-baseline justify-center gap-1">
             @php
                 $isLowStock = $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && strtolower($sparepart->condition) === 'baik';
+                $isApproaching = $sparepart->minimum_stock > 0 && $sparepart->stock > $sparepart->minimum_stock && $sparepart->stock <= ($sparepart->minimum_stock + 5) && strtolower($sparepart->condition) === 'baik';
             @endphp
             
             @if($isLowStock)
-                <div class="relative group self-center" title="{{ __('ui.low_stock') }}">
+                <div class="relative group self-center" title="{{ __('ui.status_critical') }}">
                     <svg class="w-4 h-4 text-danger-500 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                 </div>
+            @elseif($isApproaching)
+                <div class="relative group self-center" title="{{ __('ui.approaching_stock') }}">
+                    <svg class="w-4 h-4 text-warning-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
             @endif
-            <span class="text-base font-bold {{ $isLowStock ? 'text-danger-600' : 'text-secondary-900' }}">
+            <span class="text-base font-bold {{ $isLowStock ? 'text-danger-600' : ($isApproaching ? 'text-warning-600' : 'text-secondary-900') }}">
                 {{ $sparepart->stock }}
             </span>
             <span class="text-xs text-secondary-500">{{ $sparepart->unit ?? 'Pcs' }}</span>

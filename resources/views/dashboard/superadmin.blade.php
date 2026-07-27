@@ -1980,12 +1980,13 @@
                                 <template x-for="item in lowStockItems" :key="item.uuid">
                                     <tr class="bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href = '/inventory/' + item.uuid">
                                         <td class="px-4 py-3 font-medium text-secondary-800" x-text="item.name || 'Unknown'"></td>
-                                        <td class="px-6 py-4 hidden md:table-cell" x-text="item.category || '-'"></td>
+                                        <td class="px-6 py-4 hidden md:table-cell" x-text="item.category?.name || '-'"></td>
                                         <td class="px-6 py-4 text-center font-bold text-danger-600" x-text="item.stock"></td>
                                         <td class="px-6 py-4 text-center text-secondary-600 hidden md:table-cell" x-text="item.minimum_stock"></td>
                                         <td class="px-6 py-4 text-center">
                                             <span class="badge badge-danger" x-show="item.stock == 0">{{ __('ui.status_out_of_stock') }}</span>
-                                            <span class="badge badge-warning" x-show="item.stock > 0">{{ __('ui.status_critical') }}</span>
+                                            <span class="badge badge-danger" x-show="item.stock > 0 && item.stock <= item.minimum_stock">{{ __('ui.status_critical') }}</span>
+                                            <span class="badge badge-warning" x-show="item.stock > item.minimum_stock" style="background:#fff7ed;color:#92400e;border-color:#fbbf24;">{{ __('ui.approaching_stock') }}</span>
                                         </td>
                                     </tr>
                                 </template>

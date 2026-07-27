@@ -88,8 +88,7 @@ class SendMonthlyReports extends Command
         $summary = [
             'total_items' => \App\Models\Sparepart::count(),
             'active_borrowings' => \App\Models\Borrowing::where('status', 'dipinjam')->count(),
-            'low_stock_count' => \App\Models\Sparepart::where('minimum_stock', '>', 0)
-                ->whereColumn('stock', '<=', 'minimum_stock')->count(),
+            'low_stock_count' => \App\Models\Sparepart::lowStock()->count(),
             'monthly_activities' => \App\Models\ActivityLog::whereBetween('created_at', [$startDate, $endDate])->count(),
         ];
 

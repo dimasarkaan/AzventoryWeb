@@ -31,7 +31,7 @@ class StockRequestNotification extends Notification implements ShouldBroadcast
         $url = route('inventory.stock-approvals.index', ['search' => $this->stockLog->sparepart->name]);
 
         if ($notifiable->role === UserRole::OPERATOR) {
-            $url = route('inventory.show', $this->stockLog->sparepart_id);
+            $url = route('inventory.show', $this->stockLog->sparepart->uuid);
         }
 
         return [
@@ -47,7 +47,7 @@ class StockRequestNotification extends Notification implements ShouldBroadcast
     {
         $url = route('inventory.stock-approvals.index', ['search' => $this->stockLog->sparepart->name]);
         if ($notifiable->role === UserRole::OPERATOR) {
-            $url = route('inventory.show', $this->stockLog->sparepart_id);
+            $url = route('inventory.show', $this->stockLog->sparepart->uuid);
         }
 
         return new BroadcastMessage([

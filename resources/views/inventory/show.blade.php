@@ -12,11 +12,7 @@
                         <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
                             {{ $sparepart->name }}
                         </h2>
-                        @if($sparepart->status === 'aktif')
-                            <span class="badge badge-success">{{ __('ui.status_active') }}</span>
-                        @else
-                            <span class="badge badge-danger">{{ __('ui.status_inactive') }}</span>
-                        @endif
+                        <x-status-badge :status="$sparepart->status" type="pill" />
                     </div>
                     <div class="flex items-center gap-2 mt-1.5 text-secondary-500 font-mono text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
@@ -96,8 +92,19 @@
                             </div>
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.condition') }}</span>
-                                <div class="mt-1 text-secondary-900 font-medium">
-                                    {{ $sparepart->condition }}
+                                <div class="mt-1">
+                                    @php
+                                        $condition = $sparepart->condition ?? '-';
+                                        $conditionColor = match(strtolower($condition)) {
+                                            'baik' => 'text-success-700 bg-success-50 border-success-200',
+                                            'rusak' => 'text-danger-700 bg-danger-50 border-danger-200',
+                                            'hilang' => 'text-secondary-700 bg-secondary-100 border-secondary-200',
+                                            default => 'text-secondary-700 bg-secondary-50 border-secondary-200'
+                                        };
+                                    @endphp
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border {{ $conditionColor }}">
+                                        {{ ucfirst($condition) }}
+                                    </span>
                                 </div>
                             </div>
                             @if($sparepart->type === 'sale')
@@ -133,12 +140,21 @@
                             <div class="mt-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-100">
                                  <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                  <div>
-                                     <span class="font-bold block">{{ __('ui.low_stock_alert') }}</span>
-                                     {{ __('ui.low_stock_desc') }} ({{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
+                                     <span class="font-bold block">{{ __('ui.status_critical') }}</span>
+                                     Stok mencapai atau di bawah batas minimum (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
                                  </div>
                             </div>
                         </template>
-                        <template x-if="liveStock > {{ $sparepart->minimum_stock ?? 0 }}">
+                        <template x-if="liveStock > {{ $sparepart->minimum_stock ?? 0 }} && liveStock <= {{ ($sparepart->minimum_stock ?? 0) + 5 }}">
+                            <div class="mt-4 bg-warning-50 text-warning-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-warning-200">
+                                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                 <div>
+                                     <span class="font-bold block">{{ __('ui.approaching_stock') }}</span>
+                                     Stok hampir mencapai batas minimum (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
+                                 </div>
+                            </div>
+                        </template>
+                        <template x-if="liveStock > {{ ($sparepart->minimum_stock ?? 0) + 5 }}">
                              <div class="mt-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-center gap-2 border border-success-100">
                                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                  <span>{{ __('ui.stock_safe') }} (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }})</span>

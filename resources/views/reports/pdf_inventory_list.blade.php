@@ -32,12 +32,16 @@
                 <td>{{ $item->location?->name ?? '-' }}</td>
                 <td style="text-align: center;">{{ $item->stock }} {{ $item->unit }}</td>
                 <td>
-                    @if($item->stock == 0)
+                    @if(strtolower($item->condition) === 'rusak')
+                        <span class="badge badge-danger">Rusak</span>
+                    @elseif(strtolower($item->condition) === 'hilang')
+                        <span class="badge badge-secondary" style="background:#f1f5f9;color:#475569;border-color:#cbd5e1;">Hilang</span>
+                    @elseif($item->stock == 0)
                         <span class="badge badge-danger">{{ __('ui.status_out_of_stock') }}</span>
-                    @elseif($item->minimum_stock > 0 && strtolower($item->condition) === 'baik')
+                    @elseif($item->minimum_stock > 0)
                         @if($item->stock <= $item->minimum_stock)
                             <span class="badge badge-warning">{{ __('ui.stock_low') }}</span>
-                        @elseif($item->stock <= round($item->minimum_stock * 1.5))
+                        @elseif($item->stock <= ($item->minimum_stock + 5))
                             <span class="badge badge-warning" style="background:#fff7ed;color:#92400e;border-color:#fbbf24;">{{ __('ui.approaching_stock') }}</span>
                         @else
                             <span class="badge badge-success">{{ __('ui.stock_safe') }}</span>

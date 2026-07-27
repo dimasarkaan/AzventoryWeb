@@ -54,9 +54,7 @@
                     </div>
                     <div>
                         <p class="text-xs font-medium text-secondary-500 uppercase tracking-wider">{{ __('ui.stats_status') }}</p>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-100 text-success-800">
-                            {{ __('ui.status_active') }}
-                        </span>
+                        <x-status-badge :status="$user->status" type="pill" class="text-xs" />
                     </div>
                 </div>
             </div>

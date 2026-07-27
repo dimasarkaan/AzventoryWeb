@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
         Gate::policy(\App\Models\StockLog::class, \App\Policies\StockLogPolicy::class);
         Gate::policy(\App\Models\Borrowing::class, \App\Policies\BorrowingPolicy::class);
+        Gate::policy(\App\Models\Location::class, \App\Policies\LocationPolicy::class);
+        Gate::policy(\App\Models\Brand::class, \App\Policies\BrandPolicy::class);
+        Gate::policy(\App\Models\Category::class, \App\Policies\CategoryPolicy::class);
 
         config(['app.locale' => 'id']);
         \Carbon\Carbon::setLocale('id');

@@ -75,7 +75,6 @@ class SuperAdminDashboardController extends Controller
             $topEntered = $this->dashboardService->getTopItems($start, $end, 'masuk');
             $deadStockItems = $this->dashboardService->getDeadStock($start, $end, $period);
             $activeUsers = $this->dashboardService->getUserLeaderboard($start, $end);
-            $forecasts = $this->dashboardService->getForecasts($topExited);
 
             // --- Grafik ---
             $stockByCategory = $this->dashboardService->getStockByAttribute('category');
@@ -102,7 +101,7 @@ class SuperAdminDashboardController extends Controller
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart' => function ($query) {
                 $query->withTrashed();
             }, 'user'])
-                ->where('status', 'borrowed')
+                ->active()
                 ->latest()
                 ->take(5)
                 ->get();
@@ -110,8 +109,7 @@ class SuperAdminDashboardController extends Controller
             $overdueBorrowingsListRaw = \App\Models\Borrowing::with(['sparepart' => function ($query) {
                 $query->withTrashed();
             }, 'user'])
-                ->where('status', 'borrowed')
-                ->where('expected_return_at', '<', now())
+                ->overdue()
                 ->orderBy('expected_return_at', 'asc')
                 ->take(5)
                 ->get();
@@ -143,7 +141,6 @@ class SuperAdminDashboardController extends Controller
                     'topEntered' => $topEntered,
                     'deadStockItems' => $deadStockItems,
                     'activeUsers' => $activeUsers,
-                    'forecasts' => $forecasts,
                     'stockByCategory' => $stockByCategory,
                     'stockByLocation' => $stockByLocation,
                     'recentActivities' => $recentActivities,
@@ -157,9 +154,7 @@ class SuperAdminDashboardController extends Controller
 
         // --- Stok Menipis (max 5) ---
         $lowStockItemsRaw = \App\Models\Sparepart::with('category')
-            ->where('minimum_stock', '>', 0)
-            ->whereColumn('stock', '<=', 'minimum_stock')
-            ->where('condition', 'Baik')
+            ->lowStock()
             ->orderBy('stock', 'asc')
             ->take(5)
             ->get();
@@ -171,15 +166,13 @@ class SuperAdminDashboardController extends Controller
                 'name' => $item->name,
                 'stock' => $item->stock,
                 'minimum_stock' => $item->minimum_stock,
+                'category' => ['name' => $item->category->name ?? 'Unknown'],
                 'category_name' => $item->category->name ?? 'Unknown',
             ];
         });
 
         // Barang bertipe 'sale' yang belum memiliki harga — selalu fresh (tidak di-cache)
-        $noPriceItemsRaw = \App\Models\Sparepart::where('type', 'sale')
-            ->where(function ($q) {
-                $q->whereNull('price')->orWhere('price', '<=', 0);
-            })
+        $noPriceItemsRaw = \App\Models\Sparepart::noPrice()
             ->latest()
             ->take(10)
             ->get();

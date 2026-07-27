@@ -721,12 +721,13 @@
                                     <tr class="bg-white hover:bg-secondary-50 transition-colors cursor-pointer"
                                         @click="window.location.href = '/inventory/' + (item.uuid || item.id)">
                                         <td class="px-4 py-3 font-medium text-secondary-800" x-text="item.name || 'Unknown'"></td>
-                                        <td class="px-6 py-4 hidden md:table-cell" x-text="item.category || '-'"></td>
+                                        <td class="px-6 py-4 hidden md:table-cell" x-text="item.category?.name || '-'"></td>
                                         <td class="px-6 py-4 text-center font-bold text-danger-600" x-text="item.stock"></td>
                                         <td class="px-6 py-4 text-center text-secondary-600 hidden md:table-cell" x-text="item.minimum_stock"></td>
                                         <td class="px-6 py-4 text-center">
                                             <span class="badge badge-danger" x-show="item.stock == 0">{{ __('ui.status_out_of_stock') }}</span>
-                                            <span class="badge badge-warning" x-show="item.stock > 0">{{ __('ui.status_critical') }}</span>
+                                            <span class="badge badge-danger" x-show="item.stock > 0 && item.stock <= item.minimum_stock">{{ __('ui.status_critical') }}</span>
+                                            <span class="badge badge-warning" x-show="item.stock > item.minimum_stock" style="background:#fff7ed;color:#92400e;border-color:#fbbf24;">{{ __('ui.approaching_stock') }}</span>
                                         </td>
                                     </tr>
                                 </template>
@@ -1017,18 +1018,32 @@
         }
 
         function doCapture(toastEl) {
-            const target = document.querySelector('[x-data]') || document.body;
-            html2canvas(target, { scale: 1.5, useCORS: true, backgroundColor: '#f8fafc', logging: false })
-                .then(canvas => {
+            document.body.classList.add('is-exporting'); // Add export class to trigger pure white mode
+
+            // Tunggu sebentar agar CSS apply sebelum direkam
+            setTimeout(() => {
+                const target = document.querySelector('[x-data]') || document.body;
+                html2canvas(target, {
+                    scale: 1.5,
+                    useCORS: true,
+                    backgroundColor: '#ffffff',
+                    windowWidth: 1280, // force desktop width so it doesn't squish
+                    logging: false,
+                }).then(canvas => {
+                    document.body.classList.remove('is-exporting'); // Remove immediately
                     const link = document.createElement('a');
-                    link.download = `dashboard-admin-azventory-${new Date().toISOString().slice(0,10)}.png`;
+                    const d = new Date();
+                    const dateStr = d.toISOString().slice(0, 10);
+                    link.download = `dashboard-admin-azventory-${dateStr}.png`;
                     link.href = canvas.toDataURL('image/png');
                     link.click();
                     if (toastEl) toastEl.remove();
                 }).catch(() => {
+                    document.body.classList.remove('is-exporting');
                     if (toastEl) toastEl.remove();
                     window.showAlert('Error', 'Gagal mengambil screenshot. Gunakan opsi Cetak/PDF.', 'error');
                 });
+            }, 300);
         }
 
         const movementDataKey = @json($movementData);

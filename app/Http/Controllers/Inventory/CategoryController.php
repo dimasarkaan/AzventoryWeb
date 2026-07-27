@@ -36,6 +36,8 @@ class CategoryController extends Controller
     // Menyimpan data kategori baru ke dalam database
     public function store(Request $request)
     {
+        $this->authorize('create', Category::class);
+
         // Validasi: Nama kategori wajib ada, berupa teks, dan tak boleh kembar (unique) dengan data yang sudah ada
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
@@ -60,6 +62,9 @@ class CategoryController extends Controller
     // Memperbarui informasi kategori yang sudah ada (Nama atau Status Aktifnya)
     public function update(Request $request, $id)
     {
+        $category = Category::findOrFail($id);
+        $this->authorize('update', $category);
+
         // Validasi: Nama tidak boleh kembar KECUALI dengan dirinya sendiri (id-nya)
         $request->validate([
             'name' => 'required|string|max:255|unique:categories,name,'.$id,
@@ -122,6 +127,7 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $category = Category::findOrFail($id);
+        $this->authorize('delete', $category);
 
         // Cek Keamanan: Pastikan apakah masih ada barang di gudang yang memakai nama kategori ini
         $count = $category->spareparts()->count();

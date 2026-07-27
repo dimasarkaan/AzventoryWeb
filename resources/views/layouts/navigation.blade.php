@@ -229,7 +229,9 @@
                                 axios.get('/notifications?_=' + new Date().getTime())
                                     .then(response => {
                                         this.notifications = response.data;
-                                        this.unreadCount = this.notifications.filter(n => !n.read_at).length;
+                                        // Bug fix: Jangan overwrite unreadCount menggunakan panjang array preview, 
+                                        // karena array dari backend di-limit maksimal 5 item.
+                                        // Biarkan nilai awalnya tetap memakai data utuh dari Blade {{ auth()->user()->unreadNotifications()->count() }}
                                     })
                                     .catch(error => console.error(error));
                             },

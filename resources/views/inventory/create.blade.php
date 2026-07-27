@@ -264,7 +264,8 @@
                                     selected: '{{ old('brand_id') }}',
                                     options: {{ json_encode($brands) }},
                                     get filteredOptions() {
-                                        if (this.search === '') return this.options;
+                                        let found = this.options.find(o => o.id == this.selected);
+                                        if (this.search === '' || (found && this.search === found.name)) return this.options;
                                         return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                     },
                                     select(option) {
@@ -377,7 +378,8 @@
                                     selected: '{{ old('category_id') }}',
                                     options: {{ json_encode($categories) }},
                                     get filteredOptions() {
-                                        if (this.search === '') return this.options;
+                                        let found = this.options.find(o => o.id == this.selected);
+                                        if (this.search === '' || (found && this.search === found.name)) return this.options;
                                         return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                     },
                                     select(option) {
@@ -732,7 +734,8 @@
                                 selected: '{{ old('location_id') }}',
                                 options: {{ json_encode($locations) }},
                                 get filteredOptions() {
-                                    if (this.search === '') return this.options;
+                                    let found = this.options.find(o => o.id == this.selected);
+                                    if (this.search === '' || (found && this.search === found.name)) return this.options;
                                     return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
                                 },
                                 select(option) {

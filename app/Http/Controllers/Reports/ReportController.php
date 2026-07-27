@@ -96,7 +96,15 @@ class ReportController extends Controller
 
             // Jika jumlah datanya wajar (dibawah 1000 data), proses langsung detik itu juga karena server pasti kuat
             if (count($reportData['data']) <= 1000) {
-                $this->logActivity('Laporan Diunduh', "Mengunduh PDF langsung tipe: {$type}");
+                $reportTypeLabel = match ($type) {
+                    'inventory_list' => 'Inventaris',
+                    'stock_mutation' => 'Mutasi Stok',
+                    'borrowing_history' => 'Peminjaman',
+                    'low_stock' => 'Stok Menipis',
+                    'activity_log' => 'Aktivitas Sistem',
+                    default => 'Sistem'
+                };
+                $this->logActivity('Laporan Diunduh', "Mengunduh PDF Laporan {$reportTypeLabel}");
 
                 // Memuat layout tampilan kertas menggunakan library DOMPDF
                 $pdf = app()->make('dompdf.wrapper')->loadView($reportData['view'], [
@@ -136,7 +144,15 @@ class ReportController extends Controller
             // Maka pembuatannya kita lemparkan ke 'pekerja belakang layar' (Queue / Background Job)
             GenerateReportJob::dispatch($request->user(), $startDate, $endDate, $location, $type);
 
-            $this->logActivity('Laporan Diproses', "Meminta antrean laporan PDF tipe: {$type}");
+            $reportTypeLabel = match ($type) {
+                'inventory_list' => 'Inventaris',
+                'stock_mutation' => 'Mutasi Stok',
+                'borrowing_history' => 'Peminjaman',
+                'low_stock' => 'Stok Menipis',
+                'activity_log' => 'Aktivitas Sistem',
+                default => 'Sistem'
+            };
+            $this->logActivity('Laporan Diproses', "Meminta antrean sistem untuk memproses PDF Laporan {$reportTypeLabel}");
 
             $message = 'Laporan sedang diproses karena ukuran data yang besar. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.';
 
@@ -155,7 +171,15 @@ class ReportController extends Controller
         // ================= JALUR EKSPOR KE EXCEL =================
         // Langsung oper susunan query database murni kita ke layanan khusus ExcelExportService
         $excelService = new \App\Services\ExcelExportService;
-        $this->logActivity('Laporan Diunduh (Excel)', "Mengunduh Excel tipe: {$type}");
+        $reportTypeLabel = match ($type) {
+            'inventory_list' => 'Inventaris',
+            'stock_mutation' => 'Mutasi Stok',
+            'borrowing_history' => 'Peminjaman',
+            'low_stock' => 'Stok Menipis',
+            'activity_log' => 'Aktivitas Sistem',
+            default => 'Sistem'
+        };
+        $this->logActivity('Laporan Diunduh (Excel)', "Mengunduh Excel Laporan {$reportTypeLabel}");
 
         return match ($type) {
             'inventory_list' => $excelService->exportInventoryList($query, $filename),

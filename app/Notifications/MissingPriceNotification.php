@@ -39,7 +39,7 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
             'url' => route('inventory.edit', $this->sparepart->uuid).'?focus=price',
             'sparepart_id' => $this->sparepart->id,
             'added_by' => $this->addedBy->name,
-            'type' => 'warning',
+            'type' => 'danger',
         ];
     }
 
@@ -54,7 +54,7 @@ class MissingPriceNotification extends Notification implements ShouldBroadcast
             ]),
             'url' => route('inventory.edit', $this->sparepart->uuid).'?focus=price',
             'unread_count' => $notifiable->unreadNotifications()->count() + 1,
-            'type' => 'warning',
+            'type' => 'danger',
         ]);
     }
 }

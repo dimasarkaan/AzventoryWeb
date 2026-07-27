@@ -265,7 +265,7 @@ class InventoryController extends Controller
             'data' => [
                 'current_stock' => $sparepart->stock,
                 'minimum_stock' => $sparepart->minimum_stock,
-                'is_low_stock' => $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock && strtolower($sparepart->condition) === 'baik',
+                'is_low_stock' => $sparepart->isLowStock(),
                 'part_number' => $sparepart->part_number,
             ],
         ]);

@@ -33,6 +33,8 @@ class BrandController extends Controller
     // Menyimpan data Merek baru ke dalam database
     public function store(Request $request)
     {
+        $this->authorize('create', Brand::class);
+
         $request->validate([
             'name' => 'required|string|max:191|unique:brands,name',
         ]);
@@ -52,6 +54,8 @@ class BrandController extends Controller
     // Mengedit/Memperbarui informasi nama Merek atau mengganti statusnya (Aktif/Non-aktif)
     public function update(Request $request, Brand $brand)
     {
+        $this->authorize('update', $brand);
+
         $request->validate([
             'name' => 'required|string|max:191|unique:brands,name,'.$brand->id,
             'is_active' => 'sometimes|boolean',
@@ -109,6 +113,8 @@ class BrandController extends Controller
     // Menghapus data Merek selamanya dari sistem
     public function destroy(Brand $brand)
     {
+        $this->authorize('delete', $brand);
+
         $count = $brand->spareparts()->count();
 
         if ($count > 0) {

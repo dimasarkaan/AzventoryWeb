@@ -116,9 +116,20 @@ class StockRequestController extends Controller
 
                 // Early Warning System (Sistem Peringatan Dini)
                 // Jika stok keluar menyebabkan barang menyentuh limit krisis (minimum stock), otomatis kirim peringatan ke Admin
-                if ($request->type === 'keluar' && $sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
-                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                    Notification::send($admins, new \App\Notifications\LowStockNotification($sparepart));
+                if ($request->type === 'keluar') {
+                    if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
+                        $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+                        Notification::send($admins, new \App\Notifications\LowStockNotification($sparepart));
+                        
+                        $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
+                        try {
+                            broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
+                        } catch (\Throwable $e) {
+                        }
+                    } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= ($sparepart->minimum_stock + 5)) {
+                        $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+                        Notification::send($admins, new \App\Notifications\ApproachingStockNotification($sparepart));
+                    }
                 }
 
             } else {

@@ -61,4 +61,16 @@ class Borrowing extends Model
 
         return $this->expected_return_at && $this->expected_return_at->endOfDay()->isPast();
     }
+
+    // Scope (Standarisasi Global): Mengambil data peminjaman yang masih aktif (belum dikembalikan penuh)
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'borrowed');
+    }
+
+    // Scope (Standarisasi Global): Mengambil data peminjaman yang aktif dan sudah melewati batas waktu (Overdue)
+    public function scopeOverdue($query)
+    {
+        return $query->active()->where('expected_return_at', '<', now());
+    }
 }
