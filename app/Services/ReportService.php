@@ -50,8 +50,11 @@ class ReportService
             $view = 'reports.pdf_inventory_list';
 
         } elseif ($type == 'stock_mutation') {
-            $query = StockLog::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user'])
-                ->where('status', 'approved');
+            $query = StockLog::with([
+                'sparepart' => fn ($q) => $q->withTrashed(),
+                'sparepart.brand', 'sparepart.category', 'sparepart.location',
+                'user' => fn ($q) => $q->withTrashed()
+            ])->where('status', 'approved');
             $this->applyDateRange($query, 'created_at', $startDate, $endDate);
 
             if ($location !== 'all' && $location) {
@@ -66,7 +69,12 @@ class ReportService
             $view = 'reports.pdf_stock_mutation';
 
         } elseif ($type == 'borrowing_history') {
-            $query = Borrowing::with(['sparepart.brand', 'sparepart.category', 'sparepart.location', 'user', 'returns'])->withSum('returns', 'quantity');
+            $query = Borrowing::with([
+                'sparepart' => fn ($q) => $q->withTrashed(),
+                'sparepart.brand', 'sparepart.category', 'sparepart.location',
+                'user' => fn ($q) => $q->withTrashed(),
+                'returns'
+            ])->withSum('returns', 'quantity');
             $this->applyDateRange($query, 'borrowed_at', $startDate, $endDate);
 
             if ($location !== 'all' && $location) {
@@ -92,7 +100,7 @@ class ReportService
             $title = 'Laporan Stok Menipis';
             $view = 'reports.pdf_low_stock';
         } elseif ($type == 'activity_log') {
-            $query = \App\Models\ActivityLog::with('user');
+            $query = \App\Models\ActivityLog::with(['user' => fn ($q) => $q->withTrashed()]);
             $this->applyDateRange($query, 'created_at', $startDate, $endDate);
             $query->latest();
             $title = 'Laporan Riwayat Aktivitas';

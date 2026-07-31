@@ -28,6 +28,10 @@ class StoreBorrowingRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+            if (auth()->check() && auth()->user()->borrowings()->overdue()->exists()) {
+                $validator->errors()->add('borrow_error', 'Sistem mengunci fitur peminjaman. Anda masih memiliki pinjaman barang yang melewati batas waktu (Overdue). Harap kembalikan barang tersebut terlebih dahulu.');
+            }
+
             $sparepart = $this->route('sparepart'); // Get sparepart from route binding
 
             if ($sparepart instanceof Sparepart) {

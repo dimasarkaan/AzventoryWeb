@@ -92,6 +92,9 @@ class AppServiceProvider extends ServiceProvider
         // Environment validation untuk production
         if (app()->environment('production')) {
             URL::forceScheme('https');
+            if (config('app.url')) {
+                URL::forceRootUrl(config('app.url'));
+            }
             $this->validateCriticalEnvVariables();
         }
     }

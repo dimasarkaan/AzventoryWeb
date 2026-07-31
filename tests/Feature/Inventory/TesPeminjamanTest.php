@@ -38,6 +38,7 @@ class TesPeminjamanTest extends TestCase
         $item = Sparepart::factory()->create([
             'stock' => 10,
             'condition' => 'Baik',
+            'type' => 'asset',
         ]);
 
         $response = $this->actingAs($this->superAdmin)

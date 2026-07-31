@@ -288,7 +288,7 @@ class InventoryController extends Controller
         $logs = StockLog::where('sparepart_id', $sparepart->id)
             ->with('user')
             ->latest()
-            ->paginate($request->input('per_page', 20));
+            ->paginate($request->input('per_page', 20))->withQueryString();
 
         return response()->json([
             'status' => 'success',

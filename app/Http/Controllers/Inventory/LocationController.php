@@ -147,7 +147,7 @@ class LocationController extends Controller
         }
 
         // Pengecekan Keamanan: Jangan sampai menghapus gudang yang di dalamnya masih berisi barang fisik
-        $count = $location->spareparts()->count();
+        $count = $location->spareparts()->withTrashed()->count();
 
         // Jika terdeteksi ada barang, tolak keras penghapusan untuk mencegah error Data Menggantung (Orphan Data)
         if ($count > 0) {

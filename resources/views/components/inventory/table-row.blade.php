@@ -1,6 +1,6 @@
 @props(['sparepart', 'trash' => false])
 
-<tr class="group hover:bg-secondary-50/60 transition-colors border-b border-secondary-50 last:border-b-0">
+<tr onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('input')) window.location='{{ route('inventory.show', $sparepart) }}'" class="group hover:bg-secondary-50/60 transition-colors border-b border-secondary-50 last:border-b-0 cursor-pointer">
     @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!$trash && auth()->user()->role === \App\Enums\UserRole::ADMIN))
         <td class="px-4 py-3 text-center">
             <input type="checkbox" name="ids[]" value="{{ $sparepart->id }}" class="bulk-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
@@ -27,7 +27,17 @@
                         {{ $sparepart->name }}
                     </a>
                 </div>
-                <span class="text-xs text-secondary-500 font-mono truncate block">{{ $sparepart->part_number }}</span>
+                <span class="text-xs text-secondary-500 font-mono truncate block relative group/copy no-click" 
+                      x-data="{ copied: false }"
+                      @click="
+                          navigator.clipboard.writeText('{{ $sparepart->part_number }}');
+                          copied = true;
+                          setTimeout(() => copied = false, 2000);
+                      "
+                      title="Klik untuk menyalin Part Number">
+                    <span class="hover:text-primary-600 transition-colors cursor-pointer border-b border-dashed border-transparent hover:border-primary-400">{{ $sparepart->part_number }}</span>
+                    <span x-show="copied" style="display: none;" class="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">Disalin!</span>
+                </span>
             </div>
         </div>
     </td>

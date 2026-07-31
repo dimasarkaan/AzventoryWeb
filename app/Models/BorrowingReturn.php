@@ -27,6 +27,6 @@ class BorrowingReturn extends Model
     // Relasi ke transaksi peminjaman induk.
     public function borrowing()
     {
-        return $this->belongsTo(Borrowing::class);
+        return $this->belongsTo(Borrowing::class)->withTrashed();
     }
 }

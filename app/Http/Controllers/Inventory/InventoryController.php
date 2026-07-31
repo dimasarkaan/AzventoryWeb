@@ -121,13 +121,13 @@ class InventoryController extends Controller
         }
 
         // Membagi riwayat peminjaman menjadi 5 data per halaman
-        $borrowings = $borrowingQuery->paginate(5, ['*'], 'history_page');
+        $borrowings = $borrowingQuery->paginate(5, ['*'], 'history_page')->withQueryString();
 
         // Mencari barang lain yang sejenis (berdasarkan Part Number yang sama) untuk mempermudah perbandingan stok
         $similarItems = Sparepart::with(['brand', 'category', 'location'])
             ->where('part_number', $inventory->part_number)
             ->where('id', '!=', $inventory->id) // Kecualikan barang yang sedang dilihat ini
-            ->paginate(3, ['*'], 'similar_page');
+            ->paginate(3, ['*'], 'similar_page')->withQueryString();
 
         // Menampilkan halaman detail barang dengan membawa semua data yang sudah disiapkan
         return view('inventory.show', [
@@ -310,6 +310,11 @@ class InventoryController extends Controller
             return response()->json(['message' => __('Hanya Superadmin yang memiliki izin untuk menghapus barang.')], 403);
         }
 
+        $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'exists:spareparts,id',
+        ]);
+
         $ids = $request->input('ids', []);
 
         // Validasi jika array ID kosong
@@ -335,6 +340,9 @@ class InventoryController extends Controller
 
         // Mengeksekusi query untuk menghapus item-item tersebut (soft delete)
         Sparepart::whereIn('id', $ids)->delete();
+
+        // Membersihkan cache agar perubahan langsung terlihat
+        $this->inventoryService->clearCache();
 
         // Mengirim respon sukses kembali ke AJAX/Frontend
         return response()->json(['message' => 'Berhasil menghapus '.$count.' item.']);

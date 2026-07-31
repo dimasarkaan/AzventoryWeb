@@ -1,5 +1,6 @@
 {{-- resources/views/dashboard/_activity_modal.blade.php --}}
 <div x-show="showActivityModal" 
+     @keydown.window.escape="showActivityModal = false"
      role="dialog"
      aria-modal="true"
      aria-labelledby="activity-modal-title"
@@ -27,8 +28,8 @@
                 <h3 id="activity-modal-title" class="text-base font-bold text-secondary-900">Detail Aktivitas</h3>
                 <button @click="showActivityModal = false" 
                         aria-label="Tutup Modal"
-                        class="text-secondary-400 hover:text-secondary-600 transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
 

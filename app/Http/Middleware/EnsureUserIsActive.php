@@ -15,9 +15,19 @@ class EnsureUserIsActive
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->status !== 'aktif') {
+            if ($request->wantsJson() || $request->is('api/*')) {
+                // If it's an API request, revoke the current token and return 403
+                if (method_exists($request->user(), 'currentAccessToken') && $request->user()->currentAccessToken()) {
+                    $request->user()->currentAccessToken()->delete();
+                }
+                return response()->json(['message' => 'Akun Anda telah dinonaktifkan oleh Administrator.'], 403);
+            }
+
             Auth::guard('web')->logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
+            if ($request->hasSession()) {
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+            }
 
             return redirect()->route('login')->withErrors([
                 'login' => 'Akun Anda telah dinonaktifkan oleh Administrator.',

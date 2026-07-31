@@ -129,6 +129,7 @@
                                 <span class="text-gray-600">{{ __('ui.upload_image') }}</span>
                                 <input type="file" id="qr-input-file" accept="image/*" class="hidden" onchange="scanFromFile(this)">
                             </label>
+                            <p class="text-center text-[10px] text-gray-400 mt-1">Atau <span class="font-mono bg-gray-100 text-gray-500 px-1 rounded border border-gray-200">Ctrl+V</span> (Paste) gambar QR code di halaman ini</p>
                         </div>
                     </div>
 
@@ -373,6 +374,16 @@
 
         // Auto start
         startCamera();
+
+        // Paste Image Support (Ctrl+V)
+        window.addEventListener('paste', e => {
+            if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
+                const file = e.clipboardData.files[0];
+                if (file.type.startsWith('image/')) {
+                    scanFromFile({ files: [file] });
+                }
+            }
+        });
 
         // Handle BFCache (Back/Forward Cache) revival
         window.addEventListener('pageshow', function (event) {

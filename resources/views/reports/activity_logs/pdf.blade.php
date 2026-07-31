@@ -75,10 +75,10 @@
             @forelse($logs as $log)
                 <tr>
                     <td>{{ $log->created_at->format('d/m/Y H:i') }}</td>
-                    <td>{{ $log->user->name ?? __('ui.system_user') }}</td>
+                    <td>{{ $log->user?->name ?? __('ui.system_user') }}</td>
                     <td style="text-align: center;">
                         @php
-                            $role = $log->user->role ?? null;
+                            $role = $log->user?->role ?? null;
                             $badgeClass = match($role) {
                                 \App\Enums\UserRole::SUPERADMIN => 'badge-danger',
                                 \App\Enums\UserRole::ADMIN => 'badge-warning',

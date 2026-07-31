@@ -47,13 +47,22 @@ class ProfileController extends Controller
     {
         $validatedData = $request->validated();
 
+        // Amankan Mass Assignment: Hanya perbolehkan field yang relevan untuk diupdate
+        $allowedFields = ['name', 'email', 'phone', 'address'];
+        
+        if (! $request->user()->is_username_changed) {
+            $allowedFields[] = 'username';
+        }
+        
+        $safeData = $request->safe()->only($allowedFields);
+
         // Opsi B: Lockdown identitas Operator
-        if ($request->user()->role === \App\Enums\UserRole::OPERATOR) {
-            unset($validatedData['name']);
-            unset($validatedData['email']);
+        if ($request->user()->role === UserRole::OPERATOR) {
+            unset($safeData['name']);
+            unset($safeData['email']);
         }
 
-        $request->user()->fill($validatedData);
+        $request->user()->fill($safeData);
 
         // Cek jika username sedang diubah (hanya sekali)
         if ($request->user()->isDirty('username')) {
@@ -113,7 +122,7 @@ class ProfileController extends Controller
             }
         }
 
-        if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+        if ($user->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
             return back()->with('error', 'Anda tidak dapat menghapus akun karena masih memiliki pinjaman barang yang belum dikembalikan.');
         }
 
@@ -170,8 +179,8 @@ class ProfileController extends Controller
     public function myInventory(Request $request): View
     {
         $user = $request->user();
-        $activeBorrowings = $user->borrowings()->whereNull('returned_at')->with('sparepart')->latest()->get();
-        $historyBorrowings = $user->borrowings()->whereNotNull('returned_at')->with(['sparepart', 'returns'])->latest('returned_at')->get();
+        $activeBorrowings = $user->borrowings()->whereNull('returned_at')->with(['sparepart' => fn($q) => $q->withTrashed()])->latest()->get();
+        $historyBorrowings = $user->borrowings()->whereNotNull('returned_at')->with(['sparepart' => fn($q) => $q->withTrashed(), 'returns'])->latest('returned_at')->get();
 
         return view('profile.my_inventory', compact('user', 'activeBorrowings', 'historyBorrowings'));
     }

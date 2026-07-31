@@ -82,12 +82,13 @@ class InventoryService
             // Mencari barang yang belum memiliki harga atau harganya 0
             $query->noPrice();
         } elseif (($filters['filter'] ?? '') === 'problematic') {
-            // Menampilkan barang dengan kondisi Rusak/Hilang (Hanya dapat dilihat oleh Admin/Superadmin)
-            if (auth()->check() && in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])) {
+            if (auth()->check() && auth()->user()->role === \App\Enums\UserRole::OPERATOR) {
+                // Operator tidak boleh melihat barang bermasalah, paksa query kosong
+                $query->whereRaw('1 = 0');
+            } else {
+                // Menampilkan barang dengan kondisi Rusak/Hilang
                 $query->problematic()
                     ->with(['stockLogs' => fn ($q) => $q->latest()]);
-            } else {
-                $query->whereRaw('1 = 0'); // Sengaja dibuat query salah jika rolenya bukan admin (menyembunyikan data)
             }
         }
 
@@ -122,8 +123,9 @@ class InventoryService
         }
 
         try {
+            $newImageUploaded = null;
             // Memulai transaksi DB agar jika error di tengah jalan, semua dibatalkan (Rollback) agar data tidak berantakan
-            return DB::transaction(function () use ($data) {
+            return DB::transaction(function () use (&$data, &$newImageUploaded) {
                 
                 // Mengecek ke database apakah ada barang yang atributnya sama persis
                 $existingItem = $this->findExactDuplicate($data);
@@ -179,6 +181,7 @@ class InventoryService
                 // Jika user mengunggah foto, optimalkan ukurannya dulu sebelum disimpan
                 if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
                     $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
+                    $newImageUploaded = $data['image'];
                 } elseif (! empty($data['existing_image'])) {
                     // Jika memanfaatkan foto dari riwayat sebelumnya, gandakan file fisiknya
                     $existingPath = $data['existing_image'];
@@ -187,6 +190,7 @@ class InventoryService
                         $newPath = 'spareparts/'.Str::random(40).'.'.$extension;
                         Storage::disk('public')->copy($existingPath, $newPath);
                         $data['image'] = $newPath;
+                        $newImageUploaded = $data['image'];
                     }
                 }
 
@@ -224,6 +228,12 @@ class InventoryService
 
                 return ['status' => 'created', 'message' => $message, 'data' => $sparepart];
             });
+        } catch (\Exception $e) {
+            // Hapus file foto yang terlanjur terupload jika proses gagal
+            if ($newImageUploaded && Storage::disk('public')->exists($newImageUploaded)) {
+                Storage::disk('public')->delete($newImageUploaded);
+            }
+            throw $e;
         } finally {
             // Setelah semua aksi DB selesai atau pun error, cabut perlindungan lock-nya
             $lock->release();
@@ -233,42 +243,60 @@ class InventoryService
     // Fitur Pembaruan: Menyimpan perubahan data barang dan otomatis mencetak ulang stiker QR jika nama atau nomor serinya berubah.
     public function updateSparepart(Sparepart $sparepart, array $data)
     {
-        return DB::transaction(function () use ($sparepart, $data) {
-            if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
-                if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
-                    Storage::disk('public')->delete($sparepart->image);
-                }
-                $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
-            } elseif (array_key_exists('existing_image', $data) && empty($data['existing_image'])) {
-                // User menghapus foto (klik ikon X) tanpa mengunggah foto baru
-                if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
-                    Storage::disk('public')->delete($sparepart->image);
-                }
-                $data['image'] = null; // Set field image di database menjadi null
-            }
+        $oldImage = null;
+        $newImageUploaded = null;
+        $oldQr = null;
 
-            // Hapus existing_image dari array data agar tidak di-fill ke model
-            unset($data['existing_image']);
-
-            $sparepart->fill($data);
-
-            // Regenerasi QR hanya jika part_number berubah untuk efisiensi
-            if ($sparepart->wasChanged('part_number') || ! $sparepart->qr_code_path) {
-                if ($sparepart->getOriginal('qr_code_path') && Storage::disk('public')->exists($sparepart->getOriginal('qr_code_path'))) {
-                    Storage::disk('public')->delete($sparepart->getOriginal('qr_code_path'));
+        try {
+            $result = DB::transaction(function () use ($sparepart, $data, &$oldImage, &$newImageUploaded, &$oldQr) {
+                if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+                    $oldImage = $sparepart->image;
+                    $data['image'] = $this->imageOptimizer->optimizeAndSave($data['image'], 'spareparts');
+                    $newImageUploaded = $data['image'];
+                } elseif (array_key_exists('existing_image', $data) && empty($data['existing_image'])) {
+                    // User menghapus foto (klik ikon X) tanpa mengunggah foto baru
+                    $oldImage = $sparepart->image;
+                    $data['image'] = null; // Set field image di database menjadi null
                 }
-                $this->qrCodeService->generate($sparepart);
-            }
+
+                // Hapus existing_image dari array data agar tidak di-fill ke model
+                unset($data['existing_image']);
+
+                $sparepart->fill($data);
+
+                // Regenerasi QR hanya jika part_number berubah untuk efisiensi
+                if ($sparepart->wasChanged('part_number') || ! $sparepart->qr_code_path) {
+                    if ($sparepart->getOriginal('qr_code_path')) {
+                        $oldQr = $sparepart->getOriginal('qr_code_path');
+                    }
+                    $this->qrCodeService->generate($sparepart);
+                }
 
             $changes = [];
+            $stockDiff = 0;
             if ($sparepart->isDirty()) {
                 foreach ($sparepart->getDirty() as $key => $value) {
                     $original = $sparepart->getOriginal($key);
                     $changes[$key] = ['old' => $original, 'new' => $value];
+                    if ($key === 'stock') {
+                        $stockDiff = $value - $original;
+                    }
                 }
             }
 
             $sparepart->save();
+
+            if ($stockDiff !== 0) {
+                StockLog::create([
+                    'sparepart_id' => $sparepart->id,
+                    'user_id' => auth()->id(),
+                    'type' => $stockDiff > 0 ? 'masuk' : 'keluar',
+                    'quantity' => abs($stockDiff),
+                    'reason' => 'Penyesuaian stok manual (Update Data Barang)',
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                ]);
+            }
 
             $this->logActivity('Sparepart Diperbarui', __('messages.log_item_updated', ['name' => $sparepart->name, 'part_number' => $sparepart->part_number]), $changes);
             $this->clearCache();
@@ -286,15 +314,33 @@ class InventoryService
                     } catch (\Throwable $e) {
                     }
 
-                } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= ($sparepart->minimum_stock + 5)) {
-                    // Notifikasi approaching: stok menuju minimum (selisih <= 5 dari minimum)
-                    $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
-                    Notification::send($admins, new ApproachingStockNotification($sparepart));
+                    } elseif ($sparepart->minimum_stock > 0 && $sparepart->stock <= ($sparepart->minimum_stock + 5)) {
+                        // Notifikasi approaching: stok menuju minimum (selisih <= 5 dari minimum)
+                        $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
+                        Notification::send($admins, new ApproachingStockNotification($sparepart));
+                    }
                 }
+
+                return ['status' => 'success', 'message' => __('messages.item_updated'), 'data' => $sparepart];
+            });
+
+            // Hapus file fisik lama JIKA transaksi DB sukses sepenuhnya
+            if ($oldImage && Storage::disk('public')->exists($oldImage)) {
+                Storage::disk('public')->delete($oldImage);
+            }
+            if ($oldQr && Storage::disk('public')->exists($oldQr)) {
+                Storage::disk('public')->delete($oldQr);
             }
 
-            return ['status' => 'updated', 'message' => __('messages.item_updated'), 'data' => $sparepart];
-        });
+            return $result;
+
+        } catch (\Exception $e) {
+            // Hapus file foto yang terlanjur terupload JIKA transaksi gagal di tengah jalan
+            if ($newImageUploaded && Storage::disk('public')->exists($newImageUploaded)) {
+                Storage::disk('public')->delete($newImageUploaded);
+            }
+            throw $e;
+        }
     }
 
     // Fitur Hapus Sementara: Membuang barang ke tong sampah (Soft Delete) agar bisa dikembalikan lagi jika salah klik.
@@ -628,6 +674,9 @@ class InventoryService
     {
         return DB::transaction(function () use ($sparepart, $data) {
             $sparepart = Sparepart::where('id', $sparepart->id)->lockForUpdate()->first();
+            if (!$sparepart) {
+                throw new \Exception('Barang tidak ditemukan atau sudah dihapus.');
+            }
 
             if ($sparepart->stock < $data['quantity']) {
                 throw new \Exception(__('messages.insufficient_stock'));
@@ -694,6 +743,9 @@ class InventoryService
         return DB::transaction(function () use ($borrowing, $data, $photos) {
             // Pessimistic Locking untuk mencegah race condition / duplikasi stok
             $borrowing = Borrowing::where('id', $borrowing->id)->lockForUpdate()->first();
+            if (!$borrowing) {
+                throw new \Exception('Transaksi peminjaman tidak ditemukan.');
+            }
 
             $qty = $data['return_quantity'];
 
@@ -760,6 +812,16 @@ class InventoryService
                     $this->qrCodeService->generate($targetItem);
                 }
 
+                StockLog::create([
+                    'sparepart_id' => $targetItem->id,
+                    'user_id' => auth()->id(),
+                    'type' => 'masuk',
+                    'quantity' => $qty,
+                    'reason' => 'Pengembalian barang dalam kondisi ' . $translatedCondition . ' oleh ' . ($borrowing->borrower_name ?? 'Peminjam'),
+                    'status' => 'approved',
+                    'approved_by' => auth()->id(),
+                ]);
+
                 $this->logActivity('Pengembalian Barang ('.$translatedCondition.')', "Mengembalikan {$qty} unit '{$originalSparepart->name}' dalam kondisi {$translatedCondition}.", [
                     'stock' => [
                         'old' => $targetItem->stock - $qty,
@@ -796,6 +858,10 @@ class InventoryService
             $oldStock = null;
             if ($status === 'approved') {
                 $sparepart = Sparepart::where('id', $stockLog->sparepart_id)->lockForUpdate()->first();
+                if (!$sparepart) {
+                    throw new \Exception('Barang tidak ditemukan atau sudah dihapus. Pengajuan tidak dapat disetujui.');
+                }
+                
                 $oldStock = $sparepart->stock;
 
                 if ($stockLog->type === 'masuk') {
@@ -840,7 +906,8 @@ class InventoryService
             $lockedLog->update($updateData);
 
             $statusText = $status === 'approved' ? 'disetujui' : 'ditolak';
-            $description = "Pengajuan stok {$lockedLog->type} untuk '{$lockedLog->sparepart->name}' sejumlah {$lockedLog->quantity} telah {$statusText}.";
+            $sparepartName = $lockedLog->sparepart ? $lockedLog->sparepart->name : 'Barang Terhapus';
+            $description = "Pengajuan stok {$lockedLog->type} untuk '{$sparepartName}' sejumlah {$lockedLog->quantity} telah {$statusText}.";
             if ($status === 'rejected' && $rejectionReason) {
                 $description .= " Alasan: {$rejectionReason}";
             }

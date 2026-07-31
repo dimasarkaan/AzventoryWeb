@@ -237,7 +237,7 @@ class TesRoleAdminTest extends TestCase
     #[Test]
     public function admin_dapat_meminjam_item()
     {
-        $sparepart = Sparepart::factory()->create(['stock' => 15, 'condition' => 'Baik']);
+        $sparepart = Sparepart::factory()->create(['stock' => 15, 'condition' => 'Baik', 'type' => 'asset']);
 
         $response = $this->actingAs($this->admin)->post(route('inventory.borrow.store', $sparepart), [
             'quantity' => 2,

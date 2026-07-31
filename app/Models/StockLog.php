@@ -19,18 +19,18 @@ class StockLog extends Model
     // Relasi Database: Mencari tahu siapa pemohon/operator yang mengubah stok ini
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     // Relasi Database: Mencari tahu barang/aset apa yang stoknya berubah
     public function sparepart()
     {
-        return $this->belongsTo(Sparepart::class);
+        return $this->belongsTo(Sparepart::class)->withTrashed();
     }
 
     // Relasi Database: Mencari tahu siapa atasan yang me-ACC (menyetujui) permintaan ini
     public function approver()
     {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(User::class, 'approved_by')->withTrashed();
     }
 }

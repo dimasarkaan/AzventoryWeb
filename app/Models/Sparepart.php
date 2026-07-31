@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-// Model (Blueprint Tabel Database) utama yang mewakili fisik Barang di gudang.
-// Bisa berupa Aset Perusahaan atau Barang Jualan (Sale).
+// Model untuk tabel spareparts
 class Sparepart extends Model
 {
     use HasFactory, HasUuids, SoftDeletes;
@@ -19,51 +18,54 @@ class Sparepart extends Model
         'stock', 'unit', 'status', 'image', 'qr_code_path',
     ];
 
-    // Relasi Database: Mengambil seluruh riwayat pergerakan (keluar/masuk/penyesuaian) stok untuk barang ini
+    // Relasi ke tabel stock_logs
     public function stockLogs()
     {
         return $this->hasMany(StockLog::class);
     }
 
-    // Relasi Database: Mengambil semua riwayat peminjaman yang melibatkan barang ini
+    // Relasi ke tabel borrowings
     public function borrowings()
     {
         return $this->hasMany(Borrowing::class);
     }
 
-    // Relasi Database: Menghubungkan barang ini dengan data Kategorinya
+    // Relasi ke tabel categories
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    // Relasi Database: Menghubungkan barang ini dengan data Mereknya
+    // Relasi ke tabel brands
     public function brand()
     {
         return $this->belongsTo(Brand::class);
     }
 
-    // Relasi Database: Menghubungkan barang ini dengan lokasi rak penyimpanannya
+    // Relasi ke tabel locations
     public function location()
     {
         return $this->belongsTo(Location::class);
     }
 
-    // Fitur Pengecek (Helper): Mengecek apakah barang ini berstatus "Aset"
+    // Mengecek apakah tipe barang adalah asset
     public function isAsset()
     {
         return $this->type === 'asset';
     }
 
-    // Fitur Pengecek (Helper): Mengecek apakah barang ini berstatus untuk dijual ("Sale")
+    // Mengecek apakah tipe barang adalah sale
     public function isSaleable()
     {
         return $this->type === 'sale';
     }
 
-    // Sistem Validasi Cerdas: Mencegah barang yang rusak atau stoknya habis agar tidak bisa dipinjam
     public function canBeBorrowed(int $quantity)
     {
+        if ($this->type !== 'asset') {
+            return 'Hanya barang bertipe Asset yang dapat dipinjam.';
+        }
+
         if ($this->condition !== 'Baik') {
             return 'Hanya barang dengan kondisi "Baik" yang dapat dipinjam.';
         }
@@ -75,7 +77,7 @@ class Sparepart extends Model
         return true;
     }
 
-    // Fitur Penyelidik (Detektif): Mencari tahu riwayat atau kronologi kejadian jika barang dilaporkan Rusak/Hilang
+    // Mendapatkan kronologi jika barang dilaporkan Rusak/Hilang
     public function getProblemChronologyAttribute()
     {
         if (! in_array($this->condition, ['Rusak', 'Hilang'])) {
@@ -128,7 +130,7 @@ class Sparepart extends Model
         return 'Tidak ada riwayat catatan spesifik.';
     }
 
-    // Scope (Standarisasi Global): Mengambil data barang yang stoknya sudah Menuju Kritis (<= 150%) atau Habis
+    // Scope: Mengambil barang dengan stok menipis atau habis
     public function scopeLowStock($query)
     {
         return $query->where('minimum_stock', '>', 0)
@@ -136,13 +138,13 @@ class Sparepart extends Model
                      ->where('condition', 'Baik');
     }
 
-    // Scope (Standarisasi Global): Mengambil data barang yang bermasalah (kondisi Rusak atau Hilang)
+    // Scope: Mengambil barang dengan kondisi bermasalah (Rusak/Hilang)
     public function scopeProblematic($query)
     {
         return $query->whereIn('condition', ['Rusak', 'Hilang']);
     }
 
-    // Scope (Standarisasi Global): Mengambil data barang jualan (Sale) yang belum diatur harganya
+    // Scope: Mengambil barang jualan yang belum diatur harganya
     public function scopeNoPrice($query)
     {
         return $query->where('type', 'sale')
@@ -151,7 +153,7 @@ class Sparepart extends Model
                      });
     }
 
-    // Helper (Standarisasi Global): Mengecek apakah SATU barang spesifik ini sedang menipis
+    // Mengecek apakah stok barang ini menipis
     public function isLowStock()
     {
         return $this->minimum_stock > 0 
@@ -159,13 +161,33 @@ class Sparepart extends Model
             && strtolower($this->condition) === 'baik';
     }
 
-    // Keamanan URL: Menggunakan huruf acak (UUID) di URL Profil barang agar ID aslinya tidak mudah ditebak peretas
+    // Mendapatkan status stok berdasarkan batas minimum secara konsisten dengan UI
+    public function getStockStatusAttribute()
+    {
+        if ($this->stock <= 0) {
+            return __('ui.status_out_of_stock');
+        }
+
+        if ($this->minimum_stock <= 0) {
+            return 'Tanpa Batas';
+        }
+
+        if ($this->stock <= $this->minimum_stock) {
+            return __('ui.status_critical');
+        } elseif ($this->stock <= ($this->minimum_stock + 5)) {
+            return __('ui.approaching_stock');
+        }
+
+        return __('ui.stock_safe');
+    }
+
+    // Menggunakan uuid sebagai route key
     public function getRouteKeyName()
     {
         return 'uuid';
     }
 
-    // Kompatibilitas URL: Memastikan tautan/link lama yang masih menggunakan angka ID biasa tetap berfungsi normal
+    // Mendukung pencarian model melalui id atau uuid di route
     public function resolveRouteBinding($value, $field = null)
     {
         $field = $field ?? $this->getRouteKeyName();
@@ -177,7 +199,7 @@ class Sparepart extends Model
         return $this->where($field, $value)->first();
     }
 
-    // Mendaftarkan kolom 'uuid' agar otomatis diisi gabungan angka/huruf acak oleh sistem saat barang baru masuk
+    // Menentukan kolom yang otomatis diisi UUID
     public function uniqueIds()
     {
         return ['uuid'];

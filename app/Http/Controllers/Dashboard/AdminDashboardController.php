@@ -113,14 +113,17 @@ class AdminDashboardController extends Controller
                 'user',
             ])
                 ->active()
-                ->whereIn('user_id', function ($q) {
-                    // Admin hanya bisa mengawasi peminjaman dari Admin lain dan Operator
-                    $q->select('id')
-                        ->from('users')
-                        ->whereIn('role', [
-                            \App\Enums\UserRole::OPERATOR,
-                            \App\Enums\UserRole::ADMIN,
-                        ]);
+                ->where(function ($q) {
+                    // Admin hanya bisa mengawasi peminjaman dari Admin lain, Operator, dan user yang sudah dihapus permanen
+                    $q->whereNull('user_id')
+                      ->orWhereIn('user_id', function ($subQ) {
+                          $subQ->select('id')
+                              ->from('users')
+                              ->whereIn('role', [
+                                  \App\Enums\UserRole::OPERATOR,
+                                  \App\Enums\UserRole::ADMIN,
+                              ]);
+                      });
                 })
                 ->latest()
                 ->take(5)
@@ -132,13 +135,16 @@ class AdminDashboardController extends Controller
                 'user',
             ])
                 ->overdue()
-                ->whereIn('user_id', function ($q) {
-                    $q->select('id')
-                        ->from('users')
-                        ->whereIn('role', [
-                            \App\Enums\UserRole::OPERATOR,
-                            \App\Enums\UserRole::ADMIN,
-                        ]);
+                ->where(function ($q) {
+                    $q->whereNull('user_id')
+                      ->orWhereIn('user_id', function ($subQ) {
+                          $subQ->select('id')
+                              ->from('users')
+                              ->whereIn('role', [
+                                  \App\Enums\UserRole::OPERATOR,
+                                  \App\Enums\UserRole::ADMIN,
+                              ]);
+                      });
                 })
                 ->orderBy('expected_return_at', 'asc') // Urutkan dari yang paling terlambat
                 ->take(5)

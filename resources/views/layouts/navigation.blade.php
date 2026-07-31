@@ -11,7 +11,7 @@
         } catch(e) {}
     }
 </script>
-<nav x-data="{ mobileMenuOpen: false }" class="glass-nav border-b border-secondary-200">
+<nav x-data="{ mobileMenuOpen: false }" @keydown.escape.window="mobileMenuOpen = false" class="glass-nav border-b border-secondary-200">
     <!-- Menu Navigasi Utama -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         <div class="flex justify-between h-16">
@@ -89,7 +89,7 @@
             <div class="flex items-center ms-auto gap-2 sm:gap-4 lg:ms-6">
 
                 <!-- Notifications Dropdown -->
-                <div x-data="notificationComponent()" class="relative">
+                <div x-data="notificationComponent()" @keydown.escape.window="notificationOpen = false" class="relative">
                     <button @click="notificationOpen = !notificationOpen" class="relative p-2 text-secondary-500 hover:text-primary-600 hover:bg-primary-50 rounded-full focus:outline-none transition-all duration-200">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                         <span x-show="unreadCount > 0" x-text="unreadCount" style="display: none;" class="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-danger-600 rounded-full border-2 border-white shadow-sm min-w-[1.25rem]">
@@ -148,7 +148,7 @@
                 </div>
 
                 <!-- Dropdown Pengaturan -->
-            <div x-data="{ profileOpen: false }" class="relative hidden lg:block">
+            <div x-data="{ profileOpen: false }" @keydown.escape.window="profileOpen = false" class="relative hidden lg:block">
                 <button @click="profileOpen = !profileOpen" class="inline-flex items-center gap-3 px-1 py-1 border border-transparent text-sm leading-4 font-medium rounded-full text-secondary-500 hover:text-secondary-700 focus:outline-none transition ease-in-out duration-150 group">
                     <!-- Info Profil: 2 Baris (Nama di Atas, Peran di Bawah) -->
                     <div class="hidden md:flex flex-col items-end text-right mr-3">
@@ -322,7 +322,11 @@
     </div>
 
     <!-- Menu Navigasi Responsif -->
-    <div x-show="mobileMenuOpen" style="display: none;" class="lg:hidden bg-white border-t border-secondary-100">
+    <div x-show="mobileMenuOpen" 
+         @click.away="mobileMenuOpen = false"
+         @keydown.window.escape="mobileMenuOpen = false"
+         style="display: none;" 
+         class="lg:hidden bg-white border-t border-secondary-100 absolute w-full z-40 shadow-lg">
         <div class="pt-2 pb-3 space-y-1">
              @php
                 $resNavClass = "block w-full ps-3 pe-4 py-2 border-l-4 text-start text-base font-medium transition duration-150 ease-in-out";

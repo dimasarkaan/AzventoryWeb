@@ -57,7 +57,7 @@ class UserController extends Controller
             $query->where('role', $request->role);
         }
 
-        $users = $query->latest()->paginate($request->input('per_page', 20));
+        $users = $query->latest()->paginate($request->input('per_page', 20))->withQueryString();
 
         return response()->json([
             'status' => 'success',
@@ -136,10 +136,19 @@ class UserController extends Controller
 
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
-            'role' => 'sometimes|string',
-            'status' => 'sometimes|string',
+            'role' => 'sometimes|string|in:superadmin,admin,operator',
+            'status' => 'sometimes|string|in:aktif,nonaktif',
             'jabatan' => 'nullable|string',
         ]);
+
+        if (auth()->id() === $user->id) {
+            if ($request->has('role') && $request->role !== $user->role->value) {
+                return response()->json(['message' => 'Anda tidak dapat mengubah role akun Anda sendiri'], 400);
+            }
+            if ($request->has('status') && $request->status !== $user->status) {
+                return response()->json(['message' => 'Anda tidak dapat menonaktifkan akun Anda sendiri'], 400);
+            }
+        }
 
         $user->update($validated);
 
@@ -164,6 +173,11 @@ class UserController extends Controller
             'password' => Hash::make($password),
             'password_changed_at' => null,
         ]);
+
+        // Revoke all API tokens to force re-login on mobile devices for security
+        if (method_exists($user, 'tokens')) {
+            $user->tokens()->delete();
+        }
 
         $this->logActivity('Reset Password (API)', "Password user '{$user->name}' direset via API.");
 

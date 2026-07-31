@@ -16,17 +16,22 @@ class OperatorDashboardController extends Controller
         // Mengambil penanda waktu kapan sistem terakhir kali di-update (dari memori Cache)
         $lastUpdate = \Illuminate\Support\Facades\Cache::get('inventory_last_updated', now()->timestamp);
         
+        // Mengambil dan memvalidasi periode tren untuk mencegah serangan Cache Exhaustion (DoS)
+        $allowedPeriods = ['7_days', '30_days', '6_months', '1_year'];
+        $trendPeriod = request('trend_period');
+        $validTrendPeriod = in_array($trendPeriod, $allowedPeriods) ? $trendPeriod : '6_months';
+        
         // Membuat kunci memori (Cache Key) yang spesifik untuk user ini dan grafik periode yang dipilihnya
         // Supaya dashboard super cepat saat direfresh tanpa membebani database
-        $cacheKey = "operator_dashboard_{$userId}_{$lastUpdate}_".request('trend_period', '6_months');
+        $cacheKey = "operator_dashboard_{$userId}_{$lastUpdate}_{$validTrendPeriod}";
 
         /** @return array<string, mixed> */
-        $data = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($userId): array {
+        $data = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($userId, $validTrendPeriod): array {
             
             // --- Menarik maksimal 3 barang teratas yang sedang dipinjam oleh user ini ---
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart'])
                 ->where('user_id', $userId)
-                ->where('status', 'borrowed')
+                ->whereIn('status', ['borrowed', 'overdue'])
                 ->latest('borrowed_at') // Urutkan dari barang yang paling baru dipinjam
                 ->take(3)
                 ->get()
@@ -46,7 +51,7 @@ class OperatorDashboardController extends Controller
 
             // Menghitung angka pasti jumlah keseluruhan barang yang sedang dipinjam
             $activeBorrowingsCount = \App\Models\Borrowing::where('user_id', $userId)
-                ->where('status', 'borrowed')
+                ->whereIn('status', ['borrowed', 'overdue'])
                 ->count();
 
             // --- Menarik maksimal 3 pengajuan penambahan stok (Stock Request) yang belum di-Acc Admin ---
@@ -102,15 +107,15 @@ class OperatorDashboardController extends Controller
                     return [
                         'action' => $log->action,
                         'action_lower' => strtolower($log->action),
-                        'details' => strip_tags($log->details), // Buang karakter HTML (<p> <b>) agar tidak bocor
+                        'details' => strip_tags($log->description ?? ''), // Buang karakter HTML (<p> <b>) agar tidak bocor
                         'created_at_diff' => $log->created_at ? $log->created_at->diffForHumans() : '-', // Format "5 menit yang lalu"
                     ];
                 });
 
             // ================= DATA PERSIAPAN GRAFIK (CHARTS) =================
 
-            // Menentukan panjang grafik yang diinginkan (default-nya 6 bulan)
-            $trendPeriod = request('trend_period', '6_months');
+            // Menentukan panjang grafik yang diinginkan (menggunakan nilai yang sudah divalidasi)
+            $trendPeriod = $validTrendPeriod;
             
             // Pengaturan interval tanggal/bulan
             $trendConfigs = [
@@ -192,7 +197,7 @@ class OperatorDashboardController extends Controller
             return $result;
         });
 
-        $data['trendPeriod'] = request('trend_period', '6_months');
+        $data['trendPeriod'] = $validTrendPeriod;
 
         // Jika fungsi dipanggil dari background script (AJAX API), keluarkan versi JSON
         if (request()->wantsJson()) {

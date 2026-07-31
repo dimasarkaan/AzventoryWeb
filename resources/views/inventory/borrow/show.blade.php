@@ -64,7 +64,15 @@
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">Barang</span>
                                 <p class="text-base text-secondary-900 font-medium mt-1">{{ $borrowing->sparepart->name }}</p>
-                                <p class="text-xs text-secondary-500 font-mono">{{ $borrowing->sparepart->part_number }}</p>
+                                <div class="flex items-center gap-2 mt-0.5 text-xs text-secondary-500 font-mono" x-data="{ copied: false }">
+                                    <span>{{ $borrowing->sparepart->part_number }}</span>
+                                    <button @click="navigator.clipboard.writeText('{{ $borrowing->sparepart->part_number }}'); copied = true; setTimeout(() => copied = false, 2000)" 
+                                            class="p-0.5 rounded hover:bg-secondary-100 transition-colors text-secondary-400 hover:text-secondary-600 focus:outline-none"
+                                            :title="copied ? 'Tersalin!' : 'Salin Part Number'">
+                                        <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                        <svg x-show="copied" class="w-3.5 h-3.5 text-success-500" style="display: none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </div>
                             </div>
 
                             <div>
@@ -184,20 +192,33 @@
 
                                             <!-- Photos Gallery -->
                                             @if($return->photos && count($return->photos) > 0)
-                                                <div>
+                                                <div x-data="{ showLightbox: false, lightboxSrc: '' }">
                                                     <span class="text-xs text-secondary-500 font-semibold mb-2 block">Foto Bukti</span>
                                                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                                         @foreach($return->photos as $photo)
-                                                            <a href="{{ asset('storage/' . $photo) }}" target="_blank" class="group relative aspect-square rounded-lg overflow-hidden bg-secondary-200 hover:ring-2 hover:ring-primary-500 transition-all">
+                                                            <button type="button" @click.stop="lightboxSrc = '{{ asset('storage/' . $photo) }}'; showLightbox = true" class="group relative aspect-square rounded-lg overflow-hidden bg-secondary-200 hover:ring-2 hover:ring-primary-500 transition-all focus:outline-none text-left">
                                                                 <img src="{{ asset('storage/' . $photo) }}" alt="Return Evidence" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
                                                                 <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
                                                                     <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
                                                                     </svg>
                                                                 </div>
-                                                            </a>
+                                                            </button>
                                                         @endforeach
                                                     </div>
+                                                    
+                                                    <!-- Lightbox Modal -->
+                                                    <template x-teleport="body">
+                                                        <div x-show="showLightbox" 
+                                                             x-transition.opacity.duration.300ms
+                                                             class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90" 
+                                                             style="display: none;">
+                                                            <button @click.stop="showLightbox = false" class="absolute top-4 right-4 text-white hover:text-gray-300 p-2 focus:outline-none z-[101]">
+                                                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                            </button>
+                                                            <img @click.away="showLightbox = false" :src="lightboxSrc" alt="Return Evidence" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl relative z-[100]">
+                                                        </div>
+                                                    </template>
                                                 </div>
                                             @endif
                                         </div>

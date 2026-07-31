@@ -11,6 +11,15 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class ExcelExportService
 {
+    // Sanitasi keamanan untuk mencegah serangan CSV/Excel Injection (Formula Injection)
+    protected function sanitizeExcelFormula($value)
+    {
+        if (is_string($value) && in_array(substr(trim($value), 0, 1), ['=', '+', '-', '@'])) {
+            return "'" . $value;
+        }
+        return $value;
+    }
+
     // Desain Grafis Excel: Mengatur judul laporan (Title) agar terlihat mewah dan profesional
     protected function setupReportTitle($sheet, $title, $lastColumn)
     {
@@ -196,10 +205,10 @@ class ExcelExportService
 
         foreach ($items as $log) {
             $sheet->setCellValue("A{$row}", $log->created_at->format('d/m/Y H:i:s'));
-            $sheet->setCellValue("B{$row}", $log->user ? $log->user->name : 'Sistem');
+            $sheet->setCellValue("B{$row}", $this->sanitizeExcelFormula($log->user ? $log->user->name : 'Sistem'));
             $sheet->setCellValue("C{$row}", $log->user ? $log->user->role->label() : '-');
-            $sheet->setCellValue("D{$row}", $log->action);
-            $sheet->setCellValue("E{$row}", $log->description);
+            $sheet->setCellValue("D{$row}", $this->sanitizeExcelFormula($log->action));
+            $sheet->setCellValue("E{$row}", $this->sanitizeExcelFormula($log->description));
             $row++;
         }
 
@@ -244,9 +253,9 @@ class ExcelExportService
         $items = ($data instanceof \Illuminate\Database\Eloquent\Builder) ? $data->lazy() : $data;
 
         foreach ($items as $item) {
-            $sheet->setCellValue("A{$row}", $item->part_number);
-            $sheet->setCellValue("B{$row}", $item->name);
-            $sheet->setCellValue("C{$row}", $item->category?->name ?? '-');
+            $sheet->setCellValue("A{$row}", $this->sanitizeExcelFormula($item->part_number));
+            $sheet->setCellValue("B{$row}", $this->sanitizeExcelFormula($item->name));
+            $sheet->setCellValue("C{$row}", $this->sanitizeExcelFormula($item->category?->name ?? '-'));
 
             // Kolom Baru: Kondisi
             $sheet->setCellValue("D{$row}", $item->condition ?? '-');
@@ -360,8 +369,8 @@ class ExcelExportService
 
         foreach ($items as $log) {
             $sheet->setCellValue("A{$row}", $log->created_at->format('d/m/Y H:i'));
-            $sheet->setCellValue("B{$row}", $log->sparepart->part_number ?? '-');
-            $sheet->setCellValue("C{$row}", $log->sparepart->name ?? '-');
+            $sheet->setCellValue("B{$row}", $this->sanitizeExcelFormula($log->sparepart?->part_number ?? '-'));
+            $sheet->setCellValue("C{$row}", $this->sanitizeExcelFormula($log->sparepart?->name ?? '-'));
 
             $typeLabel = $log->type === 'masuk' ? 'Masuk' : 'Keluar';
 
@@ -372,8 +381,8 @@ class ExcelExportService
             // Store as explicit string or number, keep format (+ / -)
             $sheet->setCellValueExplicit("E{$row}", $qtyPrefix.$log->quantity, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
 
-            $sheet->setCellValue("F{$row}", $log->user->name ?? '-');
-            $sheet->setCellValue("G{$row}", $log->reason);
+            $sheet->setCellValue("F{$row}", $this->sanitizeExcelFormula($log->user?->name ?? '-'));
+            $sheet->setCellValue("G{$row}", $this->sanitizeExcelFormula($log->reason));
             $row++;
         }
 
@@ -398,14 +407,14 @@ class ExcelExportService
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Riwayat Peminjaman');
 
-        $lastColumn = 'H';
+        $lastColumn = 'I';
         $headerRow = 5;
 
         // Setup Title
         $this->setupReportTitle($sheet, 'Laporan Riwayat Peminjaman Barang', $lastColumn);
 
         // Headers
-        $headers = ['Nama Peminjam', 'Nama Barang', 'Jumlah', 'Tgl Pinjam', 'Tenggat Waktu', 'Tgl Kembali', 'Status', 'Kondisi'];
+        $headers = ['Nama Peminjam', 'Nama Barang', 'Jumlah', 'Sisa', 'Tgl Pinjam', 'Tenggat Waktu', 'Tgl Kembali', 'Status', 'Kondisi'];
         foreach ($headers as $index => $header) {
             $column = chr(ord('A') + $index);
             $sheet->setCellValue("{$column}{$headerRow}", $header);
@@ -418,17 +427,18 @@ class ExcelExportService
         $items = ($data instanceof \Illuminate\Database\Eloquent\Builder) ? $data->lazy() : $data;
 
         foreach ($items as $borrowing) {
-            $sheet->setCellValue("A{$row}", $borrowing->user->name ?? $borrowing->borrower_name ?? '-');
-            $sheet->setCellValue("B{$row}", $borrowing->sparepart->name ?? '-');
+            $sheet->setCellValue("A{$row}", $this->sanitizeExcelFormula($borrowing->user?->name ?? $borrowing->borrower_name ?? '-'));
+            $sheet->setCellValue("B{$row}", $this->sanitizeExcelFormula($borrowing->sparepart?->name ?? '-'));
             $sheet->setCellValueExplicit("C{$row}", $borrowing->quantity, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
+            $sheet->setCellValueExplicit("D{$row}", $borrowing->remaining_quantity, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
 
             $borrowedAt = $borrowing->borrowed_at ? (\Carbon\Carbon::parse($borrowing->borrowed_at)->format('d/m/Y')) : '-';
             $dueDate = $borrowing->expected_return_at ? (\Carbon\Carbon::parse($borrowing->expected_return_at)->format('d/m/Y')) : ($borrowing->due_date ? (\Carbon\Carbon::parse($borrowing->due_date)->format('d/m/Y')) : '-');
             $returnedAt = $borrowing->returned_at ? \Carbon\Carbon::parse($borrowing->returned_at)->format('d/m/Y') : '-';
 
-            $sheet->setCellValue("D{$row}", $borrowedAt);
-            $sheet->setCellValue("E{$row}", $dueDate);
-            $sheet->setCellValue("F{$row}", $returnedAt);
+            $sheet->setCellValue("E{$row}", $borrowedAt);
+            $sheet->setCellValue("F{$row}", $dueDate);
+            $sheet->setCellValue("G{$row}", $returnedAt);
 
             // Handle Enum or String for Borrowing Status
             $rawStatus = ($borrowing->status instanceof \BackedEnum) ? $borrowing->status->value : (is_string($borrowing->status) ? $borrowing->status : '');
@@ -440,7 +450,7 @@ class ExcelExportService
             ];
             $statusText = $statusLabels[strtolower($rawStatus)] ?? ucfirst($rawStatus);
             
-            $sheet->setCellValue("G{$row}", $statusText);
+            $sheet->setCellValue("H{$row}", $statusText);
 
             // Status Color Coding
             $color = match (strtolower($rawStatus)) {
@@ -449,7 +459,7 @@ class ExcelExportService
                 'terlambat', 'ditolak', 'lost' => 'FFDC2626', // Red-600
                 default => 'FF64748B', // Slate-500
             };
-            $sheet->getStyle("G{$row}")->applyFromArray([
+            $sheet->getStyle("H{$row}")->applyFromArray([
                 'font' => ['color' => ['argb' => $color], 'bold' => true],
             ]);
 
@@ -472,10 +482,10 @@ class ExcelExportService
                 $conditionLabel = implode(', ', $mappedConditions);
             }
 
-            $sheet->setCellValue("H{$row}", $conditionLabel);
+            $sheet->setCellValue("I{$row}", $conditionLabel);
 
             // Format Quantity Column
-            $sheet->getStyle("C{$row}")->getNumberFormat()->setFormatCode('#,##0');
+            $sheet->getStyle("C{$row}:D{$row}")->getNumberFormat()->setFormatCode('#,##0');
 
             $row++;
         }
@@ -488,6 +498,9 @@ class ExcelExportService
             $lastDataRow = $row - 1;
             $sheet->setCellValue("C{$row}", '=SUM(C'.($headerRow + 1).":C{$lastDataRow})");
             $sheet->getStyle("C{$row}")->applyFromArray(['font' => ['bold' => true]]);
+
+            $sheet->setCellValue("D{$row}", '=SUM(D'.($headerRow + 1).":D{$lastDataRow})");
+            $sheet->getStyle("D{$row}")->applyFromArray(['font' => ['bold' => true]]);
 
             $row++;
         }
@@ -533,10 +546,10 @@ class ExcelExportService
         $items = ($data instanceof \Illuminate\Database\Eloquent\Builder) ? $data->lazy() : $data;
 
         foreach ($items as $item) {
-            $sheet->setCellValue("A{$row}", $item->part_number);
-            $sheet->setCellValue("B{$row}", $item->name);
-            $sheet->setCellValue("C{$row}", $item->category->name ?? '-');
-            $sheet->setCellValue("D{$row}", $item->location->name ?? '-');
+            $sheet->setCellValue("A{$row}", $this->sanitizeExcelFormula($item->part_number));
+            $sheet->setCellValue("B{$row}", $this->sanitizeExcelFormula($item->name));
+            $sheet->setCellValue("C{$row}", $this->sanitizeExcelFormula($item->category?->name ?? '-'));
+            $sheet->setCellValue("D{$row}", $this->sanitizeExcelFormula($item->location?->name ?? '-'));
             $sheet->setCellValueExplicit("E{$row}", $item->minimum_stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
             $sheet->setCellValueExplicit("F{$row}", $item->stock, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_NUMERIC);
             $sheet->getStyle("E{$row}:F{$row}")->getNumberFormat()->setFormatCode('#,##0');

@@ -94,6 +94,13 @@ class BorrowingController extends Controller
             // Jika dipanggil secara normal (submit form biasa)
             return back()->with('success', $message);
         } catch (\Exception $e) {
+            // Hapus file foto yang terlanjur terupload jika proses pengembalian dibatalkan/gagal
+            foreach ($returnPhotos as $photoPath) {
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($photoPath)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($photoPath);
+                }
+            }
+
             // Menangkap error (contoh: mencoba mengembalikan jumlah yang lebih banyak dari yang dipinjam)
             if ($request->wantsJson()) {
                 return response()->json(['error' => $e->getMessage()], 500);

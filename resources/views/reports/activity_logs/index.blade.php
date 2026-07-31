@@ -218,12 +218,12 @@
                                                 @if($log->user && $log->user->avatar)
                                                     <img src="{{ asset('storage/' . $log->user->avatar) }}" alt="" class="h-full w-full object-cover rounded-full">
                                                 @else
-                                                    <span class="font-bold text-xs">{{ substr($log->user->name ?? 'S', 0, 1) }}</span>
+                                                    <span class="font-bold text-xs">{{ substr($log->user?->name ?? 'S', 0, 1) }}</span>
                                                 @endif
                                             </div>
                                             <div>
-                                                <div class="font-medium text-secondary-900">{{ $log->user->name ?? __('ui.system_user') }}</div>
-                                                <div class="text-xs text-secondary-500 font-mono">{{ $log->user->email ?? '-' }}</div>
+                                                <div class="font-medium text-secondary-900">{{ $log->user?->name ?? __('ui.system_user') }}</div>
+                                                <div class="text-xs text-secondary-500 font-mono">{{ $log->user?->email ?? '-' }}</div>
                                             </div>
                                         </div>
                                     </td>
@@ -285,11 +285,11 @@
                                      @if($log->user && $log->user->avatar)
                                         <img src="{{ asset('storage/' . $log->user->avatar) }}" alt="" class="h-full w-full object-cover">
                                     @else
-                                        {{ substr($log->user->name ?? 'S', 0, 1) }}
+                                        {{ substr($log->user?->name ?? 'S', 0, 1) }}
                                     @endif
                                 </div>
                                 <div class="min-w-0">
-                                    <div class="font-bold text-secondary-900 truncate">{{ $log->user->name ?? __('ui.system_user') }}</div>
+                                    <div class="font-bold text-secondary-900 truncate">{{ $log->user?->name ?? __('ui.system_user') }}</div>
                                     <div class="text-xs text-secondary-500">{{ $log->created_at->diffForHumans() }}</div>
                                 </div>
                             </div>

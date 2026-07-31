@@ -13,7 +13,7 @@
             <form action="{{ route('inventory.store') }}" method="POST" enctype="multipart/form-data" 
                   @submit="isSubmitting = true" 
                   x-data="inventoryForm()"
-                  @trigger-check-pn="checkPN()"
+                  @trigger-check-pn="checkPN($event.detail)"
                   @update-pn="partNumber = $event.detail"
                   @update-name="itemName = $event.detail"
                   @update-brand="itemBrand = $event.detail"
@@ -61,8 +61,8 @@
                                     <label for="part_number" class="input-label">{{ __('ui.part_number') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative flex gap-2" x-data="{
                                         open: false,
-                                        search: '{!! old('part_number', '') !!}',
-                                        selected: '{{ old('part_number') }}',
+                                        search: @js(old('part_number', '')),
+                                        selected: @js(old('part_number')),
                                         options: {{ json_encode($partNumbers) }} || [],
                                         get filteredOptions() {
                                             if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
@@ -73,7 +73,7 @@
                                             this.search = value;
                                             this.$dispatch('update-pn', value);
                                             this.open = false;
-                                            this.$dispatch('trigger-check-pn');
+                                            this.$dispatch('trigger-check-pn', false);
                                         },
                                         createNew() {
                                             let term = this.search.toUpperCase();
@@ -82,7 +82,7 @@
                                         init() {
                                             if (this.selected) {
                                                 this.$dispatch('update-pn', this.selected);
-                                                this.$dispatch('trigger-check-pn');
+                                                this.$dispatch('trigger-check-pn', true);
                                                 this.search = this.selected;
                                             }
                                             this.$watch('partNumber', value => {
@@ -92,13 +92,13 @@
                                                 }
                                             });
                                         }
-                                    }" @click.outside="open = false">
+                                    }" @click.outside="open = false" @keydown.escape.window="open = false">
                                         <div class="relative w-full">
                                             <input type="hidden" name="part_number" x-model="selected">
                                             <input id="part_number" class="input-field pr-10 w-full" type="text" 
                                                    x-model="search" 
-                                                   @focus="!isLocked && (open = true, $el.select())"
                                                    @input="!isLocked && (open = true, selected = search, partNumber = search.toUpperCase(), search = search.toUpperCase())"
+                                                   @focus="!isLocked && (open = true, $el.select())" 
                                                    @change="checkPN"
                                                    @keydown.enter.prevent="createNew()" 
                                                    placeholder="{{ __('ui.placeholder_pn') }}" 
@@ -167,8 +167,8 @@
                                 <!-- Nama Barang (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '{!! old('name', '') !!}',
-                                    selected: '{{ old('name') }}',
+                                    search: @js(old('name', '')),
+                                    selected: @js(old('name')),
                                     options: {{ json_encode($names) }} || [],
                                     get filteredOptions() {
                                         if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
@@ -200,7 +200,7 @@
                                             this.search = this.itemName;
                                         }
                                     }
-                                }" @click.outside="open = false">
+                                }" @click.outside="open = false" @keydown.escape.window="open = false">
                                     <label for="name" class="input-label">{{ __('ui.name') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
                                         <input type="hidden" name="name" x-model="selected">
@@ -260,8 +260,8 @@
                                 <!-- Merk (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '{!! old('brand_name', '') !!}',
-                                    selected: '{{ old('brand_id') }}',
+                                    search: @js(old('brand_name', '')),
+                                    selected: @js(old('brand_id')),
                                     options: {{ json_encode($brands) }},
                                     get filteredOptions() {
                                         let found = this.options.find(o => o.id == this.selected);
@@ -316,7 +316,7 @@
                                             }
                                         }
                                     }
-                                }" @click.outside="open = false">
+                                }" @click.outside="open = false" @keydown.escape.window="open = false">
                                     <label for="brand" class="input-label">{{ __('ui.brand') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
                                         <input type="hidden" name="brand_id" x-model="selected">
@@ -374,8 +374,8 @@
                                 <!-- Kategori (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '{!! old('category_name', '') !!}',
-                                    selected: '{{ old('category_id') }}',
+                                    search: @js(old('category_name', '')),
+                                    selected: @js(old('category_id')),
                                     options: {{ json_encode($categories) }},
                                     get filteredOptions() {
                                         let found = this.options.find(o => o.id == this.selected);
@@ -430,7 +430,7 @@
                                             }
                                         }
                                     }
-                                }" @click.outside="open = false">
+                                }" @click.outside="open = false" @keydown.escape.window="open = false">
                                     <label for="category" class="input-label">{{ __('ui.category') }} <span class="text-danger-500">*</span></label>
                                     <div class="relative">
                                         <input type="hidden" name="category_id" x-model="selected">
@@ -488,13 +488,13 @@
 
                             <!-- Row 3: Warna, Usia & Kondisi -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 col-span-full" x-data="{ 
-                                selectedAge: '{{ old("age", "") }}',
-                                selectedCondition: '{{ old("condition", "") }}'
+                                selectedAge: @js(old("age", "")),
+                                selectedCondition: @js(old("condition", ""))
                             }" x-effect="if(selectedAge === 'Baru' && !selectedCondition) { selectedCondition = 'Baik'; }">
                                 <!-- Warna (Creatable Select) -->
                                 <div class="relative" x-data="{
                                     open: false,
-                                    search: '{!! old('color', '') !!}',
+                                    search: @js(old('color', '')),
                                     selected: '',
                                     options: {{ json_encode($colors) }},
                                     get filteredOptions() {
@@ -512,13 +512,13 @@
                                         this.select(newValue);
                                     },
                                     init() {
-                                        if (this.itemColor || '{{ old('color') }}') {
-                                            this.selected = this.itemColor || '{{ old('color') }}';
+                                        if (this.itemColor || @js(old('color'))) {
+                                            this.selected = this.itemColor || @js(old('color'));
                                             this.search = this.selected;
                                             this.itemColor = this.selected;
                                         }
                                     }
-                                }" @click.outside="open = false">
+                                }" @click.outside="open = false" @keydown.escape.window="open = false">
                                     <label for="color" class="input-label">{{ __('ui.color') }}</label>
                                     <div class="relative">
                                         <input type="hidden" name="color" x-model="selected">
@@ -574,7 +574,7 @@
                                         selectedAge = value;
                                         this.open = false;
                                     }
-                                }" @click.outside="open = false">
+                                }" @click.outside="open = false" @keydown.escape.window="open = false">
                                     <label for="age-dropdown-btn" class="input-label">Status Pemakaian <span class="text-danger-500">*</span></label>
                                     <div class="relative">
                                         <input type="hidden" name="age" x-model="selected">
@@ -617,7 +617,7 @@
                                         selectedCondition = value;
                                         this.open = false;
                                     }
-                                }" @click.outside="open = false" x-effect="selected = selectedCondition">
+                                }" @click.outside="open = false" @keydown.escape.window="open = false" x-effect="selected = selectedCondition">
                                     <label for="condition-dropdown-btn" class="input-label">Kondisi Barang <span class="text-danger-500">*</span></label>
                                     <div class="relative">
                                         <input type="hidden" name="condition" x-model="selected">
@@ -663,15 +663,47 @@
                                      :class="{ 'border-primary-400 bg-primary-50': isDragging, 'border-gray-300 hover:border-primary-400': !isDragging }"
                                      x-on:dragover.prevent="isDragging = true"
                                      x-on:dragleave.prevent="isDragging = false"
-                                     x-on:drop.prevent="isDragging = false; fileName = $event.dataTransfer.files[0].name; $refs.fileInput.files = $event.dataTransfer.files; 
-                                                      // Create local preview from dropped file
+                                     x-on:drop.prevent="isDragging = false; 
                                                       const file = $event.dataTransfer.files[0];
+                                                      if (file.size > 17 * 1024 * 1024) {
+                                                          window.showAlert('Error', 'Ukuran gambar maksimal 17MB', 'error');
+                                                          $refs.fileInput.value = '';
+                                                          return;
+                                                      }
+                                                      fileName = file.name; 
+                                                      $refs.fileInput.files = $event.dataTransfer.files; 
+                                                      // Create local preview from dropped file
                                                       const reader = new FileReader();
                                                       reader.onload = (e) => { 
                                                           imagePreview = e.target.result; 
                                                           localStorage.setItem('temp_inventory_image', e.target.result);
                                                       };
                                                       reader.readAsDataURL(file);
+                                     "
+                                     @paste.window="
+                                        const items = ($event.clipboardData || $event.originalEvent.clipboardData).items;
+                                        for (let index in items) {
+                                            const item = items[index];
+                                            if (item.kind === 'file' && item.type.startsWith('image/')) {
+                                                $event.preventDefault();
+                                                const file = item.getAsFile();
+                                                if (file.size > 17 * 1024 * 1024) {
+                                                    window.showAlert('Error', 'Ukuran gambar maksimal 17MB', 'error');
+                                                    return;
+                                                }
+                                                fileName = file.name;
+                                                const dataTransfer = new DataTransfer();
+                                                dataTransfer.items.add(file);
+                                                $refs.fileInput.files = dataTransfer.files;
+                                                const reader = new FileReader();
+                                                reader.onload = (e) => { 
+                                                    imagePreview = e.target.result; 
+                                                    localStorage.setItem('temp_inventory_image', e.target.result);
+                                                };
+                                                reader.readAsDataURL(file);
+                                                break;
+                                            }
+                                        }
                                      ">
                                     
                                     <!-- Preview Area -->
@@ -695,15 +727,23 @@
                                             <label for="image" class="relative cursor-pointer bg-transparent rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500">
                                                 <span>{{ __('ui.choose_file') }}</span>
                                                 <input id="image" name="image" type="file" accept="image/*" class="sr-only" x-ref="fileInput" 
-                                                       x-on:change="fileName = $event.target.files[0].name;
-                                                                    // Create local preview
+                                                       x-on:change="
                                                                     const file = $event.target.files[0];
-                                                                    const reader = new FileReader();
-                                                                    reader.onload = (e) => { 
-                                                                        imagePreview = e.target.result; 
-                                                                        localStorage.setItem('temp_inventory_image', e.target.result);
-                                                                    };
-                                                                    reader.readAsDataURL(file);
+                                                                    if (file && file.size > 17 * 1024 * 1024) {
+                                                                        window.showAlert('Error', 'Ukuran gambar maksimal 17MB', 'error');
+                                                                        $event.target.value = '';
+                                                                        return;
+                                                                    }
+                                                                    if (file) {
+                                                                        fileName = file.name;
+                                                                        // Create local preview
+                                                                        const reader = new FileReader();
+                                                                        reader.onload = (e) => { 
+                                                                            imagePreview = e.target.result; 
+                                                                            localStorage.setItem('temp_inventory_image', e.target.result);
+                                                                        };
+                                                                        reader.readAsDataURL(file);
+                                                                    }
                                                        ">
                                             </label>
                                             <p>{{ __('ui.drag_drop') }}</p>
@@ -730,8 +770,8 @@
                             <!-- Lokasi Gudang (Creatable Select) -->
                             <div class="relative" x-data="{
                                 open: false,
-                                search: '{!! old('location_name', '') !!}',
-                                selected: '{{ old('location_id') }}',
+                                search: @js(old('location_name', '')),
+                                selected: @js(old('location_id')),
                                 options: {{ json_encode($locations) }},
                                 get filteredOptions() {
                                     let found = this.options.find(o => o.id == this.selected);
@@ -764,7 +804,7 @@
                                         if (found) this.search = found.name;
                                     }
                                 }
-                            }" @click.outside="open = false">
+                            }" @click.outside="open = false" @keydown.escape.window="open = false">
                                 <label for="location" class="input-label">{{ __('ui.location') }} <span class="text-danger-500">*</span></label>
                                 <div class="relative">
                                     <input type="hidden" name="location_id" x-model="selected">
@@ -842,7 +882,7 @@
                             <!-- Satuan (Creatable Select) -->
                             <div class="relative" x-data="{
                                 open: false,
-                                search: '{!! old('unit', '') !!}',
+                                search: @js(old('unit', '')),
                                 selected: 'Pcs',
                                 options: {{ json_encode($units) }},
                                 get filteredOptions() {
@@ -871,7 +911,7 @@
                                         this.search = this.itemUnit;
                                     }
                                 }
-                            }" @click.outside="open = false">
+                            }" @click.outside="open = false" @keydown.escape.window="open = false">
                                 <label for="unit" class="input-label">{{ __('ui.unit') }}</label>
                                 <div class="relative">
                                     <input type="hidden" name="unit" x-model="selected">
@@ -1026,19 +1066,33 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('inventoryForm', () => ({
-                type: '{{ old('type', 'sale') }}',
-                partNumber: '{{ old('part_number') }}',
+                type: @js(old('type', 'sale')),
+                partNumber: @js(old('part_number')),
                 isLocked: false,
-                itemName: '{{ old('name') }}',
-                itemBrand: '{{ old('brand_id') }}',
-                itemCategory: '{{ old('category_id') }}',
-                itemColor: '{{ old('color') }}', 
-                itemUnit: '{{ old('unit', 'Pcs') }}',
-                itemPrice: '{{ old('price') }}',
+                itemName: @js(old('name')),
+                itemBrand: @js(old('brand_id')),
+                itemCategory: @js(old('category_id')),
+                itemColor: @js(old('color')), 
+                itemUnit: @js(old('unit', 'Pcs')),
+                itemPrice: @js(old('price')),
                 imagePreview: null,
-                existingImage: '', // Store path for backend
+                existingImage: @js(old('existing_image', '')), // Store path for backend
                 isLoading: false,
                 isSubmitting: false,
+
+                saveDraft() {
+                    const draft = {
+                        type: this.type,
+                        partNumber: this.partNumber,
+                        itemName: this.itemName,
+                        itemBrand: this.itemBrand,
+                        itemCategory: this.itemCategory,
+                        itemColor: this.itemColor,
+                        itemUnit: this.itemUnit,
+                        itemPrice: this.itemPrice
+                    };
+                    localStorage.setItem('inventory_draft_' + window.location.pathname, JSON.stringify(draft));
+                },
 
                 init() {
                     // 1. Setup Global Trigger for Scan Modal
@@ -1049,12 +1103,14 @@
 
                     // 2. Check for Pre-filled PN
                     if (this.partNumber) {
-                         this.checkPN();
+                         this.checkPN(true);
                     }
 
                     // 3. Restore Image from LocalStorage if Validation Failed
                     const hasErrors = {{ $errors->any() ? 'true' : 'false' }};
-                    if (hasErrors) {
+                    if (this.existingImage) {
+                        this.imagePreview = '/storage/' + this.existingImage;
+                    } else if (hasErrors) {
                         const storedImage = localStorage.getItem('temp_inventory_image');
                         if (storedImage) {
                             this.imagePreview = storedImage;
@@ -1076,10 +1132,41 @@
                         }
                     } else {
                         localStorage.removeItem('temp_inventory_image');
+                        
+                        // 4. Restore form draft if no validation errors
+                        const draftStr = localStorage.getItem('inventory_draft_' + window.location.pathname);
+                        if (draftStr) {
+                            try {
+                                const draft = JSON.parse(draftStr);
+                                this.type = draft.type || this.type;
+                                this.partNumber = draft.partNumber || this.partNumber;
+                                this.itemName = draft.itemName || this.itemName;
+                                this.itemBrand = draft.itemBrand || this.itemBrand;
+                                this.itemCategory = draft.itemCategory || this.itemCategory;
+                                this.itemColor = draft.itemColor || this.itemColor;
+                                this.itemUnit = draft.itemUnit || this.itemUnit;
+                                this.itemPrice = draft.itemPrice || this.itemPrice;
+                            } catch(e) {}
+                        }
                     }
+
+                    // 5. Setup auto-save watchers
+                    this.$watch('type', () => this.saveDraft());
+                    this.$watch('partNumber', () => this.saveDraft());
+                    this.$watch('itemName', () => this.saveDraft());
+                    this.$watch('itemBrand', () => this.saveDraft());
+                    this.$watch('itemCategory', () => this.saveDraft());
+                    this.$watch('itemColor', () => this.saveDraft());
+                    this.$watch('itemUnit', () => this.saveDraft());
+                    this.$watch('itemPrice', () => this.saveDraft());
+
+                    // Clear draft on submit
+                    document.querySelector('form').addEventListener('submit', () => {
+                        localStorage.removeItem('inventory_draft_' + window.location.pathname);
+                    });
                 },
 
-                async checkPN() {
+                async checkPN(isInitialLoad = false) {
                     if (!this.partNumber) return;
                     
                     this.isLoading = true;
@@ -1090,21 +1177,26 @@
 
                         if (response.data.exists) {
                             const data = response.data.data;
-                            this.itemName = data.name;
-                            this.itemBrand = data.brand_id;
-                            this.itemCategory = data.category_id;
-                            this.type = data.type;
-                            this.itemUnit = data.unit;
-                            this.itemPrice = data.price; // Auto-fill price
                             
-                            // Handle Image
-                            if (data.image_url) {
-                                this.imagePreview = data.image_url;
-                                this.existingImage = data.image_path;
+                            // Hanya timpa nilai jika bukan dari proses recovery validasi (isInitialLoad = false)
+                            // Jika initial load, biarkan Alpine menggunakan nilai old() dari Laravel
+                            if (!isInitialLoad) {
+                                this.itemName = data.name;
+                                this.itemBrand = data.brand_id;
+                                this.itemCategory = data.category_id;
+                                this.type = data.type;
+                                this.itemUnit = data.unit;
+                                this.itemPrice = data.price; // Auto-fill price
+                                
+                                // Handle Image
+                                if (data.image_url) {
+                                    this.imagePreview = data.image_url;
+                                    this.existingImage = data.image_path;
+                                }
                             }
 
                             this.isLocked = true;
-                            console.log('Produk ditemukan, data diisi otomatis.');
+                            console.log('Produk ditemukan, data diisi otomatis (atau dilock).');
                         } else {
                             // PN baru (belum ada di database): unlock semua field
                             // Reset harga ke 0 agar tidak menggunakan sisa harga dari PN sebelumnya
@@ -1436,6 +1528,23 @@
                 }
             }))
         })
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-scroll to first validation error if exists
+            setTimeout(() => {
+                const firstError = document.querySelector('.text-red-600, .text-danger-500, .text-danger-600, [class*="text-red-"]');
+                if (firstError) {
+                    // Scroll into view with smooth behavior
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Add a brief focus to the input field nearby if possible
+                    const input = firstError.closest('div, .relative, .card')?.querySelector('input:not([type="hidden"]), select, textarea');
+                    if (input) {
+                        input.focus({preventScroll: true});
+                    }
+                }
+            }, 300); // Small delay to wait for Alpine initialization
+        });
     </script>
     @endpush
 </x-app-layout>

@@ -94,7 +94,7 @@
                                     'all': '{{ __('ui.all_time') }}',
                                     'custom': '{{ __('ui.custom_date') }}'
                                 }
-                            }">
+                            }" @keydown.escape.window="open = false">
                                 <button type="button" @click="open = !open" @click.away="open = false" 
                                         aria-labelledby="period_label"
                                         aria-haspopup="listbox"
@@ -155,7 +155,7 @@
                                 this.selectedLabel = label;
                                 this.open = false;
                             }
-                        }">
+                        }" @keydown.escape.window="open = false">
                             <span id="location_label" class="block text-sm font-medium text-secondary-700 mb-2">{{ __('ui.warehouse_location') }}</span>
                             <input type="hidden" name="location" :value="selected">
                             

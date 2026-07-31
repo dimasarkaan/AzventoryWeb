@@ -42,7 +42,7 @@ class BorrowingController extends Controller
             $query->where('user_id', $request->user_id);
         }
 
-        $borrowings = $query->latest()->paginate($request->input('per_page', 20));
+        $borrowings = $query->latest()->paginate($request->input('per_page', 20))->withQueryString();
 
         return response()->json($borrowings);
     }

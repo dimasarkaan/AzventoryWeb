@@ -187,8 +187,7 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
             Route::delete('/profile/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])->name('profile.api-tokens.destroy');
         });
 
-        // Kembalikan item sendiri
-        Route::post('/my-inventory/return/{borrowing}', [BorrowingController::class, 'returnItem'])->name('profile.inventory.return');
+        // Kembalikan item sendiri (menggunakan route dari inventory group)
 
         // Notifikasi
         Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');

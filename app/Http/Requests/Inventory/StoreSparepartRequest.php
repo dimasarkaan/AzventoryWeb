@@ -114,7 +114,7 @@ class StoreSparepartRequest extends FormRequest
             'minimum_stock' => 'nullable|integer|min:0|max:2147483647',
             'unit' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\s]*$/'],
             'status' => 'required|in:aktif,nonaktif',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120', // Max 5MB untuk foto HP
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:17408', // Max 17MB untuk foto HP
             'existing_image' => 'nullable|string',
         ];
     }
@@ -166,7 +166,7 @@ class StoreSparepartRequest extends FormRequest
             'status.required' => 'Status wajib dipilih.',
             'image.image' => 'File harus berupa gambar.',
             'image.mimes' => 'Format file Gambar harus jpeg, png, jpg, atau webp.',
-            'image.max' => 'Ukuran file Gambar maksimal 5MB.',
+            'image.max' => 'Ukuran file Gambar maksimal 17MB.',
             'name.regex' => 'Nama barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
             'part_number.regex' => 'Part Number hanya boleh berisi huruf, angka, strip (-), garis miring (/), dan underscore (_).',
             'condition.regex' => 'Kondisi Barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',

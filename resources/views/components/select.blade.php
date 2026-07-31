@@ -43,7 +43,7 @@
 class="relative {{ $width }}">
     <input type="hidden" name="{{ $name }}" :value="selected">
     
-    <button type="button" id="{{ $id }}" @click="open = !open" @click.away="open = false"
+    <button type="button" id="{{ $id }}" @click="open = !open" @click.away="open = false" @keydown.window.escape="open = false"
             class="input-field w-full text-left flex justify-between items-center rounded-xl py-2.5 px-4 text-sm cursor-pointer hover:border-primary-400 focus:ring-2 ring-primary-500 bg-white transition-all shadow-sm">
         <span x-text="selectedLabel" :class="{'text-secondary-900': selected, 'text-secondary-500': !selected}" class="truncate mr-2"></span>
         <svg class="w-4 h-4 text-secondary-400 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>

@@ -29,7 +29,7 @@ class ReturnBorrowingRequest extends FormRequest
                 'min:1',
                 'max:5',
             ],
-            'return_photos.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:5120', // Max 5MB
+            'return_photos.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:17408', // Max 17MB
         ];
     }
 
@@ -49,7 +49,7 @@ class ReturnBorrowingRequest extends FormRequest
             'return_photos.max' => 'Maksimal unggah :max foto.',
             'return_photos.*.image' => 'File harus berupa gambar.',
             'return_photos.*.mimes' => 'Format file harus jpeg, png, jpg, gif, atau webp.',
-            'return_photos.*.max' => 'Ukuran file maksimal 5MB.',
+            'return_photos.*.max' => 'Ukuran file Gambar maksimal 17MB.',
         ];
     }
 }

@@ -64,6 +64,14 @@
                                         {{ __('ui.inventory_empty_desc') }}
                                     @endif
                                 </p>
+                                @if($isFiltered)
+                                    <div class="mt-5">
+                                        <a href="{{ route('inventory.index', request()->only(['trash', 'filter'])) }}" class="btn btn-primary inline-flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            Hapus Semua Filter & Pencarian
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </td>
                     </tr>

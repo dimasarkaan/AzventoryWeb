@@ -158,6 +158,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // --- Bulk Action Logic (Event Delegation) ---
+    let lastCheckedBox = null;
+
     function updateBulkActionBar() {
         const bulkActionBar = document.getElementById('bulk-action-bar');
         const selectedCountSpan = document.getElementById('selected-count');
@@ -214,6 +216,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Individual Checkbox
         if (e.target.classList.contains('bulk-checkbox')) {
+            // Note: Shift+Click logic is handled in the 'click' event listener below
             updateBulkActionBar();
 
             // Sync Select All Checkboxes
@@ -225,6 +228,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (desktopSelect) desktopSelect.checked = allChecked;
             if (mobileSelect) mobileSelect.checked = allChecked;
+        }
+    });
+
+    // Shift-Click Logic for Checkboxes
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('bulk-checkbox')) {
+            if (e.shiftKey && lastCheckedBox) {
+                const checkboxes = Array.from(document.querySelectorAll('.bulk-checkbox'));
+                const start = checkboxes.indexOf(lastCheckedBox);
+                const end = checkboxes.indexOf(e.target);
+                
+                if (start !== -1 && end !== -1) {
+                    const min = Math.min(start, end);
+                    const max = Math.max(start, end);
+                    
+                    for (let i = min; i <= max; i++) {
+                        if (checkboxes[i] !== e.target) {
+                            checkboxes[i].checked = e.target.checked;
+                            // dispatch change event to trigger UI updates in other scripts if any
+                            checkboxes[i].dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    }
+                }
+            }
+            lastCheckedBox = e.target;
         }
     });
 

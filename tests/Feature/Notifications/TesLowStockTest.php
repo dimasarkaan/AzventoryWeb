@@ -29,6 +29,7 @@ class TesLowStockTest extends TestCase
         $sparepart = Sparepart::factory()->create([
             'stock' => 15, // Currently 15
             'minimum_stock' => 10,
+            'condition' => 'Baik',
         ]);
 
         // Simulasikan pembaruan stok menjadi 12 (120% dari 10, yaitu antara 11-15)
@@ -55,6 +56,7 @@ class TesLowStockTest extends TestCase
         $sparepart = Sparepart::factory()->create([
             'stock' => 20, // Currently 20
             'minimum_stock' => 10,
+            'condition' => 'Baik',
         ]);
 
         // Update stok menjadi 16 (160% dari 10, lebih dari 150%)

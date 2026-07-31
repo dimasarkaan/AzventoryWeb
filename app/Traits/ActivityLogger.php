@@ -18,9 +18,7 @@ trait ActivityLogger
     {
         // Metadata dasar untuk audit keamanan
         $metadata = [
-            'ip' => request()->header('X-Forwarded-For')
-                    ? explode(',', request()->header('X-Forwarded-For'))[0]
-                    : request()->ip(),
+            'ip' => request()->ip(),
             'user_agent' => request()->header('User-Agent'),
         ];
 

@@ -40,6 +40,7 @@ class TesLogikaNotifikasiTest extends TestCase
             'stock' => 5,
             'minimum_stock' => 3,
             'condition' => 'Baik',
+            'type' => 'asset',
         ]);
 
         // Admins borrow 3 items, making stock 2 (below minimum 3)

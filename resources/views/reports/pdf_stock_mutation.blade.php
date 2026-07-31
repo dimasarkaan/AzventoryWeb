@@ -23,8 +23,8 @@
             <tr>
                 <td>{{ $log->created_at->translatedFormat('d F Y H:i') }}</td>
                 <td>
-                    <strong>{{ $log->sparepart->name ?? __('ui.unknown') }}</strong><br>
-                    <small>PN: {{ $log->sparepart->part_number ?? '-' }}</small>
+                    <strong>{{ $log->sparepart?->name ?? __('ui.unknown') }}</strong><br>
+                    <small>PN: {{ $log->sparepart?->part_number ?? '-' }}</small>
                 </td>
                 <td>
                     @if($log->type == 'masuk')
@@ -41,7 +41,7 @@
                     @endif
                 </td>
                 <td>{{ $log->reason }}</td>
-                <td>{{ $log->user->name ?? '-' }}</td>
+                <td>{{ $log->user?->name ?? '-' }}</td>
             </tr>
             @endforeach
         </tbody>

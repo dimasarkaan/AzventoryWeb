@@ -4,7 +4,7 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BA-93nBS.css",
+    "file": "assets/app-Cy2DKwh0.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -22,7 +22,7 @@
     ]
   },
   "resources/js/pages/superadmin/inventory/index.js": {
-    "file": "assets/index-D52a8_n5.js",
+    "file": "assets/index-CdBTp4vK.js",
     "name": "index",
     "src": "resources/js/pages/superadmin/inventory/index.js",
     "isEntry": true,

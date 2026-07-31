@@ -30,7 +30,7 @@
         </div>
     </td>
     <td class="px-2 py-3 max-w-[100px]">
-        <div class="font-medium text-secondary-900 truncate text-sm" title="{{ $approval->user->name }}">{{ $approval->user->name }}</div>
+        <div class="font-medium text-secondary-900 truncate text-sm" title="{{ $approval->user->name ?? 'User Terhapus' }}">{{ $approval->user->name ?? 'User Terhapus' }}</div>
     </td>
     <td class="px-2 py-3">
         @if($approval->type === 'masuk')

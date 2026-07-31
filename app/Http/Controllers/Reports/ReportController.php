@@ -193,6 +193,9 @@ class ReportController extends Controller
     // Endpoint khusus (Link rahasia) untuk mengunduh file PDF yang sudah berhasil dicetak dan masuk ke lonceng notifikasi
     public function downloadGeneratedFile(string $filename)
     {
+        // Cegah Path Traversal (Keamanan Mutlak)
+        $filename = basename($filename);
+
         $path = 'reports/' . $filename;
 
         // Cek dulu apakah file masih ada di dalam brankas penyimpanan (local disk) yang aman dari pihak luar

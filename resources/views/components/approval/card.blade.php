@@ -23,7 +23,7 @@
             </div>
             <div>
                 <div class="font-bold text-secondary-900 line-clamp-1">{{ $approval->sparepart->name }}</div>
-                <div class="text-xs text-secondary-500">{{ __('ui.by_user', ['name' => $approval->user->name]) }}</div>
+                <div class="text-xs text-secondary-500">{{ __('ui.by_user', ['name' => $approval->user->name ?? 'User Terhapus']) }}</div>
             </div>
         </div>
        

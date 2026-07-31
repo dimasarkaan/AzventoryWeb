@@ -27,14 +27,16 @@ class ActivityLogController extends Controller
         if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
             $query->where('user_id', $currentUser->id);
         } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
-            $query->whereHas('user', function ($q) {
-                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            $query->where(function ($q) {
+                $q->whereHas('user', function ($q2) {
+                    $q2->withTrashed()->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+                })->orWhereNull('user_id'); // Izinkan melihat log dari user yang sudah hard-delete (meski tidak tahu rolenya, demi keutuhan audit)
             });
         }
 
         if ($request->has('role') && $request->role && $request->role !== 'Semua Role') {
             $query->whereHas('user', function ($q) use ($request) {
-                $q->where('role', $request->role);
+                $q->withTrashed()->where('role', $request->role);
             });
         }
 
@@ -103,7 +105,7 @@ class ActivityLogController extends Controller
 
         $activityLogs = $query->latest()->paginate(10)->withQueryString();
 
-        $usersQuery = \App\Models\User::orderBy('name');
+        $usersQuery = \App\Models\User::withTrashed()->orderBy('name');
         if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
             $usersQuery->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
         } elseif ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
@@ -113,8 +115,10 @@ class ActivityLogController extends Controller
 
         $actionsQuery = ActivityLog::select('action')->distinct()->orderBy('action');
         if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
-            $actionsQuery->whereHas('user', function ($q) {
-                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            $actionsQuery->where(function ($q) {
+                $q->whereHas('user', function ($q2) {
+                    $q2->withTrashed()->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+                })->orWhereNull('user_id');
             });
         } elseif ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
             $actionsQuery->where('user_id', $currentUser->id);
@@ -140,14 +144,16 @@ class ActivityLogController extends Controller
         if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
             $query->where('user_id', $currentUser->id);
         } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
-            $query->whereHas('user', function ($q) {
-                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            $query->where(function ($q) {
+                $q->whereHas('user', function ($q2) {
+                    $q2->withTrashed()->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+                })->orWhereNull('user_id');
             });
         }
 
         if ($request->has('role') && $request->role && $request->role !== 'Semua Role') {
             $query->whereHas('user', function ($q) use ($request) {
-                $q->where('role', $request->role);
+                $q->withTrashed()->where('role', $request->role);
             });
         }
 

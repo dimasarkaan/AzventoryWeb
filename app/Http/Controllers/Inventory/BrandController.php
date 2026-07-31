@@ -115,7 +115,7 @@ class BrandController extends Controller
     {
         $this->authorize('delete', $brand);
 
-        $count = $brand->spareparts()->count();
+        $count = $brand->spareparts()->withTrashed()->count();
 
         if ($count > 0) {
             return response()->json([

@@ -129,8 +129,8 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $this->authorize('delete', $category);
 
-        // Cek Keamanan: Pastikan apakah masih ada barang di gudang yang memakai nama kategori ini
-        $count = $category->spareparts()->count();
+        // Cek Keamanan: Pastikan apakah masih ada barang di gudang yang memakai nama kategori ini (termasuk yang di tempat sampah)
+        $count = $category->spareparts()->withTrashed()->count();
 
         // Jika ternyata masih nyangkut, TOLAK permohonan hapus. Ini untuk mencegah error Constraint Violation / Orphan Data.
         if ($count > 0) {

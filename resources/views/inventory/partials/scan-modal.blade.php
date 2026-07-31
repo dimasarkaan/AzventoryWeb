@@ -1,4 +1,4 @@
-<div x-show="scanModalOpen" class="fixed inset-0 z-[60] overflow-y-auto" style="display: none;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+<div x-show="scanModalOpen" @keydown.window.escape="closeScanModal()" class="fixed inset-0 z-[60] overflow-y-auto" style="display: none;" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <!-- Backdrop -->
     <div x-show="scanModalOpen" 
             x-transition:enter="ease-out duration-300"

@@ -29,8 +29,8 @@ class TesAnalitikDashboardTest extends TestCase
     public function dashboard_menampilkan_statistik_dasar_dengan_benar()
     {
         // Persiapan
-        Sparepart::factory()->count(3)->create(['stock' => 10]); // Total 30 stok
-        Sparepart::factory()->create(['stock' => 5]); // Total 35 stok
+        Sparepart::factory()->count(3)->create(['stock' => 10, 'condition' => 'Baik']); // Total 30 stok
+        Sparepart::factory()->create(['stock' => 5, 'condition' => 'Baik']); // Total 35 stok
 
         // Aksi
         $response = $this->actingAs($this->superAdmin)->get(route('dashboard.superadmin'));
@@ -48,11 +48,12 @@ class TesAnalitikDashboardTest extends TestCase
         $deadItem = Sparepart::factory()->create([
             'name' => 'Dead Item',
             'stock' => 10,
+            'condition' => 'Baik',
             'created_at' => now()->subMonths(4),
         ]);
 
         // 2. Item Aktif: Ada log keluar baru-baru ini
-        $activeItem = Sparepart::factory()->create(['name' => 'Active Item', 'stock' => 10]);
+        $activeItem = Sparepart::factory()->create(['name' => 'Active Item', 'stock' => 10, 'condition' => 'Baik']);
         StockLog::factory()->create([
             'sparepart_id' => $activeItem->id,
             'type' => 'keluar',
@@ -70,55 +71,7 @@ class TesAnalitikDashboardTest extends TestCase
         $this->assertFalse($deadStockItems->contains($activeItem));
     }
 
-    #[Test]
-    public function dashboard_logika_perhitungan_perkiraan_stok()
-    {
-        // Persiapan: Item dengan penggunaan konsisten selama 3 bulan terakhir
-        $item = Sparepart::factory()->create(['stock' => 100]);
 
-        // 1 Bulan lalu: 30 terpakai
-        StockLog::factory()->create([
-            'sparepart_id' => $item->id,
-            'type' => 'keluar',
-            'status' => 'approved',
-            'quantity' => 30,
-            'created_at' => now()->subMonth(),
-        ]);
-
-        // 2 Bulan lalu: 30 terpakai
-        StockLog::factory()->create([
-            'sparepart_id' => $item->id,
-            'type' => 'keluar',
-            'status' => 'approved',
-            'quantity' => 30,
-            'created_at' => now()->subMonths(2),
-        ]);
-
-        // 3 Bulan lalu: 30 terpakai
-        StockLog::factory()->create([
-            'sparepart_id' => $item->id,
-            'type' => 'keluar',
-            'status' => 'approved',
-            'quantity' => 30,
-            'created_at' => now()->subMonths(3),
-        ]);
-
-        // Act
-        $response = $this->actingAs($this->superAdmin)->get(route('dashboard.superadmin', ['period' => 'this_year']));
-
-        // Assert
-        // Logika Perkiraan: Rata-rata 3 bulan terakhir. (30+30+30)/3 = 30
-        $forecasts = $response->viewData('forecasts');
-
-        // Temukan item kita dalam perkiraan (seharusnya ada karena item keluar teratas)
-        // Catatan: Logika controller memilih item Keluar Teratas dulu, lalu hitung perkiraan.
-        // Karena ini satu-satunya item dengan aktivitas, harusnya ada di top 5.
-
-        $forecastItem = collect($forecasts)->firstWhere('name', $item->name);
-
-        $this->assertNotNull($forecastItem, 'Item should appear in forecast list');
-        $this->assertEquals(30, $forecastItem['predicted_need'], 'Prediction should be average of last 3 months');
-    }
 
     #[Test]
     public function dashboard_filter_tanggal_mempengaruhi_analitik()

@@ -12,7 +12,12 @@ use Illuminate\Support\Facades\Route;
 // Controller ini bertugas mencari kecocokan kata secara serentak di 3 tempat sekaligus: Menu, Data Barang, dan Pengguna.
 class GlobalSearchController extends Controller
 {
-    // Mengeksekusi pencarian otomatis saat user mengetikkan sesuatu (minimal 2 huruf)
+    /**
+     * Mengeksekusi pencarian otomatis saat user mengetikkan sesuatu (minimal 2 huruf)
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function __invoke(Request $request)
     {
         $query = $request->input('query');
@@ -61,7 +66,7 @@ class GlobalSearchController extends Controller
                     return [
                         'id' => $item->id,
                         'title' => $item->name,
-                        'subtitle' => $item->part_number.' • '.($item->location->name ?? '-').' • Stok: '.$item->stock,
+                        'subtitle' => $item->part_number.' • '.($item->location?->name ?? '-').' • Stok: '.$item->stock,
                         'image' => $item->image ? asset('storage/'.$item->image) : null,
                         'url' => $url,
                         'type' => 'Inventaris',
@@ -112,7 +117,6 @@ class GlobalSearchController extends Controller
                 ['title' => 'Scan QR', 'url' => route('inventory.scan-qr'), 'icon' => 'qrcode'],
                 ['title' => 'Laporan', 'url' => route('reports.index'), 'icon' => 'chart-bar'],
                 ['title' => 'Riwayat Aktivitas', 'url' => route('reports.activity-logs.index'), 'icon' => 'clock'],
-                ['title' => 'Persetujuan Stok', 'url' => route('inventory.stock-approvals.index'), 'icon' => 'check-circle'],
             ],
             \App\Enums\UserRole::ADMIN => [
                 ['title' => 'Manajemen Inventaris', 'url' => route('inventory.index'), 'icon' => 'cube'],

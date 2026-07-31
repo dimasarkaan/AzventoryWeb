@@ -32,9 +32,9 @@
             @foreach($data as $index => $row)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $row->user->name ?? $row->borrower_name }}</td>
+                <td>{{ $row->user?->name ?? $row->borrower_name }}</td>
                 <td>
-                    <b>{{ $row->sparepart->name ?? 'Deleted Item' }}</b>
+                    <b>{{ $row->sparepart?->name ?? 'Deleted Item' }}</b>
                     <br><span style="color: #666; font-size: 8pt;">Jml: {{ $row->quantity }}</span>
                 </td>
                 <td>{{ $row->borrowed_at->translatedFormat('d F Y') }}</td>

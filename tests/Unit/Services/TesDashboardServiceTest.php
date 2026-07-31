@@ -44,7 +44,7 @@ class TesDashboardServiceTest extends TestCase
     #[Test]
     public function mengembalikan_snapshot_stok_dengan_benar()
     {
-        Sparepart::factory()->count(3)->create(['stock' => 10]);
+        Sparepart::factory()->count(3)->create(['stock' => 10, 'condition' => 'Baik']);
         \App\Models\Brand::insert([
             ['name' => 'Brand A'],
             ['name' => 'Brand B'],

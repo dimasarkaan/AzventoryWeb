@@ -14,9 +14,15 @@
                         </h2>
                         <x-status-badge :status="$sparepart->status" type="pill" />
                     </div>
-                    <div class="flex items-center gap-2 mt-1.5 text-secondary-500 font-mono text-sm">
+                    <div class="flex items-center gap-2 mt-1.5 text-secondary-500 font-mono text-sm" x-data="{ copied: false }">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
-                        {{ $sparepart->part_number }}
+                        <span>{{ $sparepart->part_number }}</span>
+                        <button @click="navigator.clipboard.writeText('{{ $sparepart->part_number }}'); copied = true; setTimeout(() => copied = false, 2000)" 
+                                class="p-1 rounded-md hover:bg-secondary-100 transition-colors text-secondary-400 hover:text-secondary-600 focus:outline-none"
+                                :title="copied ? 'Tersalin!' : 'Salin Part Number'">
+                            <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            <svg x-show="copied" class="w-4 h-4 text-success-500" style="display: none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </button>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
@@ -37,10 +43,27 @@
                 <!-- Left Column (Visual & Main Info) -->
                 <div class="lg:col-span-2 flex flex-col gap-6">
                     <!-- Image Card -->
-                    <div class="card overflow-hidden">
-                        <div class="aspect-video w-full bg-secondary-100 flex items-center justify-center relative">
+                    <div class="card overflow-hidden" x-data="{ showLightbox: false }">
+                        <div class="aspect-video w-full bg-secondary-100 flex items-center justify-center relative group cursor-pointer" @click="showLightbox = true">
                             @if($sparepart->image)
-                                <img src="{{ asset('storage/' . $sparepart->image) }}" alt="{{ $sparepart->name }}" loading="lazy" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/' . $sparepart->image) }}" alt="{{ $sparepart->name }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
+                                <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
+                                    <svg class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                </div>
+                                
+                                <!-- Lightbox Modal -->
+                                <template x-teleport="body">
+                                    <div x-show="showLightbox" 
+                                         @keydown.window.escape="showLightbox = false"
+                                         x-transition.opacity.duration.300ms
+                                         class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90" 
+                                         style="display: none;">
+                                        <button @click="showLightbox = false" class="absolute top-4 right-4 text-white hover:text-gray-300 p-2 focus:outline-none">
+                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </button>
+                                        <img @click.away="showLightbox = false" src="{{ asset('storage/' . $sparepart->image) }}" alt="{{ $sparepart->name }}" class="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-2xl">
+                                    </div>
+                                </template>
                             @else
                                 <div class="text-secondary-400 flex flex-col items-center">
                                     <svg class="w-16 h-16 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -136,30 +159,32 @@
                             </div>
                         </div>
                         
-                        <template x-if="liveStock <= {{ $sparepart->minimum_stock ?? 0 }}">
-                            <div class="mt-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-100">
-                                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                 <div>
-                                     <span class="font-bold block">{{ __('ui.status_critical') }}</span>
-                                     Stok mencapai atau di bawah batas minimum (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
-                                 </div>
-                            </div>
-                        </template>
-                        <template x-if="liveStock > {{ $sparepart->minimum_stock ?? 0 }} && liveStock <= {{ ($sparepart->minimum_stock ?? 0) + 5 }}">
-                            <div class="mt-4 bg-warning-50 text-warning-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-warning-200">
-                                 <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                 <div>
-                                     <span class="font-bold block">{{ __('ui.approaching_stock') }}</span>
-                                     Stok hampir mencapai batas minimum (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
-                                 </div>
-                            </div>
-                        </template>
-                        <template x-if="liveStock > {{ ($sparepart->minimum_stock ?? 0) + 5 }}">
-                             <div class="mt-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-center gap-2 border border-success-100">
-                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                 <span>{{ __('ui.stock_safe') }} (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }})</span>
-                            </div>
-                        </template>
+                        @if(strtolower($sparepart->condition) === 'baik')
+                            <template x-if="liveStock <= {{ $sparepart->minimum_stock ?? 0 }}">
+                                <div class="mt-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-100">
+                                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                     <div>
+                                         <span class="font-bold block">{{ __('ui.status_critical') }}</span>
+                                         Stok mencapai atau di bawah batas minimum (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
+                                     </div>
+                                </div>
+                            </template>
+                            <template x-if="liveStock > {{ $sparepart->minimum_stock ?? 0 }} && liveStock <= {{ ($sparepart->minimum_stock ?? 0) + 5 }}">
+                                <div class="mt-4 bg-warning-50 text-warning-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-warning-200">
+                                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                     <div>
+                                         <span class="font-bold block">{{ __('ui.approaching_stock') }}</span>
+                                         Stok hampir mencapai batas minimum (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }}).
+                                     </div>
+                                </div>
+                            </template>
+                            <template x-if="liveStock > {{ ($sparepart->minimum_stock ?? 0) + 5 }}">
+                                 <div class="mt-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-center gap-2 border border-success-100">
+                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                     <span>{{ __('ui.stock_safe') }} (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }})</span>
+                                </div>
+                            </template>
+                        @endif
 
                         <!-- Actions Wrapper -->
                         <div>
@@ -483,12 +508,14 @@
                                                 </div>
                                             </td>
                                             <td class="px-4 py-3 text-secondary-600">
-                                                <span class="font-bold text-secondary-900 bg-secondary-100 px-2 py-1 rounded-lg text-xs">
-                                                    {{ $borrowing->quantity }} {{ $sparepart->unit }}
+                                                <div class="flex flex-col items-start gap-1">
+                                                    <span class="font-bold text-secondary-900 bg-secondary-100 px-2 py-1 rounded-lg text-xs">
+                                                        {{ $borrowing->quantity }} {{ $sparepart->unit }}
+                                                    </span>
                                                     @if($borrowing->remaining_quantity < $borrowing->quantity)
-                                                        <span class="text-xs text-secondary-500 font-normal block mt-1">Sisa: {{ $borrowing->remaining_quantity }}</span>
+                                                        <span class="text-xs text-secondary-500 font-normal">Sisa: {{ $borrowing->remaining_quantity }}</span>
                                                     @endif
-                                                </span>
+                                                </div>
                                             </td>
                                             <td class="px-4 py-3 text-secondary-600">
                                                 {{ \Carbon\Carbon::parse($borrowing->borrowed_at)->translatedFormat('d F Y H:i') }}
@@ -917,13 +944,22 @@
                                     },
 
                                     processFiles(newFiles) {
-                                        if (this.files.length + newFiles.length > 5) {
+                                        let validFiles = [];
+                                        for (let file of newFiles) {
+                                            if (file.size > 17 * 1024 * 1024) {
+                                                window.showAlert('Error', `Ukuran gambar ${file.name} maksimal 17MB`, 'error');
+                                            } else {
+                                                validFiles.push(file);
+                                            }
+                                        }
+                                        
+                                        if (this.files.length + validFiles.length > 5) {
                                             window.showAlert('Peringatan', 'Maksimal 5 foto', 'warning');
                                             return;
                                         }
-                                        this.files = this.files.concat(newFiles);
+                                        this.files = this.files.concat(validFiles);
                                         this.updateInput();
-                                        newFiles.forEach(file => {
+                                        validFiles.forEach(file => {
                                             const reader = new FileReader();
                                             reader.onload = (e) => { this.previews.push(e.target.result); };
                                             reader.readAsDataURL(file);

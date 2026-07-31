@@ -45,7 +45,12 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        $this->logActivity('Ubah Password', 'User memperbarui kata sandi akun mereka.');
+        // Revoke all API tokens to force re-login on mobile devices for security
+        if (method_exists($request->user(), 'tokens')) {
+            $request->user()->tokens()->delete();
+        }
+
+        $this->logActivity('Ubah Password', 'User memperbarui kata sandi akun mereka dan semua sesi API telah direset.');
 
         return back()->with('status', 'password-updated');
     }

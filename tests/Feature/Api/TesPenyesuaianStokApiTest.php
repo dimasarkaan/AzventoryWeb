@@ -31,7 +31,7 @@ class TesPenyesuaianStokApiTest extends TestCase
     {
         parent::setUp();
         $this->superadmin = User::factory()->create(['role' => UserRole::SUPERADMIN]);
-        $this->sparepart = Sparepart::factory()->create(['stock' => 20, 'minimum_stock' => 5]);
+        $this->sparepart = Sparepart::factory()->create(['stock' => 20, 'minimum_stock' => 5, 'condition' => 'Baik']);
     }
 
     // ── Helper ─────────────────────────────────────────────────────

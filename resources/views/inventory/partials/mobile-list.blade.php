@@ -6,7 +6,7 @@
         </div>
     @endif
     @forelse ($spareparts as $sparepart)
-        <div class="card p-4">
+        <div class="card p-4 cursor-pointer hover:bg-secondary-50/60 transition-colors" onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('input')) window.location='{{ route('inventory.show', $sparepart) }}'">
             <!-- Header: Image, Name, Status -->
             <div class="flex items-start gap-3 mb-4">
                  @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN))
@@ -38,7 +38,18 @@
                                 </h3>
                                 
                             </div>
-                            <p class="text-xs text-secondary-500 font-mono mt-0.5">{{ $sparepart->part_number }}</p>
+                            <!-- Part Number -->
+                        <span class="text-xs text-secondary-500 font-mono truncate block relative group/copy no-click" 
+                              x-data="{ copied: false }"
+                              @click.stop="
+                                  navigator.clipboard.writeText('{{ $sparepart->part_number }}');
+                                  copied = true;
+                                  setTimeout(() => copied = false, 2000);
+                              "
+                              title="Klik untuk menyalin">
+                            <span class="hover:text-primary-600 transition-colors cursor-pointer">{{ $sparepart->part_number }}</span>
+                            <span x-show="copied" style="display: none;" class="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">Disalin!</span>
+                        </span>
                         </div>
                         <x-status-badge :status="$sparepart->status" class="flex-shrink-0" />
                     </div>
@@ -186,6 +197,15 @@
                     @endif
                 </p>
             </div>
+
+            @if($isFiltered)
+                <div class="mt-6">
+                    <a href="{{ route('inventory.index', request()->only(['trash', 'filter'])) }}" class="btn btn-primary inline-flex items-center w-full justify-center shadow-md">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        Hapus Pencarian & Filter
+                    </a>
+                </div>
+            @endif
         </div>
     @endforelse
     

@@ -41,6 +41,7 @@ class TesPaksaGantiPasswordTest extends TestCase
             'role' => 'operator',
         ]);
 
+        $this->withoutExceptionHandling();
         $response = $this->actingAs($user)->get(route('dashboard.operator'));
 
         $response->assertStatus(200);

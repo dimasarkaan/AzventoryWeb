@@ -82,8 +82,8 @@ class DashboardService
 
         return Cache::remember($cacheKey, 3600, function () {
             return [
-                'totalSpareparts' => Sparepart::count(),
-                'totalStock' => Sparepart::sum('stock'),
+                'totalSpareparts' => Sparepart::where('condition', '!=', 'Hilang')->count(),
+                'totalStock' => Sparepart::where('condition', '!=', 'Hilang')->sum('stock'),
                 'totalCategories' => Category::count(),
                 'totalBrands' => Brand::count(),
                 'totalLocations' => Location::count(),
@@ -217,6 +217,7 @@ class DashboardService
             ->where('stock_logs.status', 'approved')
             ->where('stock_logs.type', $type)
             ->whereBetween('stock_logs.created_at', [$start, $end])
+            ->whereNull('spareparts.deleted_at')
             ->selectRaw('spareparts.name as sparepart_name, spareparts.uuid as sparepart_uuid, stock_logs.sparepart_id, SUM(stock_logs.quantity) as total_qty')
             ->groupBy('stock_logs.sparepart_id', 'spareparts.name', 'spareparts.uuid')
             ->orderByDesc('total_qty')
@@ -265,11 +266,17 @@ class DashboardService
         $borrowQuery = Borrowing::query();
 
         if ($user->role === \App\Enums\UserRole::ADMIN) {
-            $allowedUserIds = User::whereIn('role', [
-                \App\Enums\UserRole::OPERATOR,
-                \App\Enums\UserRole::ADMIN,
-            ])->pluck('id');
-            $borrowQuery->whereIn('user_id', $allowedUserIds);
+            $borrowQuery->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhereIn('user_id', function ($subQ) {
+                      $subQ->select('id')
+                          ->from('users')
+                          ->whereIn('role', [
+                              \App\Enums\UserRole::OPERATOR,
+                              \App\Enums\UserRole::ADMIN,
+                          ]);
+                  });
+            });
         } elseif ($user->role === \App\Enums\UserRole::OPERATOR) {
             $borrowQuery->where('user_id', $user->id);
         }
@@ -297,12 +304,17 @@ class DashboardService
 
         // Proteksi: Admin hanya boleh melihat log dari Admin & Operator (Hierarki privasi)
         if ($user && $user->role === \App\Enums\UserRole::ADMIN) {
-            $allowedUserIds = User::whereIn('role', [
-                \App\Enums\UserRole::ADMIN,
-                \App\Enums\UserRole::OPERATOR,
-            ])->pluck('id');
-
-            $query->whereIn('user_id', $allowedUserIds);
+            $query->where(function ($q) {
+                $q->whereNull('user_id')
+                  ->orWhereIn('user_id', function ($subQ) {
+                      $subQ->select('id')
+                          ->from('users')
+                          ->whereIn('role', [
+                              \App\Enums\UserRole::ADMIN,
+                              \App\Enums\UserRole::OPERATOR,
+                          ]);
+                  });
+            });
         }
 
         return $query->latest()->take($limit)->get();
@@ -317,12 +329,14 @@ class DashboardService
             $fk = $attribute.'_id';
 
             return Sparepart::join($table, "spareparts.{$fk}", '=', "{$table}.id")
+                ->where('spareparts.condition', '!=', 'Hilang')
                 ->select("{$table}.name as label", DB::raw('sum(spareparts.stock) as total'))
                 ->groupBy("{$table}.name")
                 ->pluck('total', 'label');
         }
 
-        return Sparepart::select($attribute, DB::raw('sum(stock) as total'))
+        return Sparepart::where('condition', '!=', 'Hilang')
+            ->select($attribute, DB::raw('sum(stock) as total'))
             ->groupBy($attribute)
             ->pluck('total', $attribute);
     }

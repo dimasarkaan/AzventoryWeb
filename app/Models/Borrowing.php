@@ -28,13 +28,13 @@ class Borrowing extends Model
     // Relasi Database: Menghubungkan catatan transaksi ini dengan fisik barang di gudang
     public function sparepart()
     {
-        return $this->belongsTo(Sparepart::class);
+        return $this->belongsTo(Sparepart::class)->withTrashed();
     }
 
     // Relasi Database: Menghubungkan catatan ini dengan akun pengguna yang bertanggung jawab
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     // Relasi Database: Menarik semua riwayat pengembalian (termasuk yang dicicil sedikit-sedikit)
@@ -71,6 +71,6 @@ class Borrowing extends Model
     // Scope (Standarisasi Global): Mengambil data peminjaman yang aktif dan sudah melewati batas waktu (Overdue)
     public function scopeOverdue($query)
     {
-        return $query->active()->where('expected_return_at', '<', now());
+        return $query->active()->where('expected_return_at', '<', now()->startOfDay());
     }
 }

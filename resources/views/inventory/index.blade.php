@@ -195,11 +195,32 @@
 
                     <!-- Top: Search Bar & Filter Toggle -->
                     <div class="mb-4 flex gap-2">
-                        <div class="relative w-full">
+                        <div class="relative w-full" 
+                             x-data="{ searchQuery: '{{ request('search') ? addslashes(request('search')) : '' }}' }"
+                             @keydown.window="
+                                if ($event.key === '/' && $event.target.tagName !== 'INPUT' && $event.target.tagName !== 'TEXTAREA') {
+                                    $event.preventDefault();
+                                    $refs.searchInput.focus();
+                                }
+                             "
+                        >
                              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <x-icon.search class="w-5 h-5 text-secondary-400" />
                             </div>
-                            <input type="text" name="search" value="{{ request('search') }}" class="input-field pl-10 w-full" placeholder="{{ __('ui.search_inventory_placeholder') }}" onchange="this.form.submit()" maxlength="255">
+                            <input type="text" x-ref="searchInput" name="search" x-model="searchQuery" 
+                                   @keydown.escape="$refs.searchInput.blur()"
+                                   class="input-field pl-10 pr-20 w-full" 
+                                   placeholder="{{ __('ui.search_inventory_placeholder') }}" 
+                                   onchange="this.form.submit()" maxlength="255">
+                            
+                            <!-- Search Shortcut Hint (Hidden on mobile or when typing) -->
+                            <div x-show="searchQuery.length === 0" class="absolute inset-y-0 right-0 pr-3 hidden sm:flex items-center pointer-events-none">
+                                <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
+                            </div>
+
+                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('inventory-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" style="display: none;">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
                         </div>
                         <button type="button" @click="showFilters = !showFilters" class="btn btn-secondary md:hidden flex items-center justify-center w-12 flex-shrink-0" title="{{ __('ui.show_filter') }}">
                             <x-icon.filter class="w-5 h-5" />
@@ -264,7 +285,7 @@
                         </div>
                         
                         <div class="flex items-end flex-shrink-0">
-                            <a href="{{ route('inventory.index') }}" id="reset-filters" class="btn btn-secondary flex items-center justify-center p-2.5 h-[42px] w-[42px]" title="{{ __('ui.reset_filter') }}">
+                            <a href="{{ route('inventory.index', request()->only(['trash', 'filter'])) }}" id="reset-filters" class="btn btn-secondary flex items-center justify-center p-2.5 h-[42px] w-[42px]" title="{{ __('ui.reset_filter') }}">
                                 <x-icon.restore class="h-5 w-5" />
                             </a>
                         </div>

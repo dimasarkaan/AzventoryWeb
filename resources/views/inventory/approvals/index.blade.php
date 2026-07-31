@@ -154,6 +154,14 @@
                                 <p class="text-xs text-secondary-500">
                                     {{ __($descKey) }}
                                 </p>
+                                @if(request('search') || (request('filter_type') && request('filter_type') !== 'all') || (request('status') && request('status') !== 'pending'))
+                                    <div class="mt-4">
+                                        <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-secondary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 mx-auto w-fit">
+                                            <x-icon.restore class="w-4 h-4" />
+                                            Hapus Filter & Pencarian
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     @endforelse
@@ -215,6 +223,14 @@
                                                 @endphp
                                                 <p class="text-base font-bold text-secondary-900 mb-1">{{ __($titleKey) }}</p>
                                                 <p class="text-sm text-secondary-500">{{ __($descKey) }}</p>
+                                                @if(request('search') || (request('filter_type') && request('filter_type') !== 'all') || (request('status') && request('status') !== 'pending'))
+                                                    <div class="mt-4">
+                                                        <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-secondary px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 mx-auto w-fit">
+                                                            <x-icon.restore class="w-4 h-4" />
+                                                            Hapus Filter & Pencarian
+                                                        </a>
+                                                    </div>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>

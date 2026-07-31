@@ -29,3 +29,11 @@ Thumbs.db
 /config/scribe.php
 /config/telescope.php
 /app/Providers/TelescopeServiceProvider.php
+
+# IDE Helpers
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
+
+# Temporary Scripts
+/scratch

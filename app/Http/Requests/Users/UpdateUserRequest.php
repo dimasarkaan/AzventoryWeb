@@ -59,4 +59,22 @@ class UpdateUserRequest extends FormRequest
             'status.in' => 'Pilihan status tidak valid.',
         ];
     }
+
+    // Melindungi Superadmin agar tidak bisa mendowngrade peran atau menonaktifkan dirinya sendiri
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $user = $this->route('user');
+            $currentUser = auth()->user();
+
+            if ($user && $currentUser && $user->id === $currentUser->id) {
+                if ($this->input('role') !== $user->role->value) {
+                    $validator->errors()->add('role', 'Anda tidak dapat mengubah peran (Role) akun Anda sendiri demi keamanan.');
+                }
+                if ($this->input('status') !== $user->status) {
+                    $validator->errors()->add('status', 'Anda tidak dapat menonaktifkan akun Anda sendiri.');
+                }
+            }
+        });
+    }
 }

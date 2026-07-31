@@ -37,21 +37,23 @@ class ExportActivityLogJob implements ShouldQueue
     public function handle(): void
     {
         // Rebuild query dynamically to avoid Payload Too Large exception in Queue
-        $query = \App\Models\ActivityLog::with('user');
+        $query = \App\Models\ActivityLog::with(['user' => fn ($q) => $q->withTrashed()]);
         $currentUser = $this->user;
 
         if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
             $query->where('user_id', $currentUser->id);
         } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
-            $query->whereHas('user', function ($q) {
-                $q->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+            $query->where(function ($q) {
+                $q->whereHas('user', function ($q2) {
+                    $q2->withTrashed()->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
+                })->orWhereNull('user_id');
             });
         }
 
         if (isset($this->params['role']) && $this->params['role'] && $this->params['role'] !== 'Semua Role') {
             $role = $this->params['role'];
             $query->whereHas('user', function ($q) use ($role) {
-                $q->where('role', $role);
+                $q->withTrashed()->where('role', $role);
             });
         }
 

@@ -77,8 +77,8 @@ class UserController extends Controller
         // Membuat username sementara dengan format: bagian depan email + angka acak
         $username = explode('@', $request->email)[0].rand(100, 999);
         
-        // Memastikan username tersebut unik dan belum ada di database
-        while (User::where('username', $username)->exists()) {
+        // Memastikan username tersebut unik dan belum ada di database (termasuk di tong sampah)
+        while (User::withTrashed()->where('username', $username)->exists()) {
             $username = explode('@', $request->email)[0].rand(100, 999);
         }
 
@@ -124,6 +124,11 @@ class UserController extends Controller
         // Mengecek hak akses pengguna untuk melihat form pengubahan data
         $this->authorize('update', $user);
 
+        // Mencegah pengguna mengedit role/status akunnya sendiri via User Management (harus lewat Profil)
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'Anda tidak dapat mengubah data sensitif akun Anda sendiri dari sini. Silakan gunakan menu Profil.');
+        }
+
         // Menampilkan halaman form edit beserta data pengguna yang akan diubah
         return view('users.edit', compact('user'));
     }
@@ -131,6 +136,11 @@ class UserController extends Controller
     // Memperbarui atau menyimpan perubahan data pengguna ke database
     public function update(UpdateUserRequest $request, User $user)
     {
+        // Mencegah pengguna mengubah akunnya sendiri yang bisa berakibat fatal (seperti tak sengaja merubah peran/status diri sendiri)
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'Anda tidak diperbolehkan mengubah peran atau status akun Anda sendiri.');
+        }
+
         // Menyimpan daftar perubahan atribut data pengguna untuk dicatat ke dalam log nantinya
         $changes = [];
         foreach ($request->validated() as $key => $value) {
@@ -166,6 +176,11 @@ class UserController extends Controller
     // Mengembalikan (reset) password pengguna ke password default (password123)
     public function resetPassword(User $user)
     {
+        // Mencegah pengguna mereset kata sandinya sendiri via admin panel
+        if (auth()->id() === $user->id) {
+            return back()->with('error', 'Anda tidak dapat mereset kata sandi Anda sendiri dari sini. Gunakan menu Ganti Password.');
+        }
+
         // Mendefinisikan password default untuk fitur reset password
         $defaultPassword = 'password123';
         
@@ -174,6 +189,11 @@ class UserController extends Controller
             'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
             'password_changed_at' => null, // Memaksa agar pengguna harus mengganti password lagi pada login berikutnya
         ]);
+
+        // Revoke all API tokens to force re-login on mobile devices for security
+        if (method_exists($user, 'tokens')) {
+            $user->tokens()->delete();
+        }
 
         // Menyimpan jejak aktivitas reset password
         $this->logActivity('Reset Password', __('messages.log_user_password_reset', ['name' => $user->name]));
@@ -194,7 +214,7 @@ class UserController extends Controller
         }
 
         // Validasi tambahan agar pengguna yang memiliki status peminjaman aktif belum bisa dihapus
-        if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+        if ($user->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
             return back()->with('error', 'Tidak dapat menghapus pengguna karena masih memiliki pinjaman barang aktif.');
         }
 
@@ -244,7 +264,7 @@ class UserController extends Controller
         }
 
         // Memastikan pengguna yang akan dihapus permanen tidak memiliki pinjaman barang yang belum dikembalikan
-        if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+        if ($user->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
             return back()->with('error', 'Tidak dapat menghapus permanen pengguna karena masih memiliki pinjaman barang aktif.');
         }
 
@@ -329,7 +349,7 @@ class UserController extends Controller
             }
 
             // Melewati proses hapus jika pengguna masih memiliki barang pinjaman yang belum selesai
-            if ($user->borrowings()->where('status', 'borrowed')->exists()) {
+            if ($user->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
                 $skipped++;
                 continue;
             }

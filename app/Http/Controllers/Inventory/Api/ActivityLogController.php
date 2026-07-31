@@ -36,7 +36,7 @@ class ActivityLogController extends Controller
             $query->where('action', 'like', '%'.$request->action.'%');
         }
 
-        $logs = $query->latest()->paginate($request->input('per_page', 20));
+        $logs = $query->latest()->paginate($request->input('per_page', 20))->withQueryString();
 
         return response()->json([
             'status' => 'success',
@@ -62,7 +62,7 @@ class ActivityLogController extends Controller
         $logs = ActivityLog::where('user_id', $userId)
             ->with('user')
             ->latest()
-            ->paginate($request->input('per_page', 20));
+            ->paginate($request->input('per_page', 20))->withQueryString();
 
         return response()->json([
             'status' => 'success',

@@ -30,7 +30,7 @@ class ProfileController extends Controller
                 'avatar_url' => $user->avatar ? asset('storage/'.$user->avatar) : null,
                 'stats' => [
                     'total_borrowed' => $user->borrowings()->count(),
-                    'active_borrows' => $user->borrowings()->where('status', 'borrowed')->count(),
+                    'active_borrows' => $user->borrowings()->whereIn('status', ['borrowed', 'overdue'])->count(),
                 ],
                 'created_at' => $user->created_at,
             ],

@@ -215,7 +215,7 @@ class TesRoleOperatorTest extends TestCase
     #[Test]
     public function operator_dapat_meminjam_item()
     {
-        $sparepart = Sparepart::factory()->create(['stock' => 15, 'condition' => 'Baik']);
+        $sparepart = Sparepart::factory()->create(['stock' => 15, 'condition' => 'Baik', 'type' => 'asset']);
 
         $response = $this->actingAs($this->operator)->post(route('inventory.borrow.store', $sparepart), [
             'quantity' => 2,

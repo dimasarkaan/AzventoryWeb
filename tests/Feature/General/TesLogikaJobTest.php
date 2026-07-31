@@ -30,25 +30,17 @@ class TesLogikaJobTest extends TestCase
 
         $spareparts = Sparepart::factory()->count(5)->create();
 
-        // Snapshot data seperti yang dilakukan ReportController
-        $reportData = [
-            'data' => $spareparts,
-            'title' => 'Laporan Data Inventaris Saat Ini',
-            'view' => 'reports.pdf_inventory_list',
-        ];
-
         // Buat Job
         $job = new GenerateReportJob(
             $user,
-            $reportData,
-            null,
-            null,
-            'all',
-            'inventory_list'
+            null, // startDate
+            null, // endDate
+            'all', // location
+            'inventory_list' // type
         );
 
         // Jalankan handle() secara manual (simulasi worker)
-        $job->handle();
+        $job->handle(app(\App\Services\ReportService::class));
 
         // Verifikasi file tersimpan di storage
         $files = Storage::disk('local')->allFiles('reports');
@@ -82,12 +74,11 @@ class TesLogikaJobTest extends TestCase
         // Buat Job
         $job = new ExportActivityLogJob(
             $user,
-            ['start_date' => null, 'end_date' => null],
-            $logs
+            ['start_date' => null, 'end_date' => null]
         );
 
         // Jalankan handle()
-        $job->handle();
+        $job->handle(app(\App\Services\ReportService::class));
 
         // Verifikasi file
         $files = Storage::disk('local')->allFiles('reports');

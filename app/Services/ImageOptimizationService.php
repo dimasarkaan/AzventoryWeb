@@ -38,7 +38,8 @@ class ImageOptimizationService
 
         // Fallback: jika GD tidak tersedia, simpan file apa adanya tanpa optimasi
         if (! $manager) {
-            $extension = $file->getClientOriginalExtension() ?: 'jpg';
+            // Secure: Use extension() which guesses based on MIME type (magic bytes), NOT the user-provided extension
+            $extension = $file->extension() ?: 'jpg';
             $filename = Str::random(40).'.'.$extension;
             $path = $folder.'/'.$filename;
             Storage::disk('public')->put($path, file_get_contents($file));

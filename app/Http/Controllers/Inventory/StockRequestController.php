@@ -68,16 +68,25 @@ class StockRequestController extends Controller
 
             // --- JALUR VIP: Eksekusi Langsung (Hanya Admin / Superadmin) ---
             if ($isAutoApproved) {
+                // Re-query dengan pessimistic locking untuk mencegah race condition (TOCTOU)
+                $lockedSparepart = \App\Models\Sparepart::where('id', $sparepart->id)->lockForUpdate()->first();
+                if (!$lockedSparepart) {
+                    throw \Illuminate\Validation\ValidationException::withMessages(['quantity' => 'Barang tidak ditemukan atau sudah dihapus.']);
+                }
+
                 if ($request->type === 'masuk') {
-                    $sparepart->stock += $request->quantity;
+                    $lockedSparepart->stock += $request->quantity;
                 } else { // keluar
                     // Pengecekan kedua kali demi keamanan super ketat, mencegah bug stok minus
-                    if ($sparepart->stock < $request->quantity) {
+                    if ($lockedSparepart->stock < $request->quantity) {
                         throw \Illuminate\Validation\ValidationException::withMessages(['quantity' => 'Stok tidak mencukupi untuk pengurangan ini.']);
                     }
-                    $sparepart->stock -= $request->quantity;
+                    $lockedSparepart->stock -= $request->quantity;
                 }
-                $sparepart->save();
+                $lockedSparepart->save();
+
+                // Sinkronisasi data ke instance asli agar log dan notifikasi menggunakan data terbaru
+                $sparepart->stock = $lockedSparepart->stock;
 
                 // Bersihkan Cache memori Dashboard supaya grafik dan ringkasan langsung merefleksikan jumlah stok terbaru
                 $this->inventoryService->clearCache();

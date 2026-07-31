@@ -77,9 +77,8 @@ class TesPeminjamanKompleksTest extends TestCase
         // Cek apakah borrowing masih bisa mengakses nama barang via withTrashed()
         $borrowingLoad = Borrowing::find($borrowing->id);
 
-        // Eloquent relationship usually returns null if deleted, unless we specify withTrashed in model rel
-        // If not specified in model, it returns null.
-        $this->assertNull($borrowingLoad->sparepart);
+        // Eloquent relationship will return the model because it uses withTrashed() in Borrowing.php
+        $this->assertNotNull($borrowingLoad->sparepart);
 
         // Verify we can still find it if we use withTrashed manually or if relationship handles it
         $sparepartDeleted = Sparepart::withTrashed()->find($sparepart->id);
@@ -108,7 +107,7 @@ class TesPeminjamanKompleksTest extends TestCase
 
         $this->assertDatabaseMissing('users', ['id' => $user->id, 'deleted_at' => null]);
 
-        // Relationship check
-        $this->assertNull($borrowing->fresh()->user);
+        // Relationship check (User rel also uses withTrashed)
+        $this->assertNotNull($borrowing->fresh()->user);
     }
 }

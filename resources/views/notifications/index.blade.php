@@ -170,6 +170,15 @@
                         <p class="relative z-10 text-secondary-500 max-w-sm leading-relaxed">
                             {{ request('filter') === 'unread' ? 'Semua notifikasi penting sudah Anda baca.' : __('ui.notification_empty_desc') }}
                         </p>
+
+                        @if(request('filter') === 'unread')
+                            <div class="relative z-10 mt-6">
+                                <a href="{{ route('notifications.index') }}" class="btn btn-secondary px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 mx-auto w-fit">
+                                    <x-icon.restore class="w-4 h-4" />
+                                    Tampilkan Semua
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 @endforelse
             </div>

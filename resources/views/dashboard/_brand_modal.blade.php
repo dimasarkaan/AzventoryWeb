@@ -1,4 +1,5 @@
 <div x-show="showBrandModal" 
+     @keydown.window.escape="if(!brandConfirmDeleteId && !brandEditingId) { showBrandModal = false }"
      role="dialog"
      aria-modal="true"
      aria-labelledby="brand-modal-title"
@@ -12,7 +13,7 @@
      x-transition:leave-end="opacity-0">
     
     <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showBrandModal = false" aria-hidden="true"></div>
+        <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="if(!brandConfirmDeleteId && !brandEditingId) { showBrandModal = false }" aria-hidden="true"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
@@ -189,6 +190,7 @@
 
             {{-- Custom Delete Confirmation Overlay --}}
             <div x-show="brandConfirmDeleteId" 
+                 @keydown.window.escape.stop="cancelBrandDelete()"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"

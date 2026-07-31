@@ -64,7 +64,7 @@ class TesAuditLogTest extends TestCase
         ]);
 
         $log = ActivityLog::where('action', 'Laporan Diunduh (Excel)')->first();
-        $this->assertStringContainsString('inventory_list', $log->description);
+        $this->assertStringContainsString('Laporan Inventaris', $log->description);
     }
 
     #[Test]
