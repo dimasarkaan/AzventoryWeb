@@ -650,6 +650,8 @@
                 formatKey(key) {
                     const translations = {
                         'item_ids': 'ID Item',
+                        'items': 'Daftar Item',
+                        'names': 'Daftar Nama',
                         'counts': 'Jumlah Potongan',
                         'total_labels': 'Total Label',
                         'name': 'Nama',

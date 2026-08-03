@@ -411,6 +411,7 @@ class InventoryService
                 return ['status' => 'empty', 'message' => __('messages.trash_empty')];
             }
 
+            $names = [];
             /** @var \App\Models\Sparepart $sparepart */
             foreach ($spareparts as $sparepart) {
                 if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
@@ -419,10 +420,15 @@ class InventoryService
                 if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
                     Storage::disk('public')->delete($sparepart->image);
                 }
+                $names[] = $sparepart->part_number . ' - ' . $sparepart->name;
                 $sparepart->forceDelete();
             }
 
-            $this->logActivity('Tong Sampah Dikosongkan', __('messages.log_trash_cleared', ['count' => $spareparts->count()]));
+            $namesList = implode(', ', $names);
+
+            $this->logActivity('Tong Sampah Dikosongkan', __('messages.log_trash_cleared', ['count' => $spareparts->count()]), [
+                'items' => ['old' => $namesList, 'new' => '-']
+            ]);
             $this->clearCache();
 
             return ['status' => 'all_deleted', 'message' => __('messages.trash_cleared')];
@@ -438,9 +444,18 @@ class InventoryService
                 return ['status' => 'empty', 'message' => __('messages.no_item_selected')];
             }
 
-            Sparepart::onlyTrashed()->whereIn('id', $ids)->restore();
+            $spareparts = Sparepart::onlyTrashed()->whereIn('id', $ids)->get();
+            $names = [];
+            foreach ($spareparts as $sparepart) {
+                $names[] = $sparepart->part_number . ' - ' . $sparepart->name;
+                $sparepart->restore();
+            }
 
-            $this->logActivity('Pemulihan Massal', __('messages.log_bulk_restored', ['count' => $count]));
+            $namesList = implode(', ', $names);
+
+            $this->logActivity('Pemulihan Massal', __('messages.log_bulk_restored', ['count' => $count]), [
+                'items' => ['old' => '-', 'new' => $namesList]
+            ]);
             $this->clearCache();
 
             return ['status' => 'success', 'message' => __('messages.bulk_restored', ['count' => $count])];
@@ -456,6 +471,7 @@ class InventoryService
                 return ['status' => 'empty', 'message' => __('messages.no_item_selected')];
             }
 
+            $names = [];
             /** @var \App\Models\Sparepart $sparepart */
             foreach ($spareparts as $sparepart) {
                 if ($sparepart->qr_code_path && Storage::disk('public')->exists($sparepart->qr_code_path)) {
@@ -464,10 +480,15 @@ class InventoryService
                 if ($sparepart->image && Storage::disk('public')->exists($sparepart->image)) {
                     Storage::disk('public')->delete($sparepart->image);
                 }
+                $names[] = $sparepart->part_number . ' - ' . $sparepart->name;
                 $sparepart->forceDelete();
             }
 
-            $this->logActivity('Hapus Permanen Massal', __('messages.log_bulk_deleted_force', ['count' => $spareparts->count()]));
+            $namesList = implode(', ', $names);
+
+            $this->logActivity('Hapus Permanen Massal', __('messages.log_bulk_deleted_force', ['count' => $spareparts->count()]), [
+                'items' => ['old' => $namesList, 'new' => '-']
+            ]);
             $this->clearCache();
 
             return ['status' => 'success', 'message' => __('messages.bulk_force_deleted', ['count' => $spareparts->count()])];

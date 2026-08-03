@@ -334,9 +334,17 @@ class InventoryController extends Controller
         }
 
         $count = count($ids);
+        $spareparts = Sparepart::whereIn('id', $ids)->get();
+        $names = [];
+        foreach($spareparts as $sparepart) {
+            $names[] = $sparepart->part_number . ' - ' . $sparepart->name;
+        }
+        $namesList = implode(', ', $names);
         
         // Mencatat aktivitas penghapusan massal ke dalam log
-        $this->logActivity('Hapus Massal (Soft)', "Menghapus {$count} item inventaris ke tong sampah.", ['ids' => $ids]);
+        $this->logActivity('Hapus Massal (Soft)', "Menghapus {$count} item inventaris ke tong sampah.", [
+            'items' => ['old' => $namesList, 'new' => '-']
+        ]);
 
         // Mengeksekusi query untuk menghapus item-item tersebut (soft delete)
         Sparepart::whereIn('id', $ids)->delete();
@@ -361,13 +369,20 @@ class InventoryController extends Controller
         $counts = $request->input('counts');
         $total = $request->input('total');
 
+        $spareparts = Sparepart::whereIn('id', $ids)->get();
+        $names = [];
+        foreach($spareparts as $sparepart) {
+            $names[] = $sparepart->part_number . ' - ' . $sparepart->name;
+        }
+        $namesList = implode(', ', $names);
+
         $this->logActivity(
             'Cetak Label',
             'Mencetak total '.$total.' label untuk '.count($ids).' item inventaris.',
             [
-                'item_ids' => $ids,
-                'counts' => $counts,
-                'total_labels' => $total,
+                'items' => ['old' => '-', 'new' => $namesList],
+                'counts' => ['old' => '-', 'new' => json_encode($counts)],
+                'total_labels' => ['old' => '-', 'new' => $total],
             ]
         );
 

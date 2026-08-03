@@ -301,15 +301,21 @@ class UserController extends Controller
         // Mengambil seluruh data pengguna yang ada di tempat sampah berdasarkan kumpulan ID yang diberikan
         $users = User::onlyTrashed()->whereIn('id', $ids)->get();
 
+        $names = [];
         // Melakukan perulangan untuk memulihkan masing-masing akun pengguna
         foreach ($users as $user) {
             /** @var \App\Models\User $user */
             $user->restore();
+            $names[] = $user->name;
             $count++; // Menghitung total data yang berhasil dipulihkan
         }
 
+        $namesList = implode(', ', $names);
+
         // Mencatat aktivitas pemulihan massal ke dalam log sistem
-        $this->logActivity('Bulk Restore User', __('messages.log_bulk_user_restored', ['count' => $count]));
+        $this->logActivity('Bulk Restore User', __('messages.log_bulk_user_restored', ['count' => $count]), [
+            'names' => ['old' => '-', 'new' => $namesList]
+        ]);
 
         // Kembali ke halaman sebelumnya dengan pesan jumlah data yang berhasil dipulihkan
         return redirect()->back()->with('success', __('messages.bulk_user_restored', ['count' => $count]));
@@ -339,6 +345,7 @@ class UserController extends Controller
         $count = 0;
         $skipped = 0;
         
+        $names = [];
         // Memproses satu per satu data pengguna yang akan dihapus permanen
         foreach ($users as $user) {
             /** @var \App\Models\User $user */
@@ -359,13 +366,18 @@ class UserController extends Controller
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
             
+            $names[] = $user->name;
             // Menghapus data akun dari database selamanya
             $user->forceDelete();
             $count++;
         }
 
+        $namesList = implode(', ', $names);
+
         // Mencatat jumlah pengguna yang berhasil dihapus ke dalam log
-        $this->logActivity('Bulk Force Delete User', __('messages.log_bulk_user_deleted_force', ['count' => $count]));
+        $this->logActivity('Bulk Force Delete User', __('messages.log_bulk_user_deleted_force', ['count' => $count]), [
+            'names' => ['old' => $namesList, 'new' => '-']
+        ]);
 
         // Menyusun pesan keberhasilan beserta informasi jika ada akun yang gagal dihapus (dilewati)
         $message = __('messages.bulk_user_force_deleted', ['count' => $count]);

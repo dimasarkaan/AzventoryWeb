@@ -225,6 +225,12 @@ class TesKasusBatasUserTest extends TestCase
         foreach ($users as $user) {
             $this->assertNotSoftDeleted('users', ['id' => $user->id]);
         }
+
+        $log = \App\Models\ActivityLog::where('action', 'Bulk Restore User')->latest()->first();
+        $this->assertNotNull($log);
+        $this->assertNotNull($log->properties);
+        $this->assertStringContainsString($users[0]->name, json_encode($log->properties));
+        $this->assertStringContainsString($users[1]->name, json_encode($log->properties));
     }
 
     #[Test]
@@ -244,5 +250,11 @@ class TesKasusBatasUserTest extends TestCase
         foreach ($users as $user) {
             $this->assertDatabaseMissing('users', ['id' => $user->id]);
         }
+
+        $log = \App\Models\ActivityLog::where('action', 'Bulk Force Delete User')->latest()->first();
+        $this->assertNotNull($log);
+        $this->assertNotNull($log->properties);
+        $this->assertStringContainsString($users[0]->name, json_encode($log->properties));
+        $this->assertStringContainsString($users[1]->name, json_encode($log->properties));
     }
 }
