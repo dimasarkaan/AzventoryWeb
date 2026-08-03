@@ -34,6 +34,6 @@ class ActivityLog extends Model
     // Relasi ke user yang melakukan aktivitas.
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 }

@@ -44,6 +44,16 @@ class NewPasswordController extends Controller
                 ])->save();
 
                 event(new PasswordReset($user));
+
+                \App\Models\ActivityLog::create([
+                    'user_id' => $user->id,
+                    'action' => 'Reset Password Berhasil',
+                    'description' => "Pengguna berhasil melakukan reset kata sandi menggunakan link dari email.",
+                    'properties' => [
+                        'ip' => request()->ip(),
+                        'user_agent' => request()->header('User-Agent'),
+                    ],
+                ]);
             }
         );
 

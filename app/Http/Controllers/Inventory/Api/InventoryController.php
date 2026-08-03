@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
  */
 class InventoryController extends Controller
 {
+    use \App\Traits\ActivityLogger;
     protected $inventoryService;
 
     protected $qrCodeService;
@@ -69,6 +70,8 @@ class InventoryController extends Controller
 
         $sparepart = Sparepart::create($validated);
         $this->qrCodeService->generate($sparepart);
+
+        $this->logActivity('Barang Dibuat (API)', "Barang baru '{$sparepart->name}' ditambahkan melalui API.");
 
         return response()->json([
             'status' => 'success',
@@ -140,6 +143,8 @@ class InventoryController extends Controller
         $inventory->load(['brand', 'category', 'location']);
         $this->qrCodeService->generate($inventory);
 
+        $this->logActivity('Barang Diupdate (API)', "Data barang '{$inventory->name}' diperbarui melalui API.");
+
         return response()->json([
             'status' => 'success',
             'message' => 'Data Barang berhasil diperbarui',
@@ -165,6 +170,7 @@ class InventoryController extends Controller
 
         $this->authorize('delete', $inventory);
 
+        $this->logActivity('Barang Dihapus (API)', "Barang '{$inventory->name}' dihapus melalui API.");
         $inventory->delete();
 
         return response()->json([
@@ -230,6 +236,9 @@ class InventoryController extends Controller
                 'approved_by' => $apiUser->id,
                 'approved_at' => now(),
             ]);
+            
+            $actionWord = $request->type === 'increment' ? 'Penambahan' : 'Pengurangan';
+            $this->logActivity("{$actionWord} Stok API", "{$actionWord} {$request->quantity} unit untuk barang '{$lockedSparepart->name}' via API. Alasan: " . ($request->description ?? '-'));
 
             return ['status' => 'success', 'data' => $lockedSparepart];
         });

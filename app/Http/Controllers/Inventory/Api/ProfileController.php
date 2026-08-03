@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
  */
 class ProfileController extends Controller
 {
+    use \App\Traits\ActivityLogger;
+
     /**
      * Mendapatkan profil pengguna yang sedang login.
      */
@@ -51,6 +53,8 @@ class ProfileController extends Controller
         ]);
 
         $user->update($validated);
+
+        $this->logActivity('Profil Diupdate (API)', 'User mengupdate profil mereka via aplikasi mobile/API.');
 
         return response()->json([
             'status' => 'success',

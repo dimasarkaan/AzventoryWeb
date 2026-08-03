@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 // Token ini berguna kalau nanti aplikasi ini mau dihubungkan ke aplikasi Mobile atau sistem luar.
 class ApiTokenController extends Controller
 {
+    use \App\Traits\ActivityLogger;
+
     // Memproses pembuatan token/kunci rahasia baru (Hanya Superadmin yang berhak)
     public function store(Request $request)
     {
@@ -26,6 +28,8 @@ class ApiTokenController extends Controller
         // Plain text token hanya akan dikembalikan satu kali
         $token = $request->user()->createToken($request->token_name);
 
+        $this->logActivity('Generate API Token', "Superadmin membuat Kunci API baru dengan label '{$request->token_name}'.");
+
         return back()
             ->with('new_api_token', $token->plainTextToken)
             ->with('success', 'API Token berhasil dibuat. Harap salin token tersebut.');
@@ -40,7 +44,12 @@ class ApiTokenController extends Controller
         }
 
         // Cari dan hapus token yang cocok milik user bersangkutan (mencegah hapus token user lain)
-        $request->user()->tokens()->where('id', $tokenId)->delete();
+        $token = $request->user()->tokens()->where('id', $tokenId)->first();
+        if ($token) {
+            $tokenName = $token->name;
+            $token->delete();
+            $this->logActivity('Revoke API Token', "Superadmin mencabut (menghanguskan) Kunci API '{$tokenName}'.");
+        }
 
         return back()->with('api_token_deleted', true)->with('success', 'Akses API Token berhasil dicabut secara permanen.');
     }

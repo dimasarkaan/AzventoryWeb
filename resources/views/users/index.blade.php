@@ -49,11 +49,32 @@
                      <!-- Top: Search Bar & Filter Toggle -->
                      <div class="mb-4 flex flex-col md:flex-row gap-4 items-center justify-between transition-all duration-300">
                         <div class="flex w-full gap-2 md:block">
-                             <div class="relative w-full md:flex-1">
+                             <div class="relative w-full md:flex-1"
+                                  x-data="{ searchQuery: '{{ request('search') ? addslashes(request('search')) : '' }}' }"
+                                  @keydown.window="
+                                    if ($event.key === '/' && $event.target.tagName !== 'INPUT' && $event.target.tagName !== 'TEXTAREA') {
+                                        $event.preventDefault();
+                                        $refs.searchInput.focus();
+                                    }
+                                  "
+                             >
                                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                      <svg class="w-5 h-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                  </div>
-                                 <input type="text" name="search" value="{{ request('search') }}" class="input-field pl-10 w-full" placeholder="{{ __('ui.search_user_placeholder') }}" onchange="this.form.submit()" maxlength="255">
+                                 <input type="text" x-ref="searchInput" name="search" x-model="searchQuery" 
+                                        @keydown.escape="$refs.searchInput.blur()"
+                                        class="input-field pl-10 pr-20 w-full" 
+                                        placeholder="{{ __('ui.search_user_placeholder') }}" 
+                                        onchange="this.form.submit()" maxlength="255">
+                                 
+                                 <!-- Search Shortcut Hint (Hidden on mobile or when typing) -->
+                                 <div x-show="searchQuery.length === 0" class="absolute inset-y-0 right-0 pr-3 hidden sm:flex items-center pointer-events-none">
+                                     <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
+                                 </div>
+
+                                 <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.querySelector('form[action=\'{{ route('users.index') }}\']').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" style="display: none;">
+                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                 </button>
                              </div>
                             <button type="button" @click="showFilters = !showFilters" class="btn btn-secondary md:hidden flex items-center justify-center w-12 flex-shrink-0" title="{{ __('ui.show_filter') }}">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>

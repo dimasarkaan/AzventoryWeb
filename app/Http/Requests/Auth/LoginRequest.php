@@ -75,6 +75,18 @@ class LoginRequest extends FormRequest
         if (! Auth::attempt($credentials, $remember)) {
             RateLimiter::hit($this->throttleKey());
 
+            if ($user) {
+                \App\Models\ActivityLog::create([
+                    'user_id' => $user->id,
+                    'action' => 'Login Gagal',
+                    'description' => "Upaya masuk gagal. Kata sandi yang dimasukkan salah.",
+                    'properties' => [
+                        'ip' => $this->ip(),
+                        'user_agent' => $this->header('User-Agent'),
+                    ],
+                ]);
+            }
+
             throw ValidationException::withMessages([
                 'login' => trans('auth.failed'),
             ]);

@@ -90,12 +90,31 @@
                         <!-- Search -->
                         <div class="space-y-1">
                             <label for="search" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.search_keyword') }}</label>
-                            <div class="relative">
+                            <div class="relative"
+                                 x-data="{ searchQuery: '{{ request('search') ? addslashes(request('search')) : '' }}' }"
+                                 @keydown.window="
+                                    if ($event.key === '/' && $event.target.tagName !== 'INPUT' && $event.target.tagName !== 'TEXTAREA') {
+                                        $event.preventDefault();
+                                        $refs.searchInput.focus();
+                                    }
+                                 "
+                            >
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                 </span>
-                                <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Deskripsi..."
-                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm h-[42px]">
+                                <input type="text" name="search" id="search" x-ref="searchInput" x-model="searchQuery" 
+                                    @keydown.escape="$refs.searchInput.blur()"
+                                    placeholder="Deskripsi..."
+                                    class="form-input pl-10 pr-20 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm h-[42px]">
+                                
+                                <!-- Search Shortcut Hint (Hidden on mobile or when typing) -->
+                                <div x-show="searchQuery.length === 0" class="absolute inset-y-0 right-0 pr-3 hidden sm:flex items-center pointer-events-none">
+                                    <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
+                                </div>
+
+                                <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" style="display: none;">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
                             </div>
                         </div>
 

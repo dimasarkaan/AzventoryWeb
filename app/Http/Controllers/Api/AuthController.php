@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Validator;
 // Berkomunikasi murni menggunakan teks JSON dan menggunakan sistem Token (Sanctum) sebagai pengganti Session.
 class AuthController extends Controller
 {
+    use \App\Traits\ActivityLogger;
+
     // Memproses percobaan Login via API
     // Jika email & password benar, sistem akan membuatkan dan memberikan 'Kunci Akses' (Bearer Token)
     public function login(Request $request)
@@ -30,6 +32,19 @@ class AuthController extends Controller
         }
 
         if (! Auth::attempt($request->only('email', 'password'))) {
+            $userAttempt = User::where('email', $request->email)->first();
+            if ($userAttempt) {
+                \App\Models\ActivityLog::create([
+                    'user_id' => $userAttempt->id,
+                    'action' => 'Login Gagal (API)',
+                    'description' => "Upaya masuk via API gagal. Kata sandi yang dimasukkan salah.",
+                    'properties' => [
+                        'ip' => request()->ip(),
+                        'user_agent' => request()->header('User-Agent'),
+                    ],
+                ]);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Email atau password salah',
@@ -40,6 +55,16 @@ class AuthController extends Controller
 
         // Check user active status if status column exists
         if (isset($user->status) && strtolower($user->status) != 'aktif') {
+            \App\Models\ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'Login Ditolak (API)',
+                'description' => "Upaya login via API ditolak karena akun sedang nonaktif.",
+                'properties' => [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->header('User-Agent'),
+                ],
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Akun Anda tidak aktif',
@@ -47,6 +72,17 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('API Token '.$request->email)->plainTextToken;
+
+        // Log successful login (Must use ActivityLog::create to set correct user_id since API requests are stateless before token is returned, though Auth::attempt might log them in statefully for this request)
+        \App\Models\ActivityLog::create([
+            'user_id' => $user->id,
+            'action' => 'Login (API)',
+            'description' => "Pengguna berhasil masuk ke sistem melalui API (Mobile).",
+            'properties' => [
+                'ip' => request()->ip(),
+                'user_agent' => request()->header('User-Agent'),
+            ],
+        ]);
 
         return response()->json([
             'success' => true,
@@ -67,7 +103,19 @@ class AuthController extends Controller
     // Caranya dengan menghancurkan 'Kunci Akses' (Token) yang sedang dipakai oleh HP/perangkat tersebut
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $user = $request->user();
+        if ($user) {
+            \App\Models\ActivityLog::create([
+                'user_id' => $user->id,
+                'action' => 'Logout (API)',
+                'description' => "Pengguna keluar dari sistem API (Kunci Akses dicabut).",
+                'properties' => [
+                    'ip' => request()->ip(),
+                    'user_agent' => request()->header('User-Agent'),
+                ],
+            ]);
+            $user->currentAccessToken()->delete();
+        }
 
         return response()->json([
             'success' => true,

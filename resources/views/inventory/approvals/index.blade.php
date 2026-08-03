@@ -15,18 +15,37 @@
             <div class="mb-6 card p-4 overflow-visible">
                 <form method="GET" action="{{ route('inventory.stock-approvals.index') }}" id="approval-filter-form" novalidate>
                     <div class="flex flex-col lg:flex-row gap-4 items-center">
-                        <div class="relative flex-1 w-full">
+                        <div class="relative flex-1 w-full"
+                             x-data="{ searchQuery: '{{ request('search') ? addslashes(request('search')) : '' }}' }"
+                             @keydown.window="
+                                if ($event.key === '/' && $event.target.tagName !== 'INPUT' && $event.target.tagName !== 'TEXTAREA') {
+                                    $event.preventDefault();
+                                    $refs.searchInput.focus();
+                                }
+                             "
+                        >
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <x-icon.search class="w-5 h-5 text-secondary-400" />
                             </div>
                             <input
                                 type="text"
+                                x-ref="searchInput"
                                 name="search"
-                                value="{{ request('search') }}"
+                                x-model="searchQuery"
+                                @keydown.escape="$refs.searchInput.blur()"
                                 placeholder="{{ __('ui.approvals_search_placeholder') }}"
-                                class="input-field pl-10 w-full"
+                                class="input-field pl-10 pr-20 w-full"
                                 onchange="this.form.submit()"
                             >
+                            
+                            <!-- Search Shortcut Hint (Hidden on mobile or when typing) -->
+                            <div x-show="searchQuery.length === 0" class="absolute inset-y-0 right-0 pr-3 hidden sm:flex items-center pointer-events-none">
+                                <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
+                            </div>
+
+                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('approval-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" style="display: none;">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
                         </div>
                         
                         <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
