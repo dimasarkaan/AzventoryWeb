@@ -1,4 +1,4 @@
-@props(['name', 'id' => null, 'options' => [], 'selected' => '', 'placeholder' => 'Pilih Opsi', 'submitOnChange' => false, 'width' => 'w-full md:w-auto', 'allowClear' => true])
+﻿@props(['name', 'id' => null, 'options' => [], 'selected' => '', 'placeholder' => 'Pilih Opsi', 'submitOnChange' => false, 'width' => 'w-full md:w-auto', 'allowClear' => true])
 @php
     $id = $id ?? $name;
 @endphp
@@ -37,9 +37,18 @@
         this.selected = value;
         this.selectedLabel = label;
         this.open = false;
+        
+        this.$nextTick(() => {
+            let input = this.$el.querySelector('input[type=hidden]');
+            if(input) {
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            this.$el.dispatchEvent(new CustomEvent('selected', { detail: value, bubbles: true }));
+        });
     }
 }" 
 @reset-filters.window="selected = ''; selectedLabel = placeholder; open = false"
+@set-selected.window="if ($event.detail.name === '{{ $name }}') { select($event.detail.value, options[$event.detail.value]) }"
 class="relative {{ $width }}">
     <input type="hidden" name="{{ $name }}" :value="selected">
     
@@ -57,7 +66,7 @@ class="relative {{ $width }}">
          x-transition:leave-start="transform opacity-100 scale-100"
          x-transition:leave-end="transform opacity-0 scale-95"
          class="absolute z-50 mt-1 w-full min-w-[100%] bg-white rounded-xl shadow-xl border border-secondary-100 overflow-hidden" 
-         style="display: none;">
+         x-cloak>
         <div class="max-h-60 overflow-y-auto p-1 space-y-0.5">
              <!-- Opsi Reset -->
              @if($allowClear)
@@ -81,3 +90,4 @@ class="relative {{ $width }}">
         </div>
     </div>
 </div>
+

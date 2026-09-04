@@ -13,12 +13,12 @@ class ActivityLogController extends Controller
 {
     use ActivityLogger;
 
-    // Menampilkan daftar catatan riwayat aktivitas secara lengkap
-    // Dilengkapi fitur penyaringan tingkat tinggi (Filter berdasarkan Role, User, Aksi, dan Tanggal)
-    public function index(Request $request)
+    /**
+     * Menerapkan filter pencarian dan privasi pada kueri riwayat aktivitas.
+     * Ini digunakan secara bersamaan oleh method index() dan export() untuk mencegah duplikasi (DRY).
+     */
+    private function applyFilters($query, Request $request)
     {
-        $query = ActivityLog::with('user');
-
         $currentUser = $request->user();
 
         // Implementasi Hierarki Privasi:
@@ -30,7 +30,7 @@ class ActivityLogController extends Controller
             $query->where(function ($q) {
                 $q->whereHas('user', function ($q2) {
                     $q2->withTrashed()->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
-                })->orWhereNull('user_id'); // Izinkan melihat log dari user yang sudah hard-delete (meski tidak tahu rolenya, demi keutuhan audit)
+                })->orWhereNull('user_id'); // Izinkan melihat log dari user yang sudah hard-delete
             });
         }
 
@@ -103,8 +103,19 @@ class ActivityLogController extends Controller
             }
         }
 
+        return $query;
+    }
+
+    // Menampilkan daftar catatan riwayat aktivitas secara lengkap
+    // Dilengkapi fitur penyaringan tingkat tinggi (Filter berdasarkan Role, User, Aksi, dan Tanggal)
+    public function index(Request $request)
+    {
+        $query = ActivityLog::with('user');
+        $query = $this->applyFilters($query, $request);
+
         $activityLogs = $query->latest()->paginate(10)->withQueryString();
 
+        $currentUser = $request->user();
         $usersQuery = \App\Models\User::withTrashed()->orderBy('name');
         if ($currentUser->role === \App\Enums\UserRole::ADMIN) {
             $usersQuery->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
@@ -139,47 +150,7 @@ class ActivityLogController extends Controller
     public function export(Request $request)
     {
         $query = ActivityLog::with('user');
-
-        $currentUser = $request->user();
-        if ($currentUser->role === \App\Enums\UserRole::OPERATOR) {
-            $query->where('user_id', $currentUser->id);
-        } elseif ($currentUser->role === \App\Enums\UserRole::ADMIN) {
-            $query->where(function ($q) {
-                $q->whereHas('user', function ($q2) {
-                    $q2->withTrashed()->whereIn('role', [\App\Enums\UserRole::ADMIN, \App\Enums\UserRole::OPERATOR]);
-                })->orWhereNull('user_id');
-            });
-        }
-
-        if ($request->has('role') && $request->role && $request->role !== 'Semua Role') {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->withTrashed()->where('role', $request->role);
-            });
-        }
-
-        if ($request->has('user_id') && $request->user_id) {
-            $query->where('user_id', $request->user_id);
-        }
-
-        if ($request->has('action') && $request->action) {
-            $query->where('action', $request->action);
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('description', 'like', "%{$search}%")
-                    ->orWhere('action', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->start_date) {
-            $query->whereDate('created_at', '>=', $request->start_date);
-        }
-
-        if ($request->end_date) {
-            $query->whereDate('created_at', '<=', $request->end_date);
-        }
+        $query = $this->applyFilters($query, $request);
 
         $logs = $query->latest()->get();
         $format = $request->input('format', 'pdf');

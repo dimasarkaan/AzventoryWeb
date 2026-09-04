@@ -112,18 +112,19 @@ class AdminDashboardController extends Controller
                 'sparepart' => fn ($q) => $q->withTrashed(), // Tetap tampilkan meski barang aslinya sudah di-soft delete
                 'user',
             ])
+                ->withSum('returns', 'quantity')
                 ->active()
                 ->where(function ($q) {
                     // Admin hanya bisa mengawasi peminjaman dari Admin lain, Operator, dan user yang sudah dihapus permanen
                     $q->whereNull('user_id')
-                      ->orWhereIn('user_id', function ($subQ) {
-                          $subQ->select('id')
-                              ->from('users')
-                              ->whereIn('role', [
-                                  \App\Enums\UserRole::OPERATOR,
-                                  \App\Enums\UserRole::ADMIN,
-                              ]);
-                      });
+                        ->orWhereIn('user_id', function ($subQ) {
+                            $subQ->select('id')
+                                ->from('users')
+                                ->whereIn('role', [
+                                    \App\Enums\UserRole::OPERATOR,
+                                    \App\Enums\UserRole::ADMIN,
+                                ]);
+                        });
                 })
                 ->latest()
                 ->take(5)
@@ -134,17 +135,18 @@ class AdminDashboardController extends Controller
                 'sparepart' => fn ($q) => $q->withTrashed(),
                 'user',
             ])
+                ->withSum('returns', 'quantity')
                 ->overdue()
                 ->where(function ($q) {
                     $q->whereNull('user_id')
-                      ->orWhereIn('user_id', function ($subQ) {
-                          $subQ->select('id')
-                              ->from('users')
-                              ->whereIn('role', [
-                                  \App\Enums\UserRole::OPERATOR,
-                                  \App\Enums\UserRole::ADMIN,
-                              ]);
-                      });
+                        ->orWhereIn('user_id', function ($subQ) {
+                            $subQ->select('id')
+                                ->from('users')
+                                ->whereIn('role', [
+                                    \App\Enums\UserRole::OPERATOR,
+                                    \App\Enums\UserRole::ADMIN,
+                                ]);
+                        });
                 })
                 ->orderBy('expected_return_at', 'asc') // Urutkan dari yang paling terlambat
                 ->take(5)

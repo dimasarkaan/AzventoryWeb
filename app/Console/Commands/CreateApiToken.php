@@ -37,6 +37,8 @@ class CreateApiToken extends Command
                 'name' => 'API Service: '.$name,
                 'username' => \Illuminate\Support\Str::slug('api-'.$name),
                 'password' => Hash::make(\Illuminate\Support\Str::random(32)),
+                'role' => \App\Enums\UserRole::OPERATOR->value,
+                'status' => 'aktif',
             ]
         );
 

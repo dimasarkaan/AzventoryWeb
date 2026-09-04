@@ -20,7 +20,7 @@ class ApiManajemenUserTest extends TestCase
     #[Test]
     public function superadmin_dapat_melihat_daftar_user()
     {
-        Sanctum::actingAs($this->makeUser('superadmin'));
+        Sanctum::actingAs($this->makeUser('superadmin'), ['*']);
         User::factory()->count(2)->create();
 
         $this->getJson('/api/v1/users')
@@ -30,14 +30,14 @@ class ApiManajemenUserTest extends TestCase
     #[Test]
     public function operator_tidak_dapat_melihat_daftar_user()
     {
-        Sanctum::actingAs($this->makeUser('operator'));
+        Sanctum::actingAs($this->makeUser('operator'), ['*']);
         $this->getJson('/api/v1/users')->assertStatus(403);
     }
 
     #[Test]
     public function superadmin_dapat_membuat_user_baru()
     {
-        Sanctum::actingAs($this->makeUser('superadmin'));
+        Sanctum::actingAs($this->makeUser('superadmin'), ['*']);
 
         $payload = [
             'name' => 'Operator Baru',
@@ -56,7 +56,7 @@ class ApiManajemenUserTest extends TestCase
     #[Test]
     public function superadmin_dapat_reset_password_user()
     {
-        Sanctum::actingAs($this->makeUser('superadmin'));
+        Sanctum::actingAs($this->makeUser('superadmin'), ['*']);
         $targetUser = User::factory()->create(['password' => bcrypt('lama123')]);
 
         $this->postJson("/api/v1/users/{$targetUser->uuid}/reset-password")
@@ -67,7 +67,7 @@ class ApiManajemenUserTest extends TestCase
     #[Test]
     public function superadmin_dapat_menghapus_user_soft_delete()
     {
-        Sanctum::actingAs($this->makeUser('superadmin'));
+        Sanctum::actingAs($this->makeUser('superadmin'), ['*']);
         $targetUser = User::factory()->create();
 
         $this->deleteJson("/api/v1/users/{$targetUser->uuid}")

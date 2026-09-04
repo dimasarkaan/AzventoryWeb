@@ -74,11 +74,14 @@ window.confirmDelete = function (event) {
         width: '24em',
         iconColor: '#ef4444',
         padding: '2em',
-        backdrop: `rgba(0,0,0,0.4)`
-    }).then((result) => {
-        if (result.isConfirmed) {
+        backdrop: `rgba(0,0,0,0.4)`,
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
             form.submit();
+            return new Promise(() => {}); // Tetap loading sampai halaman beralih
         }
+    }).then((result) => {
+        // Kosongkan karena ditangani preConfirm
     })
 };
 

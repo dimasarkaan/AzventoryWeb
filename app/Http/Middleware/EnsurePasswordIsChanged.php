@@ -17,9 +17,10 @@ class EnsurePasswordIsChanged
             if ($request->wantsJson() || $request->is('api/*')) {
                 return response()->json([
                     'message' => 'Anda harus mengganti kata sandi default sebelum melanjutkan.',
-                    'action_required' => 'password_change'
+                    'action_required' => 'password_change',
                 ], 403);
             }
+
             return redirect()->route('password.change')->with('warning', 'Anda harus mengganti kata sandi default sebelum melanjutkan.');
         }
 

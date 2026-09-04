@@ -2,7 +2,7 @@
     'name',
     'show' => false,
     'maxWidth' => '2xl',
-    'zIndex' => 'z-50'
+    'zIndex' => 'z-[110]'
 ])
 
 @php

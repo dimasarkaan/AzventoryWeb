@@ -36,7 +36,7 @@ class TesPenyesuaianStokApiTest extends TestCase
     #[Test]
     public function api_adjust_stock_decrement_berhasil_dan_user_id_tidak_null()
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         $response = $this->putJson("/api/v1/inventory/{$this->sparepart->uuid}/adjust-stock", [
             'type' => 'decrement',
@@ -67,7 +67,7 @@ class TesPenyesuaianStokApiTest extends TestCase
     #[Test]
     public function api_adjust_stock_increment_berhasil()
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         $response = $this->putJson("/api/v1/inventory/{$this->sparepart->uuid}/adjust-stock", [
             'type' => 'increment',
@@ -93,7 +93,7 @@ class TesPenyesuaianStokApiTest extends TestCase
     #[Test]
     public function api_adjust_stock_gagal_jika_stok_tidak_cukup()
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         $this->putJson("/api/v1/inventory/{$this->sparepart->uuid}/adjust-stock", [
             'type' => 'decrement',
@@ -118,7 +118,7 @@ class TesPenyesuaianStokApiTest extends TestCase
     #[Test]
     public function api_adjust_stock_gagal_jika_item_tidak_ditemukan()
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         $this->putJson('/api/v1/inventory/99999/adjust-stock', [
             'type' => 'decrement',
@@ -129,7 +129,7 @@ class TesPenyesuaianStokApiTest extends TestCase
     #[Test]
     public function api_adjust_stock_validasi_gagal_jika_type_salah()
     {
-        Sanctum::actingAs($this->admin);
+        Sanctum::actingAs($this->admin, ['*']);
 
         $this->putJson("/api/v1/inventory/{$this->sparepart->uuid}/adjust-stock", [
             'type' => 'invalid_type',

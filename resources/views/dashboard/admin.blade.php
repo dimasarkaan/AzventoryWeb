@@ -147,6 +147,7 @@
                             $activeMonthLabel = $bulanList[$month ?? ''] ?? 'Semua Bulan';
                         @endphp
                         <form method="GET" action="{{ route('dashboard.admin') }}"
+                              x-data="{ isSubmitting: false }" @submit="isSubmitting = true"
                               class="bg-white border border-secondary-200 rounded-xl p-4 flex flex-wrap items-end gap-3 shadow-sm" novalidate>
                             <input type="hidden" name="period" value="custom">
 
@@ -225,7 +226,13 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn btn-primary text-sm">Terapkan</button>
+                            <button type="submit" class="btn btn-primary text-sm flex items-center gap-2" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
+                                <span x-show="!isSubmitting">Terapkan</span>
+                                <span x-show="isSubmitting" class="flex items-center gap-2" x-cloak>
+                                    <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    Memproses...
+                                </span>
+                            </button>
                             <a href="{{ route('dashboard.admin') }}" class="btn btn-secondary text-sm">Reset</a>
                         </form>
                     </div>
@@ -954,7 +961,7 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.js"></script>
     <script>
         // Default Chart
         Chart.defaults.font.family = "'Inter', sans-serif";

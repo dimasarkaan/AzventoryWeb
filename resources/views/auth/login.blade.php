@@ -11,7 +11,7 @@
             <!-- Field Login -->
             <div>
                 <label for="login" class="input-label">{{ __('ui.auth_label_login') }}</label>
-                <input id="login" type="text" name="login" class="input-field w-full" value="{{ old('login') }}" required autocomplete="username" autofocus tabindex="1" minlength="3" maxlength="255" title="Silakan masukkan username atau email yang valid">
+                <input id="login" type="text" name="login" data-testid="input-login" class="input-field w-full" value="{{ old('login') }}" required autocomplete="username" autofocus tabindex="1" minlength="3" maxlength="255" title="Silakan masukkan username atau email yang valid">
                 <x-input-error :messages="$errors->get('login')" class="mt-2" />
             </div>
 
@@ -26,7 +26,7 @@
                     @endif
                 </div>
                 <div class="relative">
-                    <input id="password" type="password" name="password" class="input-field w-full pr-10" required autocomplete="current-password" tabindex="2" maxlength="255">
+                    <input id="password" type="password" name="password" data-testid="input-password" class="input-field w-full pr-10" required autocomplete="current-password" tabindex="2" maxlength="255">
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-secondary-600 focus:outline-none" tabindex="-1">
                         <svg id="eye-icon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -37,18 +37,23 @@
                         </svg>
                     </button>
                 </div>
+                <div id="caps-lock-warning" class="hidden mt-2 p-2 bg-warning-50 border border-warning-200 rounded-lg flex items-center gap-2 text-warning-700 text-xs animate-pulse">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <strong>Perhatian:</strong> Tombol Caps Lock Anda sedang menyala!
+                </div>
                 <x-input-error :messages="$errors->get('password')" class="mt-2" />
             </div>
 
             <!-- Ingat Saya -->
             <div class="block">
                 <label for="remember_me" class="inline-flex items-center group cursor-pointer">
-                    <input id="remember_me" type="checkbox" name="remember" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition duration-150 ease-in-out cursor-pointer" tabindex="3">
+                    <input id="remember_me" type="checkbox" name="remember" data-testid="checkbox-remember" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition duration-150 ease-in-out cursor-pointer" tabindex="3">
                     <span class="ml-2 text-sm text-secondary-600 group-hover:text-secondary-800 transition-colors">{{ __('ui.auth_remember_me') }}</span>
                 </label>
             </div>
 
             <button type="submit" 
+                    data-testid="btn-login"
                     class="w-full btn btn-primary justify-center py-3 text-base shadow-lg shadow-primary-500/20 disabled:opacity-70 disabled:cursor-not-allowed" 
                     tabindex="3"
                     :disabled="loading">
@@ -71,6 +76,7 @@
         </form>
     </div>
 
+    @push('scripts')
     <script>
         function togglePasswordVisibility() {
             var passwordInput = document.getElementById('password');
@@ -87,6 +93,26 @@
                 eyeOffIcon.classList.add('hidden');
             }
         }
+            const passwordInput = document.getElementById('password');
+        const capsWarning = document.getElementById('caps-lock-warning');
+
+        passwordInput.addEventListener('keyup', function(e) {
+            if (e.getModifierState('CapsLock')) {
+                capsWarning.classList.remove('hidden');
+            } else {
+                capsWarning.classList.add('hidden');
+            }
+        });
+
+        passwordInput.addEventListener('mousedown', function(e) {
+            if (e.getModifierState('CapsLock')) {
+                capsWarning.classList.remove('hidden');
+            } else {
+                capsWarning.classList.add('hidden');
+            }
+        });
     </script>
+    @endpush
 </x-guest-layout>
+
 

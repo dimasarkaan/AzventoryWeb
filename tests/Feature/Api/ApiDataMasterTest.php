@@ -23,7 +23,7 @@ class ApiDataMasterTest extends TestCase
     #[Test]
     public function crud_brands_berhasil_via_api()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         // Create
         $this->postJson('/api/v1/brands', ['name' => 'BRAND-API'])
@@ -48,7 +48,7 @@ class ApiDataMasterTest extends TestCase
     #[Test]
     public function crud_categories_berhasil_via_api()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->postJson('/api/v1/categories', ['name' => 'CAT-API'])->assertStatus(201);
         $cat = Category::first();
@@ -59,7 +59,7 @@ class ApiDataMasterTest extends TestCase
     #[Test]
     public function crud_locations_berhasil_via_api()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->postJson('/api/v1/locations', ['name' => 'LOC-API'])->assertStatus(201);
         $loc = Location::first();

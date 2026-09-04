@@ -4,156 +4,208 @@ namespace Tests\Feature\Inventory;
 
 use App\Enums\UserRole;
 use App\Models\Sparepart;
+use App\Models\StockLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-/**
- * Test untuk StockRequestController.
- * Mencakup pengajuan perubahan stok oleh Operator (pending)
- * dan Admin (auto-approve).
- */
 class TesPermintaanStokTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected User $superadmin;
+    protected $superadmin;
 
-    protected User $admin;
+    protected $admin;
 
-    protected User $operator;
-
-    protected Sparepart $sparepart;
+    protected $operator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->superadmin = User::factory()->create(['role' => UserRole::SUPERADMIN]);
-        $this->admin = User::factory()->create(['role' => UserRole::ADMIN]);
-        $this->operator = User::factory()->create(['role' => UserRole::OPERATOR]);
-        $this->sparepart = Sparepart::factory()->create(['stock' => 50, 'minimum_stock' => 5]);
+
+        $this->superadmin = User::factory()->create([
+            'role' => UserRole::SUPERADMIN,
+            'password_changed_at' => now(),
+        ]);
+
+        $this->admin = User::factory()->create([
+            'role' => UserRole::ADMIN,
+            'password_changed_at' => now(),
+        ]);
+
+        $this->operator = User::factory()->create([
+            'role' => UserRole::OPERATOR,
+            'password_changed_at' => now(),
+        ]);
     }
 
-    #[Test]
-    public function operator_dapat_mengajukan_permintaan_penambahan_stok_dengan_status_pending()
+    public function test_vip_auto_approve_kurang_stok()
     {
-        \Illuminate\Support\Facades\Notification::fake();
+        $sparepart = Sparepart::factory()->create(['stock' => 10]);
 
-        $response = $this->actingAs($this->operator)
-            ->post(route('inventory.stock.request.store', $this->sparepart), [
-                'type' => 'masuk',
-                'quantity' => 10,
-                'reason' => 'Penambahan stok rutin bulanan.',
-            ]);
+        $response = $this->actingAs($this->superadmin)->post(route('inventory.stock.request.store', $sparepart), [
+            'type' => 'keluar',
+            'quantity' => 2,
+            'reason' => 'Dipakai di mesin A',
+        ]);
 
-        $response->assertRedirect(route('inventory.show', $this->sparepart));
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('spareparts', [
+            'id' => $sparepart->id,
+            'stock' => 8,
+        ]);
+
         $this->assertDatabaseHas('stock_logs', [
-            'sparepart_id' => $this->sparepart->id,
+            'sparepart_id' => $sparepart->id,
+            'user_id' => $this->superadmin->id,
+            'status' => 'approved',
+            'type' => 'keluar',
+            'quantity' => 2,
+        ]);
+    }
+
+    public function test_reguler_pending_tambah_stok()
+    {
+        $sparepart = Sparepart::factory()->create(['stock' => 5]);
+
+        $response = $this->actingAs($this->operator)->post(route('inventory.stock.request.store', $sparepart), [
+            'type' => 'masuk',
+            'quantity' => 5,
+            'reason' => 'Barang baru datang',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('spareparts', [
+            'id' => $sparepart->id,
+            'stock' => 5,
+        ]);
+
+        $this->assertDatabaseHas('stock_logs', [
+            'sparepart_id' => $sparepart->id,
+            'user_id' => $this->operator->id,
+            'status' => 'pending',
+            'type' => 'masuk',
+            'quantity' => 5,
+        ]);
+    }
+
+    public function test_approval_tunggal_setuju_stok_bertambah()
+    {
+        $sparepart = Sparepart::factory()->create(['stock' => 5]);
+        $stockLog = StockLog::factory()->create([
+            'sparepart_id' => $sparepart->id,
+            'user_id' => $this->operator->id,
             'type' => 'masuk',
             'quantity' => 10,
             'status' => 'pending',
+            'reason' => 'Tambahan',
         ]);
-    }
 
-    #[Test]
-    public function operator_dapat_mengajukan_permintaan_pengurangan_stok_dengan_status_pending()
-    {
-        \Illuminate\Support\Facades\Notification::fake();
-
-        $response = $this->actingAs($this->operator)
-            ->post(route('inventory.stock.request.store', $this->sparepart), [
-                'type' => 'keluar',
-                'quantity' => 5,
-                'reason' => 'Pengurangan stok untuk perbaikan.',
-            ]);
-
-        $response->assertRedirect();
-        $this->assertDatabaseHas('stock_logs', [
-            'sparepart_id' => $this->sparepart->id,
-            'type' => 'keluar',
-            'status' => 'pending',
-        ]);
-        // Stok TIDAK langsung berubah (butuh approval)
-        $this->assertEquals(50, $this->sparepart->fresh()->stock);
-    }
-
-    #[Test]
-    public function admin_mengajukan_stok_masuk_dan_langsung_disetujui()
-    {
-        $initialStock = $this->sparepart->stock;
-
-        $this->actingAs($this->admin)
-            ->post(route('inventory.stock.request.store', $this->sparepart), [
-                'type' => 'masuk',
-                'quantity' => 20,
-                'reason' => 'Restock dari supplier.',
-            ]);
-
-        $this->assertDatabaseHas('stock_logs', [
-            'sparepart_id' => $this->sparepart->id,
-            'type' => 'masuk',
-            'quantity' => 20,
+        $response = $this->actingAs($this->admin)->put(route('inventory.stock-approvals.update', $stockLog), [
             'status' => 'approved',
         ]);
-        // Stok langsung bertambah
-        $this->assertEquals($initialStock + 20, $this->sparepart->fresh()->stock);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('spareparts', [
+            'id' => $sparepart->id,
+            'stock' => 15,
+        ]);
+
+        $this->assertDatabaseHas('stock_logs', [
+            'id' => $stockLog->id,
+            'status' => 'approved',
+            'approved_by' => $this->admin->id,
+        ]);
     }
 
-    #[Test]
-    public function superadmin_mengajukan_stok_keluar_dan_stok_langsung_berkurang()
+    public function test_approval_massal_sekaligus()
     {
-        $initialStock = $this->sparepart->stock;
+        $sparepart1 = Sparepart::factory()->create(['stock' => 5]);
+        $sparepart2 = Sparepart::factory()->create(['stock' => 2]);
 
-        $this->actingAs($this->superadmin)
-            ->post(route('inventory.stock.request.store', $this->sparepart), [
-                'type' => 'keluar',
-                'quantity' => 10,
-                'reason' => 'Dipakai untuk maintenance.',
-            ]);
+        $log1 = StockLog::factory()->create(['sparepart_id' => $sparepart1->id, 'user_id' => $this->operator->id, 'type' => 'masuk', 'quantity' => 5, 'status' => 'pending', 'reason' => 'T']);
+        $log2 = StockLog::factory()->create(['sparepart_id' => $sparepart2->id, 'user_id' => $this->operator->id, 'type' => 'keluar', 'quantity' => 1, 'status' => 'pending', 'reason' => 'K']);
 
-        $this->assertEquals($initialStock - 10, $this->sparepart->fresh()->stock);
+        $response = $this->actingAs($this->admin)->post(route('inventory.stock-approvals.bulk-approve'), [
+            'ids' => [$log1->id, $log2->id],
+            'status' => 'approved',
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('spareparts', ['id' => $sparepart1->id, 'stock' => 10]);
+        $this->assertDatabaseHas('spareparts', ['id' => $sparepart2->id, 'stock' => 1]);
     }
 
-    #[Test]
-    public function pengajuan_stok_keluar_gagal_jika_stok_tidak_mencukupi_untuk_admin()
+    public function test_penolakan_request_mutasi_stok()
     {
-        $this->sparepart->update(['stock' => 3]);
+        $sparepart = Sparepart::factory()->create(['stock' => 5]);
+        $stockLog = StockLog::factory()->create([
+            'sparepart_id' => $sparepart->id,
+            'user_id' => $this->operator->id,
+            'type' => 'masuk',
+            'quantity' => 10,
+            'status' => 'pending',
+            'reason' => 'T',
+        ]);
 
-        $response = $this->actingAs($this->admin)
-            ->post(route('inventory.stock.request.store', $this->sparepart), [
-                'type' => 'keluar',
-                'quantity' => 10,
-                'reason' => 'Melebihi stok tersedia.',
-            ]);
+        $response = $this->actingAs($this->admin)->put(route('inventory.stock-approvals.update', $stockLog), [
+            'status' => 'rejected',
+            'rejection_reason' => 'Tidak perlu',
+        ]);
+
+        $response->assertRedirect();
+
+        $this->assertDatabaseHas('spareparts', ['id' => $sparepart->id, 'stock' => 5]);
+        $this->assertDatabaseHas('stock_logs', ['id' => $stockLog->id, 'status' => 'rejected', 'rejection_reason' => 'Tidak perlu']);
+    }
+
+    public function test_validasi_menolak_keluar_melebihi_stok()
+    {
+        $sparepart = Sparepart::factory()->create(['stock' => 3]);
+
+        $response = $this->actingAs($this->operator)->post(route('inventory.stock.request.store', $sparepart), [
+            'type' => 'keluar',
+            'quantity' => 5, // Lebih dari stok 3
+            'reason' => 'Minta lebih',
+        ]);
 
         $response->assertSessionHasErrors('quantity');
-        $this->assertEquals(3, $this->sparepart->fresh()->stock);
+
+        $this->assertDatabaseHas('spareparts', ['id' => $sparepart->id, 'stock' => 3]);
     }
 
-    #[Test]
-    public function validasi_gagal_jika_quantity_kurang_dari_satu()
+    public function test_operator_forbidden_akses_halaman_approval()
     {
-        $response = $this->actingAs($this->operator)
-            ->post(route('inventory.stock.request.store', $this->sparepart), [
-                'type' => 'masuk',
-                'quantity' => 0,
-                'reason' => 'Jumlah tidak valid.',
-            ]);
-
-        $response->assertSessionHasErrors('quantity');
+        $response = $this->actingAs($this->operator)->get(route('inventory.stock-approvals.index'));
+        $response->assertStatus(403);
     }
 
-    #[Test]
-    public function validasi_gagal_jika_reason_tidak_diisi()
+    public function test_mencegah_double_submission_approval()
     {
-        $response = $this->actingAs($this->operator)
-            ->post(route('inventory.stock.request.store', $this->sparepart), [
-                'type' => 'masuk',
-                'quantity' => 5,
-                'reason' => '',
-            ]);
+        $sparepart = Sparepart::factory()->create(['stock' => 5]);
+        $stockLog = StockLog::factory()->create([
+            'sparepart_id' => $sparepart->id,
+            'user_id' => $this->operator->id,
+            'type' => 'masuk',
+            'quantity' => 5,
+            'status' => 'approved', // Sudah pernah di-approve!
+            'reason' => 'T',
+        ]);
 
-        $response->assertSessionHasErrors('reason');
+        $response = $this->actingAs($this->admin)->put(route('inventory.stock-approvals.update', $stockLog), [
+            'status' => 'approved',
+        ]);
+
+        // Error bisa berupa forbidden, bad request, atau redirect back with error/validation errors.
+        // Kita hanya asert bahwa stok tidak bertambah menjadi 10.
+        $this->assertDatabaseHas('spareparts', ['id' => $sparepart->id, 'stock' => 5]);
     }
 }

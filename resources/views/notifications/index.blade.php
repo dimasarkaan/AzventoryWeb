@@ -213,12 +213,17 @@
                 width: '24em',
                 iconColor: '#3b82f6',
                 padding: '2em',
-                backdrop: `rgba(0,0,0,0.4)`
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('mark-all-read-form').submit();
+                backdrop: `rgba(0,0,0,0.4)`,
+                showLoaderOnConfirm: true,
+                allowOutsideClick: () => !Swal.isLoading(),
+                preConfirm: () => {
+                    return new Promise((resolve) => {
+                        document.getElementById('mark-all-read-form').submit();
+                        // Asumsikan submit langsung reload/redirect, biarkan loading terus berjalan
+                        setTimeout(resolve, 3000);
+                    });
                 }
-            })
+            });
         }
     </script>
     @endpush

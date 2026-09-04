@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="activityLogComponent()">
             <!-- Header & Actions -->
@@ -33,7 +33,7 @@
                         </button>
                         <div x-show="open" 
                              class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-secondary-100"
-                             style="display: none;">
+                             x-cloak>
                             <a href="{{ route('reports.activity-logs.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" 
                                @click="isExporting = true; open = false; setTimeout(() => isExporting = false, 3000)"
                                class="px-4 py-2 text-sm text-secondary-700 hover:bg-secondary-50 flex items-center gap-2">
@@ -69,7 +69,7 @@
                  x-transition:leave-start="opacity-100 transform translate-y-0"
                  x-transition:leave-end="opacity-0 transform -translate-y-2"
                  class="mb-6"
-                 style="display: none;">
+                 x-cloak>
                  
                 <form id="filter-form" action="{{ route('reports.activity-logs.index') }}" method="GET" class="card p-6 border border-secondary-200 shadow-lg overflow-visible"
                       @submit="
@@ -112,7 +112,7 @@
                                     <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
                                 </div>
 
-                                <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" style="display: none;">
+                                <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" x-cloak>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                 </button>
                             </div>
@@ -342,7 +342,7 @@
                         </div>
 
                         <div class="text-xs text-secondary-400 text-right">
-                            {{ $log->created_at->format('d M Y • H:i:s') }}
+                            {{ $log->created_at->format('d M Y â€¢ H:i:s') }}
                         </div>
                     </div>
                 @empty
@@ -356,347 +356,12 @@
                 {{ $activityLogs->links() }}
             </div>
 
-            <!-- Detail Modal (Premium Design) -->
-            <div x-show="showActivityModal" 
-                 class="fixed inset-0 z-[9999] overflow-y-auto" 
-                 style="display: none;"
-                 x-cloak
-                 @keydown.escape.window="showActivityModal = false"
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0">
-                
-                <div class="flex items-center justify-center min-h-screen p-4 text-center sm:p-0">
-                    <div class="fixed inset-0 transition-opacity bg-secondary-900/60 backdrop-blur-sm" @click="showActivityModal = false" aria-hidden="true"></div>
+                @include('reports.activity_logs.partials.detail-modal')
 
-                    <div class="relative inline-block w-full max-w-lg overflow-hidden text-left align-middle transition-all transform bg-white rounded-2xl shadow-2xl sm:my-8 sm:max-w-2xl border border-secondary-100"
-                         x-transition:enter="transition ease-out duration-300"
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
-                        
-                        {{-- Header --}}
-                        <div class="bg-secondary-50/50 px-6 py-4 border-b border-secondary-100 flex justify-between items-center">
-                            <h3 class="text-base font-bold text-secondary-900">Detail Aktivitas</h3>
-                            <button @click="showActivityModal = false" class="text-secondary-400 hover:text-secondary-600 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        </div>
+        @push('scripts')
+    @include('reports.activity_logs.partials.scripts')
+    @endpush
 
-                        {{-- Content --}}
-                        <div class="px-6 py-6" x-show="selectedActivity">
-                            {{-- Activity Summary --}}
-                            <div class="flex items-start gap-4 mb-6">
-                                <div class="w-12 h-12 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 flex-shrink-0 ring-4 ring-primary-50">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-lg font-bold text-secondary-900 leading-tight mb-1" x-text="selectedActivity?.description"></p>
-                                    <span class="badge badge-secondary text-[10px] uppercase font-bold tracking-widest" x-text="selectedActivity?.action"></span>
-                                </div>
-                            </div>
-
-                            {{-- Properties Table (The Audit Core) --}}
-                            <div class="mb-4" x-show="selectedActivity && hasVisibleProperties(selectedActivity.properties)">
-                                <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-widest mb-3">Detail Perubahan Data</h4>
-                                <div class="overflow-hidden border border-secondary-200 rounded-xl shadow-sm bg-white">
-                                    <table class="min-w-full divide-y divide-secondary-200">
-                                        <thead class="bg-secondary-50/50">
-                                            <tr>
-                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest">Kolom</th>
-                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-red-50/30">Sebelum</th>
-                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-green-50/30">Sesudah</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-secondary-100">
-                                            <template x-if="selectedActivity && selectedActivity.properties">
-                                                <template x-for="(values, key) in selectedActivity.properties" :key="key">
-                                                    <template x-if="key !== 'ip' && key !== 'user_agent'">
-                                                        <tr class="hover:bg-secondary-50/30 transition-colors">
-                                                            <td class="px-4 py-3 text-xs font-bold text-secondary-700 capitalize" x-text="formatKey(key)"></td>
-                                                            <td class="px-4 py-3 text-xs text-red-600 bg-red-50/10 break-all italic" x-text="formatValue(values.old)"></td>
-                                                            <td class="px-4 py-3 text-xs text-green-700 bg-green-50/10 font-bold break-all" x-text="formatValue(values.new)"></td>
-                                                        </tr>
-                                                    </template>
-                                                </template>
-                                            </template>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            {{-- Metadata Info --}}
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div class="p-3 bg-white rounded-2xl border border-secondary-200 shadow-sm flex flex-col min-w-0">
-                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">Pengguna</p>
-                                    <p class="text-sm font-bold text-secondary-900 leading-tight break-all" x-text="selectedActivity?.user?.name || selectedActivity?.user_name || 'System'"></p>
-                                    <p class="text-[10px] text-secondary-500 font-mono mt-1 break-all" x-text="selectedActivity?.user?.email || selectedActivity?.user_email || ''"></p>
-                                </div>
-                                <div class="p-3 bg-white rounded-2xl border border-secondary-200 shadow-sm flex flex-col min-w-0">
-                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">Waktu Presisi</p>
-                                    <p class="text-sm font-bold text-secondary-900" 
-                                       x-text="selectedActivity ? new Date(selectedActivity.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'medium' }) : '-'"></p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-    <script>
-        function activityLogComponent() {
-            return {
-                userRole: '{{ auth()->user()->role->value }}',
-                showFilters: false,
-                showActivityModal: false,
-                selectedActivity: null,
-                logs: @js($activityLogs->getCollection()->keyBy('id')),
-                lastId: {{ $activityLogs->first()?->id ?? 0 }},
-                isPolling: false,
-
-                init() {
-                    console.log('[Alpine] Activity Log Initialized');
-                    
-                    // Polling Fallback (setiap 15 detik)
-                    setInterval(() => {
-                        this.fetchNewLogs();
-                    }, 15000);
-
-                    if (window.Echo) {
-                        console.log('[Alpine] Echo found, listening for activity-logs...');
-                        window.Echo.channel('activity-logs')
-                            .listen('.ActivityLogged', (e) => {
-                                console.log('[Alpine] Event received:', e);
-                                
-                                // Mapping payload dari broadcastWith ke format log lokal
-                                const activity = {
-                                    id: e.id,
-                                    action: e.action,
-                                    description: e.description,
-                                    user_name: e.user_name,
-                                    user_email: e.user_email || '-',
-                                    created_at: e.created_at,
-                                    properties: e.properties || {}
-                                };
-                                
-                                if (!this.logs[activity.id]) {
-                                    console.log('[Alpine] New log added to UI:', activity.id);
-                                    this.logs[activity.id] = activity;
-                                    this.appendLogToUI(activity);
-                                    
-                                    // Update lastId agar polling tidak menduplikasi
-                                    if (activity.id > this.lastId) {
-                                        this.lastId = activity.id;
-                                    }
-                                }
-                            });
-                    }
-                },
-
-                async fetchNewLogs() {
-                    if (this.isPolling) return;
-                    this.isPolling = true;
-
-                    try {
-                        // Hanya fetch jika sedang di halaman 1 atau tidak ada filter aktif yang rumit
-                        const params = new URLSearchParams(window.location.search);
-                        if (params.has('page') && params.get('page') !== '1') {
-                            this.isPolling = false;
-                            return;
-                        }
-
-                        const response = await fetch(`${window.location.pathname}?wantsJson=1&since_id=${this.lastId}`, {
-                            headers: {
-                                'Accept': 'application/json',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        });
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.activityLogs && data.activityLogs.data.length > 0) {
-                                const newLogs = data.activityLogs.data.filter(log => log.id > this.lastId);
-                                
-                                if (newLogs.length > 0) {
-                                    this.lastId = Math.max(this.lastId, ...newLogs.map(l => l.id));
-                                    newLogs.reverse().forEach(log => {
-                                        if (!this.logs[log.id]) {
-                                            this.logs[log.id] = log;
-                                            this.appendLogToUI(log);
-                                        }
-                                    });
-                                }
-                            }
-                        }
-                    } catch (e) {
-                        console.error('[Polling] Error:', e);
-                    } finally {
-                        this.isPolling = false;
-                    }
-                },
-                appendLogToUI(activity) {
-                    const desktopBody = document.getElementById('desktop-logs-body');
-                    const mobileContainer = document.getElementById('mobile-logs-container');
-                    
-                    const action = (activity.action || '').toLowerCase();
-                    let badgeColor = 'bg-secondary-50 text-secondary-700 border-secondary-200';
-                    if (action.includes('buat') || action.includes('create')) {
-                        badgeColor = 'bg-success-50 text-success-700 border-success-200';
-                    } else if (action.includes('update') || action.includes('perbarui') || action.includes('edit')) {
-                        badgeColor = 'bg-primary-50 text-primary-700 border-primary-200';
-                    } else if (action.includes('hapus') || action.includes('delete') || action.includes('reject') || action.includes('tolak')) {
-                        badgeColor = 'bg-red-50 text-red-700 border-red-200';
-                    }
-
-                    if (desktopBody) {
-                        const emptyRow = desktopBody.querySelector('td[colspan]');
-                        if (emptyRow) emptyRow.closest('tr').remove();
-                        
-                        const newRowHTML = `
-                            <tr class="group hover:bg-secondary-50 transition-colors animate-highlight" id="log-${activity.id}">
-                                ${this.userRole !== 'operator' ? `
-                                <td>
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0">
-                                            <span class="font-bold text-xs">${(activity.user_name || 'S').charAt(0)}</span>
-                                        </div>
-                                        <div>
-                                            <div class="font-medium text-secondary-900">${activity.user_name || 'System'}</div>
-                                            <div class="text-xs text-secondary-500 font-mono">${activity.user_email || '-'}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                ` : ''}
-                                <td>
-                                    <span class="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${badgeColor}">
-                                        ${activity.action}
-                                    </span>
-                                </td>
-                                <td class="text-sm text-secondary-600">
-                                    <div class="max-w-lg whitespace-normal break-words">${activity.description}</div>
-                                </td>
-                                <td class="text-sm text-secondary-500 whitespace-nowrap">
-                                    ${new Date(activity.created_at).toLocaleString('id-ID')}
-                                </td>
-                                <td class="text-right">
-                                    ${(activity.properties && Object.keys(activity.properties).length > 0) ? `
-                                        <button class="view-log-btn p-2 text-secondary-400 hover:text-primary-600 transition-colors rounded-full hover:bg-primary-50"
-                                                title="Lihat Detail Perubahan">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                        </button>
-                                    ` : ''}
-                                </td>
-                            </tr>
-                        `;
-                        desktopBody.insertAdjacentHTML('afterbegin', newRowHTML);
-                        const newRow = desktopBody.firstElementChild;
-                        const btn = newRow.querySelector('.view-log-btn');
-                        if (btn) btn.onclick = () => this.viewActivityDetails(activity.id);
-                    }
-
-                    if (mobileContainer) {
-                        const emptyCard = mobileContainer.querySelector('.text-center');
-                        if (emptyCard) emptyCard.closest('.card').remove();
-
-                        const newCardHTML = `
-                            <div class="card p-4 flex flex-col gap-3 animate-highlight">
-                                <div class="flex items-center justify-between gap-4">
-                                    ${this.userRole !== 'operator' ? `
-                                    <div class="flex items-center gap-3 min-w-0">
-                                        <div class="h-10 w-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-500 flex-shrink-0 font-bold overflow-hidden">
-                                            ${(activity.user_name || 'S').charAt(0)}
-                                        </div>
-                                        <div class="min-w-0">
-                                            <div class="font-bold text-secondary-900 truncate">${activity.user_name || 'System'}</div>
-                                            <div class="text-xs text-secondary-500">Baru Saja</div>
-                                        </div>
-                                    </div>
-                                    ` : `
-                                    <div class="min-w-0">
-                                        <div class="text-sm font-bold text-secondary-900">Baru Saja</div>
-                                    </div>
-                                    `}
-                                    <span class="badge ${badgeColor} text-[10px] uppercase font-bold tracking-wider flex-shrink-0 whitespace-nowrap">${activity.action}</span>
-                                </div>
-                                <div class="text-sm text-secondary-600 bg-secondary-50 p-3 rounded-lg border border-secondary-100 flex justify-between items-start gap-4">
-                                    <span class="flex-1">${activity.description}</span>
-                                    ${(activity.properties && Object.keys(activity.properties).length > 0) ? `
-                                        <button class="view-log-btn px-3 py-1.5 text-sm font-semibold text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors shadow-sm">
-                                            Detail
-                                        </button>
-                                    ` : ''}
-                                </div>
-                                <div class="text-xs text-secondary-400 text-right">
-                                    Baru Saja
-                                </div>
-                            </div>
-                        `;
-                        mobileContainer.insertAdjacentHTML('afterbegin', newCardHTML);
-                        const newCard = mobileContainer.firstElementChild;
-                        const btn = newCard.querySelector('.view-log-btn');
-                        if (btn) btn.onclick = () => this.viewActivityDetails(activity.id);
-                    }
-                },
-
-                formatValue(val) {
-                    if (val === null || val === undefined) return '-';
-                    if (typeof val === 'boolean') return val ? 'Ya' : 'Tidak';
-                    return val;
-                },
-
-                formatKey(key) {
-                    const translations = {
-                        'item_ids': 'ID Item',
-                        'items': 'Daftar Item',
-                        'names': 'Daftar Nama',
-                        'counts': 'Jumlah Potongan',
-                        'total_labels': 'Total Label',
-                        'name': 'Nama',
-                        'brand': 'Merek',
-                        'category': 'Kategori',
-                        'stock': 'Stok',
-                        'price': 'Harga',
-                        'description': 'Deskripsi',
-                        'condition': 'Kondisi',
-                        'location': 'Lokasi',
-                        'color': 'Warna',
-                        'status': 'Status',
-                        'type': 'Tipe',
-                        'role': 'Peran',
-                        'email': 'Email',
-                        'password': 'Kata Sandi',
-                        'part_number': 'No. Identifikasi',
-                        'remarks': 'Catatan',
-                        'problem_chronology': 'Kronologi Masalah'
-                    };
-                    const lowerKey = key.toLowerCase();
-                    return translations[lowerKey] || key.replace(/_/g, ' ');
-                },
-
-                viewActivityDetails(id) {
-                    console.log('[Alpine] viewActivityDetails called for ID:', id);
-                    if (!this.logs) {
-                        console.error('[Alpine] logs object is undefined!');
-                        return;
-                    }
-                    this.selectedActivity = this.logs[id];
-                    if (this.selectedActivity) {
-                        this.showActivityModal = true;
-                    } else {
-                        console.warn('[Alpine] Log not found for ID:', id);
-                    }
-                },
-
-                hasVisibleProperties(properties) {
-                    if (!properties) return false;
-                    return Object.keys(properties).some(key => key !== 'ip' && key !== 'user_agent');
-                }
-            };
-        }
-    </script>
 
     <!-- Animation Helper -->
     <style>
@@ -711,6 +376,7 @@
         </div>
     </div>
 </x-app-layout>
+
 
 
 

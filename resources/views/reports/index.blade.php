@@ -23,56 +23,40 @@
                         <span id="report_category_label" class="block text-sm font-bold text-secondary-900 mb-4">{{ __('ui.choose_report_type') }}</span>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" role="radiogroup" aria-labelledby="report_category_label">
                             <!-- Inventaris -->
-                            <label class="cursor-pointer relative group">
-                                <input type="radio" name="report_type" value="inventory_list" x-model="reportType" class="peer sr-only">
-                                <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
-                                    <div class="w-12 h-12 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center mb-3 group-hover:bg-primary-200 transition-colors">
-                                        <x-icon.inventory class="w-6 h-6" />
-                                    </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.inventory_data') }}</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.inventory_data_desc') }}</span>
-                                </div>
-                                <div class="absolute inset-0 border-2 border-primary-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
-                            </label>
+                            <x-reports.type-card 
+                                value="inventory_list" 
+                                color="primary" 
+                                title="{{ __('ui.inventory_data') }}" 
+                                description="{{ __('ui.inventory_data_desc') }}">
+                                <x-slot name="icon"><x-icon.inventory class="w-6 h-6" /></x-slot>
+                            </x-reports.type-card>
 
                             <!-- Mutasi Stok -->
-                            <label class="cursor-pointer relative group">
-                                <input type="radio" name="report_type" value="stock_mutation" x-model="reportType" class="peer sr-only">
-                                <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
-                                    <div class="w-12 h-12 rounded-full bg-warning-100 text-warning-600 flex items-center justify-center mb-3 group-hover:bg-warning-200 transition-colors">
-                                        <x-icon.mutation class="w-6 h-6" />
-                                    </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.stock_mutation_history') }}</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.stock_mutation_desc') }}</span>
-                                </div>
-                                <div class="absolute inset-0 border-2 border-primary-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
-                            </label>
+                            <x-reports.type-card 
+                                value="stock_mutation" 
+                                color="warning" 
+                                title="{{ __('ui.stock_mutation_history') }}" 
+                                description="{{ __('ui.stock_mutation_desc') }}">
+                                <x-slot name="icon"><x-icon.mutation class="w-6 h-6" /></x-slot>
+                            </x-reports.type-card>
 
                             <!-- Peminjaman -->
-                            <label class="cursor-pointer relative group">
-                                <input type="radio" name="report_type" value="borrowing_history" x-model="reportType" class="peer sr-only">
-                                <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-sky-400 peer-checked:border-sky-600 peer-checked:bg-sky-50 transition-all h-full flex flex-col items-center text-center">
-                                    <div class="w-12 h-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mb-3 group-hover:bg-sky-200 transition-colors">
-                                        <x-icon.borrow-user class="w-6 h-6" />
-                                    </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.borrowing_history_report') }}</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.borrowing_history_desc') }}</span>
-                                </div>
-                                <div class="absolute inset-0 border-2 border-sky-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
-                            </label>
+                            <x-reports.type-card 
+                                value="borrowing_history" 
+                                color="sky" 
+                                title="{{ __('ui.borrowing_history_report') }}" 
+                                description="{{ __('ui.borrowing_history_desc') }}">
+                                <x-slot name="icon"><x-icon.borrow-user class="w-6 h-6" /></x-slot>
+                            </x-reports.type-card>
 
-                                <!-- Low Stock -->
-                            <label class="cursor-pointer relative group">
-                                <input type="radio" name="report_type" value="low_stock" x-model="reportType" class="peer sr-only">
-                                <div class="p-5 rounded-xl border-2 border-secondary-100 hover:border-primary-400 peer-checked:border-primary-600 peer-checked:bg-primary-50 transition-all h-full flex flex-col items-center text-center">
-                                    <div class="w-12 h-12 rounded-full bg-danger-100 text-danger-600 flex items-center justify-center mb-3 group-hover:bg-danger-200 transition-colors">
-                                        <x-icon.low-stock class="w-6 h-6" />
-                                    </div>
-                                    <span class="font-bold text-secondary-900 block mb-1">{{ __('ui.low_stock_report') }}</span>
-                                    <span class="text-xs text-secondary-500 leading-tight">{{ __('ui.low_stock_desc') }}</span>
-                                </div>
-                                <div class="absolute inset-0 border-2 border-primary-600 rounded-xl opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
-                            </label>
+                            <!-- Low Stock -->
+                            <x-reports.type-card 
+                                value="low_stock" 
+                                color="danger" 
+                                title="{{ __('ui.low_stock_report') }}" 
+                                description="{{ __('ui.low_stock_desc') }}">
+                                <x-slot name="icon"><x-icon.low-stock class="w-6 h-6" /></x-slot>
+                            </x-reports.type-card>
                         </div>
                     </div>
 
@@ -114,7 +98,7 @@
                                                 x-transition:leave-start="transform opacity-100 scale-100"
                                                 x-transition:leave-end="transform opacity-0 scale-95"
                                                 class="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-secondary-100 overflow-hidden" 
-                                                style="display: none;">
+                                                x-cloak>
                                             <div class="p-2 space-y-1">
                                                 <template x-for="(label, key) in labels" :key="key">
                                                     <div @click="period = key; open = false" 
@@ -181,7 +165,7 @@
                                         x-transition:leave-start="transform opacity-100 scale-100"
                                         x-transition:leave-end="transform opacity-0 scale-95"
                                         class="absolute z-50 mt-2 w-full bg-white rounded-xl shadow-xl border border-secondary-100 overflow-hidden" 
-                                        style="display: none;">
+                                        x-cloak>
                                     <div class="max-h-60 overflow-y-auto p-2 space-y-1">
                                         <!-- Default Option -->
                                         <div @click="select('', '{{ __('ui.all_locations') }}')" 
@@ -210,16 +194,28 @@
 
                     <!-- Format & Action -->
                     <div class="bg-secondary-50 -mx-6 -mb-6 p-6 mt-8 rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-secondary-100">
-                        <div class="flex items-center space-x-6">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 w-full sm:w-auto">
                             <span class="text-sm font-medium text-secondary-700">{{ __('ui.format_label') }}</span>
-                                <label class="inline-flex items-center cursor-pointer">
-                                <input type="radio" name="export_format" value="pdf" checked id="format_pdf" class="text-primary-600 focus:ring-primary-500 h-4 w-4 border-gray-300">
-                                <span class="ml-2 text-sm text-secondary-700 font-medium">{{ __('ui.pdf_document') }}</span>
-                            </label>
-                            <label class="inline-flex items-center cursor-pointer">
-                                <input type="radio" name="export_format" value="excel" id="format_excel" class="text-success-600 focus:ring-success-500 h-4 w-4 border-gray-300">
-                                <span class="ml-2 text-sm text-secondary-700 font-medium">{{ __('ui.excel_document') }}</span>
-                            </label>
+                            
+                            <div class="flex p-1 bg-secondary-200/50 rounded-xl w-full sm:w-auto">
+                                <!-- PDF Option -->
+                                <label class="relative cursor-pointer flex-1 sm:flex-none">
+                                    <input type="radio" name="export_format" value="pdf" checked class="peer sr-only">
+                                    <div class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold text-secondary-500 hover:text-secondary-700 transition-all peer-checked:bg-white peer-checked:text-danger-600 peer-checked:shadow-sm peer-checked:ring-1 peer-checked:ring-secondary-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                        {{ __('ui.pdf_document') }}
+                                    </div>
+                                </label>
+                                
+                                <!-- Excel Option -->
+                                <label class="relative cursor-pointer flex-1 sm:flex-none">
+                                    <input type="radio" name="export_format" value="excel" class="peer sr-only">
+                                    <div class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold text-secondary-500 hover:text-secondary-700 transition-all peer-checked:bg-white peer-checked:text-success-600 peer-checked:shadow-sm peer-checked:ring-1 peer-checked:ring-secondary-200">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        {{ __('ui.excel_document') }}
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                         <button type="submit" 
                             :disabled="loading || isDateInvalid"
@@ -230,11 +226,11 @@
                             <span x-show="!loading" style="display: inline;" class="whitespace-nowrap font-bold">{{ __('ui.download_report') }}</span>
                             
                             <!-- State: Loading -->
-                            <svg x-show="loading" style="display: none;" class="animate-spin h-5 w-5 text-white flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <svg x-show="loading" x-cloak class="animate-spin h-5 w-5 text-white flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span x-show="loading" style="display: none;">Memproses...</span>
+                            <span x-show="loading" x-cloak>Memproses...</span>
                         </button>
                     </div>
                 </form>
@@ -243,104 +239,8 @@
     </div>
 
     @push('scripts')
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('reportManager', () => ({
-                reportType: 'inventory_list', 
-                period: 'this_month',
-                startDate: '',
-                endDate: '',
-                loading: false,
-                
-                get isDateInvalid() {
-                    if (this.period === 'custom' && this.startDate && this.endDate) {
-                        return new Date(this.startDate) > new Date(this.endDate);
-                    }
-                    return false;
-                },
-
-                async downloadReport(e) {
-                    if (this.isDateInvalid) {
-                        e.preventDefault();
-                        return;
-                    }
-
-                    const format = document.querySelector('input[name=export_format]:checked').value;
-                    
-                    if (format === 'excel') {
-                        this.loading = true;
-                        setTimeout(() => this.loading = false, 3000);
-                        return;
-                    }
-
-                    e.preventDefault();
-                    this.loading = true;
-
-                    if (window.showToast) {
-                        window.showToast('info', 'Laporan sedang diproses. Mohon tunggu...');
-                    }
-
-                    try {
-                        const formData = new FormData(e.target);
-                        const params = new URLSearchParams(formData);
-                        
-                        const response = await fetch(`${e.target.action}?${params.toString()}`, {
-                            headers: {
-                                'Accept': 'application/json, application/pdf',
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        });
-
-                        const contentType = response.headers.get('content-type');
-
-                        if (response.ok && contentType && contentType.includes('application/pdf')) {
-                            const blob = await response.blob();
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            
-                            const disposition = response.headers.get('content-disposition');
-                            let filename = 'laporan.pdf';
-                            if (disposition && disposition.indexOf('attachment') !== -1) {
-                                const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-                                const matches = filenameRegex.exec(disposition);
-                                if (matches != null && matches[1]) { 
-                                    filename = matches[1].replace(/['"]/g, '');
-                                }
-                            }
-                            
-                            a.download = filename;
-                            document.body.appendChild(a);
-                            a.click();
-                            window.URL.revokeObjectURL(url);
-                            
-                            if (window.showToast) {
-                                window.showToast('success', 'Laporan berhasil diunduh.');
-                            }
-                        } else if (response.ok && contentType && contentType.includes('application/json')) {
-                            const data = await response.json();
-                            if (data.success) {
-                                if (window.showToast && data.message) {
-                                    window.showToast('info', data.message);
-                                }
-                            } else {
-                                window.showToast('error', data.message || 'Gagal mengirim permintaan.');
-                            }
-                        } else {
-                            throw new Error('Respons tidak dikenali atau server error');
-                        }
-                    } catch (error) {
-                        console.error('Error:', error);
-                        if (window.showToast) {
-                            window.showToast('error', 'Terjadi kesalahan sistem saat mengunduh.');
-                        }
-                    } finally {
-                        this.loading = false;
-                    }
-                }
-            }));
-        });
-    </script>
+    @include('reports.partials._report_scripts')
     @endpush
 </x-app-layout>
+
 

@@ -84,7 +84,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function index_mengembalikan_daftar_inventory_dengan_paginasi()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         Sparepart::factory()->count(5)->create();
 
         $this->withoutExceptionHandling();
@@ -107,7 +107,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function index_dengan_filter_search_mengembalikan_data_yang_sesuai()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $this->makeSparepart(['name' => 'Laptop ASUS X123']);
         $this->makeSparepart(['name' => 'Printer Canon']);
 
@@ -122,7 +122,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function index_dengan_filter_category_mengembalikan_data_sesuai()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $cat = \App\Models\Category::factory()->create();
         $this->makeSparepart(['category_id' => $cat->id]);
 
@@ -137,7 +137,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function index_dengan_filter_per_page_mengembalikan_jumlah_yang_diminta()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         Sparepart::factory()->count(10)->create();
 
         $response = $this->getJson('/api/v1/inventory?per_page=3');
@@ -149,7 +149,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function index_mengembalikan_data_kosong_jika_tidak_ada_inventory()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $response = $this->getJson('/api/v1/inventory');
         $response->assertStatus(200);
@@ -163,7 +163,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function show_mengembalikan_detail_barang_yang_benar()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['name' => 'RAM DDR4 8GB', 'stock' => 20]);
 
         $this->getJson("/api/v1/inventory/{$sparepart->uuid}")
@@ -181,7 +181,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function show_mengembalikan_404_jika_barang_tidak_ditemukan()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->getJson('/api/v1/inventory/99999')
             ->assertStatus(404)
@@ -191,7 +191,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function show_mengembalikan_struktur_json_yang_lengkap()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['price' => 150000]);
 
         $this->getJson("/api/v1/inventory/{$sparepart->uuid}")
@@ -214,7 +214,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function store_berhasil_membuat_barang_baru()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $payload = $this->validPayload(['name' => 'SSD Samsung 512GB']);
 
         $this->postJson('/api/v1/inventory', $payload)
@@ -230,7 +230,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function store_berhasil_dengan_price_opsional()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $payload = $this->validPayload();
         unset($payload['price']);
 
@@ -240,7 +240,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function store_gagal_jika_part_number_sudah_ada()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $this->makeSparepart(['part_number' => 'PN-DUPLICATE']);
 
         $this->postJson('/api/v1/inventory', $this->validPayload(['part_number' => 'PN-DUPLICATE']))
@@ -251,7 +251,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function store_gagal_jika_field_wajib_tidak_diisi()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->postJson('/api/v1/inventory', [])
             ->assertStatus(422)
@@ -261,7 +261,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function store_gagal_jika_type_tidak_valid()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->postJson('/api/v1/inventory', $this->validPayload(['type' => 'invalid']))
             ->assertStatus(422)
@@ -271,7 +271,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function store_gagal_jika_stock_negatif()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->postJson('/api/v1/inventory', $this->validPayload(['stock' => -5]))
             ->assertStatus(422)
@@ -281,7 +281,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function store_gagal_jika_status_tidak_valid()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->postJson('/api/v1/inventory', $this->validPayload(['status' => 'unknown']))
             ->assertStatus(422)
@@ -295,7 +295,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function update_berhasil_mengubah_nama_barang()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['name' => 'Nama Lama']);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}", ['name' => 'Nama Baru'])
@@ -308,7 +308,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function update_berhasil_partial_update_hanya_satu_field()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $loc1 = \App\Models\Location::factory()->create();
         $loc2 = \App\Models\Location::factory()->create();
         $sparepart = $this->makeSparepart(['location_id' => $loc1->id]);
@@ -321,7 +321,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function update_mengembalikan_404_jika_barang_tidak_ditemukan()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $this->putJson('/api/v1/inventory/99999', ['name' => 'Test'])
             ->assertStatus(404)
             ->assertJson(['status' => 'error']);
@@ -330,7 +330,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function update_gagal_jika_part_number_sudah_dipakai_barang_lain()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepartA = $this->makeSparepart(['part_number' => 'PN-AAA']);
         $sparepartB = $this->makeSparepart(['part_number' => 'PN-BBB']);
 
@@ -342,7 +342,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function update_berhasil_dengan_part_number_milik_sendiri()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['part_number' => 'PN-SELF']);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}", [
@@ -358,7 +358,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function destroy_berhasil_soft_delete_barang()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart();
 
         $this->deleteJson("/api/v1/inventory/{$sparepart->uuid}")
@@ -371,7 +371,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function destroy_mengembalikan_404_jika_barang_tidak_ditemukan()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->deleteJson('/api/v1/inventory/99999')
             ->assertStatus(404)
@@ -381,7 +381,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function barang_yang_sudah_dihapus_tidak_muncul_di_index()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['name' => 'Barang Akan Dihapus']);
 
         $this->deleteJson("/api/v1/inventory/{$sparepart->uuid}")->assertStatus(200);
@@ -398,7 +398,7 @@ class TesApiInventarisTest extends TestCase
     public function adjust_stock_decrement_berhasil_dan_log_tercatat()
     {
         $user = $this->makeUser();
-        Sanctum::actingAs($user);
+        Sanctum::actingAs($user, ['*']);
         $sparepart = $this->makeSparepart(['stock' => 10]);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -422,7 +422,7 @@ class TesApiInventarisTest extends TestCase
     public function adjust_stock_increment_berhasil_dan_log_tercatat()
     {
         $user = $this->makeUser();
-        Sanctum::actingAs($user);
+        Sanctum::actingAs($user, ['*']);
         $sparepart = $this->makeSparepart(['stock' => 10]);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -445,7 +445,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function adjust_stock_gagal_jika_stok_tidak_mencukupi()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['stock' => 5]);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -459,7 +459,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function adjust_stock_gagal_jika_item_tidak_ditemukan()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
 
         $this->putJson('/api/v1/inventory/99999/adjust-stock', [
             'type' => 'decrement',
@@ -470,7 +470,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function adjust_stock_gagal_jika_type_tidak_valid()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart();
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -482,7 +482,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function adjust_stock_gagal_jika_quantity_nol_atau_negatif()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart();
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -507,7 +507,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function adjust_stock_tanpa_description_tetap_berhasil()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['stock' => 10]);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -518,7 +518,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function adjust_stock_mengembalikan_is_low_stock_true_jika_stok_kritis()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['stock' => 10, 'minimum_stock' => 5]);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -530,7 +530,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function adjust_stock_mengembalikan_is_low_stock_false_jika_stok_aman()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $sparepart = $this->makeSparepart(['stock' => 10, 'minimum_stock' => 2]);
 
         $this->putJson("/api/v1/inventory/{$sparepart->uuid}/adjust-stock", [
@@ -546,7 +546,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function admin_dapat_mengakses_semua_endpoint_api()
     {
-        Sanctum::actingAs($this->makeUser('admin'));
+        Sanctum::actingAs($this->makeUser('admin'), ['*']);
         $sparepart = $this->makeSparepart();
 
         $this->getJson('/api/v1/inventory')->assertStatus(200);
@@ -556,7 +556,7 @@ class TesApiInventarisTest extends TestCase
     #[Test]
     public function operator_dapat_mengakses_endpoint_read()
     {
-        Sanctum::actingAs($this->makeUser('operator'));
+        Sanctum::actingAs($this->makeUser('operator'), ['*']);
         $sparepart = $this->makeSparepart();
 
         $this->getJson('/api/v1/inventory')->assertStatus(200);

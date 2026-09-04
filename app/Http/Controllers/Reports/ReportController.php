@@ -54,6 +54,16 @@ class ReportController extends Controller
         $format = $request->input('export_format', 'pdf'); // Pilihan cetak ke PDF atau Excel
         $location = $request->input('location', 'all'); // Pilihan saringan gudang/lokasi tertentu
 
+        // Sentralisasi penamaan tipe laporan (DRY)
+        $reportTypeLabel = match ($type) {
+            'inventory_list' => 'Inventaris',
+            'stock_mutation' => 'Mutasi Stok',
+            'borrowing_history' => 'Peminjaman',
+            'low_stock' => 'Stok Menipis',
+            'activity_log' => 'Aktivitas Sistem',
+            default => 'Sistem'
+        };
+
         // Mengonversi kata 'bulan ini' atau 'tahun ini' menjadi format tanggal mutlak (Tgl Mulai & Tgl Akhir)
         [$startDate, $endDate] = $this->reportService->resolveDateRange(
             $period,
@@ -96,14 +106,6 @@ class ReportController extends Controller
 
             // Jika jumlah datanya wajar (dibawah 1000 data), proses langsung detik itu juga karena server pasti kuat
             if (count($reportData['data']) <= 1000) {
-                $reportTypeLabel = match ($type) {
-                    'inventory_list' => 'Inventaris',
-                    'stock_mutation' => 'Mutasi Stok',
-                    'borrowing_history' => 'Peminjaman',
-                    'low_stock' => 'Stok Menipis',
-                    'activity_log' => 'Aktivitas Sistem',
-                    default => 'Sistem'
-                };
                 $this->logActivity('Laporan Diunduh', "Mengunduh PDF Laporan {$reportTypeLabel}");
 
                 // Memuat layout tampilan kertas menggunakan library DOMPDF
@@ -124,13 +126,7 @@ class ReportController extends Controller
 
                 // Kirim notifikasi ke sistem Lonceng user, agar file hasil unduhan ini tersimpan riwayatnya dan bisa didownload ulang nanti
                 $url = route('reports.file', ['filename' => $filenameWithExt]);
-                $notifyTitle = match ($type) {
-                    'inventory_list' => 'Laporan Inventaris',
-                    'stock_mutation' => 'Laporan Mutasi Stok',
-                    'borrowing_history' => 'Laporan Peminjaman',
-                    'low_stock' => 'Laporan Stok Menipis',
-                    default => 'Laporan Sistem'
-                };
+                $notifyTitle = "Laporan {$reportTypeLabel}";
                 $request->user()->notify(new ReportReadyNotification($notifyTitle, $url));
 
                 // Langsung paksa browser pengguna untuk mendownload/menampilkan file yang barusan kita buat
@@ -144,14 +140,6 @@ class ReportController extends Controller
             // Maka pembuatannya kita lemparkan ke 'pekerja belakang layar' (Queue / Background Job)
             GenerateReportJob::dispatch($request->user(), $startDate, $endDate, $location, $type);
 
-            $reportTypeLabel = match ($type) {
-                'inventory_list' => 'Inventaris',
-                'stock_mutation' => 'Mutasi Stok',
-                'borrowing_history' => 'Peminjaman',
-                'low_stock' => 'Stok Menipis',
-                'activity_log' => 'Aktivitas Sistem',
-                default => 'Sistem'
-            };
             $this->logActivity('Laporan Diproses', "Meminta antrean sistem untuk memproses PDF Laporan {$reportTypeLabel}");
 
             $message = 'Laporan sedang diproses karena ukuran data yang besar. Silakan cek menu Notifikasi dalam beberapa saat untuk mengunduh file.';
@@ -171,14 +159,7 @@ class ReportController extends Controller
         // ================= JALUR EKSPOR KE EXCEL =================
         // Langsung oper susunan query database murni kita ke layanan khusus ExcelExportService
         $excelService = new \App\Services\ExcelExportService;
-        $reportTypeLabel = match ($type) {
-            'inventory_list' => 'Inventaris',
-            'stock_mutation' => 'Mutasi Stok',
-            'borrowing_history' => 'Peminjaman',
-            'low_stock' => 'Stok Menipis',
-            'activity_log' => 'Aktivitas Sistem',
-            default => 'Sistem'
-        };
+
         $this->logActivity('Laporan Diunduh (Excel)', "Mengunduh Excel Laporan {$reportTypeLabel}");
 
         return match ($type) {
@@ -196,17 +177,19 @@ class ReportController extends Controller
         // Cegah Path Traversal (Keamanan Mutlak)
         $filename = basename($filename);
 
-        $path = 'reports/' . $filename;
+        $path = 'reports/'.$filename;
 
         // Cek dulu apakah file masih ada di dalam brankas penyimpanan (local disk) yang aman dari pihak luar
         if (Storage::disk('local')->exists($path)) {
             $this->logActivity('Laporan Diunduh (Secure)', "Mengunduh file laporan secara aman: {$filename}");
+
             return Storage::disk('local')->download($path);
         }
 
         // Rencana B: Jika tak ditemukan, cari di folder bebas (public) -- Ini berguna kalau server sebelumnya memakai sistem public
         if (Storage::disk('public')->exists($path)) {
             $this->logActivity('Laporan Diunduh (Fallback Public)', "Mengunduh file laporan dari disk public: {$filename}");
+
             return Storage::disk('public')->download($path);
         }
 

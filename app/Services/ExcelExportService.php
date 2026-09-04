@@ -15,8 +15,9 @@ class ExcelExportService
     protected function sanitizeExcelFormula($value)
     {
         if (is_string($value) && in_array(substr(trim($value), 0, 1), ['=', '+', '-', '@'])) {
-            return "'" . $value;
+            return "'".$value;
         }
+
         return $value;
     }
 
@@ -259,7 +260,7 @@ class ExcelExportService
 
             // Kolom Baru: Kondisi
             $sheet->setCellValue("D{$row}", $item->condition ?? '-');
-            $conditionColor = match(strtolower($item->condition ?? '')) {
+            $conditionColor = match (strtolower($item->condition ?? '')) {
                 'baik' => 'FF059669', // Emerald
                 'rusak' => 'FFDC2626', // Red
                 'hilang' => 'FF64748B', // Slate
@@ -442,14 +443,14 @@ class ExcelExportService
 
             // Handle Enum or String for Borrowing Status
             $rawStatus = ($borrowing->status instanceof \BackedEnum) ? $borrowing->status->value : (is_string($borrowing->status) ? $borrowing->status : '');
-            
+
             $statusLabels = [
                 'borrowed' => __('ui.status_borrowed'),
                 'returned' => __('ui.status_returned'),
                 'lost' => __('ui.status_lost'),
             ];
             $statusText = $statusLabels[strtolower($rawStatus)] ?? ucfirst($rawStatus);
-            
+
             $sheet->setCellValue("H{$row}", $statusText);
 
             // Status Color Coding
@@ -478,7 +479,7 @@ class ExcelExportService
                     'bad' => __('ui.condition_broken'),
                     'lost' => __('ui.condition_lost'),
                 ];
-                $mappedConditions = $conditions->map(fn($c) => $conditionLabels[$c] ?? ucfirst($c))->toArray();
+                $mappedConditions = $conditions->map(fn ($c) => $conditionLabels[$c] ?? ucfirst($c))->toArray();
                 $conditionLabel = implode(', ', $mappedConditions);
             }
 

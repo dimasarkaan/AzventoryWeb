@@ -17,9 +17,9 @@ class StoreBorrowingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity' => 'required|integer|min:1',
-            'notes' => 'nullable|string',
-            'expected_return_at' => 'required|date|after_or_equal:today',
+            'quantity' => ['required', 'integer', 'min:1'],
+            'notes' => ['nullable', 'string'],
+            'expected_return_at' => ['required', 'date', 'after_or_equal:today'],
         ];
     }
 
@@ -52,6 +52,25 @@ class StoreBorrowingRequest extends FormRequest
             'quantity' => 'Jumlah Pinjam',
             'notes' => 'Catatan',
             'expected_return_at' => 'Rencana Tanggal Pengembalian',
+        ];
+    }
+
+    // Dokumentasi API (Scribe)
+    public function bodyParameters(): array
+    {
+        return [
+            'quantity' => [
+                'description' => 'Jumlah barang yang ingin dipinjam.',
+                'example' => 2,
+            ],
+            'notes' => [
+                'description' => 'Catatan keperluan meminjam.',
+                'example' => 'Untuk keperluan meeting presentasi di lantai 3.',
+            ],
+            'expected_return_at' => [
+                'description' => 'Rencana tanggal pengembalian barang.',
+                'example' => date('Y-m-d', strtotime('+3 days')),
+            ],
         ];
     }
 }

@@ -7,6 +7,13 @@ use Illuminate\Http\Request;
 
 // Controller khusus untuk mengurus lonceng notifikasi (pemberitahuan waktu-nyata / real-time).
 // Menangani fitur buka notifikasi, tandai sudah dibaca (Mark as Read), hingga baca semua (Mark All As Read).
+/**
+ * @group Sistem & Notifikasi
+ *
+ * API ini digunakan untuk mengambil pemberitahuan otomatis dari sistem.
+ *
+ * Notifikasi ini biasanya berisi info penting seperti pengingat saat stok barang mulai habis atau batas waktu pengembalian barang pinjaman.
+ */
 class NotificationController extends Controller
 {
     // Menampilkan halaman daftar riwayat notifikasi milik pengguna yang sedang login

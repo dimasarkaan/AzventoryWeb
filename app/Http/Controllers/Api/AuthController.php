@@ -10,6 +10,13 @@ use Illuminate\Support\Facades\Validator;
 
 // Controller khusus untuk menangani proses Login & Logout lewat jalur API (biasanya untuk aplikasi Mobile/pihak ketiga).
 // Berkomunikasi murni menggunakan teks JSON dan menggunakan sistem Token (Sanctum) sebagai pengganti Session.
+/**
+ * @group Manajemen Akses (Auth)
+ *
+ * API ini menangani proses login dan logout.
+ *
+ * Saat berhasil login, sistem akan memberikan token yang digunakan untuk mengakses fitur-fitur lain di aplikasi.
+ */
 class AuthController extends Controller
 {
     use \App\Traits\ActivityLogger;
@@ -37,7 +44,7 @@ class AuthController extends Controller
                 \App\Models\ActivityLog::create([
                     'user_id' => $userAttempt->id,
                     'action' => 'Login Gagal (API)',
-                    'description' => "Upaya masuk via API gagal. Kata sandi yang dimasukkan salah.",
+                    'description' => 'Upaya masuk via API gagal. Kata sandi yang dimasukkan salah.',
                     'properties' => [
                         'ip' => request()->ip(),
                         'user_agent' => request()->header('User-Agent'),
@@ -58,7 +65,7 @@ class AuthController extends Controller
             \App\Models\ActivityLog::create([
                 'user_id' => $user->id,
                 'action' => 'Login Ditolak (API)',
-                'description' => "Upaya login via API ditolak karena akun sedang nonaktif.",
+                'description' => 'Upaya login via API ditolak karena akun sedang nonaktif.',
                 'properties' => [
                     'ip' => request()->ip(),
                     'user_agent' => request()->header('User-Agent'),
@@ -77,7 +84,7 @@ class AuthController extends Controller
         \App\Models\ActivityLog::create([
             'user_id' => $user->id,
             'action' => 'Login (API)',
-            'description' => "Pengguna berhasil masuk ke sistem melalui API (Mobile).",
+            'description' => 'Pengguna berhasil masuk ke sistem melalui API (Mobile).',
             'properties' => [
                 'ip' => request()->ip(),
                 'user_agent' => request()->header('User-Agent'),
@@ -108,7 +115,7 @@ class AuthController extends Controller
             \App\Models\ActivityLog::create([
                 'user_id' => $user->id,
                 'action' => 'Logout (API)',
-                'description' => "Pengguna keluar dari sistem API (Kunci Akses dicabut).",
+                'description' => 'Pengguna keluar dari sistem API (Kunci Akses dicabut).',
                 'properties' => [
                     'ip' => request()->ip(),
                     'user_agent' => request()->header('User-Agent'),

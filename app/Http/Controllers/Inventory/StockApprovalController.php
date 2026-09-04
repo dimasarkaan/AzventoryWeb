@@ -66,19 +66,14 @@ class StockApprovalController extends Controller
     }
 
     // Memproses keputusan Admin (Setuju / Tolak) atas SATU pengajuan stok
-    public function update(Request $request, StockLog $stock_log)
+    public function update(\App\Http\Requests\Inventory\StockApproval\UpdateStockApprovalRequest $request, StockLog $stock_log)
     {
         // Pengecekan keamanan: Pastikan hanya orang dengan peran 'Admin' yang boleh merespons form ini
         $this->authorize('update', $stock_log);
 
         $stock_log->load(['sparepart', 'user']);
-        
-        // Aturan validasi yang sangat ketat:
-        // Jika Admin mengeklik 'Tolak', sistem mewajibkan mereka mengetik 'Alasan Penolakan'
-        $request->validate([
-            'status' => 'required|in:approved,rejected',
-            'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
-        ]);
+
+        // Validasi sudah ditangani oleh UpdateStockApprovalRequest
 
         try {
             // Kita lemparkan logika penambahan stok aslinya dan notifikasinya ke file InventoryService biar Controller tetap ramping
@@ -101,17 +96,11 @@ class StockApprovalController extends Controller
     }
 
     // Mengeksekusi banyak pengajuan stok sekaligus dalam sekali klik (Bulk Action / Centang Kotak)
-    public function bulkApprove(Request $request)
+    public function bulkApprove(\App\Http\Requests\Inventory\StockApproval\BulkApproveStockRequest $request)
     {
         $this->authorize('update', new StockLog);
 
-        // Validasi massal: Pastikan ada ID yang dicentang, dan jika ditolak wajib memberi 1 alasan yang sama untuk semuanya
-        $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'exists:stock_logs,id',
-            'status' => 'required|in:approved,rejected',
-            'rejection_reason' => 'required_if:status,rejected|nullable|max:500',
-        ]);
+        // Validasi sudah ditangani oleh BulkApproveStockRequest
 
         $logs = StockLog::with(['sparepart', 'user'])->whereIn('id', $request->ids)
             ->where('status', 'pending')

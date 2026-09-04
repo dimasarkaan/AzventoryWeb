@@ -12,6 +12,8 @@ class Borrowing extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $appends = ['remaining_quantity'];
+
     protected $fillable = [
         'sparepart_id', 'user_id', 'borrower_name', 'quantity', 'borrowed_at',
         'expected_return_at', 'returned_at', 'notes', 'status',

@@ -3,19 +3,29 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Inventory\StoreCategoryRequest;
+use App\Http\Requests\Inventory\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Traits\ActivityLogger;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 // Controller khusus untuk mengelola Master Data Kategori (misal: Komputer, Elektronik, dll).
 // Berbentuk API Controller yang diakses menggunakan AJAX untuk operasi Tambah, Edit, dan Hapus.
+/**
+ * @group Master Data
+ *
+ * API ini digunakan untuk mengatur data dasar aplikasi seperti daftar Merk, Kategori, dan Lokasi Cabang. Data ini diperlukan sebelum Anda bisa menambahkan barang baru ke dalam sistem.
+ */
 class CategoryController extends Controller
 {
     use ActivityLogger;
 
-    // Menampilkan seluruh daftar kategori beserta jumlah barang di tiap kategorinya
+    /**
+     * Menampilkan seluruh daftar kategori beserta jumlah barang di tiap kategorinya
+     *
+     * @authenticated
+     */
     public function index()
     {
         // Tarik semua data kategori dan hitung otomatis relasinya (jumlah barang di kategori ini)
@@ -33,18 +43,15 @@ class CategoryController extends Controller
         return response()->json($categories);
     }
 
-    // Menyimpan data kategori baru ke dalam database
-    public function store(Request $request)
+    /**
+     * Menyimpan data kategori baru ke dalam database
+     *
+     * @authenticated
+     */
+    public function store(StoreCategoryRequest $request)
     {
-        $this->authorize('create', Category::class);
-
-        // Validasi: Nama kategori wajib ada, berupa teks, dan tak boleh kembar (unique) dengan data yang sudah ada
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-        ]);
-
         $category = Category::create(['name' => $request->name]);
-        
+
         // Kosongkan ingatan (Cache) lama agar form Dropdown (pilihan kategori) di halaman Tambah Barang otomatis ter-update
         Cache::forget('inventory_categories');
         Cache::forget('inventory_category_options');
@@ -59,20 +66,15 @@ class CategoryController extends Controller
         ], 201);
     }
 
-    // Memperbarui informasi kategori yang sudah ada (Nama atau Status Aktifnya)
-    public function update(Request $request, $id)
+    /**
+     * Memperbarui informasi kategori yang sudah ada (Nama atau Status Aktifnya)
+     *
+     * @authenticated
+     */
+    public function update(UpdateCategoryRequest $request, $id)
     {
         $category = Category::findOrFail($id);
-        $this->authorize('update', $category);
 
-        // Validasi: Nama tidak boleh kembar KECUALI dengan dirinya sendiri (id-nya)
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,'.$id,
-            'is_active' => 'sometimes|boolean',
-        ]);
-
-        $category = Category::findOrFail($id);
-        
         // Simpan data lama untuk dijadikan bahan perbandingan nanti
         $oldName = $category->name;
         $newName = $request->name;
@@ -123,7 +125,11 @@ class CategoryController extends Controller
         return response()->json(['message' => 'Kategori berhasil diperbarui.']);
     }
 
-    // Menghapus data kategori dari sistem selamanya
+    /**
+     * Menghapus data kategori dari sistem selamanya
+     *
+     * @authenticated
+     */
     public function destroy($id)
     {
         $category = Category::findOrFail($id);

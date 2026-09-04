@@ -7,9 +7,11 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 
 /**
- * @group System Reports
+ * @group Laporan & Aktivitas
  *
- * API endpoints untuk membaca riwayat dan log aktivitas sistem.
+ * Modul ini mencatat riwayat penggunaan aplikasi.
+ *
+ * Anda bisa melihat log aktivitas pengguna (siapa yang mengubah data, kapan, dan apa yang diubah) serta mengambil ringkasan statistik seperti total barang dan stok yang menipis.
  */
 class ActivityLogController extends Controller
 {
@@ -47,7 +49,7 @@ class ActivityLogController extends Controller
     /**
      * Mendapatkan log aktivitas untuk pengguna tertentu (Bisa oleh Admin).
      *
-     * @param int $userId ID pengguna
+     * @param  int  $userId  ID pengguna
      */
     public function userLogs(Request $request, $userId)
     {

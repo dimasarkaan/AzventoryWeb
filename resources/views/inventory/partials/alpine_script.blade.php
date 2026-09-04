@@ -1,3 +1,4 @@
+@push('scripts')
 <script>
     console.log('Alpine Script Loaded');
     window.testGlobalClick = function() {
@@ -209,3 +210,4 @@
         }));
     });
 </script>
+@endpush

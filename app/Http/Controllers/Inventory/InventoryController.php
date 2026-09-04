@@ -2,6 +2,7 @@
 
 // Pengatur lalu lintas utama (Controller) untuk halaman Inventaris (Sparepart).
 // Menangani semua alur: dari melihat daftar barang, menambah, mengedit, hingga hapus dan cetak QR Code.
+
 namespace App\Http\Controllers\Inventory;
 
 use App\Enums\UserRole;
@@ -40,7 +41,7 @@ class InventoryController extends Controller
 
         // Mengambil data barang yang sudah difilter dan dilimit 10 data per halaman
         $spareparts = $this->inventoryService->getFilteredSpareparts($request->all(), 10);
-        
+
         // Mengambil opsi-opsi dropdown untuk filter (seperti kategori, merek, lokasi)
         $options = $this->inventoryService->getDropdownOptions();
 
@@ -54,6 +55,7 @@ class InventoryController extends Controller
             return response()->json([
                 'desktop' => view('inventory.partials.desktop-table', $data)->render(),
                 'mobile' => view('inventory.partials.mobile-list', $data)->render(),
+                'active_filters' => view('inventory.partials.active-filters', $data)->render(),
                 'pagination' => (string) $spareparts->links(),
             ]);
         }
@@ -99,11 +101,24 @@ class InventoryController extends Controller
             }
         }
 
-        // Kembali ke halaman daftar barang dengan pesan sukses
-        return redirect()->route('inventory.index')->with('success', $result['message']);
+        // Kembali ke halaman form dengan pesan sukses dan flag modal
+        return redirect()->route('inventory.create')->with([
+            'success' => $result['message'],
+            'show_success_modal' => true,
+            'item_name' => $sparepart->name ?? 'Barang',
+        ]);
     }
 
     // Menampilkan detail informasi barang beserta riwayat peminjamannya
+    // Endpoint AJAX untuk panel Laci Quick View
+    public function quickView(Sparepart $inventory)
+    {
+        $this->authorize('view', $inventory);
+        $inventory->load(['category', 'brand', 'location']);
+
+        return view('inventory.partials.quick-view-content', ['inventory' => $inventory]);
+    }
+
     public function show(Sparepart $inventory)
     {
         // Me-load data relasi (kategori, merek, lokasi) sekaligus agar tidak error saat ditampilkan (Lazy Loading)
@@ -142,10 +157,10 @@ class InventoryController extends Controller
     {
         // Mengecek apakah user diizinkan untuk mengedit data barang
         $this->authorize('update', $inventory);
-        
+
         // Me-load relasi agar nama kategori/brand/lokasi bisa ditampilkan dengan baik di form
         $inventory->load(['category', 'brand', 'location']);
-        
+
         // Mengambil data pilihan dropdown untuk form edit
         $options = $this->inventoryService->getDropdownOptions();
 
@@ -160,7 +175,7 @@ class InventoryController extends Controller
         $this->authorize('update', $inventory);
 
         $validated = $request->validated();
-        
+
         // Mengecek apakah user memilih untuk menggabungkan atau memisahkan barang jika terdeteksi duplikat
         $mergeConfirmed = $request->input('merge_confirmed') === 'true';
         $keepSeparate = $request->input('keep_separate') === 'true';
@@ -200,7 +215,7 @@ class InventoryController extends Controller
         // Jika user mengkonfirmasi untuk menggabungkan (merge) dengan barang duplikat yang ada
         if ($mergeConfirmed) {
             $duplicateItem = Sparepart::findOrFail($request->input('duplicate_id'));
-            
+
             // Panggil service untuk memproses penggabungan stok dan penghapusan barang sumber
             $result = $this->inventoryService->mergeSpareparts($inventory, $duplicateItem);
 
@@ -336,14 +351,14 @@ class InventoryController extends Controller
         $count = count($ids);
         $spareparts = Sparepart::whereIn('id', $ids)->get();
         $names = [];
-        foreach($spareparts as $sparepart) {
-            $names[] = $sparepart->part_number . ' - ' . $sparepart->name;
+        foreach ($spareparts as $sparepart) {
+            $names[] = $sparepart->part_number.' - '.$sparepart->name;
         }
         $namesList = implode(', ', $names);
-        
+
         // Mencatat aktivitas penghapusan massal ke dalam log
         $this->logActivity('Hapus Massal (Soft)', "Menghapus {$count} item inventaris ke tong sampah.", [
-            'items' => ['old' => $namesList, 'new' => '-']
+            'items' => ['old' => $namesList, 'new' => '-'],
         ]);
 
         // Mengeksekusi query untuk menghapus item-item tersebut (soft delete)
@@ -371,8 +386,8 @@ class InventoryController extends Controller
 
         $spareparts = Sparepart::whereIn('id', $ids)->get();
         $names = [];
-        foreach($spareparts as $sparepart) {
-            $names[] = $sparepart->part_number . ' - ' . $sparepart->name;
+        foreach ($spareparts as $sparepart) {
+            $names[] = $sparepart->part_number.' - '.$sparepart->name;
         }
         $namesList = implode(', ', $names);
 

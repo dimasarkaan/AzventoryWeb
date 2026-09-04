@@ -16,7 +16,7 @@ class StoreSparepartRequest extends FormRequest
     // Berfungsi mengamankan celah (bypass) jika ada Admin yang nekat mengubah harga lewat Inspect Element (Postman)
     protected function prepareForValidation(): void
     {
-        if ($this->user()->role === \App\Enums\UserRole::ADMIN) {
+        if ($this->user() && $this->user()->role === \App\Enums\UserRole::ADMIN) {
             $this->merge([
                 'price' => $this->input('type') === 'sale' ? 0 : null,
             ]);
@@ -33,13 +33,15 @@ class StoreSparepartRequest extends FormRequest
                     'category_name.max' => 'Nama kategori maksimal 100 karakter.',
                 ]
             );
-            if ($validator->fails()) throw new \Illuminate\Validation\ValidationException($validator);
+            if ($validator->fails()) {
+                throw new \Illuminate\Validation\ValidationException($validator);
+            }
 
             $category = \App\Models\Category::whereRaw('LOWER(name) = ?', [strtolower($categoryName)])->first();
-            if (!$category) {
+            if (! $category) {
                 $category = \App\Models\Category::create([
                     'name' => $categoryName,
-                    'is_active' => true
+                    'is_active' => true,
                 ]);
             }
             $this->merge(['category_id' => $category->id]);
@@ -56,13 +58,15 @@ class StoreSparepartRequest extends FormRequest
                     'brand_name.max' => 'Nama merk maksimal 100 karakter.',
                 ]
             );
-            if ($validator->fails()) throw new \Illuminate\Validation\ValidationException($validator);
+            if ($validator->fails()) {
+                throw new \Illuminate\Validation\ValidationException($validator);
+            }
 
             $brand = \App\Models\Brand::whereRaw('LOWER(name) = ?', [strtolower($brandName)])->first();
-            if (!$brand) {
+            if (! $brand) {
                 $brand = \App\Models\Brand::create([
                     'name' => $brandName,
-                    'is_active' => true
+                    'is_active' => true,
                 ]);
             }
             $this->merge(['brand_id' => $brand->id]);
@@ -79,14 +83,16 @@ class StoreSparepartRequest extends FormRequest
                     'location_name.max' => 'Nama lokasi maksimal 100 karakter.',
                 ]
             );
-            if ($validator->fails()) throw new \Illuminate\Validation\ValidationException($validator);
+            if ($validator->fails()) {
+                throw new \Illuminate\Validation\ValidationException($validator);
+            }
 
             $location = \App\Models\Location::whereRaw('LOWER(name) = ?', [strtolower($locationName)])->first();
-            if (!$location) {
-                if ($this->user()->role === \App\Enums\UserRole::SUPERADMIN) {
+            if (! $location) {
+                if ($this->user() && $this->user()->role === \App\Enums\UserRole::SUPERADMIN) {
                     $location = \App\Models\Location::create([
                         'name' => $locationName,
-                        'is_active' => true
+                        'is_active' => true,
                     ]);
                     $this->merge(['location_id' => $location->id]);
                 }
@@ -109,12 +115,12 @@ class StoreSparepartRequest extends FormRequest
             'condition' => ['required', 'string', 'min:3', 'max:255', 'regex:/^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'"]*$/'],
             'color' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z][a-zA-Z\s\-]*$/'],
             'type' => 'required|in:sale,asset',
-            'price' => 'required_if:type,sale|nullable|numeric|min:0|max:9999999999999',
-            'stock' => 'required|integer|min:0|max:2147483647',
-            'minimum_stock' => 'nullable|integer|min:0|max:2147483647',
+            'price' => 'required_if:type,sale|nullable|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'minimum_stock' => 'nullable|integer|min:0',
             'unit' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\s]*$/'],
             'status' => 'required|in:aktif,nonaktif',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:17408', // Max 17MB untuk foto HP
+            'image' => 'nullable|file|image|mimes:jpeg,png,jpg,webp', // Max 17MB untuk foto HP
             'existing_image' => 'nullable|string',
         ];
     }
@@ -172,6 +178,84 @@ class StoreSparepartRequest extends FormRequest
             'condition.regex' => 'Kondisi Barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
             'color.regex' => 'Warna hanya boleh berisi huruf, spasi, dan strip (-).',
             'unit.regex' => 'Satuan hanya boleh berisi huruf, angka, dan spasi.',
+        ];
+    }
+
+    // Dokumentasi API (Scribe)
+    public function bodyParameters(): array
+    {
+        return [
+            'name' => [
+                'description' => 'Nama lengkap barang inventaris.',
+                'example' => 'Laptop Lenovo ThinkPad T14',
+            ],
+            'part_number' => [
+                'description' => 'Nomor unik, kode seri, atau part number barang.',
+                'example' => 'LNV-T14-2023',
+            ],
+            'brand_id' => [
+                'description' => 'ID unik dari merk barang yang sudah ada di database.',
+                'example' => 1,
+            ],
+            'category_id' => [
+                'description' => 'ID unik dari kategori barang yang sudah ada di database.',
+                'example' => 2,
+            ],
+            'location_id' => [
+                'description' => 'ID unik dari lokasi penyimpanan yang sudah ada di database.',
+                'example' => 3,
+            ],
+            'age' => [
+                'description' => 'Status pemakaian barang.',
+                'example' => 'Baru',
+            ],
+            'condition' => [
+                'description' => 'Kondisi fisik dan fungsional barang saat ini.',
+                'example' => 'Mulus 100% dan Berfungsi Normal',
+            ],
+            'color' => [
+                'description' => 'Warna dominan barang (opsional).',
+                'example' => 'Hitam',
+            ],
+            'type' => [
+                'description' => 'Tipe klasifikasi barang (asset: aset tetap, sale: barang habis pakai/dijual).',
+                'example' => 'asset',
+            ],
+            'price' => [
+                'description' => 'Harga satuan barang dalam Rupiah. Wajib diisi jika type adalah sale.',
+                'example' => 15500000,
+            ],
+            'stock' => [
+                'description' => 'Jumlah kuantitas stok saat ini.',
+                'example' => 10,
+            ],
+            'minimum_stock' => [
+                'description' => 'Batas minimum peringatan stok (opsional).',
+                'example' => 2,
+            ],
+            'unit' => [
+                'description' => 'Satuan hitung barang (opsional).',
+                'example' => 'Unit',
+            ],
+            'status' => [
+                'description' => 'Status ketersediaan barang di sistem.',
+                'example' => 'aktif',
+            ],
+            'image' => [
+                'description' => 'File foto barang (jpeg, png, jpg, webp).',
+            ],
+            'category_name' => [
+                'description' => 'Jika kategori belum ada, sistem akan membuat Kategori baru dengan nama ini.',
+                'example' => 'Elektronik & Gadget',
+            ],
+            'brand_name' => [
+                'description' => 'Jika merk belum ada, sistem akan membuat Merk baru dengan nama ini.',
+                'example' => 'Lenovo',
+            ],
+            'location_name' => [
+                'description' => 'Jika lokasi belum ada, sistem akan membuat Lokasi baru dengan nama ini.',
+                'example' => 'Gudang IT Lantai 2',
+            ],
         ];
     }
 }

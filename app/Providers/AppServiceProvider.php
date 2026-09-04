@@ -4,7 +4,13 @@ namespace App\Providers;
 
 use App\Models\Sparepart;
 use App\Policies\SparepartPolicy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Console\Events\CommandFinished;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,6 +31,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Jalankan scribe:fix otomatis setelah scribe:generate selesai
+        Event::listen(CommandFinished::class, function (CommandFinished $event) {
+            if ($event->command === 'scribe:generate' && $event->exitCode === 0) {
+                Artisan::call('scribe:fix');
+            }
+        });
         \Illuminate\Support\Facades\Schema::defaultStringLength(191);
         Gate::policy(Sparepart::class, SparepartPolicy::class);
         Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
@@ -40,6 +52,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app['translator']->addJsonPath(lang_path());
 
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(! app()->isProduction());
+
+        // API Rate Limiting per IP
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->ip());
+        });
 
         // Security Logging: Failed Login
         \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Failed::class, function ($event) {

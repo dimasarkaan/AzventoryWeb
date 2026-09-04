@@ -71,8 +71,6 @@ class TesAnalitikDashboardTest extends TestCase
         $this->assertFalse($deadStockItems->contains($activeItem));
     }
 
-
-
     #[Test]
     public function dashboard_filter_tanggal_mempengaruhi_analitik()
     {

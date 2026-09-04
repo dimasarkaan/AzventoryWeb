@@ -79,7 +79,7 @@ class LoginRequest extends FormRequest
                 \App\Models\ActivityLog::create([
                     'user_id' => $user->id,
                     'action' => 'Login Gagal',
-                    'description' => "Upaya masuk gagal. Kata sandi yang dimasukkan salah.",
+                    'description' => 'Upaya masuk gagal. Kata sandi yang dimasukkan salah.',
                     'properties' => [
                         'ip' => $this->ip(),
                         'user_agent' => $this->header('User-Agent'),

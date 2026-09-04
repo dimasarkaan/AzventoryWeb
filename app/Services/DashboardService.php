@@ -258,7 +258,6 @@ class DashboardService
             ->get();
     }
 
-
     // Menghitung jumlah barang yang sedang dipinjam dan yang sudah telat/lewat jatuh tempo (Overdue).
     // Menampilkan data sesuai jabatan: Superadmin melihat semua, Operator hanya melihat miliknya sendiri.
     public function getBorrowingStats(User $user): array
@@ -268,14 +267,14 @@ class DashboardService
         if ($user->role === \App\Enums\UserRole::ADMIN) {
             $borrowQuery->where(function ($q) {
                 $q->whereNull('user_id')
-                  ->orWhereIn('user_id', function ($subQ) {
-                      $subQ->select('id')
-                          ->from('users')
-                          ->whereIn('role', [
-                              \App\Enums\UserRole::OPERATOR,
-                              \App\Enums\UserRole::ADMIN,
-                          ]);
-                  });
+                    ->orWhereIn('user_id', function ($subQ) {
+                        $subQ->select('id')
+                            ->from('users')
+                            ->whereIn('role', [
+                                \App\Enums\UserRole::OPERATOR,
+                                \App\Enums\UserRole::ADMIN,
+                            ]);
+                    });
             });
         } elseif ($user->role === \App\Enums\UserRole::OPERATOR) {
             $borrowQuery->where('user_id', $user->id);
@@ -306,14 +305,14 @@ class DashboardService
         if ($user && $user->role === \App\Enums\UserRole::ADMIN) {
             $query->where(function ($q) {
                 $q->whereNull('user_id')
-                  ->orWhereIn('user_id', function ($subQ) {
-                      $subQ->select('id')
-                          ->from('users')
-                          ->whereIn('role', [
-                              \App\Enums\UserRole::ADMIN,
-                              \App\Enums\UserRole::OPERATOR,
-                          ]);
-                  });
+                    ->orWhereIn('user_id', function ($subQ) {
+                        $subQ->select('id')
+                            ->from('users')
+                            ->whereIn('role', [
+                                \App\Enums\UserRole::ADMIN,
+                                \App\Enums\UserRole::OPERATOR,
+                            ]);
+                    });
             });
         }
 

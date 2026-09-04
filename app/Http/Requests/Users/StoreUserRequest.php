@@ -43,20 +43,47 @@ class StoreUserRequest extends FormRequest
             'name.required' => 'Nama lengkap wajib diisi.',
             'name.min' => 'Nama lengkap minimal harus 3 karakter.',
             'name.regex' => 'Nama lengkap harus diawali huruf dan tidak boleh mengandung angka atau simbol khusus (kecuali titik, petik, atau strip).',
-            
+
             'email.required' => 'Alamat email wajib diisi.',
             'email.email' => 'Format email tidak valid. Pastikan menggunakan @ dan nama domain yang benar (contoh: nama@domain.com).',
             'email.unique' => 'Alamat email ini sudah terdaftar. Silakan gunakan email lain.',
-            
+
             'role.required' => 'Peran pengguna wajib dipilih.',
             'role.in' => 'Pilihan peran tidak valid. Harus superadmin, admin, atau operator.',
-            
+
             'jabatan.required' => 'Jabatan wajib diisi.',
             'jabatan.min' => 'Jabatan minimal harus 3 karakter.',
             'jabatan.regex' => 'Jabatan harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
-            
+
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Pilihan status tidak valid.',
+        ];
+    }
+
+    // Dokumentasi API (Scribe)
+    public function bodyParameters(): array
+    {
+        return [
+            'name' => [
+                'description' => 'Nama lengkap pengguna.',
+                'example' => 'John Doe',
+            ],
+            'email' => [
+                'description' => 'Alamat email valid (harus unik).',
+                'example' => 'johndoe@example.com',
+            ],
+            'role' => [
+                'description' => 'Peran pengguna (superadmin, admin, operator).',
+                'example' => 'admin',
+            ],
+            'jabatan' => [
+                'description' => 'Jabatan pengguna di perusahaan.',
+                'example' => 'Staff IT',
+            ],
+            'status' => [
+                'description' => 'Status akun (aktif, nonaktif).',
+                'example' => 'aktif',
+            ],
         ];
     }
 }

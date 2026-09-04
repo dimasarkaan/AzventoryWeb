@@ -50,7 +50,7 @@ class GenerateReportJob implements ShouldQueue
 
         // Fetch Data dynamically to avoid Payload Too Large exception in Queue
         $reportData = $reportService->getReportData($this->type, $this->location, $this->startDate, $this->endDate);
-        
+
         $data = $reportData['data'];
         $title = $reportData['title'];
         $view = $reportData['view'];

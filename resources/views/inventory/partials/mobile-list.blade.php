@@ -6,12 +6,14 @@
         </div>
     @endif
     @forelse ($spareparts as $sparepart)
-        <div class="card p-4 cursor-pointer hover:bg-secondary-50/60 transition-colors" onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('input')) window.location='{{ route('inventory.show', $sparepart) }}'">
+        <div x-data="{ openOptions: false }"
+             class="card p-4 relative cursor-pointer transition-colors hover:bg-secondary-50/60"
+             @click="if(!event.target.closest('button') && !event.target.closest('input') && !event.target.closest('a') && !event.target.closest('.no-click')) window.location.href = '{{ route('inventory.show', $sparepart) }}'">
             <!-- Header: Image, Name, Status -->
             <div class="flex items-start gap-3 mb-4">
                  @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN))
-                    <div class="flex items-center self-center">
-                        <input type="checkbox" value="{{ $sparepart->id }}" class="bulk-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5">
+                    <div class="flex items-center self-center" onclick="event.stopPropagation()">
+                        <input type="checkbox" value="{{ $sparepart->id }}" class="bulk-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5 cursor-pointer">
                     </div>
                 @endif
                 <!-- Type Indicator -->
@@ -29,14 +31,16 @@
                 <!-- Title & Badge -->
                 <div class="flex-1 min-w-0">
                     <div class="flex items-start justify-between gap-2">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                    <h3 class="text-base font-bold text-secondary-900 line-clamp-1">
+                        <div class="pr-6 relative w-full">
+                            <div class="flex flex-col gap-1">
+                                <h3 class="text-base font-bold text-secondary-900 line-clamp-1 pr-6">
                                     <a href="{{ route('inventory.show', $sparepart) }}">
                                         {{ $sparepart->name }}
                                     </a>
                                 </h3>
-                                
+                                <div class="flex items-center gap-2">
+                                    <x-status-badge :status="$sparepart->status" class="flex-shrink-0" />
+                                </div>
                             </div>
                             <!-- Part Number -->
                         <span class="text-xs text-secondary-500 font-mono truncate block relative group/copy no-click" 
@@ -48,10 +52,15 @@
                               "
                               title="Klik untuk menyalin">
                             <span class="hover:text-primary-600 transition-colors cursor-pointer">{{ $sparepart->part_number }}</span>
-                            <span x-show="copied" style="display: none;" class="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">Disalin!</span>
+                            <span x-show="copied" x-cloak class="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap">Disalin!</span>
                         </span>
+                        
+                        <!-- Options Button -->
+                        <button @click.stop="openOptions = true" class="absolute top-0 right-0 p-1 -mt-1 -mr-1 text-secondary-400 hover:text-primary-600 rounded-full hover:bg-secondary-100 transition-colors z-10" aria-label="Opsi">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                        </button>
+                        
                         </div>
-                        <x-status-badge :status="$sparepart->status" class="flex-shrink-0" />
                     </div>
                 </div>
             </div>
@@ -112,49 +121,78 @@
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div class="flex items-center justify-end gap-2">
-                @if(request('trash'))
-                    @can('restore', $sparepart)
-                    <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto" novalidate>
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="btn btn-sm btn-success w-full justify-center flex items-center gap-1" onclick="confirmInventoryRestore(event)">
-                            <x-icon.restore class="w-4 h-4" />
-                            {{ __('ui.restore') }}
-                        </button>
-                    </form>
-                    @endcan
-                    @can('forceDelete', $sparepart)
-                    <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block w-full sm:w-auto mt-2 sm:mt-0" novalidate>
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger w-full justify-center flex items-center gap-1" onclick="confirmInventoryForceDelete(event)">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            {{ __('ui.force_delete') }}
-                        </button>
-                    </form>
-                    @endcan
-                @else
-                    <a href="{{ route('inventory.show', $sparepart) }}" class="btn btn-sm btn-secondary flex-1 justify-center">
-                        {{ __('ui.detail') }}
-                    </a>
-                    @can('update', $sparepart)
-                    <a href="{{ route('inventory.edit', $sparepart) }}" class="btn btn-sm btn-secondary flex-1 justify-center border-secondary-300 shadow-sm">
-                        {{ __('ui.edit') }}
-                    </a>
-                    @endcan
-                    @can('delete', $sparepart)
-                    <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="inline-block flex-1" novalidate>
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger w-full justify-center" onclick="confirmDelete(event)">
-                            {{ __('ui.delete') }}
-                        </button>
-                    </form>
-                    @endcan
-                @endif
-            </div>
+            <!-- Mobile Native Bottom Sheet Actions -->
+            <template x-teleport="body">
+                <div x-show="openOptions" style="display: none;" class="z-50 relative">
+                    <!-- Backdrop -->
+                    <div x-show="openOptions"
+                         x-transition.opacity.duration.300ms
+                         @click="openOptions = false"
+                         class="fixed inset-0 bg-secondary-900/40 backdrop-blur-sm z-40"></div>
+
+                    <!-- Bottom Sheet -->
+                    <div x-show="openOptions"
+                         x-transition:enter="transform transition ease-out duration-300"
+                         x-transition:enter-start="translate-y-full"
+                         x-transition:enter-end="translate-y-0"
+                         x-transition:leave="transform transition ease-in duration-200"
+                         x-transition:leave-start="translate-y-0"
+                         x-transition:leave-end="translate-y-full"
+                         class="fixed bottom-0 inset-x-0 bg-white rounded-t-3xl z-50 p-6 pb-8 shadow-2xl border-t border-secondary-100 max-h-[90vh] overflow-y-auto">
+                        
+                        <!-- Drag Handle -->
+                        <div class="w-12 h-1.5 bg-secondary-200 rounded-full mx-auto mb-6"></div>
+
+                        <h3 class="text-lg font-bold text-secondary-900 mb-4 px-2">{{ $sparepart->name }}</h3>
+
+                        <div class="space-y-2">
+                            @if(request('trash'))
+                                @can('restore', $sparepart)
+                                <form action="{{ route('inventory.restore', $sparepart->uuid) }}" method="POST" class="block w-full" novalidate>
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="flex items-center gap-4 w-full p-4 rounded-2xl bg-success-50 text-success-700 font-medium active:bg-success-100 transition-colors text-left" onclick="confirmInventoryRestore(event)">
+                                        <x-icon.restore class="w-6 h-6 text-success-500" />
+                                        <span>{{ __('ui.restore') }}</span>
+                                    </button>
+                                </form>
+                                @endcan
+                                @can('forceDelete', $sparepart)
+                                <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="block w-full mt-2" novalidate>
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="flex items-center gap-4 w-full p-4 rounded-2xl bg-danger-50 text-danger-700 font-medium active:bg-danger-100 transition-colors text-left" onclick="confirmInventoryForceDelete(event)">
+                                        <svg class="w-6 h-6 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        <span>{{ __('ui.force_delete') }}</span>
+                                    </button>
+                                </form>
+                                @endcan
+                            @else
+                                <a href="{{ route('inventory.show', $sparepart) }}" class="flex items-center gap-4 w-full p-4 rounded-2xl bg-secondary-50 text-secondary-800 font-medium active:bg-secondary-100 transition-colors">
+                                    <x-icon.box class="w-6 h-6 text-secondary-500" />
+                                    <span>{{ __('ui.detail') }}</span>
+                                </a>
+                                @can('update', $sparepart)
+                                <a href="{{ route('inventory.edit', $sparepart) }}" class="flex items-center gap-4 w-full p-4 rounded-2xl bg-secondary-50 text-secondary-800 font-medium active:bg-secondary-100 transition-colors">
+                                    <x-icon.edit class="w-6 h-6 text-primary-500" />
+                                    <span>{{ __('ui.edit') }}</span>
+                                </a>
+                                @endcan
+                                @can('delete', $sparepart)
+                                <form action="{{ route('inventory.destroy', $sparepart) }}" method="POST" class="block w-full mt-2" novalidate>
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="flex items-center gap-4 w-full p-4 rounded-2xl bg-danger-50 text-danger-700 font-medium active:bg-danger-100 transition-colors text-left" onclick="confirmDelete(event)">
+                                        <x-icon.trash class="w-6 h-6 text-danger-500" />
+                                        <span>{{ __('ui.delete') }}</span>
+                                    </button>
+                                </form>
+                                @endcan
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </template>
         </div>
     @empty
         <!-- Mobile Empty State -->

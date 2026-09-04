@@ -1,7 +1,9 @@
-name: 'Peminjaman (Borrowing)'
+name: 'Peminjaman Barang'
 description: |-
 
-  API endpoints untuk alur peminjaman, persetujuan, dan pengembalian inventaris.
+  Bagian ini digunakan untuk mencatat peminjaman barang inventaris.
+
+  API ini melacak siapa yang meminjam, kapan barang harus dikembalikan, dan bagaimana kondisi barang saat dikembalikan.
 endpoints:
   -
     custom: []
@@ -10,10 +12,12 @@ endpoints:
     uri: api/v1/borrowings
     metadata:
       custom: []
-      groupName: 'Peminjaman (Borrowing)'
+      groupName: 'Peminjaman Barang'
       groupDescription: |-
 
-        API endpoints untuk alur peminjaman, persetujuan, dan pengembalian inventaris.
+        Bagian ini digunakan untuk mencatat peminjaman barang inventaris.
+
+        API ini melacak siapa yang meminjam, kapan barang harus dikembalikan, dan bagaimana kondisi barang saat dikembalikan.
       subgroup: ''
       subgroupDescription: ''
       title: 'Mendapatkan daftar peminjaman aktif/riwayat.'
@@ -37,7 +41,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -46,6 +50,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -60,13 +66,15 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: api/v1/borrowings
+    uri: 'api/v1/inventory/{sparepart_uuid}/borrow'
     metadata:
       custom: []
-      groupName: 'Peminjaman (Borrowing)'
+      groupName: 'Peminjaman Barang'
       groupDescription: |-
 
-        API endpoints untuk alur peminjaman, persetujuan, dan pengembalian inventaris.
+        Bagian ini digunakan untuk mencatat peminjaman barang inventaris.
+
+        API ini melacak siapa yang meminjam, kapan barang harus dikembalikan, dan bagaimana kondisi barang saat dikembalikan.
       subgroup: ''
       subgroupDescription: ''
       title: 'Mencatat peminjaman baru via API.'
@@ -77,51 +85,42 @@ endpoints:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
       Content-Type: application/json
       Accept: application/json
-    urlParameters: []
-    cleanUrlParameters: []
+    urlParameters:
+      sparepart_uuid:
+        custom: []
+        name: sparepart_uuid
+        description: ''
+        required: true
+        example: 019fb1c3-fa05-70ad-992f-586203643141
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      sparepart:
+        custom: []
+        name: sparepart
+        description: 'UUID dari barang inventaris.'
+        required: true
+        example: 9a5f3b...
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      sparepart_uuid: 019fb1c3-fa05-70ad-992f-586203643141
+      sparepart: 9a5f3b...
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      sparepart_id:
-        custom: []
-        name: sparepart_id
-        description: 'The <code>id</code> of an existing record in the spareparts table.'
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
       quantity:
         custom: []
         name: quantity
-        description: 'Kolom value harus minimal 1.'
+        description: 'Jumlah barang yang ingin dipinjam. Kolom value harus minimal 1.'
         required: true
-        example: 45
+        example: 2
         type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      borrower_name:
-        custom: []
-        name: borrower_name
-        description: ''
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      expected_return_at:
-        custom: []
-        name: expected_return_at
-        description: 'Untuk catatan tambahan. Kolom value bukan tanggal yang valid. Must be a date after <code>now</code>.'
-        required: true
-        example: '2107-08-09'
-        type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
@@ -129,20 +128,29 @@ endpoints:
       notes:
         custom: []
         name: notes
-        description: ''
+        description: 'Catatan keperluan meminjam.'
         required: false
-        example: consequatur
+        example: 'Untuk keperluan meeting presentasi di lantai 3.'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
+      expected_return_at:
+        custom: []
+        name: expected_return_at
+        description: 'Rencana tanggal pengembalian barang. Kolom value bukan tanggal yang valid. Kolom value harus berupa tanggal setelah atau sama dengan <code>today</code>.'
+        required: true
+        example: '2026-08-27'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
-      sparepart_id: consequatur
-      quantity: 45
-      borrower_name: consequatur
-      expected_return_at: '2107-08-09'
-      notes: consequatur
+      quantity: 2
+      notes: 'Untuk keperluan meeting presentasi di lantai 3.'
+      expected_return_at: '2026-08-27'
     fileParameters: []
     responses:
       -
@@ -150,7 +158,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -159,6 +167,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -176,10 +186,12 @@ endpoints:
     uri: 'api/v1/borrowings/{id}'
     metadata:
       custom: []
-      groupName: 'Peminjaman (Borrowing)'
+      groupName: 'Peminjaman Barang'
       groupDescription: |-
 
-        API endpoints untuk alur peminjaman, persetujuan, dan pengembalian inventaris.
+        Bagian ini digunakan untuk mencatat peminjaman barang inventaris.
+
+        API ini melacak siapa yang meminjam, kapan barang harus dikembalikan, dan bagaimana kondisi barang saat dikembalikan.
       subgroup: ''
       subgroupDescription: ''
       title: 'Detail peminjaman.'
@@ -202,8 +214,20 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      borrowing:
+        custom: []
+        name: borrowing
+        description: 'UUID dari data peminjaman.'
+        required: true
+        example: 7b3e1c...
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
       id: consequatur
+      borrowing: 7b3e1c...
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -215,7 +239,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -224,6 +248,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -238,13 +264,15 @@ endpoints:
     custom: []
     httpMethods:
       - POST
-    uri: 'api/v1/borrowings/{id}/return'
+    uri: 'api/v1/borrowings/{borrowing_id}/return'
     metadata:
       custom: []
-      groupName: 'Peminjaman (Borrowing)'
+      groupName: 'Peminjaman Barang'
       groupDescription: |-
 
-        API endpoints untuk alur peminjaman, persetujuan, dan pengembalian inventaris.
+        Bagian ini digunakan untuk mencatat peminjaman barang inventaris.
+
+        API ini melacak siapa yang meminjam, kapan barang harus dikembalikan, dan bagaimana kondisi barang saat dikembalikan.
       subgroup: ''
       subgroupDescription: ''
       title: 'Pengembalian barang via API.'
@@ -253,69 +281,99 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters:
-      id:
+      borrowing_id:
         custom: []
-        name: id
+        name: borrowing_id
         description: 'The ID of the borrowing.'
         required: true
-        example: consequatur
-        type: string
+        example: 1
+        type: integer
         enumValues: []
         exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      borrowing:
+        custom: []
+        name: borrowing
+        description: 'UUID dari data peminjaman yang akan dikembalikan.'
+        required: true
+        example: 7b3e1c...
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: consequatur
+      borrowing_id: 1
+      borrowing: 7b3e1c...
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      quantity:
+      return_quantity:
         custom: []
-        name: quantity
-        description: ''
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      condition:
-        custom: []
-        name: condition
-        description: ''
+        name: return_quantity
+        description: 'Jumlah barang yang dikembalikan. Kolom value harus minimal 1.'
         required: true
-        example: consequatur
-        type: string
+        example: 2
+        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      notes:
+      return_condition:
         custom: []
-        name: notes
-        description: ''
+        name: return_condition
+        description: 'Kondisi barang saat dikembalikan (good, bad, lost).'
+        required: true
+        example: good
+        type: string
+        enumValues:
+          - good
+          - bad
+          - lost
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      return_notes:
+        custom: []
+        name: return_notes
+        description: 'Catatan pengembalian (opsional).'
         required: false
-        example: consequatur
+        example: 'Dikembalikan dengan kondisi mulus.'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: true
         deprecated: false
+      return_photos:
+        custom: []
+        name: return_photos
+        description: 'Must be a file. Kolom value harus berupa file gambar.'
+        required: false
+        example:
+          - null
+        type: 'file[]'
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
-      condition: consequatur
-      notes: consequatur
-    fileParameters: []
+      return_quantity: 2
+      return_condition: good
+      return_notes: 'Dikembalikan dengan kondisi mulus.'
+    fileParameters:
+      return_photos:
+        - null
     responses:
       -
         custom: []
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -324,6 +382,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []

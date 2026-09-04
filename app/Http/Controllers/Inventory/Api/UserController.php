@@ -9,9 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 /**
- * @group User Management
+ * @group Manajemen Pengguna
  *
- * API endpoints khusus Superadmin untuk CRUD manajemen pengguna dan hak akses.
+ * Bagian ini berisi API untuk mengelola akun staf atau karyawan yang bisa login ke aplikasi Azventory. Anda bisa menambahkan pengguna baru, mengubah data mereka, mengatur ulang kata sandi, serta menentukan peran masing-masing pengguna (Superadmin, Admin, Operator, dll).
  */
 class UserController extends Controller
 {
@@ -68,19 +68,15 @@ class UserController extends Controller
     /**
      * Membuat user baru via API.
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Users\StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'role' => 'required|string',
-            'jabatan' => 'nullable|string',
-            'status' => 'required|string',
-        ]);
+        $this->authorize('create', User::class);
+
+        $validated = $request->validated();
 
         // Generate username otomatis (seperti di Web)
         $username = explode('@', $validated['email'])[0].rand(100, 999);
-        while (User::where('username', $username)->exists()) {
+        while (User::withTrashed()->where('username', $username)->exists()) {
             $username = explode('@', $validated['email'])[0].rand(100, 999);
         }
 
@@ -112,14 +108,14 @@ class UserController extends Controller
 
     /**
      * Detail user.
+     *
+     * @urlParam user string required UUID dari pengguna. Example: 4d2f8e...
      */
-    public function show($id)
+    public function show(User $user)
     {
-        $user = User::withTrashed()->with(['borrowings.sparepart'])->where('uuid', $id)->first();
+        $this->authorize('view', $user);
 
-        if (! $user) {
-            return response()->json(['message' => 'User tidak ditemukan'], 404);
-        }
+        $user->load(['borrowings.sparepart']);
 
         return response()->json([
             'status' => 'success',
@@ -129,28 +125,18 @@ class UserController extends Controller
 
     /**
      * Update user via API.
+     *
+     * @urlParam user string required UUID dari pengguna. Example: 4d2f8e...
      */
-    public function update(Request $request, $id)
+    public function update(\App\Http\Requests\Users\UpdateUserRequest $request, User $user)
     {
-        $user = User::where('uuid', $id)->firstOrFail();
-
-        $validated = $request->validate([
-            'name' => 'sometimes|string|max:255',
-            'role' => 'sometimes|string|in:superadmin,admin,operator',
-            'status' => 'sometimes|string|in:aktif,nonaktif',
-            'jabatan' => 'nullable|string',
-        ]);
+        $this->authorize('update', $user);
 
         if (auth()->id() === $user->id) {
-            if ($request->has('role') && $request->role !== $user->role->value) {
-                return response()->json(['message' => 'Anda tidak dapat mengubah role akun Anda sendiri'], 400);
-            }
-            if ($request->has('status') && $request->status !== $user->status) {
-                return response()->json(['message' => 'Anda tidak dapat menonaktifkan akun Anda sendiri'], 400);
-            }
+            return response()->json(['message' => 'Anda tidak dapat mengubah data sensitif akun Anda sendiri dari sini. Silakan gunakan menu Profil.'], 400);
         }
 
-        $user->update($validated);
+        $user->update($request->validated());
 
         $this->logActivity('User Diupdate (API)', "Data user '{$user->name}' diperbarui via API.");
 
@@ -163,10 +149,13 @@ class UserController extends Controller
 
     /**
      * Reset Password via API.
+     *
+     * @urlParam id string required UUID dari pengguna. Example: 4d2f8e...
      */
-    public function resetPassword($id)
+    public function resetPassword(User $user)
     {
-        $user = User::where('uuid', $id)->firstOrFail();
+        $this->authorize('update', $user);
+
         $password = 'password123';
 
         $user->update([
@@ -190,17 +179,19 @@ class UserController extends Controller
 
     /**
      * Hapus user via API.
+     *
+     * @urlParam user string required UUID dari pengguna. Example: 4d2f8e...
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        $user = User::where('uuid', $id)->firstOrFail();
+        $this->authorize('delete', $user);
 
         if (auth()->id() === $user->id) {
-            return response()->json(['message' => 'Tidak dapat menghapus akun sendiri'], 400);
+            return response()->json(['message' => 'Tidak dapat menghapus akun Anda sendiri'], 400);
         }
 
         if ($user->borrowings()->where('status', 'borrowed')->exists()) {
-            return response()->json(['message' => 'User masih memiliki pinjaman aktif'], 400);
+            return response()->json(['message' => 'Sistem menolak penghapusan. Pengguna ini masih memiliki pinjaman barang yang belum dikembalikan.'], 400);
         }
 
         $user->delete();
@@ -209,7 +200,7 @@ class UserController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'message' => 'User berhasil dihapus',
+            'message' => 'Data pengguna berhasil dihapus.',
         ]);
     }
 }

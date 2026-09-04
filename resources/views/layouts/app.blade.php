@@ -5,24 +5,30 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok</title>
+        <title>
+            @hasSection('title')
+                @yield('title') - {{ config('app.name', 'Azventory') }}
+            @else
+                {{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok
+            @endif
+        </title>
 
         <!-- Primary Meta Tags -->
-        <meta name="title" content="{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok">
-        <meta name="description" content="Aplikasi digitalisasi pencatatan masuk, keluar, dan peminjaman stok di CV Azzahra Computer.">
+        <meta name="title" content="@yield('title', config('app.name', 'Azventory') . ' - Sistem Manajemen Stok')">
+        <meta name="description" content="@yield('description', 'Aplikasi digitalisasi pencatatan masuk, keluar, dan peminjaman stok di CV Azzahra Computer.')">
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ request()->url() }}">
-        <meta property="og:title" content="{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok">
-        <meta property="og:description" content="Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.">
+        <meta property="og:title" content="@yield('title', config('app.name', 'Azventory') . ' - Sistem Manajemen Stok')">
+        <meta property="og:description" content="@yield('description', 'Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.')">
         <meta property="og:image" content="{{ asset('images/bannerazventory.png') }}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ request()->url() }}">
-        <meta property="twitter:title" content="{{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok">
-        <meta property="twitter:description" content="Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.">
+        <meta property="twitter:title" content="@yield('title', config('app.name', 'Azventory') . ' - Sistem Manajemen Stok')">
+        <meta property="twitter:description" content="@yield('description', 'Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.')">
         <meta property="twitter:image" content="{{ asset('images/bannerazventory.png') }}">
 
         <!-- PWA Meta Tags -->
@@ -45,6 +51,7 @@
         @stack('styles')
     </head>
     <body class="font-sans antialiased">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[99999] focus:p-4 focus:bg-white focus:text-primary-600 focus:font-bold">Skip to main content</a>
         <div class="min-h-screen bg-gray-100 transition-opacity duration-300 opacity-0"
              x-data="{ 
                 isOffline: !navigator.onLine,
@@ -71,96 +78,7 @@
                          }
                      }, true)">
             
-            <!-- Global Offline Overlay (Triggered on Action) -->
-            <div x-show="showOfflineOverlay" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 z-[99999] flex items-center justify-center p-4 overflow-hidden"
-                 x-cloak>
-                
-                <!-- Animated Background Blobs -->
-                <div class="absolute inset-0 bg-slate-50/80 backdrop-blur-xl"></div>
-                <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-pulse"></div>
-                <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
-
-                <!-- Premium Glass Card -->
-                <div class="relative bg-white/70 backdrop-blur-2xl border border-white/50 rounded-[2.5rem] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] p-8 md:p-12 max-w-lg w-full text-center transform transition-all duration-500"
-                     x-show="showOfflineOverlay"
-                     x-transition:enter="transition ease-out duration-500 delay-100"
-                     x-transition:enter-start="scale-90 opacity-0 translate-y-8"
-                     x-transition:enter-end="scale-100 opacity-100 translate-y-0">
-                    
-                    <!-- Icon with Pulse -->
-                    <div class="relative w-24 h-24 mx-auto mb-8 bg-white rounded-3xl shadow-[0_12px_24px_-8px_rgba(37,99,235,0.2)] flex items-center justify-center">
-                        <div class="absolute inset-0 bg-primary-500/20 rounded-3xl animate-ping"></div>
-                        <svg class="w-12 h-12 text-primary-600 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 2.829a4.978 4.978 0 01-1.414-2.83m1.414 2.83l2.829-2.83m-2.829 2.83L3 21M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </div>
-
-                    <h2 class="text-3xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">
-                        {{ __('ui.offline_title') }}
-                    </h2>
-                    <p class="text-slate-500 text-lg leading-relaxed mb-6">
-                        {{ __('ui.offline_desc') }}
-                    </p>
-
-                    <div class="flex flex-col gap-3">
-                        <button @click="if(navigator.onLine) { window.location.reload(); } else { showRetryError = true; setTimeout(() => showRetryError = false, 3000); }" 
-                                class="group relative inline-flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white font-bold py-4 px-10 rounded-2xl transition-all duration-300 shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)] hover:shadow-[0_25px_50px_-12px_rgba(37,99,235,0.5)] hover:-translate-y-1 active:translate-y-0 w-full overflow-hidden">
-                            <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
-                            <svg class="w-5 h-5 mr-3 transition-transform group-hover:rotate-180 duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                            </svg>
-                            {{ __('ui.offline_retry') }}
-                        </button>
-                        
-                        <button @click="showOfflineOverlay = false" 
-                                class="text-slate-400 hover:text-slate-600 font-medium py-2 transition-colors">
-                            Kembali Lihat Halaman
-                        </button>
-                    </div>
-
-                    <div class="mt-8 opacity-30 flex items-center justify-center gap-2 font-medium grayscale">
-                        <img src="{{ asset('logo.svg') }}" alt="Azventory" class="w-5">
-                        <span class="text-sm">Azventory System</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Offline Indicator Banner (Always Shown when Offline) -->
-            <div x-show="isOffline" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="-translate-y-full"
-                 x-transition:enter-end="translate-y-0"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="translate-y-0"
-                 x-transition:leave-end="-translate-y-full"
-                 class="relative z-[10000] bg-orange-500/95 backdrop-blur-md text-white text-center py-2.5 text-xs sm:text-sm font-bold shadow-lg border-b border-white/20"
-                 x-cloak>
-                <div class="flex items-center justify-center gap-2 px-4">
-                    <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                    <span>{{ __('ui.offline_banner_text') }}</span>
-                </div>
-            </div>
-
-            <!-- Retry Error Toast (Built-in Alpine) -->
-            <div x-show="showRetryError" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="translate-y-10 opacity-0"
-                 x-transition:enter-end="translate-y-0 opacity-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="translate-y-0 opacity-100"
-                 x-transition:leave-end="translate-y-10 opacity-0"
-                 class="fixed bottom-24 sm:bottom-12 left-1/2 -translate-x-1/2 z-[100000] w-[calc(100%-2rem)] max-w-sm bg-slate-900/90 backdrop-blur-xl text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10"
-                 x-cloak>
-                <div class="flex-shrink-0 w-2.5 h-2.5 bg-orange-500 rounded-full animate-ping"></div>
-                <span class="font-semibold tracking-wide text-sm sm:text-base">Koneksi masih terputus...</span>
-            </div>
+            @include('layouts.partials.offline-overlay')
 
             @include('layouts.navigation')
 
@@ -175,11 +93,12 @@
             @endisset
 
             <!-- Konten Halaman -->
-            <main>
+            <main id="main-content">
                 {{ $slot }}
             </main>
         </div>
         
+        <x-pwa-install-prompt />
         <x-spotlight-search />
         <x-toast />
 
@@ -206,5 +125,24 @@
                 name: "{{ auth()->check() ? auth()->user()->name : '' }}"
             };
         </script>
+
+        <!-- Back to Top Button -->
+        <div x-data="{ showScrollTop: false }" 
+             @scroll.window="showScrollTop = window.pageYOffset > 300"
+             class="fixed bottom-24 sm:bottom-24 right-6 z-[90]">
+            <button x-show="showScrollTop"
+                    x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-8"
+                    x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 translate-y-8"
+                    @click="window.scrollTo({top: 0, behavior: 'smooth'})"
+                    class="p-3 bg-primary-600 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.3)] hover:bg-primary-700 hover:shadow-[0_8px_30px_rgb(37,99,235,0.5)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all transform hover:-translate-y-1"
+                    title="Kembali ke Atas"
+                    x-cloak>
+                <svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+            </button>
+        </div>
     </body>
 </html>

@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'user.active' => \App\Http\Middleware\EnsureUserIsActive::class,
             'password.changed' => \App\Http\Middleware\EnsurePasswordIsChanged::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'token.ability' => \App\Http\Middleware\CheckTokenAbility::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -160,6 +160,15 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- Bulk Action Logic (Event Delegation) ---
     let lastCheckedBox = null;
 
+    window.clearBulkSelection = function() {
+        document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = false);
+        const desktopSelect = document.getElementById('select-all');
+        const mobileSelect = document.getElementById('mobile-select-all');
+        if (desktopSelect) desktopSelect.checked = false;
+        if (mobileSelect) mobileSelect.checked = false;
+        updateBulkActionBar();
+    };
+
     function updateBulkActionBar() {
         const bulkActionBar = document.getElementById('bulk-action-bar');
         const selectedCountSpan = document.getElementById('selected-count');
@@ -293,11 +302,14 @@ window.submitInventoryBulkRestore = function () {
         buttonsStyling: false,
         width: '26em',
         iconColor: '#10b981',
-        backdrop: `rgba(15, 23, 42, 0.5)`
-    }).then((result) => {
-        if (result.isConfirmed) {
+        backdrop: `rgba(15, 23, 42, 0.5)`,
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
             document.getElementById('bulk-restore-form').submit();
+            return new Promise(() => {}); // Tetap loading sampai halaman beralih
         }
+    }).then((result) => {
+        // Kosongkan karena ditangani preConfirm
     });
 };
 
@@ -324,11 +336,14 @@ window.submitInventoryBulkDelete = function () {
         buttonsStyling: false,
         width: '26em',
         iconColor: '#ef4444',
-        backdrop: `rgba(15, 23, 42, 0.5)`
-    }).then((result) => {
-        if (result.isConfirmed) {
+        backdrop: `rgba(15, 23, 42, 0.5)`,
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
             document.getElementById('bulk-delete-form').submit();
+            return new Promise(() => {}); // Tetap loading sampai halaman beralih
         }
+    }).then((result) => {
+        // Kosongkan karena ditangani preConfirm
     });
 };
 
@@ -363,6 +378,7 @@ window.submitInventoryBulkDestroy = function () {
         confirmButtonText: 'Ya, Hapus!',
         cancelButtonText: 'Batal',
         reverseButtons: true,
+        showLoaderOnConfirm: true,
         customClass: {
             popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
             title: '!text-secondary-900 !text-xl !font-bold !mt-2',
@@ -374,12 +390,10 @@ window.submitInventoryBulkDestroy = function () {
         buttonsStyling: false,
         width: '26em',
         iconColor: '#ef4444',
-        backdrop: `rgba(15, 23, 42, 0.5)`
-    }).then((result) => {
-        if (result.isConfirmed) {
+        backdrop: `rgba(15, 23, 42, 0.5)`,
+        preConfirm: () => {
             const ids = Array.from(selected).map(cb => cb.value);
-            
-            fetch(route, {
+            return fetch(route, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -395,30 +409,36 @@ window.submitInventoryBulkDestroy = function () {
                 }
                 return data;
             })
-            .then(data => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: data.message,
-                    timer: 2000,
-                    showConfirmButton: false,
-                    customClass: {
-                        popup: '!rounded-2xl !font-sans',
-                        title: '!text-secondary-900 !text-xl !font-bold',
-                        htmlContainer: '!text-secondary-500 !text-sm',
-                    },
-                    width: '24em',
-                    padding: '2em',
-                    iconColor: '#10b981',
-                    backdrop: `rgba(0,0,0,0.4)`
-                }).then(() => {
-                    window.location.reload();
-                });
-            })
             .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    icon: 'error',
+                Swal.showValidationMessage(error.message);
+            });
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then((result) => {
+        if (result.isConfirmed && result.value) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: result.value.message,
+                timer: 2000,
+                showConfirmButton: false,
+                customClass: {
+                    popup: '!rounded-2xl !font-sans',
+                    title: '!text-secondary-900 !text-xl !font-bold',
+                    htmlContainer: '!text-secondary-500 !text-sm',
+                },
+                width: '24em',
+                padding: '2em',
+                iconColor: '#10b981',
+                backdrop: `rgba(0,0,0,0.4)`
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        Swal.fire({
+            icon: 'error',
                     title: 'Kesalahan',
                     text: error.message || 'Terjadi kesalahan saat menghapus data.',
 
@@ -434,8 +454,6 @@ window.submitInventoryBulkDestroy = function () {
                     iconColor: '#ef4444',
                     backdrop: `rgba(0,0,0,0.4)`
                 });
-            });
-        }
     });
 };
 
@@ -462,11 +480,14 @@ window.confirmInventoryRestore = function (event) {
         buttonsStyling: false,
         width: '26em',
         iconColor: '#10b981',
-        backdrop: `rgba(15, 23, 42, 0.5)`
-    }).then((result) => {
-        if (result.isConfirmed) {
+        backdrop: `rgba(15, 23, 42, 0.5)`,
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
             form.submit();
+            return new Promise(() => {}); // Tetap loading sampai halaman beralih
         }
+    }).then((result) => {
+        // Kosongkan karena ditangani preConfirm
     });
 };
 
@@ -492,11 +513,14 @@ window.confirmInventoryForceDelete = function (event) {
         buttonsStyling: false,
         width: '26em',
         iconColor: '#ef4444',
-        backdrop: `rgba(15, 23, 42, 0.5)`
-    }).then((result) => {
-        if (result.isConfirmed) {
+        backdrop: `rgba(15, 23, 42, 0.5)`,
+        showLoaderOnConfirm: true,
+        preConfirm: () => {
             form.submit();
+            return new Promise(() => {}); // Tetap loading sampai halaman beralih
         }
+    }).then((result) => {
+        // Kosongkan karena ditangani preConfirm
     });
 };
 

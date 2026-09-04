@@ -202,7 +202,7 @@
                                      x-transition:leave-start="transform opacity-100 scale-100" 
                                      x-transition:leave-end="transform opacity-0 scale-95" 
                                      class="absolute left-0 sm:left-auto sm:right-0 origin-top-left sm:origin-top-right mt-1 w-48 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] border border-secondary-100 py-1.5 z-[100] overflow-hidden" 
-                                     style="display: none;">
+                                     x-cloak>
                                     
                                     @php
                                         $periods = [

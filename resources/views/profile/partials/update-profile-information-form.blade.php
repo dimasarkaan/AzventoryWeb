@@ -1,5 +1,5 @@
 <section x-data="{ isEditing: {{ $errors->hasAny(['name', 'email', 'username', 'phone', 'address', 'avatar']) ? 'true' : 'false' }}, isSubmitting: false }"
-         x-init="if ({{ session('status') === 'profile-updated' || session('status') === 'avatar-deleted' || $errors->hasAny(['name', 'email', 'username', 'phone', 'address', 'avatar']) ? 'true' : 'false' }}) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }">
+         x-init="if ({{ session('success') || $errors->hasAny(['name', 'email', 'username', 'phone', 'address', 'avatar']) ? 'true' : 'false' }}) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }">
     <form id="send-verification" method="post" action="{{ route('verification.send') }}" novalidate>
         @csrf
     </form>
@@ -20,6 +20,7 @@
                                     x-show="isEditing"
                                     x-transition
                                     x-on:click.prevent="$dispatch('open-modal', 'confirm-avatar-deletion')"
+                                    data-testid="btn-delete-avatar-trigger"
                                     class="absolute -bottom-1 -right-1 bg-danger-500 text-white rounded-full p-1.5 shadow-lg hover:bg-danger-600 focus:outline-none focus:ring-2 ring-offset-2 ring-danger-500 transition-all" 
                                     title="Hapus Foto">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -31,11 +32,18 @@
                         </div>
                     @endif
                     
-                    <div class="relative" x-show="isEditing" x-transition x-data="{ avatarPreview: null, fileName: null }">
+                    <div class="relative" x-show="isEditing" x-transition x-data="{ avatarPreview: null, fileName: null, fileError: null }">
                         <!-- Hidden Input -->
                         <input type="file" id="avatar" name="avatar" class="hidden" accept="image/*" x-ref="avatarInput"
-                               @change="fileName = $event.target.files[0].name;
+                               @change="fileError = null;
                                         const file = $event.target.files[0];
+                                        if (!file) return;
+                                        if (file.size > 10 * 1024 * 1024) { 
+                                            fileError = 'Ukuran maksimal 10MB'; 
+                                            $refs.avatarInput.value = ''; 
+                                            return; 
+                                        }
+                                        fileName = file.name;
                                         const reader = new FileReader();
                                         reader.onload = (e) => { avatarPreview = e.target.result; };
                                         reader.readAsDataURL(file);">
@@ -70,7 +78,7 @@
             <div class="sm:col-span-3">
                 <label for="username" class="input-label">{{ __('ui.profile_label_username') }}</label>
                 @if(!$user->is_username_changed)
-                    <input type="text" name="username" id="username" 
+                    <input type="text" name="username" id="username" data-testid="input-username"
                            class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('username') ? '!border-red-500' : '' }}" 
                            value="{{ old('username', $user->username) }}" 
                            autocomplete="username"
@@ -94,7 +102,7 @@
             <div class="sm:col-span-3">
                  <label for="email" class="input-label">{{ __('ui.profile_label_email') }}</label>
                 @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
-                    <input type="email" name="email" id="email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('email') ? '!border-red-500' : '' }}" value="{{ old('email', $user->email) }}" autocomplete="email" x-bind:disabled="!isEditing" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" title="Format email tidak valid (contoh: nama@domain.com)" minlength="5" maxlength="255" required>
+                    <input type="email" name="email" id="email" data-testid="input-email" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('email') ? '!border-red-500' : '' }}" value="{{ old('email', $user->email) }}" autocomplete="email" x-bind:disabled="!isEditing" pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$" title="Format email tidak valid (contoh: nama@domain.com)" minlength="5" maxlength="255" required>
                     <x-input-error class="mt-2" :messages="$errors->get('email')" />
                 @else
                      <div class="relative">
@@ -111,7 +119,7 @@
              <div class="sm:col-span-3">
                 <label for="name" class="input-label">{{ __('ui.profile_label_name') }}</label>
                 @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
-                <input type="text" name="name" id="name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('name') ? '!border-red-500' : '' }}" value="{{ old('name', $user->name) }}" autocomplete="name" x-bind:disabled="!isEditing" pattern="^[a-zA-Z][a-zA-Z\s\.\'\-]*$" title="Nama lengkap harus diawali huruf dan hanya boleh berisi huruf, spasi, titik, koma atas, dan strip tanpa angka" minlength="3" maxlength="255" required>
+                <input type="text" name="name" id="name" data-testid="input-name" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('name') ? '!border-red-500' : '' }}" value="{{ old('name', $user->name) }}" autocomplete="name" x-bind:disabled="!isEditing" pattern="^[a-zA-Z][a-zA-Z\s\.\'\-]*$" title="Nama lengkap harus diawali huruf dan hanya boleh berisi huruf, spasi, titik, koma atas, dan strip tanpa angka" minlength="3" maxlength="255" required>
                 <x-input-error class="mt-2" :messages="$errors->get('name')" />
                 @else
                     <div class="relative">
@@ -126,28 +134,28 @@
              <!-- Phone -->
              <div class="sm:col-span-3">
                 <label for="phone" class="input-label">{{ __('ui.profile_label_phone') }}</label>
-                <input type="text" name="phone" id="phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('phone') ? '!border-red-500' : '' }}" value="{{ old('phone', $user->phone) }}" placeholder="{{ __('ui.profile_placeholder_phone') }}" autocomplete="tel" x-bind:disabled="!isEditing" pattern="^(\+62|08)[0-9]{8,13}$" title="Format Nomor WhatsApp tidak valid. Gunakan format Indonesia (misal: 08... atau +62...)" minlength="10" maxlength="20">
+                <input type="text" name="phone" id="phone" data-testid="input-phone" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('phone') ? '!border-red-500' : '' }}" value="{{ old('phone', $user->phone) }}" placeholder="{{ __('ui.profile_placeholder_phone') }}" autocomplete="tel" x-bind:disabled="!isEditing" pattern="^(\+62|08)[0-9]{8,13}$" title="Format Nomor WhatsApp tidak valid. Gunakan format Indonesia (misal: 08... atau +62...)" minlength="10" maxlength="20">
                 <x-input-error class="mt-2" :messages="$errors->get('phone')" />
             </div>
 
             <!-- Address -->
             <div class="sm:col-span-6">
                  <label for="address" class="input-label">{{ __('ui.profile_label_address') }}</label>
-                 <textarea id="address" name="address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('address') ? '!border-red-500' : '' }}" autocomplete="street-address" x-bind:disabled="!isEditing" maxlength="500">{{ old('address', $user->address) }}</textarea>
+                 <textarea id="address" name="address" data-testid="input-address" rows="3" class="input-field w-full disabled:bg-gray-50 disabled:text-gray-500 {{ $errors->has('address') ? '!border-red-500' : '' }}" autocomplete="street-address" x-bind:disabled="!isEditing" maxlength="500">{{ old('address', $user->address) }}</textarea>
                  <x-input-error class="mt-2" :messages="$errors->get('address')" />
             </div>
         </div>
 
         <div class="flex items-center gap-4 transition-all" :class="isEditing ? 'pt-4 border-t border-secondary-100' : 'mt-4'">
             <!-- Edit Button -->
-            <button type="button" class="btn btn-secondary flex items-center gap-2" @click="isEditing = true; setTimeout(() => document.getElementById('name').focus(), 100)" x-show="!isEditing">
+            <button type="button" data-testid="btn-edit-profile" class="btn btn-secondary flex items-center gap-2" @click="isEditing = true; setTimeout(() => document.getElementById('name').focus(), 100)" x-show="!isEditing">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                 {{ __('ui.profile_btn_edit') }}
             </button>
 
             <!-- Save & Cancel Buttons -->
-            <div class="flex items-center gap-2" x-show="isEditing" style="display: none;">
-                <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+            <div class="flex items-center gap-2" x-show="isEditing" x-cloak>
+                <button type="submit" data-testid="btn-save-profile" class="btn btn-primary" :disabled="isSubmitting">
                     <span x-show="!isSubmitting">{{ __('ui.profile_btn_save') }}</span>
                     <span x-show="isSubmitting" class="flex items-center gap-2">
                          <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -159,27 +167,17 @@
                 </button>
             </div>
 
-            @if (session('status') === 'profile-updated' || session('status') === 'avatar-deleted')
-                <p
-                    x-data="{ show: true }"
-                    x-show="show"
-                    x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-success-600 bg-success-50 px-3 py-1 rounded-full border border-success-100"
-                >
-                    {{ session('status') === 'avatar-deleted' ? 'Foto profil berhasil dihapus.' : __('ui.profile_save_success') }}
-                </p>
-            @endif
+
         </div>
     </form>
 
-    <form id="delete-avatar-form" method="POST" action="{{ route('profile.avatar.delete') }}" class="hidden" novalidate>
+    <form id="delete-avatar-form" method="POST" action="{{ route('profile.avatar.delete') }}" class="hidden" novalidate x-data="{ submitting: false }" @submit="submitting = true" @submit.window="if($event.target.id === 'delete-avatar-form') submitting = true;">
         @csrf
         @method('DELETE')
     </form>
 
     <x-modal name="confirm-avatar-deletion" focusable>
-        <div class="p-6">
+        <div class="p-6" x-data="{ submitting: false }">
             <h2 class="text-lg font-bold text-secondary-900">
                 Hapus Foto Profil?
             </h2>
@@ -194,12 +192,15 @@
                 </button>
 
                 <button type="button" 
-                        class="btn btn-danger"
-                        onclick="document.getElementById('delete-avatar-form').submit();">
-                    Hapus
+                        class="btn btn-danger flex items-center gap-2"
+                        :class="{ 'opacity-75 cursor-not-allowed': submitting }" :disabled="submitting"
+                        @click="submitting = true; document.getElementById('delete-avatar-form').submit();">
+                    <svg x-show="submitting" x-cloak class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span x-text="submitting ? 'Menghapus...' : 'Hapus'"></span>
                 </button>
             </div>
         </div>
     </x-modal>
 </section>
+
 

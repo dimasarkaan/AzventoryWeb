@@ -35,11 +35,80 @@ class ProfileController extends Controller
         $totalBorrowed = $user->borrowings()->count();
         $activeBorrows = $user->borrowings()->whereNull('returned_at')->count();
 
+        $sessions = collect(
+            \Illuminate\Support\Facades\DB::connection(config('session.connection'))->table(config('session.table', 'sessions'))
+                ->where('user_id', $user->getAuthIdentifier())
+                ->orderBy('last_activity', 'desc')
+                ->get()
+        )->map(function ($session) use ($request) {
+            $agent = $this->parseUserAgent($session->user_agent);
+
+            return (object) [
+                'id' => $session->id,
+                'agent' => (object) [
+                    'is_desktop' => $agent['is_desktop'],
+                    'os' => $agent['os'],
+                    'browser' => $agent['browser'],
+                ],
+                'ip_address' => $session->ip_address,
+                'is_current_device' => $session->id === $request->session()->getId(),
+                'last_active' => \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans(),
+            ];
+        });
+
         return view('profile.edit', [
             'user' => $user,
             'totalBorrowed' => $totalBorrowed,
             'activeBorrows' => $activeBorrows,
+            'sessions' => $sessions,
         ]);
+    }
+
+    protected function parseUserAgent($userAgent)
+    {
+        $isDesktop = ! preg_match('/Mobile|Android|iP(hone|od|ad)|IEMobile|BlackBerry|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/', $userAgent);
+
+        $browser = 'Unknown';
+        if (preg_match('/MSIE|Trident/i', $userAgent)) {
+            $browser = 'Internet Explorer';
+        } elseif (preg_match('/Edg/i', $userAgent)) {
+            $browser = 'Edge';
+        } elseif (preg_match('/Firefox/i', $userAgent)) {
+            $browser = 'Firefox';
+        } elseif (preg_match('/Chrome/i', $userAgent)) {
+            $browser = 'Chrome';
+        } elseif (preg_match('/Safari/i', $userAgent)) {
+            $browser = 'Safari';
+        } elseif (preg_match('/Opera|OPR/i', $userAgent)) {
+            $browser = 'Opera';
+        }
+
+        $os = 'Unknown';
+        if (preg_match('/Windows NT 10.0/i', $userAgent)) {
+            $os = 'Windows 10/11';
+        } elseif (preg_match('/Windows NT 6.3/i', $userAgent)) {
+            $os = 'Windows 8.1';
+        } elseif (preg_match('/Windows NT 6.2/i', $userAgent)) {
+            $os = 'Windows 8';
+        } elseif (preg_match('/Windows NT 6.1/i', $userAgent)) {
+            $os = 'Windows 7';
+        } elseif (preg_match('/Windows/i', $userAgent)) {
+            $os = 'Windows';
+        } elseif (preg_match('/Mac OS X/i', $userAgent)) {
+            $os = 'macOS';
+        } elseif (preg_match('/Linux/i', $userAgent)) {
+            $os = 'Linux';
+        } elseif (preg_match('/Android/i', $userAgent)) {
+            $os = 'Android';
+        } elseif (preg_match('/iP(hone|od|ad)/i', $userAgent)) {
+            $os = 'iOS';
+        }
+
+        return [
+            'is_desktop' => $isDesktop,
+            'browser' => $browser,
+            'os' => $os,
+        ];
     }
 
     // Memproses form penyimpanan saat pengguna mengubah Nama, Email, Username, atau mengunggah Foto Profil
@@ -49,11 +118,11 @@ class ProfileController extends Controller
 
         // Amankan Mass Assignment: Hanya perbolehkan field yang relevan untuk diupdate
         $allowedFields = ['name', 'email', 'phone', 'address'];
-        
+
         if (! $request->user()->is_username_changed) {
             $allowedFields[] = 'username';
         }
-        
+
         $safeData = $request->safe()->only($allowedFields);
 
         // Opsi B: Lockdown identitas Operator
@@ -138,6 +207,32 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
+    // Keluar dari sesi browser atau perangkat lain
+    public function destroyOtherSessions(Request $request, $id = null): RedirectResponse
+    {
+        $request->validateWithBag('sessionDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $query = \Illuminate\Support\Facades\DB::connection(config('session.connection'))->table(config('session.table', 'sessions'))
+            ->where('user_id', $request->user()->getAuthIdentifier())
+            ->where('id', '!=', $request->session()->getId());
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        $query->delete();
+
+        if ($id) {
+            $this->logActivity('Logout Sesi Spesifik', 'User melakukan logout dari satu perangkat atau browser spesifik.');
+        } else {
+            $this->logActivity('Logout Semua Sesi Lain', 'User melakukan logout dari semua perangkat atau browser lain secara paksa.');
+        }
+
+        return back()->with('status', 'other-browser-sessions-logged-out');
+    }
+
     // Menyimpan preferensi/pengaturan tambahan user (seperti mode tema gelap/terang) ke dalam kolom setting berformat JSON
     public function updateSettings(Request $request)
     {
@@ -179,8 +274,8 @@ class ProfileController extends Controller
     public function myInventory(Request $request): View
     {
         $user = $request->user();
-        $activeBorrowings = $user->borrowings()->whereNull('returned_at')->with(['sparepart' => fn($q) => $q->withTrashed()])->latest()->get();
-        $historyBorrowings = $user->borrowings()->whereNotNull('returned_at')->with(['sparepart' => fn($q) => $q->withTrashed(), 'returns'])->latest('returned_at')->get();
+        $activeBorrowings = $user->borrowings()->whereNull('returned_at')->with(['sparepart' => fn ($q) => $q->withTrashed()])->latest()->get();
+        $historyBorrowings = $user->borrowings()->whereNotNull('returned_at')->with(['sparepart' => fn ($q) => $q->withTrashed(), 'returns'])->latest('returned_at')->get();
 
         return view('profile.my_inventory', compact('user', 'activeBorrowings', 'historyBorrowings'));
     }

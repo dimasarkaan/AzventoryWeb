@@ -25,6 +25,8 @@ class SparepartCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
+            'status' => 'success',
+            'message' => 'Data Inventaris berhasil diambil',
             'data' => $this->collection,
             // Memberikan informasi tambahan versi API
             'meta' => [

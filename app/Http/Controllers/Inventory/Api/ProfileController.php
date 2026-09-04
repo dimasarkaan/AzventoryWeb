@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 /**
- * @group Profile & Account
+ * @group Profil Pengguna
  *
- * API endpoints terkait data akun user yang sedang aktif dan riwayat transaksinya.
+ * API ini khusus untuk pengguna yang sedang login agar bisa melihat dan mengubah informasi profil mereka sendiri, termasuk mengubah foto dan kata sandi.
  */
 class ProfileController extends Controller
 {

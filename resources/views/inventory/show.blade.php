@@ -3,6 +3,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" 
              x-data="inventoryDetail()"
              x-init="console.log('Alpine Scope Initialized')"
+             x-effect="document.body.style.overflow = (stockModalOpen || borrowModalOpen) ? 'hidden' : ''"
              @open-return-modal.window="initReturn($event.detail)"
         >
             <!-- Header & Actions -->
@@ -14,27 +15,58 @@
                         </h2>
                         <x-status-badge :status="$sparepart->status" type="pill" />
                     </div>
-                    <div class="flex items-center gap-2 mt-1.5 text-secondary-500 font-mono text-sm" x-data="{ copied: false }">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
-                        <span>{{ $sparepart->part_number }}</span>
-                        <button @click="navigator.clipboard.writeText('{{ $sparepart->part_number }}'); copied = true; setTimeout(() => copied = false, 2000)" 
-                                class="p-1 rounded-md hover:bg-secondary-100 transition-colors text-secondary-400 hover:text-secondary-600 focus:outline-none"
-                                :title="copied ? 'Tersalin!' : 'Salin Part Number'">
-                            <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            <svg x-show="copied" class="w-4 h-4 text-success-500" style="display: none;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        </button>
+                    <div class="flex items-center gap-2 mt-1.5 text-secondary-500 font-mono text-sm">
+                        <!-- Part number -->
+                        <div x-data="{ copied: false }" class="flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"></path></svg>
+                            <span>{{ $sparepart->part_number }}</span>
+                            <button @click="navigator.clipboard.writeText('{{ $sparepart->part_number }}'); copied = true; setTimeout(() => copied = false, 2000)" 
+                                    class="p-1 rounded-md hover:bg-secondary-100 transition-colors text-secondary-400 hover:text-secondary-600 focus:outline-none"
+                                    :title="copied ? 'Tersalin!' : 'Salin Part Number'">
+                                <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <svg x-show="copied" class="w-4 h-4 text-success-500" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            </button>
+                        </div>
+                        
+                        <span class="text-secondary-300">|</span>
+
+                        <!-- Share URL -->
+                        <div x-data="{ shared: false }" class="flex items-center">
+                            <button @click="navigator.clipboard.writeText(window.location.href); shared = true; setTimeout(() => shared = false, 2000)" 
+                                    class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-secondary-100 transition-colors text-secondary-400 hover:text-secondary-600 focus:outline-none"
+                                    :title="shared ? 'Tautan disalin!' : 'Salin Tautan'">
+                                <svg x-show="!shared" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                <svg x-show="shared" class="w-4 h-4 text-success-500" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                <span class="text-xs hidden sm:inline" x-text="shared ? 'Tersalin' : 'Bagikan'"></span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                        {{ __('ui.back') }}
+                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary px-2 md:px-4">
+                        <svg class="w-5 h-5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span class="hidden md:inline">{{ __('ui.back') }}</span>
                     </a>
+                    
                     @can('update', $sparepart)
-                    <a href="{{ route('inventory.edit', $sparepart) }}" class="btn btn-warning">
+                    <!-- Desktop Edit Button -->
+                    <a href="{{ route('inventory.edit', $sparepart) }}" data-testid="btn-edit" class="btn btn-warning hidden md:flex">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         {{ __('ui.edit') }}
                     </a>
+
+                    <!-- Mobile Dropdown -->
+                    <div class="relative md:hidden" x-data="{ openMenu: false }">
+                        <button @click="openMenu = !openMenu" class="btn btn-secondary px-2" aria-label="Opsi">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
+                        </button>
+                        <div x-show="openMenu" @click.away="openMenu = false" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-secondary-200 z-50">
+                            <a href="{{ route('inventory.edit', $sparepart) }}" class="flex items-center gap-3 px-4 py-3 text-secondary-700 hover:bg-secondary-50 hover:text-warning-600 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                {{ __('ui.edit') }}
+                            </a>
+                        </div>
+                    </div>
                     @endcan
                 </div>
             </div>
@@ -43,7 +75,7 @@
                 <!-- Left Column (Visual & Main Info) -->
                 <div class="lg:col-span-2 flex flex-col gap-6">
                     <!-- Image Card -->
-                    <div class="card overflow-hidden" x-data="{ showLightbox: false }">
+                    <div class="card overflow-hidden" x-data="{ showLightbox: false }" x-effect="if(showLightbox) document.body.style.overflow = 'hidden'; else document.body.style.overflow = '';">
                         <div class="aspect-video w-full bg-secondary-100 flex items-center justify-center relative group cursor-pointer" @click="showLightbox = true">
                             @if($sparepart->image)
                                 <img src="{{ asset('storage/' . $sparepart->image) }}" alt="{{ $sparepart->name }}" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105">
@@ -57,7 +89,7 @@
                                          @keydown.window.escape="showLightbox = false"
                                          x-transition.opacity.duration.300ms
                                          class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-90" 
-                                         style="display: none;">
+                                         x-cloak>
                                         <button @click="showLightbox = false" class="absolute top-4 right-4 text-white hover:text-gray-300 p-2 focus:outline-none">
                                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                         </button>
@@ -194,7 +226,7 @@
                                 @endphp
                                 @if($sparepart->type === 'asset')
                                     @if($sparepart->condition === 'Baik')
-                                        <button @click="borrowModalOpen = true" type="button" class="btn btn-primary w-full justify-center">
+                                        <button @click="borrowModalOpen = true" type="button" data-testid="btn-borrow" class="btn btn-primary w-full justify-center">
                                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                                             {{ __('ui.borrow_item') }}
                                         </button>
@@ -207,207 +239,21 @@
                                             </div>
                                         </div>
                                     @endif
-                                    <button @click="stockModalOpen = true" type="button" class="btn btn-secondary w-full justify-center">
+                                    <button @click="stockModalOpen = true" type="button" data-testid="btn-update-stock" class="btn btn-secondary w-full justify-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                                         {{ $isOperator ? __('ui.request_stock_change') : __('ui.update_stock') }}
                                     </button>
                                 @else
-                                    <button @click="stockModalOpen = true" type="button" class="btn btn-primary w-full justify-center">
+                                    <button @click="stockModalOpen = true" type="button" data-testid="btn-update-stock" class="btn btn-primary w-full justify-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                                         {{ $isOperator ? __('ui.request_stock_change') : __('ui.update_stock') }}
                                     </button>
                                 @endif
                             </div>
 
-                            <!-- Stock Change Modal -->
-                            <div x-show="stockModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                    <div x-show="stockModalOpen" @click="stockModalOpen = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+                            @include('inventory.partials.stock-modal')
 
-                                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                                    <div x-show="stockModalOpen" 
-                                         x-data="{ 
-                                            type: 'masuk', 
-                                            quantity: '', 
-                                            reason: '', 
-                                            get currentStock() { return liveStock; },
-                                            get isValid() {
-                                                return this.quantity > 0 && 
-                                                       this.reason.trim() !== '' && 
-                                                       (this.type === 'masuk' || (this.type === 'keluar' && this.quantity <= this.currentStock));
-                                            },
-                                            get isStockError() {
-                                                return this.type === 'keluar' && this.quantity > this.currentStock;
-                                            }
-                                         }"
-                                         x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                                        <form action="{{ route('inventory.stock.request.store', $sparepart) }}" method="POST" novalidate>
-                                            @csrf
-                                            <div class="bg-white px-4 py-4 sm:px-6 border-b border-gray-200 flex-none z-10 shadow-sm">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-primary-100 mx-0">
-                                                        <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                                    </div>
-                                                    <div class="ml-4 text-left">
-                                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                                            {{ __('ui.stock_change') }}
-                                                        </h3>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-t border-gray-100">
-                                                
-                                                <!-- Real-time Warning Banner -->
-                                                <div x-show="liveUpdateShow" x-transition class="mb-4 bg-warning-50 border-l-4 border-warning-400 p-3 rounded shadow-sm flex items-start">
-                                                    <svg class="w-5 h-5 text-warning-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                    <span class="text-warning-800 text-sm font-medium" x-text="liveUpdateMessage"></span>
-                                                </div>
-
-                                                <div class="space-y-4">
-                                                            <div>
-                                                                <span class="block text-sm font-medium text-gray-700">{{ __('ui.change_type') }} <span class="text-danger-500">*</span></span>
-                                                                <div class="mt-2 grid grid-cols-2 gap-3">
-                                                                    <label for="type_masuk" class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
-                                                                        <input type="radio" name="type" id="type_masuk" value="masuk" x-model="type" class="peer sr-only">
-                                                                        <div class="w-full text-center peer-checked:text-primary-600 font-medium text-gray-500">
-                                                                            <span class="block text-sm">{{ __('ui.stock_in') }}</span>
-                                                                        </div>
-                                                                        <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-primary-500 pointer-events-none transition-all"></div>
-                                                                    </label>
-                                                                    <label for="type_keluar" class="relative flex cursor-pointer rounded-lg border bg-white p-3 shadow-sm focus:outline-none hover:bg-gray-50 transition-colors">
-                                                                        <input type="radio" name="type" id="type_keluar" value="keluar" x-model="type" class="peer sr-only">
-                                                                         <div class="w-full text-center peer-checked:text-danger-600 font-medium text-gray-500">
-                                                                            <span class="block text-sm">{{ __('ui.stock_out') }}</span>
-                                                                        </div>
-                                                                         <div class="absolute inset-0 rounded-lg border-2 border-transparent peer-checked:border-danger-500 pointer-events-none transition-all"></div>
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div>
-                                                                <label for="quantity" class="block text-sm font-medium text-gray-700">{{ __('ui.quantity') }} <span class="text-danger-500">*</span></label>
-                                                                <div class="relative mt-1 rounded-md shadow-sm">
-                                                                    <input type="number" name="quantity" id="quantity" x-model="quantity" min="1" class="form-input block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()" placeholder="Contoh: 10" required>
-                                                                </div>
-                                                                <p x-show="isStockError" x-transition class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
-                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                                    {{ __('ui.quantity_exceeds_stock') }} (<span x-text="currentStock"></span>).
-                                                                </p>
-                                                                <p x-show="!isStockError" class="text-secondary-400 text-xs mt-1">
-                                                                    {{ __('ui.stock_available') }}: <span x-text="currentStock"></span> {{ $sparepart->unit ?? 'Pcs' }}
-                                                                </p>
-                                                            </div>
-
-                                                            <div>
-                                                                <label for="reason" class="block text-sm font-medium text-gray-700">{{ __('ui.reason') }} <span class="text-danger-500">*</span></label>
-                                                                <div class="mt-1">
-                                                                    <textarea name="reason" id="reason" x-model="reason" rows="3" class="form-textarea block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: Barang rusak, Stok opname, Pembelian baru..." required></textarea>
-                                                                </div>
-                                                            </div>
-                                            </div>
-                                            </div>
-                                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                <button type="submit" 
-                                                        :disabled="!isValid"
-                                                        :class="{ 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400': !isValid, 'bg-primary-600 hover:bg-primary-700': isValid }"
-                                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm transition-all">
-                                                    {{ __('ui.save') }}
-                                                </button>
-                                                <button type="button" @click="stockModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                                    {{ __('ui.cancel') }}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Borrow Modal -->
-                            <div x-show="borrowModalOpen" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                                    <div x-show="borrowModalOpen" @click="borrowModalOpen = false" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-
-                                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                                    <div x-show="borrowModalOpen" 
-                                         x-data="{
-                                            quantity: '',
-                                            dueDate: '',
-                                            get maxStock() { return liveStock; },
-                                            get isValid() { return this.quantity > 0 && this.quantity <= this.maxStock && this.dueDate; },
-                                            get isQuantityError() { return this.quantity !== '' && this.quantity > this.maxStock; }
-                                         }"
-                                         x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                                        <form action="{{ route('inventory.borrow.store', $sparepart) }}" method="POST" novalidate>
-                                            @csrf
-                                            <div class="bg-white px-4 py-4 sm:px-6 border-b border-gray-200 flex-none z-10 shadow-sm">
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-primary-100 mx-0">
-                                                        <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                                                    </div>
-                                                    <div class="ml-4 text-left">
-                                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                                            {{ __('ui.borrow_item') }}
-                                                        </h3>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 border-t border-gray-100">
-
-                                                <!-- Real-time Warning Banner -->
-                                                <div x-show="liveUpdateShow" x-transition class="mb-4 bg-warning-50 border-l-4 border-warning-400 p-3 rounded shadow-sm flex items-start">
-                                                    <svg class="w-5 h-5 text-warning-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                                    <span class="text-warning-800 text-sm font-medium" x-text="liveUpdateMessage"></span>
-                                                </div>
-
-                                                <div class="space-y-4">
-                                                            <div>
-                                                                <span class="block text-sm font-medium text-gray-700">{{ __('ui.borrower_name') }}</span>
-                                                                <div class="mt-1 px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-700 sm:text-sm">
-                                                                    {{ Auth::user()->name }}
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <div>
-                                                                <label for="borrow_quantity" class="block text-sm font-medium text-gray-700">{{ __('ui.quantity') }} <span class="text-danger-500">*</span></label>
-                                                                <input type="number" name="quantity" id="borrow_quantity" x-model="quantity" min="1" :max="maxStock" class="form-input mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Contoh: 1" required @keypress="if(!/[0-9]/.test($event.key)) $event.preventDefault()">
-                                                                <!-- Custom Error Message -->
-                                                                <p x-show="isQuantityError" style="display: none;" class="text-danger-500 text-xs mt-1 font-medium flex items-center gap-1">
-                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                                                    {{ __('ui.quantity_exceeds_stock') }} (<span x-text="maxStock"></span>).
-                                                                </p>
-                                                                <p x-show="!isQuantityError" class="text-secondary-400 text-xs mt-1">
-                                                                    {{ __('ui.stock_available') }}: <span x-text="maxStock"></span> {{ $sparepart->unit ?? 'Pcs' }}
-                                                                </p>
-                                                            </div>
-
-                                                            <div>
-                                                                <label for="expected_return_at" class="block text-sm font-medium text-gray-700">{{ __('ui.expected_return_date') }} <span class="text-danger-500">*</span></label>
-                                                                <input type="date" name="expected_return_at" id="expected_return_at" x-model="dueDate" min="{{ date('Y-m-d') }}" class="form-input mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" required>
-                                                            </div>
-
-                                                            <div>
-                                                                <label for="borrow_notes" class="block text-sm font-medium text-gray-700">{{ __('ui.notes') }} <span class="text-secondary-400 font-normal">(Opsional)</span></label>
-                                                                <textarea name="notes" id="borrow_notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keperluan..."></textarea>
-                                                            </div>
-                                            </div>
-                                            </div>
-                                            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                                                <button type="submit" 
-                                                        :disabled="!isValid"
-                                                        :class="{ 'opacity-50 cursor-not-allowed bg-gray-400 hover:bg-gray-400': !isValid, 'bg-primary-600 hover:bg-primary-700': isValid }"
-                                                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm transition-all">
-                                                    {{ __('ui.confirm_borrow') }}
-                                                </button>
-                                                <button type="button" @click="borrowModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                                                    {{ __('ui.cancel') }}
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                            @include('inventory.partials.borrow-modal')
                         </div>
 
                     </div>
@@ -416,13 +262,34 @@
                     <div class="card p-6 flex-1 flex flex-col h-full"> 
                         <h3 class="text-sm font-bold text-secondary-900 mb-4 uppercase tracking-wider flex-none">{{ __('ui.qr_identification') }}</h3>
                         
-                        <div class="flex-1 flex flex-col items-center justify-center min-h-[200px]"> <!-- Centered Content area -->
+                        <div class="flex-1 flex flex-col items-center justify-center min-h-[200px]" x-data="{ showQrLightbox: false }"> <!-- Centered Content area -->
                             @if ($sparepart->qr_code_path)
-                                <div class="bg-white p-2 rounded-xl shadow-sm border border-secondary-100 mb-6">
+                                <div class="bg-white p-2 rounded-xl shadow-sm border border-secondary-100 mb-6 cursor-pointer group relative transition-transform duration-300 hover:scale-105 hover:shadow-md" @click="showQrLightbox = true" title="Perbesar QR Code">
                                      <img src="{{ asset('storage/' . $sparepart->qr_code_path) }}" alt="QR Code" class="w-56 h-56">
+                                     <div class="absolute inset-0 bg-secondary-900 bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center rounded-xl">
+                                         <svg class="w-8 h-8 text-secondary-700 opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-sm bg-white/80 rounded-full p-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                     </div>
                                 </div>
+                                
+                                <!-- QR Lightbox Modal -->
+                                <template x-teleport="body">
+                                    <div x-show="showQrLightbox" 
+                                         @keydown.window.escape="showQrLightbox = false"
+                                         x-transition.opacity.duration.300ms
+                                         class="fixed inset-0 z-[100] flex items-center justify-center bg-secondary-900/90 backdrop-blur-sm" 
+                                         x-cloak>
+                                        <button @click="showQrLightbox = false" class="absolute top-4 right-4 text-white/70 hover:text-white p-2 focus:outline-none transition-colors">
+                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </button>
+                                        <div class="bg-white p-4 rounded-2xl shadow-2xl flex flex-col items-center" @click.away="showQrLightbox = false">
+                                            <img src="{{ asset('storage/' . $sparepart->qr_code_path) }}" alt="QR Code" class="max-w-[80vw] max-h-[80vh] object-contain">
+                                            <p class="mt-4 text-secondary-900 font-bold font-mono text-xl">{{ $sparepart->part_number }}</p>
+                                        </div>
+                                    </div>
+                                </template>
+
                                 <div class="grid grid-cols-2 gap-3 w-full max-w-xs">
-                                    <a href="{{ route('inventory.qr.download', $sparepart) }}" class="btn btn-secondary justify-center text-sm py-2">
+                                    <a href="{{ route('inventory.qr.download', $sparepart) }}" data-testid="btn-download-qr" class="btn btn-secondary justify-center text-sm py-2">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                                         {{ __('ui.download') }}
                                     </a>
@@ -453,8 +320,24 @@
                 <div class="col-span-1 lg:col-span-3">
 
                         <!-- History Card -->
-                        <div id="activity-history-container" class="card p-6">
-                            <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">{{ __('ui.borrowing_history') }}</h3>
+                        <div id="activity-history-container" class="card p-6" x-data="{ searchQuery: '', filterStatus: 'all' }">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 border-b border-secondary-100 pb-2 gap-4">
+                                <h3 class="text-lg font-bold text-secondary-900">{{ __('ui.borrowing_history') }}</h3>
+                                
+                                <div class="flex items-center gap-2">
+                                    <div class="relative">
+                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg class="h-4 w-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                        </div>
+                                        <input type="text" x-model="searchQuery" placeholder="Cari peminjam..." class="input-field pl-9 py-1.5 text-sm w-full sm:w-48 transition-all">
+                                    </div>
+                                    <select x-model="filterStatus" class="input-field py-1.5 pl-3 pr-8 text-sm cursor-pointer border-secondary-200">
+                                        <option value="all">Semua Status</option>
+                                        <option value="borrowed">Dipinjam</option>
+                                        <option value="returned">Selesai</option>
+                                    </select>
+                                </div>
+                            </div>
 
                             @if($borrowings->count() > 0)
                             <!-- Desktop Table -->
@@ -489,7 +372,10 @@
                                         @endphp
 
                                         @if($canView)
-                                        <tr class="hover:bg-primary-50 transition-colors group cursor-pointer" onclick="window.location.href='{{ route('inventory.borrow.show', $borrowing) }}'">
+                                        <tr class="hover:bg-primary-50 transition-colors group cursor-pointer" 
+                                            onclick="window.location.href='{{ route('inventory.borrow.show', $borrowing) }}'"
+                                            x-show="(filterStatus === 'all' || '{{ $borrowing->status }}' === filterStatus) && ('{{ strtolower(addslashes($borrowing->user->name ?? '')) }}'.includes(searchQuery.toLowerCase()))"
+                                            x-transition>
                                             <td class="px-4 py-3 text-secondary-900 font-medium">
                                                 <div class="flex items-center gap-3">
                                                     <div class="w-8 h-8 rounded-full bg-secondary-200 overflow-hidden flex-shrink-0">
@@ -608,7 +494,10 @@
                                     @endphp
 
                                     @if($canView)
-                                    <div class="bg-white border border-secondary-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all cursor-pointer" onclick="window.location.href='{{ route('inventory.borrow.show', $borrowing) }}'">
+                                    <div class="bg-white border border-secondary-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all cursor-pointer" 
+                                         onclick="window.location.href='{{ route('inventory.borrow.show', $borrowing) }}'"
+                                         x-show="(filterStatus === 'all' || '{{ $borrowing->status }}' === filterStatus) && ('{{ strtolower(addslashes($borrowing->user->name ?? '')) }}'.includes(searchQuery.toLowerCase()))"
+                                         x-transition>
                                         <!-- Header: User & Status -->
                                         <div class="flex items-start justify-between mb-3 border-b border-gray-100 pb-3">
                                             <div class="flex items-center gap-3">
@@ -758,7 +647,7 @@
                                     <!-- Info -->
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-sm font-bold text-secondary-900 truncate group-hover:text-primary-600 transition-colors">{{ $item->name }}</h4>
-                                        <p class="text-xs text-secondary-500 mb-2 truncate">{{ $item->brand->name ?? __('ui.no_brand') }} • {{ $item->category->name ?? '-' }}</p>
+                                        <p class="text-xs text-secondary-500 mb-2 truncate">{{ $item->brand->name ?? __('ui.no_brand') }} â€¢ {{ $item->category->name ?? '-' }}</p>
                                         
                                         <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-xs">
                                             <div>
@@ -798,420 +687,12 @@
                 </div>
             </div>
 
-            <!-- Return Modal -->
-            <template x-teleport="body">
-            <div x-show="returnModalOpen" 
-                 style="display: none;"
-                 class="fixed inset-0 z-[99]" 
-                 aria-labelledby="modal-title" 
-                 role="dialog" 
-                 aria-modal="true">
-                
-                <div class="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6">
-                    <!-- Backdrop -->
-                    <div x-show="returnModalOpen"
-                         x-transition:enter="ease-out duration-300" 
-                         x-transition:enter-start="opacity-0" 
-                         x-transition:enter-end="opacity-100" 
-                         x-transition:leave="ease-in duration-200" 
-                         x-transition:leave-start="opacity-100" 
-                         x-transition:leave-end="opacity-0" 
-                         class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
-                         @click="returnModalOpen = false"
-                         aria-hidden="true"></div>
-            
-                    <!-- Modal Panel -->
-                    <div x-show="returnModalOpen" 
-                         x-transition:enter="ease-out duration-300" 
-                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
-                         x-transition:leave="ease-in duration-200" 
-                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
-                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                         class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full flex flex-col max-h-[85vh]">
-                        
-                        <!-- Header (Fixed) -->
-                        <div class="bg-white px-4 py-4 sm:px-6 border-b border-gray-200 flex-none z-10 shadow-sm">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-success-100 mx-0">
-                                    <svg class="h-6 w-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                    </svg>
-                                </div>
-                                <div class="ml-4 text-left">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                        {{ __('ui.return_item_title') }}
-                                    </h3>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Form (Scrollable Body) -->
-                        <!-- Form (Scrollable Body) -->
-                        <form :action="`/inventory/borrow/${selectedBorrowing}/return`" method="POST" enctype="multipart/form-data" class="flex flex-col flex-1 min-h-0" @submit.prevent="submitReturn" novalidate>
-                            @csrf
-                            
-                            <!-- Scrollable Content -->
-                            <div class="flex-1 overflow-y-auto px-4 pt-2 pb-4 sm:px-6 space-y-4 custom-scrollbar">
-                                
-                                <!-- Error Display -->
-                                <div x-show="Object.keys(errors).length > 0" class="mb-4 bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded relative">
-                                    <strong class="font-bold">{{ __('ui.save_failed') }}</strong>
-                                    <ul class="list-disc list-inside text-sm mt-1">
-                                        <template x-for="(fieldErrors, field) in errors" :key="field">
-                                            <template x-for="error in fieldErrors">
-                                                <li x-text="error"></li>
-                                            </template>
-                                        </template>
-                                    </ul>
-                                </div>
-                                <div x-show="successMessage" class="mb-4 bg-success-50 border border-success-200 text-success-700 px-4 py-3 rounded relative">
-                                    <strong class="font-bold" x-text="successMessage"></strong>
-                                </div>
-                                <style>
-                                    /* Custom Scrollbar for better UX hint */
-                                    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-                                    .custom-scrollbar::-webkit-scrollbar-track { bg-gray-100; }
-                                    .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #CBD5E0; border-radius: 3px; }
-                                </style>
-
-                                <!-- Quantity -->
-                                <div>
-                                    <label for="return_qty" class="block text-sm font-medium text-gray-700">{{ __('ui.return_quantity') }} <span class="text-danger-500">*</span></label>
-                                    <div class="mt-1 relative rounded-md shadow-sm">
-                                        <input type="number" 
-                                               name="return_quantity" 
-                                               id="return_qty" 
-                                               x-model="returnQty"
-                                               :max="maxReturnQty"
-                                               min="1"
-                                               required
-                                               @keydown="if(['-','+','e','E','.'].includes($event.key)) $event.preventDefault()"
-                                               @input="returnQty = returnQty.replace(/[^0-9]/g, '')"
-                                               class="focus:ring-success-500 focus:border-success-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                                               placeholder="Jumlah">
-                                    </div>
-                                    <p class="mt-1 text-xs" 
-                                       :class="{'text-danger-600': !isValid, 'text-gray-500': isValid}">
-                                        Maks: <span x-text="maxReturnQty"></span>
-                                    </p>
-                                </div>
-
-                                <!-- Condition (Custom Dropdown) -->
-                                <div @click.outside="dropdownOpen = false" class="relative z-50">
-                                    <label for="return_condition_btn" class="block text-sm font-medium text-gray-700 mb-1">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
-                                    <div class="relative">
-                                        <button id="return_condition_btn" type="button" @click="dropdownOpen = !dropdownOpen"
-                                                class="input-field w-full text-left flex justify-between items-center rounded-xl py-2.5 px-4 text-sm cursor-pointer border border-gray-300 hover:border-primary-400 focus:ring-2 ring-primary-500 bg-white transition-all shadow-sm">
-                                            <span x-text="conditionLabel" :class="{'text-gray-900': returnCondition, 'text-gray-500': !returnCondition}" class="truncate mr-2"></span>
-                                            <svg class="w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0" :class="{'rotate-180': dropdownOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                        </button>
-
-                                        <div x-show="dropdownOpen" 
-                                             style="display: none;"
-                                             x-transition:enter="transition ease-out duration-100"
-                                             x-transition:enter-start="transform opacity-0 scale-95"
-                                             x-transition:enter-end="transform opacity-100 scale-100"
-                                             x-transition:leave="transition ease-in duration-75"
-                                             x-transition:leave-start="transform opacity-100 scale-100"
-                                             x-transition:leave-end="transform opacity-0 scale-95"
-                                             class="absolute z-50 mt-1 w-full min-w-[100%] bg-white rounded-xl shadow-xl border border-secondary-100 overflow-hidden">
-                                            <div class="max-h-60 overflow-y-auto p-1 space-y-0.5">
-                                                <template x-for="option in conditionOptions" :key="option.value">
-                                                    <div @click="selectCondition(option)" 
-                                                         class="px-3 py-2 rounded-lg cursor-pointer text-secondary-700 hover:bg-primary-50 hover:text-primary-700 transition-colors text-sm"
-                                                         :class="{'bg-primary-50 text-primary-700 font-medium': returnCondition === option.value}">
-                                                        <span x-text="option.label"></span>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <input type="hidden" name="return_condition" x-model="returnCondition">
-                                </div>
-
-                                <!-- Multiple Evidence Images & Camera (Hidden if Lost) -->
-                                <div class="mt-4" x-show="returnCondition !== 'lost'" x-data="{ 
-                                    files: [], 
-                                    previews: [],
-                                    cameraOpen: false,
-                                    stream: null,
-                                    
-                                    addFiles(e) {
-                                        const newFiles = Array.from(e.target.files);
-                                        this.processFiles(newFiles);
-                                    },
-
-                                    processFiles(newFiles) {
-                                        let validFiles = [];
-                                        for (let file of newFiles) {
-                                            if (file.size > 17 * 1024 * 1024) {
-                                                window.showAlert('Error', `Ukuran gambar ${file.name} maksimal 17MB`, 'error');
-                                            } else {
-                                                validFiles.push(file);
-                                            }
-                                        }
-                                        
-                                        if (this.files.length + validFiles.length > 5) {
-                                            window.showAlert('Peringatan', 'Maksimal 5 foto', 'warning');
-                                            return;
-                                        }
-                                        this.files = this.files.concat(validFiles);
-                                        this.updateInput();
-                                        validFiles.forEach(file => {
-                                            const reader = new FileReader();
-                                            reader.onload = (e) => { this.previews.push(e.target.result); };
-                                            reader.readAsDataURL(file);
-                                        });
-                                        this.$dispatch('file-change', this.files.length);
-                                    },
-
-                                    removeFile(index) {
-                                        this.files.splice(index, 1);
-                                        this.previews.splice(index, 1);
-                                        this.updateInput();
-                                        this.$dispatch('file-change', this.files.length);
-                                    },
-
-                                    updateInput() {
-                                        const dt = new DataTransfer();
-                                        this.files.forEach(file => dt.items.add(file));
-                                        this.$refs.fileInput.files = dt.files;
-                                    },
-
-                                    // Camera Logic
-                                    async startCamera() {
-                                        this.cameraOpen = true;
-                                        this.$nextTick(async () => {
-                                            try {
-                                                this.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                                                this.$refs.video.srcObject = this.stream;
-                                            } catch (err) {
-                                                window.showAlert('Error', 'Tidak dapat mengakses kamera: ' + err.message, 'error');
-                                                this.cameraOpen = false;
-                                            }
-                                        });
-                                    },
-
-                                    stopCamera() {
-                                        if (this.stream) {
-                                            this.stream.getTracks().forEach(track => track.stop());
-                                            this.stream = null;
-                                        }
-                                        this.cameraOpen = false;
-                                    },
-
-                                    capturePhoto() {
-                                        const video = this.$refs.video;
-                                        const canvas = this.$refs.canvas;
-                                        canvas.width = video.videoWidth;
-                                        canvas.height = video.videoHeight;
-                                        const ctx = canvas.getContext('2d');
-                                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                                        
-                                        canvas.toBlob(blob => {
-                                            const file = new File([blob], 'camera_' + Date.now() + '.jpg', { type: 'image/jpeg' });
-                                            this.processFiles([file]);
-                                            this.stopCamera();
-                                        }, 'image/jpeg', 0.8);
-                                    },
-
-                                    triggerGallery() {
-                                        this.$refs.galleryInput.click();
-                                    }
-                                }">
-                                    <span class="block text-sm font-medium text-gray-700 mb-2">Bukti Foto <span class="text-danger-500">*</span></span>
-                                    
-                                    <!-- Split Buttons (Pill/Chip Style - Full Width) -->
-                                    <div class="grid grid-cols-2 gap-3 mb-4">
-                                        <button id="return_photos_input" type="button" @click="startCamera" 
-                                                class="w-full inline-flex justify-center items-center px-4 py-2 rounded-full bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition-colors duration-200 border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            </svg>
-                                            <span class="text-sm font-semibold">Buka Kamera</span>
-                                        </button>
-
-                                        <button type="button" @click="triggerGallery" 
-                                                class="w-full inline-flex justify-center items-center px-4 py-2 rounded-full bg-purple-50 text-purple-700 hover:bg-purple-100 hover:text-purple-800 transition-colors duration-200 border border-transparent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                            </svg>
-                                            <span class="text-sm font-semibold">Pilih Galeri</span>
-                                        </button>
-                                    </div>
-
-                                    <!-- Camera Overlay -->
-                                    <div x-show="cameraOpen" 
-                                         style="display: none;"
-                                         class="fixed inset-0 z-[60] bg-black bg-opacity-90 flex flex-col items-center justify-center p-4">
-                                        <div class="relative w-full max-w-lg bg-black rounded-lg overflow-hidden shadow-2xl">
-                                            <video x-ref="video" autoplay playsinline class="w-full h-auto object-cover"></video>
-                                            <canvas x-ref="canvas" class="hidden"></canvas>
-                                            
-                                            <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-6 items-center">
-                                                <button type="button" @click="stopCamera" class="p-3 bg-white/20 hover:bg-white/30 rounded-full text-white backdrop-blur-sm transition-all">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                </button>
-                                                <button type="button" @click="capturePhoto" class="p-4 bg-white rounded-full text-primary-600 shadow-lg hover:scale-105 transition-transform">
-                                                    <div class="w-12 h-12 rounded-full border-4 border-primary-600 flex items-center justify-center">
-                                                        <div class="w-10 h-10 bg-primary-600 rounded-full"></div>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <p class="text-white mt-4 text-sm font-medium">Pose dan ambil foto</p>
-                                    </div>
-
-                                    <!-- Hidden Inputs -->
-                                    <input type="file" x-ref="galleryInput" accept="image/*" multiple class="hidden" @change="addFiles($event)">
-                                    <input type="file" name="return_photos[]" multiple class="hidden" x-ref="fileInput">
-
-                                    <!-- Previews Grid -->
-                                    <div class="grid grid-cols-3 gap-3" x-show="previews.length > 0">
-                                        <template x-for="(preview, index) in previews" :key="index">
-                                            <div class="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group bg-gray-50">
-                                                <img :src="preview" class="w-full h-full object-cover">
-                                                <button type="button" @click="removeFile(index)" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors z-10 w-6 h-6 flex items-center justify-center">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                </button>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <p class="mt-2 text-xs text-gray-500" x-show="files.length > 0">Maksimal 5 foto (Wajib)</p>
-                                    <input type="hidden" id="file_count" :value="files.length">
-                                </div>
-
-                                <!-- Notes -->
-                                <div>
-                                    <label for="return_notes" class="block text-sm font-medium text-gray-700">Catatan <span class="text-secondary-400 font-normal text-xs">(Opsional)</span></label>
-                                    <textarea name="return_notes" id="return_notes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Keterangan tambahan..."></textarea>
-                                </div>
-                            </div>
-
-                            <!-- Footer Actions (Fixed) -->
-                            <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-row-reverse gap-3 border-t border-gray-200 flex-none z-10 shadow-[0_-2px_4px_rgba(0,0,0,0.05)]"
-                                 x-data="{ hasFiles: false }" 
-                                 @file-change.window="hasFiles = $event.detail > 0">
-                                <button type="submit" 
-                                        :disabled="!isValid || isSubmitting || (returnCondition !== 'lost' && !hasFiles)"
-                                        :class="{ 'opacity-50 cursor-not-allowed': !isValid || isSubmitting || (returnCondition !== 'lost' && !hasFiles), 'hover:bg-primary-700': isValid && !isSubmitting && (returnCondition === 'lost' || hasFiles) }"
-                                        class="flex-1 sm:flex-none sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition-all">
-                                    <span x-show="!isSubmitting">Konfirmasi</span>
-                                    <span x-show="isSubmitting" class="flex items-center gap-2">
-                                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                        Proses...
-                                    </span>
-                                </button>
-                                <button type="button" @click="returnModalOpen = false" class="flex-1 sm:flex-none sm:w-auto mt-0 inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm">
-                                    Batal
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            </template>
-            <!-- Evidence Modal -->
-    <template x-teleport="body">
-        <div x-show="evidenceModalOpen" 
-             style="display: none;"
-             class="fixed inset-0 z-[99]" 
-             aria-labelledby="modal-title" 
-             role="dialog" 
-             aria-modal="true">
-            
-            <div class="flex min-h-screen items-center justify-center py-12 px-4 sm:px-6">
-                <!-- Backdrop -->
-                <div x-show="evidenceModalOpen"
-                     x-transition:enter="ease-out duration-300" 
-                     x-transition:enter-start="opacity-0" 
-                     x-transition:enter-end="opacity-100" 
-                     x-transition:leave="ease-in duration-200" 
-                     x-transition:leave-start="opacity-100" 
-                     x-transition:leave-end="opacity-0" 
-                     class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" 
-                     @click="evidenceModalOpen = false"
-                     aria-hidden="true"></div>
-        
-                <!-- Modal Panel -->
-                <div x-show="evidenceModalOpen" 
-                     x-transition:enter="ease-out duration-300" 
-                     x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                     x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
-                     x-transition:leave="ease-in duration-200" 
-                     x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" 
-                     x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
-                     class="relative bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:max-w-lg w-full flex flex-col max-h-[85vh]">
-                    
-                    <!-- Header -->
-                    <div class="bg-white px-4 py-4 sm:px-6 border-b border-gray-200 flex-none z-10 shadow-sm flex justify-between items-center">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                            {{ __('ui.return_evidence') }}
-                        </h3>
-                        <button @click="evidenceModalOpen = false" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                            <span class="sr-only">Tutup</span>
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-6 overflow-y-auto custom-scrollbar">
-                        <!-- Image -->
-                        <div class="aspect-video w-full rounded-lg overflow-hidden bg-gray-100 border border-gray-200 mb-4 relative group">
-                            <template x-if="activeEvidence.image">
-                                <img :src="activeEvidence.image" class="w-full h-full object-contain">
-                            </template>
-                            <template x-if="!activeEvidence.image">
-                                <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                    <span class="text-sm">No Image</span>
-                                </div>
-                            </template>
-                        </div>
-                        
-                        <!-- Details -->
-                        <div class="space-y-3">
-                            <div>
-                                <span class="text-xs text-secondary-500 uppercase font-bold tracking-wider">Tanggal Dikembalikan</span>
-                                <p class="text-secondary-900 font-medium" x-text="activeEvidence.date || '-'"></p>
-                            </div>
-                            
-                            <div>
-                                <span class="text-xs text-secondary-500 uppercase font-bold tracking-wider">Kondisi Barang</span>
-                                <p class="mt-1">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold"
-                                          :class="getBadgeColor(activeEvidence.condition)">
-                                        <span x-text="activeEvidence.condition === 'good' ? 'Baik' : (activeEvidence.condition === 'bad' ? 'Rusak' : 'Hilang')"></span>
-                                    </span>
-                                </p>
-                            </div>
-
-                            <div x-show="activeEvidence.notes && activeEvidence.notes !== '-'">
-                                <span class="text-xs text-secondary-500 uppercase font-bold tracking-wider">Catatan</span>
-                                <div class="bg-secondary-50 rounded p-3 mt-1 text-sm text-secondary-700 italic border border-secondary-100">
-                                    <span x-text="activeEvidence.notes"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Footer -->
-                    <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-row-reverse border-t border-gray-200">
-                        <button type="button" @click="evidenceModalOpen = false" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Tutup
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </template>
+            @include('inventory.partials.return-modal')
+            @include('inventory.partials.evidence-modal')
 
     </div>
     </div>
     @include('inventory.partials.alpine_script')
 </x-app-layout>
+
 

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="py-6">
+    <div class="py-6" x-data="{ isFiltering: false }">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Flash Messages -->
 
@@ -27,7 +27,7 @@
                              x-transition:leave-start="opacity-100 translate-y-0"
                              x-transition:leave-end="opacity-0 translate-y-2"
                              class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-secondary-200 p-4 z-50 text-left"
-                             style="display: none;">
+                             x-cloak>
                             <div class="flex items-center justify-between mb-3 border-b border-secondary-100 pb-2">
                                 <h3 class="font-bold text-sm text-secondary-900">{{ __('ui.legend_title') }}</h3>
                                 <button @click="showLegend = false" class="text-secondary-400 hover:text-secondary-600">
@@ -98,9 +98,14 @@
                  data-bulk-print-route="{{ route('inventory.qr.bulk-print') }}"
                  data-bulk-destroy-route="{{ route('inventory.bulk-destroy') }}"
                  class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl border border-secondary-200 px-6 py-3 flex items-center gap-6 z-50 transition-all duration-300 translate-y-24 opacity-0">
-                <div class="flex items-center gap-2 border-r border-secondary-200 pr-6">
-                    <span class="font-bold text-lg text-primary-600" id="selected-count">0</span>
-                    <span class="text-sm text-secondary-500 font-medium">{{ __('ui.selected') }}</span>
+                <div class="flex items-center gap-3 border-r border-secondary-200 pr-6">
+                    <button type="button" onclick="clearBulkSelection()" class="p-1.5 rounded-full text-secondary-400 hover:text-danger-500 hover:bg-danger-50 transition-colors" title="Batalkan Pilihan">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                    <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-lg text-primary-600" id="selected-count">0</span>
+                        <span class="text-sm text-secondary-500 font-medium">{{ __('ui.selected') }}</span>
+                    </div>
                 </div>
                 
                 <div class="flex items-center gap-3">
@@ -168,7 +173,7 @@
 
             <!-- Filters & Search -->
             <div class="mb-4 card p-4 overflow-visible" x-data="{ showFilters: false }">
-                    <form id="inventory-filter-form" method="GET" action="{{ route('inventory.index') }}" novalidate>
+                    <form id="inventory-filter-form" method="GET" action="{{ route('inventory.index') }}" @submit="isFiltering = true" novalidate>
                     <input type="hidden" name="trash" value="{{ request('trash') }}">
                     <input type="hidden" name="filter" value="{{ request('filter') }}">
 
@@ -205,10 +210,12 @@
                              "
                         >
                              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <x-icon.search class="w-5 h-5 text-secondary-400" />
+                                <x-icon.search x-show="!isFiltering" class="w-5 h-5 text-secondary-400" />
+                                <svg x-show="isFiltering" x-cloak class="animate-spin w-5 h-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                             </div>
                             <input type="text" x-ref="searchInput" name="search" x-model="searchQuery" 
                                    @keydown.escape="$refs.searchInput.blur()"
+                                   data-testid="search-inventory"
                                    class="input-field pl-10 pr-20 w-full" 
                                    placeholder="{{ __('ui.search_inventory_placeholder') }}" 
                                    onchange="this.form.submit()" maxlength="255">
@@ -218,7 +225,7 @@
                                 <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
                             </div>
 
-                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('inventory-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" style="display: none;">
+                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; isFiltering = true; $nextTick(() => { document.getElementById('inventory-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" x-cloak>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
@@ -227,77 +234,116 @@
                         </button>
                     </div>
 
-                    <!-- Bottom: Filters & Sort -->
-                    <div class="flex-col md:flex-row flex-wrap gap-3" :class="showFilters ? 'flex' : 'hidden md:flex'">
-                        @php
-                            $categoryOptions = $categoryOptions->mapWithKeys(fn($item) => [$item => $item])->toArray();
-                            $brandOptions = $brandOptions->mapWithKeys(fn($item) => [$item => $item])->toArray();
-                            $locationOptions = $locationOptions->mapWithKeys(fn($item) => [$item => $item])->toArray();
-                            $colorOptions = $colors->mapWithKeys(fn($item) => [$item => $item])->toArray();
-                            $conditionOptions = $conditions->mapWithKeys(fn($item) => [$item => $item])->toArray();
-                        @endphp
+                    <!-- Active Filter Pills -->
+                    <div id="active-filters-container">
+                        @include('inventory.partials.active-filters')
+                    </div>
 
-                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                    <!-- Backdrop for Mobile Drawer -->
+                    <template x-teleport="body">
+                        <div x-show="showFilters" 
+                             @click="showFilters = false"
+                             x-transition.opacity.duration.300ms
+                             class="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm z-[90] md:hidden" 
+                             x-cloak></div>
+                    </template>
+
+                    <!-- Bottom: Filters & Sort -->
+                    <div class="fixed md:static inset-y-0 right-0 z-[100] md:z-auto w-[85vw] max-w-sm md:w-full bg-white md:bg-transparent shadow-2xl md:shadow-none p-6 md:p-0 overflow-y-auto md:overflow-visible transition-transform duration-300 flex flex-col md:flex-row md:flex-wrap gap-4 md:gap-3 h-full md:h-auto"
+                         :class="showFilters ? 'translate-x-0' : 'translate-x-full md:translate-x-0'">
+                        
+                        <!-- Mobile Drawer Header -->
+                        <div class="flex items-center justify-between mb-4 md:hidden">
+                            <h3 class="text-lg font-bold text-secondary-900">Filter Data</h3>
+                            <button type="button" @click="showFilters = false" class="text-secondary-400 hover:text-secondary-600 bg-secondary-50 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Filter Selects -->
+                        <div class="flex flex-col md:flex-row md:flex-wrap gap-4 md:gap-3 flex-1">
                             @php
-                                $typeOptions = [
-                                    'sale' => 'Barang Dijual (Sale)',
-                                    'asset' => 'Inventaris (Asset)',
-                                ];
+                                $categoryOptions = collect($categoryOptions)->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                                $brandOptions = collect($brandOptions)->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                                $locationOptions = collect($locationOptions)->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                                $colorOptions = collect($colors)->mapWithKeys(fn($item) => [$item => $item])->toArray();
+                                $conditionOptions = collect($conditions)->mapWithKeys(fn($item) => [$item => $item])->toArray();
                             @endphp
-                            <label for="type-filter" class="sr-only">{{ __('ui.all_types') }}</label>
-                            <x-select name="type" id="type-filter" :options="$typeOptions" :selected="request('type')" placeholder="{{ __('ui.all_types') }}" :submitOnChange="true" width="w-full" />
-                        </div>
-                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <label for="category-filter" class="sr-only">{{ __('ui.all_categories') }}</label>
-                            <x-select name="category" id="category-filter" :options="$categoryOptions" :selected="request('category')" placeholder="{{ __('ui.all_categories') }}" :submitOnChange="true" width="w-full" />
-                        </div>
-                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <label for="brand-filter" class="sr-only">{{ __('ui.all_brands') }}</label>
-                            <x-select name="brand" id="brand-filter" :options="$brandOptions" :selected="request('brand')" placeholder="{{ __('ui.all_brands') }}" :submitOnChange="true" width="w-full" />
-                        </div>
-                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <label for="location-filter" class="sr-only">{{ __('ui.all_locations') }}</label>
-                            <x-select name="location" id="location-filter" :options="$locationOptions" :selected="request('location')" placeholder="{{ __('ui.all_locations') }}" :submitOnChange="true" width="w-full" />
-                        </div>
-                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <label for="color-filter" class="sr-only">{{ __('ui.all_colors') }}</label>
-                            <x-select name="color" id="color-filter" :options="$colorOptions" :selected="request('color')" placeholder="{{ __('ui.all_colors') }}" :submitOnChange="true" width="w-full" />
-                        </div>
-                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            <label for="condition-filter" class="sr-only">{{ __('ui.all_conditions') }}</label>
-                            <x-select name="condition" id="condition-filter" :options="$conditionOptions" :selected="request('condition')" placeholder="{{ __('ui.all_conditions') }}" :submitOnChange="true" width="w-full" />
-                        </div>
-                        <div class="flex-1 w-full sm:w-auto min-w-[150px]">
-                            @php
-                                $sortOptions = [
-                                    'newest' => __('ui.sort_newest'),
-                                    'oldest' => __('ui.sort_oldest'),
-                                    'name_asc' => __('ui.sort_name_asc'),
-                                    'name_desc' => __('ui.sort_name_desc'),
-                                    'stock_asc' => __('ui.sort_stock_asc'),
-                                    'stock_desc' => __('ui.sort_stock_desc'),
-                                    'price_asc' => __('ui.sort_price_asc'),
-                                    'price_desc' => __('ui.sort_price_desc'),
-                                ];
-                            @endphp
-                            <label for="sort-filter" class="sr-only">{{ __('ui.sort') }}</label>
-                            <x-select name="sort" id="sort-filter" :options="$sortOptions" :selected="request('sort', 'newest')" placeholder="{{ __('ui.sort') }}" :submitOnChange="true" width="w-full" />
+
+                            <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                                @php
+                                    $typeOptions = [
+                                        'sale' => 'Barang Dijual (Sale)',
+                                        'asset' => 'Inventaris (Asset)',
+                                    ];
+                                @endphp
+                                <label for="type-filter" class="sr-only">{{ __('ui.all_types') }}</label>
+                                <x-select name="type" id="type-filter" :options="$typeOptions" :selected="request('type')" placeholder="{{ __('ui.all_types') }}" :submitOnChange="true" width="w-full" />
+                            </div>
+                            <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                                <label for="category-filter" class="sr-only">{{ __('ui.all_categories') }}</label>
+                                <x-select name="category" id="category-filter" :options="$categoryOptions" :selected="request('category')" placeholder="{{ __('ui.all_categories') }}" :submitOnChange="true" width="w-full" />
+                            </div>
+                            <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                                <label for="brand-filter" class="sr-only">{{ __('ui.all_brands') }}</label>
+                                <x-select name="brand" id="brand-filter" :options="$brandOptions" :selected="request('brand')" placeholder="{{ __('ui.all_brands') }}" :submitOnChange="true" width="w-full" />
+                            </div>
+                            <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                                <label for="location-filter" class="sr-only">{{ __('ui.all_locations') }}</label>
+                                <x-select name="location" id="location-filter" :options="$locationOptions" :selected="request('location')" placeholder="{{ __('ui.all_locations') }}" :submitOnChange="true" width="w-full" />
+                            </div>
+                            <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                                <label for="color-filter" class="sr-only">{{ __('ui.all_colors') }}</label>
+                                <x-select name="color" id="color-filter" :options="$colorOptions" :selected="request('color')" placeholder="{{ __('ui.all_colors') }}" :submitOnChange="true" width="w-full" />
+                            </div>
+                            <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                                <label for="condition-filter" class="sr-only">{{ __('ui.all_conditions') }}</label>
+                                <x-select name="condition" id="condition-filter" :options="$conditionOptions" :selected="request('condition')" placeholder="{{ __('ui.all_conditions') }}" :submitOnChange="true" width="w-full" />
+                            </div>
+                            <div class="flex-1 w-full sm:w-auto min-w-[150px]">
+                                @php
+                                    $sortOptions = [
+                                        'newest' => __('ui.sort_newest'),
+                                        'oldest' => __('ui.sort_oldest'),
+                                        'name_asc' => __('ui.sort_name_asc'),
+                                        'name_desc' => __('ui.sort_name_desc'),
+                                        'stock_asc' => __('ui.sort_stock_asc'),
+                                        'stock_desc' => __('ui.sort_stock_desc'),
+                                        'price_asc' => __('ui.sort_price_asc'),
+                                        'price_desc' => __('ui.sort_price_desc'),
+                                    ];
+                                @endphp
+                                <label for="sort-filter" class="sr-only">{{ __('ui.sort') }}</label>
+                                <x-select name="sort" id="sort-filter" :options="$sortOptions" :selected="request('sort', 'newest')" placeholder="{{ __('ui.sort') }}" :submitOnChange="true" width="w-full" />
+                            </div>
                         </div>
                         
-                        <div class="flex items-end flex-shrink-0">
-                            <a href="{{ route('inventory.index', request()->only(['trash', 'filter'])) }}" id="reset-filters" class="btn btn-secondary flex items-center justify-center p-2.5 h-[42px] w-[42px]" title="{{ __('ui.reset_filter') }}">
-                                <x-icon.restore class="h-5 w-5" />
+                        <!-- Reset Button & Mobile Apply -->
+                        <div class="mt-auto pt-6 md:pt-0 border-t border-secondary-100 md:border-0 flex flex-col md:flex-row md:items-end gap-3 md:flex-shrink-0">
+                            <!-- Mobile Apply Button (Only visible on mobile) -->
+                            <button type="button" @click="showFilters = false" class="btn btn-primary w-full justify-center py-3 md:hidden">
+                                Terapkan Filter
+                            </button>
+                            
+                            <a href="{{ route('inventory.index', request()->only(['trash', 'filter'])) }}" id="reset-filters" class="btn btn-secondary flex items-center justify-center p-3 md:p-2.5 md:h-[42px] md:w-[42px] w-full" title="{{ __('ui.reset_filter') }}">
+                                <x-icon.restore class="h-5 w-5 mr-2 md:mr-0" />
+                                <span class="md:hidden font-medium">Reset Filter</span>
                             </a>
                         </div>
                     </div>
                 </form>
             </div>
 
-            <!-- Mobile Card View -->
-            @include('inventory.partials.mobile-list')
+            <div :class="{ 'opacity-50 pointer-events-none': isFiltering }" class="transition-opacity duration-200">
+                <!-- Mobile Card View -->
+                @include('inventory.partials.mobile-list')
 
-            <!-- Desktop Table View -->
-            @include('inventory.partials.desktop-table')
+                <!-- Desktop Table View -->
+                @include('inventory.partials.desktop-table')
+            </div>
+
+            <!-- Quick View Drawer Component -->
+            @include('inventory.partials.quick-view-drawer')
 
     @push('scripts')
     @vite('resources/js/pages/superadmin/inventory/index.js')

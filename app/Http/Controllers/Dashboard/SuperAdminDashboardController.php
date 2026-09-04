@@ -101,6 +101,7 @@ class SuperAdminDashboardController extends Controller
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart' => function ($query) {
                 $query->withTrashed();
             }, 'user'])
+                ->withSum('returns', 'quantity')
                 ->active()
                 ->latest()
                 ->take(5)
@@ -109,6 +110,7 @@ class SuperAdminDashboardController extends Controller
             $overdueBorrowingsListRaw = \App\Models\Borrowing::with(['sparepart' => function ($query) {
                 $query->withTrashed();
             }, 'user'])
+                ->withSum('returns', 'quantity')
                 ->overdue()
                 ->orderBy('expected_return_at', 'asc')
                 ->take(5)
@@ -149,6 +151,7 @@ class SuperAdminDashboardController extends Controller
                 ],
                 $borrowingStats
             );
+
             return $result;
         });
 

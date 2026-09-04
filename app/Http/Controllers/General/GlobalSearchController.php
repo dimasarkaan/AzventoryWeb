@@ -15,7 +15,6 @@ class GlobalSearchController extends Controller
     /**
      * Mengeksekusi pencarian otomatis saat user mengetikkan sesuatu (minimal 2 huruf)
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(Request $request)

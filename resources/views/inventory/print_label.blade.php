@@ -13,339 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-    <style>
-        [x-cloak] { display: none !important; }
-
-        /* Hide Number Input Arrows */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-        body { font-family: 'Inter', sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #f1f5f9; margin: 0; padding: 0; }
-        
-        /* Paginated Preview for Screen */
-        @media screen {
-            .preview-inner {
-                background-image: linear-gradient(to bottom, transparent 296.5mm, rgba(59, 130, 246, 0.15) 296.5mm, rgba(59, 130, 246, 0.15) 297mm, transparent 297mm);
-                background-size: 100% 297mm;
-                background-attachment: local;
-            }
-        }
-
-        /* --- SYSTEMATIC TOOLBAR (HYBRID) --- */
-        .premium-toolbar {
-            background: #0f172a;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 50;
-            min-height: 58px;
-            display: flex;
-            align-items: center;
-        }
-
-        .toolbar-content {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .mobile-top-bar { display: contents; }
-
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-            order: 1;
-        }
-
-        .center-controls {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            order: 2;
-        }
-
-        .action-group {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            flex-shrink: 0;
-            order: 3;
-        }
-
-        @media (max-width: 768px) {
-            .premium-toolbar { padding: 8px 0; }
-            .toolbar-content {
-                flex-direction: column;
-                gap: 10px;
-                padding: 0 16px;
-            }
-            .mobile-top-bar {
-                display: flex;
-                width: 100%;
-                justify-content: space-between;
-                align-items: center;
-                order: 1;
-            }
-            .center-controls {
-                width: 100%;
-                justify-content: center;
-                border-top: 1px solid rgba(255, 255, 255, 0.05);
-                padding-top: 10px;
-                order: 2;
-                gap: 12px;
-            }
-            .brand-section h1 { font-size: 13px !important; }
-            .action-group { gap: 10px; }
-            .toolbar-btn { height: 34px !important; padding: 0 10px !important; font-size: 10.5px !important; }
-            .btn-print { height: 34px !important; padding: 0 14px !important; font-size: 11px !important; }
-        }
-
-        /* Element Uniformity */
-        .toolbar-btn, .btn-print, .btn-close {
-            height: 38px;
-            display: flex;
-            align-items: center;
-            border-radius: 10px;
-            font-size: 11.5px;
-            font-weight: 700;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .control-group {
-            display: flex;
-            flex-direction: row;
-            gap: 4px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 3px;
-            border-radius: 12px;
-        }
-
-        .control-group .toolbar-btn {
-            height: 30px !important;
-            border: none;
-            background: transparent;
-            padding: 0 12px !important;
-        }
-
-        .control-group .toolbar-btn.active {
-            background: rgba(59, 130, 246, 0.15);
-        }
-
-        .toolbar-btn {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #94a3b8;
-            padding: 0 14px;
-            gap: 8px;
-        }
-
-        .toolbar-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: white;
-            transform: translateY(-1px);
-        }
-
-        .toolbar-btn.active {
-            background: rgba(59, 130, 246, 0.15);
-            color: #60a5fa;
-            border: 1px solid rgba(59, 130, 246, 0.3);
-        }
-
-        .btn-print {
-            background: #2563eb;
-            color: white !important;
-            padding: 0 24px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 800;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-print:hover {
-            background: #1d4ed8;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
-        }
-
-        /* --- PREVIEW CANVAS --- */
-        .preview-canvas {
-            padding-top: 100px;
-            padding-bottom: 60px;
-            background: #e2e8f0;
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 20px 20px;
-        }
-
-        @media (max-width: 768px) {
-            .preview-canvas { padding-top: 130px; }
-        }
-
-        .preview-inner {
-            width: 100%;
-            overflow-x: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px; /* Gap between A4 page cards on screen */
-        }
-
-        /* A4 Page Card on Screen */
-        .page-card {
-            width: 210mm;
-            min-height: 297mm;
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08);
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        /* --- LAYOUTS (Standardized) --- */
-        .layout-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0;
-            width: 100%;
-            align-content: flex-start;
-        }
-
-        .layout-thermal {
-            display: flex;
-            flex-direction: column;
-            gap: 2mm; /* Give gap between labels */
-            width: 40mm;
-            min-height: 100mm; /* Just for visual on screen */
-            margin: 0 auto;
-            background: white;
-            padding: 2mm 0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15), 0 1px 4px rgba(0,0,0,0.08); /* Similar shadow to A4 */
-            align-items: center;
-        }
-
-        .layout-thermal .layout-thermal-item {
-            margin: 0 !important; /* Managed by gap */
-            page-break-after: always !important;
-            break-after: page !important;
-            /* Do not remove border */
-        }
-
-        /* --- LABEL COMPONENT --- */
-        .label-item {
-            width: 33mm;
-            height: 15mm;
-            display: flex !important;
-            align-items: center !important;
-            background: white !important;
-            box-sizing: border-box !important;
-            padding: 1.25mm !important;
-            overflow: hidden !important;
-            border-radius: 2mm !important;
-            border: 1px solid #000000 !important;
-        }
-
-        .qr-section {
-            width: 12mm !important;
-            height: 12mm !important;
-            flex-shrink: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            margin-right: 1.25mm !important;
-        }
-
-        .qr-image { width: 100% !important; height: 100% !important; object-fit: contain !important; }
-
-        .info-section {
-            flex-grow: 1 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-            overflow: hidden !important;
-            height: 12mm !important;
-        }
-
-        .label-title { font-weight: 700 !important; font-size: 5pt !important; text-transform: uppercase !important; color: #64748b !important; margin-bottom: 0.5px !important; line-height: 1 !important; }
-        .label-content { font-weight: 800 !important; font-size: 6.8pt !important; margin-bottom: 1px !important; line-height: 1 !important; color: #0f172a !important; }
-        .label-text { font-size: 5.5pt !important; color: #475569 !important; line-height: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
-        .part-number { font-family: 'JetBrains Mono', monospace !important; }
-
-        @media print {
-            .premium-toolbar, .sidebar-glass, #sidebar-ui, #loading-ui, .margin-guide, .print-page-num { 
-                display: none !important; 
-            }
-            html, body { background: white !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
-            .preview-canvas { background: none !important; padding: 0 !important; height: auto !important; min-height: 0 !important; overflow: visible !important; display: block !important; }
-            .preview-inner { display: block !important; width: 100% !important; height: auto !important; min-height: 0 !important; overflow: visible !important; gap: 0 !important; }
-            /* Each page-card becomes a page — reset for print */
-            .page-card { 
-                width: 100% !important; 
-                min-height: 0 !important; 
-                box-shadow: none !important; 
-                display: block !important;
-                page-break-after: always !important;
-                break-after: page !important;
-                overflow: visible !important;
-            }
-            .page-card:last-child { page-break-after: auto !important; break-after: auto !important; }
-            .layout-grid { 
-                display: block !important; 
-                text-align: left !important; 
-                line-height: 0 !important;
-                width: 100% !important;
-                padding: 0 !important;
-            }
-            .label-item { 
-                display: inline-flex !important; 
-                margin: 1mm !important; 
-                border: 1px solid #000000 !important; 
-                transform: scale(1) !important; 
-                flex-shrink: 0 !important; 
-                page-break-inside: avoid !important; 
-                break-inside: avoid !important; 
-                vertical-align: top !important;
-            }
-            /* Specific fix for thermal print layout */
-            .layout-thermal {
-                display: block !important;
-                width: 100% !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                text-align: left !important;
-            }
-            .layout-thermal .layout-thermal-item {
-                display: flex !important; /* Force block-level flex to allow page-break */
-                margin: 0 !important;
-                border: 1px solid #000000 !important;
-                page-break-after: always !important;
-                break-after: page !important;
-            }
-        }
-
-        /* Sidebar Styles */
-        .sidebar-glass {
-            background: #ffffff;
-            border-left: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        [x-cloak] { display: none !important; }
+    @vite(['resources/css/app.css', 'resources/css/print.css', 'r!important; }
 
     </style>
     <!-- Dynamic @page handler.
@@ -375,6 +43,7 @@
     layoutMode: 'grid',
     quantity: 1,
     loading: false,
+    isPrinting: false,
     margin: { top: 10, bottom: 10, left: 10, right: 10 },
     activeTab: 'quantity',
     presets: [],
@@ -484,6 +153,8 @@
         }, 150);
     },
     async logPrint() {
+        if (this.isPrinting) return;
+        this.isPrinting = true;
         // Update dynamic @page margin style before printing
         try { await new Promise(r => setTimeout(r, 50)); } catch(e) {}
         try {
@@ -501,6 +172,7 @@
             });
         } catch (e) { console.error('Logging failed', e); }
         window.print();
+        setTimeout(() => this.isPrinting = false, 1000);
     },
 
     /* ---- Pagination Helpers ---- */
@@ -548,9 +220,10 @@
 
                 <div class="action-group md:order-3">
                     <button onclick="window.close()" class="btn-close text-slate-400 hover:text-white transition-colors">Tutup</button>
-                    <button @click="logPrint()" class="btn-print group">
-                        <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        <span>Cetak</span>
+                    <button @click="logPrint()" class="btn-print group relative" :disabled="isPrinting" :class="{'opacity-75 cursor-wait': isPrinting}">
+                        <svg x-show="!isPrinting" class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        <svg x-show="isPrinting" x-cloak class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span x-text="isPrinting ? 'Menyiapkan...' : 'Cetak'"></span>
                     </button>
                 </div>
             </div>
@@ -569,7 +242,7 @@
 
                 <button @click="sidebarOpen = !sidebarOpen" :class="{'active': sidebarOpen}" class="toolbar-btn">
                     <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    <span class="hidden sm:inline">Pengaturan</span>
+                    <span class="hidden sm:inline">Pengaturan <kbd class="ml-1 text-[9px] px-1 bg-slate-200/50 rounded font-mono text-slate-500">S</kbd></span>
                 </button>
             </div>
         </div>
@@ -600,7 +273,9 @@
                     <div class="px-6 mb-6">
                         <div class="flex p-1.5 bg-slate-100 rounded-xl">
                             <button @click="activeTab = 'quantity'" :class="activeTab === 'quantity' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">Salinan</button>
-                            <button @click="activeTab = 'margin'" :class="activeTab === 'margin' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'" class="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">Layout</button>
+                            <button @click="activeTab = 'margin'" :class="activeTab === 'margin' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-900'" class="flex-1 flex items-center justify-center gap-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all">
+                                Layout <kbd class="px-1 py-0.5 bg-slate-200 text-slate-500 rounded font-mono text-[8px]" title="Tekan T untuk ganti tab">T</kbd>
+                            </button>
                         </div>
                     </div>
 
@@ -615,7 +290,8 @@
                                                 <label for="quantity" class="text-[11px] font-black text-white/70 uppercase tracking-widest mb-1 pointer-events-none">{{ $sparepart->name }}</label>
                                                 <p class="text-[13px] font-black text-white leading-tight break-words">{{ $sparepart->part_number }}</p>
                                             </div>
-                                            <div class="flex flex-col items-center">
+                                            <div class="flex items-center">
+                                                <button @click="quantity > 1 ? quantity-- : null; updatePreview()" class="w-8 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-l-xl transition-colors font-bold select-none">-</button>
                                                 <input type="number"
                                                        id="quantity"
                                                        name="quantity"
@@ -623,7 +299,8 @@
                                                        @input.debounce.300ms="updatePreview()"
                                                        min="1"
                                                        x-on:keydown="if(['e', 'E', '+', '-', '.'].includes($event.key)) $event.preventDefault()"
-                                                       class="w-20 bg-white/20 border-white/20 rounded-xl px-2 py-3 text-center text-sm font-black text-white focus:bg-white focus:text-blue-600 outline-none transition-all">
+                                                       class="w-16 bg-white/20 border-none px-2 py-3 text-center text-sm font-black text-white focus:bg-white focus:text-blue-600 outline-none transition-all focus:ring-0">
+                                                <button @click="quantity++; updatePreview()" class="w-8 h-10 flex items-center justify-center bg-white/10 hover:bg-white/20 text-white rounded-r-xl transition-colors font-bold select-none">+</button>
                                             </div>
                                         </div>
                                         <div class="grid grid-cols-2 gap-2 mt-4">

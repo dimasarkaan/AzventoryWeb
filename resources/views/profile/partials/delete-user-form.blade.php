@@ -15,6 +15,7 @@
                  <button 
                     x-data=""
                     x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')"
+                    data-testid="btn-delete-account-trigger"
                     class="btn btn-danger"
                 >
                     {{ __('ui.profile_btn_delete_account') }}
@@ -24,7 +25,7 @@
     </div>
 
     <x-modal name="confirm-user-deletion" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <form method="post" action="{{ route('profile.destroy') }}" class="p-6" novalidate>
+        <form x-data="{ submitting: false }" @submit="submitting = true" method="post" action="{{ route('profile.destroy') }}" class="p-6" novalidate>
             @csrf
             @method('delete')
 
@@ -38,25 +39,12 @@
 
             <div class="mt-6">
                 <label for="password" class="sr-only">{{ __('ui.auth_label_password') }}</label>
-                <div class="relative w-3/4" x-data="{ show: false }">
-                    <input
-                        id="password"
-                        name="password"
-                        x-bind:type="show ? 'text' : 'password'"
-                        class="input-field w-full pr-10 {{ $errors->userDeletion->has('password') ? '!border-red-500' : '' }}"
-                        placeholder="{{ __('ui.profile_placeholder_password') }}"
-                        autocomplete="current-password"
-                        maxlength="255"
-                    />
-                    <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-secondary-600 focus:outline-none" tabindex="-1">
-                        <svg x-show="!show" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        <svg x-show="show" x-cloak class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                        </svg>
-                    </button>
+                <div class="w-full">
+                    <x-password-input id="password" name="password" data-testid="input-delete-password"
+                        class="input-field w-full {{ $errors->userDeletion->has('password') ? '!border-red-500' : '' }}" 
+                        placeholder="{{ __('ui.profile_placeholder_password') }}" 
+                        autocomplete="current-password" 
+                        maxlength="255" />
                 </div>
                 <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
             </div>
@@ -66,11 +54,13 @@
                     {{ __('ui.cancel') }}
                 </button>
 
-                <button type="submit" class="btn btn-danger">
-                    {{ __('ui.profile_btn_confirm_delete') }}
+                <button type="submit" data-testid="btn-confirm-delete-account" class="btn btn-danger flex items-center gap-2" :class="{ 'opacity-75 cursor-not-allowed': submitting }" :disabled="submitting">
+                    <svg x-show="submitting" x-cloak class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span x-text="submitting ? '{{ __('ui.saving') }}...' : '{{ __('ui.profile_btn_confirm_delete') }}'"></span>
                 </button>
             </div>
         </form>
     </x-modal>
 </section>
+
 

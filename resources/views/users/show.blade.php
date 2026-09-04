@@ -107,6 +107,30 @@
                 <div class="card p-6 mt-4">
                     <h3 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">{{ __('ui.borrowing_history') }}</h3>
                     
+                    @php
+                        $totalBorrowings = $user->borrowings->count();
+                        $activeBorrowings = $user->borrowings->where('status', 'borrowed')->count();
+                        $overdueBorrowings = $user->borrowings->where('status', 'borrowed')->filter(function($b) {
+                            return $b->expected_return_at && $b->expected_return_at < now();
+                        })->count();
+                    @endphp
+
+                    <!-- Borrowing Stats -->
+                    <div class="grid grid-cols-3 gap-4 mb-6">
+                        <div class="bg-secondary-50 rounded-xl p-4 border border-secondary-200 shadow-sm flex flex-col items-center justify-center text-center">
+                            <span class="text-2xl md:text-3xl font-black text-secondary-700">{{ $totalBorrowings }}</span>
+                            <span class="text-[10px] md:text-xs font-bold text-secondary-500 uppercase tracking-wide mt-1 text-balance">Total</span>
+                        </div>
+                        <div class="bg-warning-50 rounded-xl p-4 border border-warning-200 shadow-sm flex flex-col items-center justify-center text-center">
+                            <span class="text-2xl md:text-3xl font-black text-warning-600">{{ $activeBorrowings }}</span>
+                            <span class="text-[10px] md:text-xs font-bold text-warning-600 uppercase tracking-wide mt-1 text-balance">Dipinjam</span>
+                        </div>
+                        <div class="bg-danger-50 rounded-xl p-4 border border-danger-200 shadow-sm flex flex-col items-center justify-center text-center">
+                            <span class="text-2xl md:text-3xl font-black text-danger-600">{{ $overdueBorrowings }}</span>
+                            <span class="text-[10px] md:text-xs font-bold text-danger-600 uppercase tracking-wide mt-1 text-balance">Terlambat</span>
+                        </div>
+                    </div>
+                    
                     <div class="overflow-x-auto">
                         <table class="table-modern w-full">
                             <thead>

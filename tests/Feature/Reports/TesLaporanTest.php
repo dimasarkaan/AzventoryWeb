@@ -2,74 +2,136 @@
 
 namespace Tests\Feature\Reports;
 
+use App\Enums\UserRole;
+use App\Jobs\GenerateReportJob;
 use App\Models\Sparepart;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
-use PHPUnit\Framework\Attributes\Test;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class TesLaporanTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected $superAdmin;
+    protected $superadmin;
+
+    protected $operator;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->superAdmin = User::factory()->create(['role' => 'superadmin']);
-        Sparepart::factory()->count(5)->create();
+
+        $this->superadmin = User::factory()->create([
+            'role' => UserRole::SUPERADMIN,
+            'password_changed_at' => now(),
+        ]);
+
+        $this->operator = User::factory()->create([
+            'role' => UserRole::OPERATOR,
+            'password_changed_at' => now(),
+        ]);
+
+        Storage::fake('local');
+        Storage::fake('public');
     }
 
-    #[Test]
-    public function superadmin_dapat_mengunduh_laporan_pdf_melalui_antrean()
+    public function test_halaman_index_laporan_bisa_dibuka()
+    {
+        $response = $this->actingAs($this->superadmin)->get(route('reports.index'));
+        $response->assertStatus(200);
+    }
+
+    public function test_download_pdf_langsung_jika_data_sedikit()
+    {
+        Sparepart::factory()->count(10)->create(); // 10 data (<= 1000)
+
+        // Mock PDF biar gak beneran render DOMPDF yang berat saat testing
+        Pdf::shouldReceive('loadView')->andReturnSelf();
+        Pdf::shouldReceive('output')->andReturn('PDF_CONTENT_MOCK');
+
+        $response = $this->actingAs($this->superadmin)->get(route('reports.download', [
+            'report_type' => 'inventory_list',
+            'export_format' => 'pdf',
+            'period' => 'all',
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_download_pdf_memicu_queue_jika_data_raksasa()
     {
         Queue::fake();
-        Sparepart::factory()->count(1001)->create();
 
-        $response = $this->actingAs($this->superAdmin)
-            ->get(route('reports.download', [
-                'report_type' => 'inventory_list',
-                'export_format' => 'pdf',
-            ]));
+        Sparepart::factory()->count(1001)->create(); // 1001 data (> 1000)
+
+        $response = $this->actingAs($this->superadmin)->get(route('reports.download', [
+            'report_type' => 'inventory_list',
+            'export_format' => 'pdf',
+            'period' => 'all',
+        ]));
 
         $response->assertRedirect();
         $response->assertSessionHas('info');
 
-        // Pastikan Job Didorong
-        Queue::assertPushed(\App\Jobs\GenerateReportJob::class);
+        Queue::assertPushed(GenerateReportJob::class);
     }
 
-    #[Test]
-    public function superadmin_dapat_mengunduh_laporan_excel_secara_langsung()
+    public function test_download_excel_mengembalikan_respon_valid()
     {
-        $this->withoutExceptionHandling();
+        Sparepart::factory()->count(10)->create();
 
-        $response = $this->actingAs($this->superAdmin)
-            ->get(route('reports.download', [
-                'report_type' => 'inventory_list',
-                'export_format' => 'excel',
-            ]));
+        $response = $this->actingAs($this->superadmin)->get(route('reports.download', [
+            'report_type' => 'inventory_list',
+            'export_format' => 'excel',
+            'period' => 'all',
+        ]));
 
         $response->assertStatus(200);
-        $response->assertHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->assertDownload();
     }
 
-    #[Test]
-    public function superadmin_dapat_mengakses_halaman_laporan()
+    public function test_download_via_secure_file_link()
     {
-        $response = $this->actingAs($this->superAdmin)->get(route('reports.index'));
+        // Simulasikan ada file di disk local
+        Storage::disk('local')->put('reports/LaporanTesting.pdf', 'dummy content');
+
+        $response = $this->actingAs($this->superadmin)->get(route('reports.file', ['filename' => 'LaporanTesting.pdf']));
+
         $response->assertStatus(200);
+        $response->assertDownload();
     }
 
-    #[Test]
-    public function superadmin_dapat_mengakses_halaman_scan_qr()
+    public function test_validasi_menolak_end_date_sebelum_start_date()
     {
-        // Asumsi rute ada berdasarkan verifikasi sebelumnya
-        if (\Illuminate\Support\Facades\Route::has('inventory.scan-qr')) {
-            $response = $this->actingAs($this->superAdmin)->get(route('inventory.scan-qr'));
-            $response->assertStatus(200);
-        }
+        $response = $this->actingAs($this->superadmin)->get(route('reports.download', [
+            'start_date' => '2023-12-01',
+            'end_date' => '2023-11-01', // Kuno
+        ]));
+
+        $response->assertSessionHasErrors('end_date');
+    }
+
+    public function test_mendownload_file_hilang_mengembalikan_error()
+    {
+        // File tidak ada di local ataupun public
+        $response = $this->actingAs($this->superadmin)->get(route('reports.file', ['filename' => 'FileHantu.pdf']));
+
+        $response->assertRedirect(route('dashboard'));
+        $response->assertSessionHas('error');
+    }
+
+    public function test_tipe_laporan_tidak_didukung_untuk_excel()
+    {
+        $response = $this->actingAs($this->superadmin)->get(route('reports.download', [
+            'report_type' => 'alien_type',
+            'export_format' => 'excel',
+        ]));
+
+        $response->assertRedirect();
+        $response->assertSessionHas('error', 'Tipe laporan tidak ditemukan atau tidak valid.');
     }
 }

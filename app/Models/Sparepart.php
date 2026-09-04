@@ -108,7 +108,7 @@ class Sparepart extends Model
 
         // Lapis 2: Cek dari Log Aktivitas (Admin Edit Manual via Dashboard)
         $latestActivity = \App\Models\ActivityLog::where('action', 'Sparepart Diperbarui')
-            ->where('description', 'like', '%' . $this->part_number . '%')
+            ->where('description', 'like', '%'.$this->part_number.'%')
             ->where('properties->condition->new', $this->condition)
             ->latest()
             ->first();
@@ -116,11 +116,12 @@ class Sparepart extends Model
         if ($latestActivity) {
             $userName = $latestActivity->user->name ?? 'Admin';
             $date = $latestActivity->created_at->format('d M Y');
+
             return "Status diubah manual menjadi {$this->condition} oleh {$userName} pada {$date}";
         }
 
         // Lapis 3: Fallback check latest stock log (Penyesuaian Fisik Gudang)
-        $latestLog = $this->stockLogs->first();
+        $latestLog = $this->stockLogs()->latest()->first();
         if ($latestLog && $latestLog->reason) {
             $date = $latestLog->created_at->format('d M Y');
 
@@ -134,8 +135,8 @@ class Sparepart extends Model
     public function scopeLowStock($query)
     {
         return $query->where('minimum_stock', '>', 0)
-                     ->whereRaw('stock <= (minimum_stock + 5)')
-                     ->where('condition', 'Baik');
+            ->whereRaw('stock <= (minimum_stock + 5)')
+            ->where('condition', 'Baik');
     }
 
     // Scope: Mengambil barang dengan kondisi bermasalah (Rusak/Hilang)
@@ -148,16 +149,16 @@ class Sparepart extends Model
     public function scopeNoPrice($query)
     {
         return $query->where('type', 'sale')
-                     ->where(function ($q) {
-                         $q->whereNull('price')->orWhere('price', '<=', 0);
-                     });
+            ->where(function ($q) {
+                $q->whereNull('price')->orWhere('price', '<=', 0);
+            });
     }
 
     // Mengecek apakah stok barang ini menipis
     public function isLowStock()
     {
-        return $this->minimum_stock > 0 
-            && $this->stock <= ($this->minimum_stock + 5) 
+        return $this->minimum_stock > 0
+            && $this->stock <= ($this->minimum_stock + 5)
             && strtolower($this->condition) === 'baik';
     }
 

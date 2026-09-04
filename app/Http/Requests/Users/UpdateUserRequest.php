@@ -15,9 +15,12 @@ class UpdateUserRequest extends FormRequest
     // Syarat saat menyimpan perubahan data (termasuk mengecualikan pengecekan duplikat email miliknya sendiri)
     public function rules(): array
     {
+        $user = $this->route('user');
+        $userId = $user instanceof \App\Models\User ? $user->id : null;
+
         return [
             'name' => ['required', 'string', 'min:3', 'max:255', 'regex:/^[a-zA-Z][a-zA-Z\s\.\'\-]*$/'],
-            'email' => ['required', 'string', 'email:rfc', 'max:255', 'unique:users,email,'.$this->route('user')->id],
+            'email' => ['required', 'string', 'email:rfc', 'max:255', 'unique:users,email,'.$userId],
             'role' => ['required', 'in:superadmin,admin,operator'],
             'jabatan' => ['required', 'string', 'min:3', 'max:255', 'regex:/^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/\'"]*$/'],
             'status' => ['required', 'in:aktif,nonaktif'],
@@ -43,18 +46,18 @@ class UpdateUserRequest extends FormRequest
             'name.required' => 'Nama lengkap wajib diisi.',
             'name.min' => 'Nama lengkap minimal harus 3 karakter.',
             'name.regex' => 'Nama lengkap harus diawali huruf dan tidak boleh mengandung angka atau simbol khusus (kecuali titik, petik, atau strip).',
-            
+
             'email.required' => 'Alamat email wajib diisi.',
             'email.email' => 'Format email tidak valid. Pastikan menggunakan @ dan nama domain yang benar (contoh: nama@domain.com).',
             'email.unique' => 'Alamat email ini sudah terdaftar. Silakan gunakan email lain.',
-            
+
             'role.required' => 'Peran pengguna wajib dipilih.',
             'role.in' => 'Pilihan peran tidak valid. Harus superadmin, admin, atau operator.',
-            
+
             'jabatan.required' => 'Jabatan wajib diisi.',
             'jabatan.min' => 'Jabatan minimal harus 3 karakter.',
             'jabatan.regex' => 'Jabatan harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-()/\'").',
-            
+
             'status.required' => 'Status wajib dipilih.',
             'status.in' => 'Pilihan status tidak valid.',
         ];
@@ -76,5 +79,32 @@ class UpdateUserRequest extends FormRequest
                 }
             }
         });
+    }
+
+    // Dokumentasi API (Scribe)
+    public function bodyParameters(): array
+    {
+        return [
+            'name' => [
+                'description' => 'Nama lengkap pengguna.',
+                'example' => 'Jane Doe',
+            ],
+            'email' => [
+                'description' => 'Alamat email valid (harus unik selain milik pengguna ini sendiri).',
+                'example' => 'janedoe@example.com',
+            ],
+            'role' => [
+                'description' => 'Peran pengguna (superadmin, admin, operator).',
+                'example' => 'operator',
+            ],
+            'jabatan' => [
+                'description' => 'Jabatan pengguna di perusahaan.',
+                'example' => 'Staff Gudang',
+            ],
+            'status' => [
+                'description' => 'Status akun (aktif, nonaktif).',
+                'example' => 'aktif',
+            ],
+        ];
     }
 }

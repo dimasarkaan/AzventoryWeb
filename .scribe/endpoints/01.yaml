@@ -1,7 +1,9 @@
-name: 'Inventory Management'
+name: 'Manajemen Inventaris'
 description: |-
 
-  API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+  Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+  Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
 endpoints:
   -
     custom: []
@@ -10,10 +12,12 @@ endpoints:
     uri: api/v1/inventory
     metadata:
       custom: []
-      groupName: 'Inventory Management'
+      groupName: 'Manajemen Inventaris'
       groupDescription: |-
 
-        API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+        Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+        Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
       subgroup: ''
       subgroupDescription: ''
       title: 'Mendapatkan daftar barang inventaris.'
@@ -37,7 +41,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -46,6 +50,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -63,10 +69,12 @@ endpoints:
     uri: api/v1/inventory
     metadata:
       custom: []
-      groupName: 'Inventory Management'
+      groupName: 'Manajemen Inventaris'
       groupDescription: |-
 
-        API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+        Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+        Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
       subgroup: ''
       subgroupDescription: ''
       title: 'Menyimpan barang inventaris baru.'
@@ -75,30 +83,30 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters: []
     cleanUrlParameters: []
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      part_number:
+      name:
         custom: []
-        name: part_number
-        description: ''
+        name: name
+        description: 'Nama lengkap barang inventaris. Must match the regex /^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/''"]*$/. Kolom value harus memiliki minimal 3 karakter. Kolom value tidak boleh lebih dari 255 karakter.'
         required: true
-        example: consequatur
+        example: 'Laptop Lenovo ThinkPad T14'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      name:
+      part_number:
         custom: []
-        name: name
-        description: ''
+        name: part_number
+        description: 'Nomor unik, kode seri, atau part number barang. Must match the regex /^[a-zA-Z0-9][a-zA-Z0-9\-\_\/]*$/. Kolom value harus memiliki minimal 3 karakter. Kolom value tidak boleh lebih dari 255 karakter.'
         required: true
-        example: consequatur
+        example: LNV-T14-2023
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -107,9 +115,20 @@ endpoints:
       brand_id:
         custom: []
         name: brand_id
-        description: 'The <code>id</code> of an existing record in the brands table.'
+        description: 'ID unik dari merk barang yang sudah ada di database. The <code>id</code> of an existing record in the brands table.'
         required: true
-        example: consequatur
+        example: 1
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'ID unik dari kategori barang yang sudah ada di database. The <code>id</code> of an existing record in the categories table.'
+        required: true
+        example: 2
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -118,18 +137,53 @@ endpoints:
       location_id:
         custom: []
         name: location_id
-        description: 'The <code>id</code> of an existing record in the locations table.'
+        description: 'ID unik dari lokasi penyimpanan yang sudah ada di database. The <code>id</code> of an existing record in the locations table.'
         required: true
-        example: consequatur
+        example: 3
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      age:
+        custom: []
+        name: age
+        description: 'Status pemakaian barang.'
+        required: true
+        example: Baru
+        type: string
+        enumValues:
+          - Baru
+          - 'Pernah Dipakai (Bekas)'
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      condition:
+        custom: []
+        name: condition
+        description: 'Kondisi fisik dan fungsional barang saat ini. Must match the regex /^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/''"]*$/. Kolom value harus memiliki minimal 3 karakter. Kolom value tidak boleh lebih dari 255 karakter.'
+        required: true
+        example: 'Mulus 100% dan Berfungsi Normal'
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      color:
+        custom: []
+        name: color
+        description: 'Warna dominan barang (opsional). Must match the regex /^[a-zA-Z][a-zA-Z\s\-]*$/. Kolom value tidak boleh lebih dari 50 karakter.'
+        required: false
+        example: Hitam
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
       type:
         custom: []
         name: type
-        description: ''
+        description: 'Tipe klasifikasi barang (asset: aset tetap, sale: barang habis pakai/dijual).'
         required: true
         example: asset
         type: string
@@ -139,24 +193,35 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'Harga satuan barang dalam Rupiah. Wajib diisi jika type adalah sale. This field is required when <code>type</code> is <code>sale</code>. Kolom value harus minimal 0.'
+        required: false
+        example: 15500000.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
       stock:
         custom: []
         name: stock
-        description: 'Kolom value harus minimal 0.'
+        description: 'Jumlah kuantitas stok saat ini. Kolom value harus minimal 0.'
         required: true
-        example: 45
+        example: 10
         type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      price:
+      minimum_stock:
         custom: []
-        name: price
-        description: 'Kolom value harus minimal 0.'
+        name: minimum_stock
+        description: 'Batas minimum peringatan stok (opsional). Kolom value harus minimal 0.'
         required: false
-        example: 56
-        type: number
+        example: 2
+        type: integer
         enumValues: []
         exampleWasSpecified: false
         nullable: true
@@ -164,53 +229,9 @@ endpoints:
       unit:
         custom: []
         name: unit
-        description: ''
+        description: 'Satuan hitung barang (opsional). Must match the regex /^[a-zA-Z0-9\s]*$/. Kolom value tidak boleh lebih dari 50 karakter.'
         required: false
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      minimum_stock:
-        custom: []
-        name: minimum_stock
-        description: 'Kolom value harus minimal 0.'
-        required: false
-        example: 45
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The <code>id</code> of an existing record in the categories table.'
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      condition:
-        custom: []
-        name: condition
-        description: ''
-        required: true
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      age:
-        custom: []
-        name: age
-        description: 'Kolom value tidak boleh lebih dari 50 karakter.'
-        required: false
-        example: mqeopfuudtdsufvyvddqa
+        example: Unit
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -219,9 +240,9 @@ endpoints:
       status:
         custom: []
         name: status
-        description: ''
+        description: 'Status ketersediaan barang di sistem.'
         required: true
-        example: nonaktif
+        example: aktif
         type: string
         enumValues:
           - aktif
@@ -229,28 +250,53 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      image:
+        custom: []
+        name: image
+        description: 'File foto barang (jpeg, png, jpg, webp). Must be a file. Kolom value harus berupa file gambar.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      existing_image:
+        custom: []
+        name: existing_image
+        description: ''
+        required: false
+        example: consequatur
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
     cleanBodyParameters:
-      part_number: consequatur
-      name: consequatur
-      brand_id: consequatur
-      location_id: consequatur
+      name: 'Laptop Lenovo ThinkPad T14'
+      part_number: LNV-T14-2023
+      brand_id: 1
+      category_id: 2
+      location_id: 3
+      age: Baru
+      condition: 'Mulus 100% dan Berfungsi Normal'
+      color: Hitam
       type: asset
-      stock: 45
-      price: 56
-      unit: consequatur
-      minimum_stock: 45
-      category_id: consequatur
-      condition: consequatur
-      age: mqeopfuudtdsufvyvddqa
-      status: nonaktif
-    fileParameters: []
+      price: 15500000.0
+      stock: 10
+      minimum_stock: 2
+      unit: Unit
+      status: aktif
+      existing_image: consequatur
+    fileParameters:
+      image: null
     responses:
       -
         custom: []
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -259,6 +305,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -273,13 +321,15 @@ endpoints:
     custom: []
     httpMethods:
       - GET
-    uri: 'api/v1/inventory/{id}'
+    uri: 'api/v1/inventory/{uuid}'
     metadata:
       custom: []
-      groupName: 'Inventory Management'
+      groupName: 'Manajemen Inventaris'
       groupDescription: |-
 
-        API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+        Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+        Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
       subgroup: ''
       subgroupDescription: ''
       title: 'Mendapatkan detail satu barang inventaris.'
@@ -291,19 +341,31 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      id:
+      uuid:
         custom: []
-        name: id
-        description: 'The ID of the inventory.'
+        name: uuid
+        description: ''
         required: true
-        example: consequatur
+        example: 019fb1c3-fa05-70ad-992f-586203643141
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      inventory:
+        custom: []
+        name: inventory
+        description: 'UUID dari barang inventaris.'
+        required: true
+        example: 9a5f3b...
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
-      id: consequatur
+      uuid: 019fb1c3-fa05-70ad-992f-586203643141
+      inventory: 9a5f3b...
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -315,7 +377,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -324,6 +386,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -339,13 +403,15 @@ endpoints:
     httpMethods:
       - PUT
       - PATCH
-    uri: 'api/v1/inventory/{id}'
+    uri: 'api/v1/inventory/{uuid}'
     metadata:
       custom: []
-      groupName: 'Inventory Management'
+      groupName: 'Manajemen Inventaris'
       groupDescription: |-
 
-        API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+        Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+        Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
       subgroup: ''
       subgroupDescription: ''
       title: 'Memperbarui barang inventaris.'
@@ -354,42 +420,54 @@ endpoints:
       deprecated: false
     headers:
       Authorization: 'Bearer {YOUR_AUTH_KEY}'
-      Content-Type: application/json
+      Content-Type: multipart/form-data
       Accept: application/json
     urlParameters:
-      id:
+      uuid:
         custom: []
-        name: id
-        description: 'The ID of the inventory.'
+        name: uuid
+        description: ''
         required: true
-        example: consequatur
+        example: 019fb1c3-fa05-70ad-992f-586203643141
         type: string
         enumValues: []
         exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      inventory:
+        custom: []
+        name: inventory
+        description: 'UUID dari barang inventaris yang akan diupdate.'
+        required: true
+        example: 9a5f3b...
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
     cleanUrlParameters:
-      id: consequatur
+      uuid: 019fb1c3-fa05-70ad-992f-586203643141
+      inventory: 9a5f3b...
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters:
-      part_number:
+      name:
         custom: []
-        name: part_number
-        description: ''
-        required: false
-        example: null
+        name: name
+        description: 'Nama lengkap barang inventaris yang ingin diubah. Must match the regex /^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/''"]*$/. Kolom value harus memiliki minimal 3 karakter. Kolom value tidak boleh lebih dari 255 karakter.'
+        required: true
+        example: 'Laptop Lenovo ThinkPad T14 Gen 3'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      name:
+      part_number:
         custom: []
-        name: name
-        description: ''
-        required: false
-        example: consequatur
+        name: part_number
+        description: 'Nomor unik, kode seri, atau part number barang. Must match the regex /^[a-zA-Z0-9][a-zA-Z0-9\-\_\/]*$/. Kolom value harus memiliki minimal 3 karakter. Kolom value tidak boleh lebih dari 255 karakter.'
+        required: true
+        example: LNV-T14-2023-V2
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -398,9 +476,20 @@ endpoints:
       brand_id:
         custom: []
         name: brand_id
-        description: 'The <code>id</code> of an existing record in the brands table.'
-        required: false
-        example: null
+        description: 'ID unik dari merk barang yang sudah ada di database. The <code>id</code> of an existing record in the brands table.'
+        required: true
+        example: 1
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      category_id:
+        custom: []
+        name: category_id
+        description: 'ID unik dari kategori barang yang sudah ada di database. The <code>id</code> of an existing record in the categories table.'
+        required: true
+        example: 2
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -409,77 +498,9 @@ endpoints:
       location_id:
         custom: []
         name: location_id
-        description: 'The <code>id</code> of an existing record in the locations table.'
-        required: false
-        example: null
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      type:
-        custom: []
-        name: type
-        description: ''
-        required: false
-        example: asset
-        type: string
-        enumValues:
-          - sale
-          - asset
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      stock:
-        custom: []
-        name: stock
-        description: 'Kolom value harus minimal 0.'
-        required: false
-        example: 45
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: false
-        deprecated: false
-      price:
-        custom: []
-        name: price
-        description: 'Kolom value harus minimal 0.'
-        required: false
-        example: 56
-        type: number
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      unit:
-        custom: []
-        name: unit
-        description: ''
-        required: false
-        example: consequatur
-        type: string
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      minimum_stock:
-        custom: []
-        name: minimum_stock
-        description: 'Kolom value harus minimal 0.'
-        required: false
-        example: 45
-        type: integer
-        enumValues: []
-        exampleWasSpecified: false
-        nullable: true
-        deprecated: false
-      category_id:
-        custom: []
-        name: category_id
-        description: 'The <code>id</code> of an existing record in the categories table.'
-        required: false
-        example: null
+        description: 'ID unik dari lokasi penyimpanan yang sudah ada di database. The <code>id</code> of an existing record in the locations table.'
+        required: true
+        example: 3
         type: string
         enumValues: []
         exampleWasSpecified: false
@@ -488,30 +509,87 @@ endpoints:
       condition:
         custom: []
         name: condition
-        description: ''
-        required: false
-        example: consequatur
+        description: 'Kondisi fisik dan fungsional barang saat ini. Must match the regex /^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/''"]*$/. Kolom value harus memiliki minimal 3 karakter. Kolom value tidak boleh lebih dari 255 karakter.'
+        required: true
+        example: 'Layar ada baret sedikit, fungsi normal'
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
-      age:
+      color:
         custom: []
-        name: age
-        description: 'Kolom value tidak boleh lebih dari 50 karakter.'
+        name: color
+        description: 'Warna dominan barang. Must match the regex /^[a-zA-Z][a-zA-Z\s\-]*$/. Kolom value tidak boleh lebih dari 50 karakter.'
         required: false
-        example: mqeopfuudtdsufvyvddqa
+        example: Silver
         type: string
         enumValues: []
         exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      type:
+        custom: []
+        name: type
+        description: 'Tipe klasifikasi barang (asset atau sale).'
+        required: true
+        example: asset
+        type: string
+        enumValues:
+          - sale
+          - asset
+        exampleWasSpecified: false
         nullable: false
+        deprecated: false
+      price:
+        custom: []
+        name: price
+        description: 'Harga satuan barang dalam Rupiah. Wajib diisi jika type adalah sale. This field is required when <code>type</code> is <code>sale</code>. Kolom value harus minimal 0.'
+        required: false
+        example: 14000000.0
+        type: number
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      stock:
+        custom: []
+        name: stock
+        description: 'Jumlah kuantitas stok barang. Kolom value harus minimal 0.'
+        required: true
+        example: 8
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      minimum_stock:
+        custom: []
+        name: minimum_stock
+        description: 'Batas minimum peringatan stok. Kolom value harus minimal 0.'
+        required: false
+        example: 2
+        type: integer
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      unit:
+        custom: []
+        name: unit
+        description: 'Satuan hitung barang. Must match the regex /^[a-zA-Z0-9\s]*$/. Kolom value tidak boleh lebih dari 50 karakter.'
+        required: false
+        example: Unit
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
         deprecated: false
       status:
         custom: []
         name: status
-        description: ''
-        required: false
+        description: 'Status ketersediaan barang.'
+        required: true
         example: aktif
         type: string
         enumValues:
@@ -520,24 +598,66 @@ endpoints:
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      image:
+        custom: []
+        name: image
+        description: 'File foto barang (jpeg, png, jpg, webp) jika ingin mengganti gambar. Must be a file. Kolom value harus berupa file gambar.'
+        required: false
+        example: null
+        type: file
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      existing_image:
+        custom: []
+        name: existing_image
+        description: 'Nama file gambar saat ini, kirim kosong (null/empty) jika gambar dihapus oleh user.'
+        required: false
+        example: laptop_lenovo.jpg
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: true
+        deprecated: false
+      age:
+        custom: []
+        name: age
+        description: 'Status pemakaian barang.'
+        required: true
+        example: 'Pernah Dipakai (Bekas)'
+        type: string
+        enumValues:
+          - Baru
+          - 'Pernah Dipakai (Bekas)'
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
-      name: consequatur
+      name: 'Laptop Lenovo ThinkPad T14 Gen 3'
+      part_number: LNV-T14-2023-V2
+      brand_id: 1
+      category_id: 2
+      location_id: 3
+      condition: 'Layar ada baret sedikit, fungsi normal'
+      color: Silver
       type: asset
-      stock: 45
-      price: 56
-      unit: consequatur
-      minimum_stock: 45
-      condition: consequatur
-      age: mqeopfuudtdsufvyvddqa
+      price: 14000000.0
+      stock: 8
+      minimum_stock: 2
+      unit: Unit
       status: aktif
-    fileParameters: []
+      existing_image: laptop_lenovo.jpg
+      age: 'Pernah Dipakai (Bekas)'
+    fileParameters:
+      image: null
     responses:
       -
         custom: []
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -546,6 +666,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -560,13 +682,15 @@ endpoints:
     custom: []
     httpMethods:
       - DELETE
-    uri: 'api/v1/inventory/{id}'
+    uri: 'api/v1/inventory/{uuid}'
     metadata:
       custom: []
-      groupName: 'Inventory Management'
+      groupName: 'Manajemen Inventaris'
       groupDescription: |-
 
-        API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+        Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+        Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
       subgroup: ''
       subgroupDescription: ''
       title: 'Menghapus barang inventaris.'
@@ -578,19 +702,31 @@ endpoints:
       Content-Type: application/json
       Accept: application/json
     urlParameters:
-      id:
+      uuid:
         custom: []
-        name: id
-        description: 'The ID of the inventory.'
+        name: uuid
+        description: ''
         required: true
-        example: consequatur
+        example: 019fb1c3-fa05-70ad-992f-586203643141
         type: string
         enumValues: []
         exampleWasSpecified: false
         nullable: false
         deprecated: false
+      inventory:
+        custom: []
+        name: inventory
+        description: 'UUID dari barang inventaris.'
+        required: true
+        example: 9a5f3b...
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanUrlParameters:
-      id: consequatur
+      uuid: 019fb1c3-fa05-70ad-992f-586203643141
+      inventory: 9a5f3b...
     queryParameters: []
     cleanQueryParameters: []
     bodyParameters: []
@@ -602,7 +738,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -611,6 +747,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -628,10 +766,12 @@ endpoints:
     uri: 'api/v1/inventory/{id}/logs'
     metadata:
       custom: []
-      groupName: 'Inventory Management'
+      groupName: 'Manajemen Inventaris'
       groupDescription: |-
 
-        API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+        Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+        Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
       subgroup: ''
       subgroupDescription: ''
       title: 'Mendapatkan riwayat mutasi stok untuk barang tertentu.'
@@ -667,7 +807,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -676,6 +816,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []
@@ -693,10 +835,12 @@ endpoints:
     uri: 'api/v1/inventory/{id}/adjust-stock'
     metadata:
       custom: []
-      groupName: 'Inventory Management'
+      groupName: 'Manajemen Inventaris'
       groupDescription: |-
 
-        API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+        Ini adalah fungsi inti aplikasi untuk mengelola barang.
+
+        Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
       subgroup: ''
       subgroupDescription: ''
       title: 'Menyesuaikan stok (tambah/kurang) untuk penjualan atau pasokan.'
@@ -729,7 +873,7 @@ endpoints:
         name: type
         description: ''
         required: true
-        example: decrement
+        example: increment
         type: string
         enumValues:
           - increment
@@ -740,12 +884,12 @@ endpoints:
       quantity:
         custom: []
         name: quantity
-        description: 'Kolom value harus minimal 1.'
+        description: 'Jumlah penyesuaian stok (bisa minus).'
         required: true
-        example: 73
+        example: 5
         type: integer
         enumValues: []
-        exampleWasSpecified: false
+        exampleWasSpecified: true
         nullable: false
         deprecated: false
       description:
@@ -759,10 +903,22 @@ endpoints:
         exampleWasSpecified: false
         nullable: true
         deprecated: false
+      notes:
+        custom: []
+        name: notes
+        description: 'Alasan penyesuaian stok.'
+        required: true
+        example: 'Penambahan stok baru'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
     cleanBodyParameters:
-      type: decrement
-      quantity: 73
+      type: increment
+      quantity: 5
       description: 'Dolores dolorum amet iste laborum eius est dolor.'
+      notes: 'Penambahan stok baru'
     fileParameters: []
     responses:
       -
@@ -770,7 +926,7 @@ endpoints:
         status: 401
         content: '{"message":"Unauthenticated."}'
         headers:
-          cache-control: 'no-cache, private'
+          cache-control: 'max-age=0, must-revalidate, no-cache, no-store, private'
           content-type: application/json
           x-frame-options: DENY
           x-content-type-options: nosniff
@@ -779,6 +935,8 @@ endpoints:
           permissions-policy: unload=(self)
           strict-transport-security: 'max-age=31536000; includeSubDomains'
           content-security-policy: "default-src 'self' http://127.0.0.1:5173 ws://127.0.0.1:5173; worker-src 'self' blob: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com http://127.0.0.1:5173 ws://127.0.0.1:5173; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: storage: https://cdnjs.cloudflare.com; connect-src 'self' data: blob: https://unpkg.com https://cdn.jsdelivr.net wss://ws-ap1.pusher.com https://sockjs-ap1.pusher.com https://stats.pusher.com https://*.whatsapp.com http://127.0.0.1:5173 ws://127.0.0.1:5173;"
+          pragma: no-cache
+          expires: '0'
           access-control-allow-origin: '*'
         description: null
     responseFields: []

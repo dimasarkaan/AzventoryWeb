@@ -21,7 +21,7 @@ class ApiSistemTest extends TestCase
     #[Test]
     public function stats_mengembalikan_data_ringkasan_sistem()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         Sparepart::factory()->count(5)->create();
 
         $this->getJson('/api/v1/stats')
@@ -40,7 +40,7 @@ class ApiSistemTest extends TestCase
     public function me_mengembalikan_profil_user_login()
     {
         $user = $this->makeUser('operator');
-        Sanctum::actingAs($user);
+        Sanctum::actingAs($user, ['*']);
 
         $this->getJson('/api/v1/me')
             ->assertStatus(200)
@@ -56,18 +56,18 @@ class ApiSistemTest extends TestCase
     public function activity_logs_hanya_bisa_diakses_superadmin()
     {
         // Fail as operator
-        Sanctum::actingAs($this->makeUser('operator'));
+        Sanctum::actingAs($this->makeUser('operator'), ['*']);
         $this->getJson('/api/v1/activity-logs')->assertStatus(403);
 
         // Success as superadmin
-        Sanctum::actingAs($this->makeUser('superadmin'));
+        Sanctum::actingAs($this->makeUser('superadmin'), ['*']);
         $this->getJson('/api/v1/activity-logs')->assertStatus(200);
     }
 
     #[Test]
     public function notifications_berhasil_diakses()
     {
-        Sanctum::actingAs($this->makeUser());
+        Sanctum::actingAs($this->makeUser(), ['*']);
         $this->getJson('/api/v1/notifications')->assertStatus(200);
     }
 }

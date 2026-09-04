@@ -53,7 +53,7 @@ class ReportService
             $query = StockLog::with([
                 'sparepart' => fn ($q) => $q->withTrashed(),
                 'sparepart.brand', 'sparepart.category', 'sparepart.location',
-                'user' => fn ($q) => $q->withTrashed()
+                'user' => fn ($q) => $q->withTrashed(),
             ])->where('status', 'approved');
             $this->applyDateRange($query, 'created_at', $startDate, $endDate);
 
@@ -73,7 +73,7 @@ class ReportService
                 'sparepart' => fn ($q) => $q->withTrashed(),
                 'sparepart.brand', 'sparepart.category', 'sparepart.location',
                 'user' => fn ($q) => $q->withTrashed(),
-                'returns'
+                'returns',
             ])->withSum('returns', 'quantity');
             $this->applyDateRange($query, 'borrowed_at', $startDate, $endDate);
 

@@ -38,6 +38,7 @@ class TesKontrollerTokenApiTest extends TestCase
         $response = $this->actingAs($this->superadmin)
             ->post(route('profile.api-tokens.store'), [
                 'token_name' => 'Token Integrasi HR',
+                'abilities' => ['inventory:read'],
             ]);
 
         $response->assertRedirect()
@@ -65,6 +66,7 @@ class TesKontrollerTokenApiTest extends TestCase
         $response = $this->actingAs($this->superadmin)
             ->post(route('profile.api-tokens.store'), [
                 'token_name' => '',
+                'abilities' => ['inventory:read'],
             ]);
 
         $response->assertSessionHasErrors('token_name');
@@ -99,19 +101,19 @@ class TesKontrollerTokenApiTest extends TestCase
     }
 
     #[Test]
-    public function superadmin_tidak_bisa_mencabut_token_milik_user_lain()
+    public function superadmin_dapat_mencabut_token_milik_user_lain()
     {
         // Buat token untuk superadmin lain
         $otherSuperadmin = User::factory()->create(['role' => UserRole::SUPERADMIN]);
         $otherSuperadmin->createToken('Token Orang Lain');
         $tokenId = $otherSuperadmin->tokens()->first()->id;
 
-        // Coba hapus dari superadmin pertama
+        // Superadmin pertama dapat mencabut token siapapun
         $this->actingAs($this->superadmin)
             ->delete(route('profile.api-tokens.destroy', $tokenId));
 
-        // Token orang lain harus tetap ada
-        $this->assertEquals(1, $otherSuperadmin->tokens()->count());
+        // Token orang lain harus berhasil terhapus
+        $this->assertEquals(0, $otherSuperadmin->tokens()->count());
     }
 
     #[Test]

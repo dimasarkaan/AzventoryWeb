@@ -20,6 +20,7 @@ class EnsureUserIsActive
                 if (method_exists($request->user(), 'currentAccessToken') && $request->user()->currentAccessToken()) {
                     $request->user()->currentAccessToken()->delete();
                 }
+
                 return response()->json(['message' => 'Akun Anda telah dinonaktifkan oleh Administrator.'], 403);
             }
 

@@ -12,24 +12,25 @@ class OperatorDashboardController extends Controller
     public function index()
     {
         $userId = auth()->id();
-        
+
         // Mengambil penanda waktu kapan sistem terakhir kali di-update (dari memori Cache)
         $lastUpdate = \Illuminate\Support\Facades\Cache::get('inventory_last_updated', now()->timestamp);
-        
+
         // Mengambil dan memvalidasi periode tren untuk mencegah serangan Cache Exhaustion (DoS)
         $allowedPeriods = ['7_days', '30_days', '6_months', '1_year'];
         $trendPeriod = request('trend_period');
         $validTrendPeriod = in_array($trendPeriod, $allowedPeriods) ? $trendPeriod : '6_months';
-        
+
         // Membuat kunci memori (Cache Key) yang spesifik untuk user ini dan grafik periode yang dipilihnya
         // Supaya dashboard super cepat saat direfresh tanpa membebani database
         $cacheKey = "operator_dashboard_{$userId}_{$lastUpdate}_{$validTrendPeriod}";
 
         /** @return array<string, mixed> */
         $data = \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($userId, $validTrendPeriod): array {
-            
+
             // --- Menarik maksimal 3 barang teratas yang sedang dipinjam oleh user ini ---
             $activeBorrowingsList = \App\Models\Borrowing::with(['sparepart'])
+                ->withSum('returns', 'quantity')
                 ->where('user_id', $userId)
                 ->whereIn('status', ['borrowed', 'overdue'])
                 ->latest('borrowed_at') // Urutkan dari barang yang paling baru dipinjam
@@ -116,7 +117,7 @@ class OperatorDashboardController extends Controller
 
             // Menentukan panjang grafik yang diinginkan (menggunakan nilai yang sudah divalidasi)
             $trendPeriod = $validTrendPeriod;
-            
+
             // Pengaturan interval tanggal/bulan
             $trendConfigs = [
                 '7_days' => ['count' => 7, 'unit' => 'days', 'format' => 'Y-m-d', 'label' => 'd M', 'groupBy' => 'day'],
@@ -173,10 +174,10 @@ class OperatorDashboardController extends Controller
                 ->first();
 
             $totalEvaluated = $stats->total;
-            
+
             // Total poin dosa (jumlah telat mengembalikan + yang sekarang masih dipinjam tapi sudah lewat jatuh tempo)
             $totalLate = $stats->returned_late + $stats->active_overdue;
-            
+
             // Jika user belum pernah meminjam sama sekali, kita beri modal angka 100 langsung.
             $trustScore = $totalEvaluated > 0 ? round((($totalEvaluated - $totalLate) / $totalEvaluated) * 100) : 100;
 

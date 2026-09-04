@@ -11,9 +11,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * @group Peminjaman (Borrowing)
+ * @group Peminjaman Barang
  *
- * API endpoints untuk alur peminjaman, persetujuan, dan pengembalian inventaris.
+ * Bagian ini digunakan untuk mencatat peminjaman barang inventaris.
+ *
+ * API ini melacak siapa yang meminjam, kapan barang harus dikembalikan, dan bagaimana kondisi barang saat dikembalikan.
  */
 class BorrowingController extends Controller
 {
@@ -49,35 +51,18 @@ class BorrowingController extends Controller
 
     /**
      * Mencatat peminjaman baru via API.
+     *
+     * @urlParam sparepart string required UUID dari barang inventaris. Example: 9a5f3b...
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Inventory\Borrowing\StoreBorrowingRequest $request, Sparepart $sparepart)
     {
-        $validated = $request->validate([
-            'sparepart_id' => 'required|exists:spareparts,id',
-            'quantity' => 'required|integer|min:1',
-            'borrower_name' => 'required|string', // Untuk catatan tambahan
-            'expected_return_at' => 'required|date|after:now',
-            'notes' => 'nullable|string',
-        ]);
-
-        $sparepart = Sparepart::findOrFail($validated['sparepart_id']);
-
         // Cek otorisasi
         if (Gate::denies('create', Borrowing::class)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
         try {
-            // Kita pakai data dari request untuk memenuhi parameter service
-            $serviceData = [
-                'borrower_name' => $validated['borrower_name'],
-                'quantity' => $validated['quantity'],
-                'expected_return_at' => $validated['expected_return_at'],
-                'notes' => $validated['notes'] ?? '',
-                'user_id' => $request->user()->id,
-            ];
-
-            $borrowing = $this->inventoryService->createBorrowing($sparepart, $serviceData);
+            $borrowing = $this->inventoryService->createBorrowing($sparepart, $request->validated());
 
             return response()->json([
                 'status' => 'success',
@@ -94,10 +79,12 @@ class BorrowingController extends Controller
 
     /**
      * Detail peminjaman.
+     *
+     * @urlParam borrowing string required UUID dari data peminjaman. Example: 7b3e1c...
      */
     public function show($id)
     {
-        $borrowing = Borrowing::with(['user', 'sparepart', 'returns'])->find($id);
+        $borrowing = Borrowing::with(['user', 'sparepart', 'returns'])->where('uuid', $id)->first();
 
         if (! $borrowing) {
             return response()->json(['message' => 'Data peminjaman tidak ditemukan'], 404);
@@ -111,22 +98,14 @@ class BorrowingController extends Controller
 
     /**
      * Pengembalian barang via API.
+     *
+     * @urlParam borrowing string required UUID dari data peminjaman yang akan dikembalikan. Example: 7b3e1c...
      */
-    public function returnItem(Request $request, $id)
+    public function returnItem(\App\Http\Requests\Inventory\Borrowing\ReturnBorrowingRequest $request, Borrowing $borrowing)
     {
-        $borrowing = Borrowing::findOrFail($id);
-
         if (Gate::denies('update', $borrowing)) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:1|max:'.$borrowing->quantity,
-            'condition' => 'required|string',
-            'notes' => 'nullable|string',
-            // Photos handling via API might be tricky depending on client,
-            // but we'll support base64 or file if provided.
-        ]);
 
         try {
             $returnPhotos = [];
@@ -137,14 +116,7 @@ class BorrowingController extends Controller
                 }
             }
 
-            // Map API keys to Service keys
-            $serviceData = [
-                'return_quantity' => $validated['quantity'],
-                'return_condition' => $validated['condition'],
-                'return_notes' => $validated['notes'] ?? '',
-            ];
-
-            $this->inventoryService->returnBorrowing($borrowing, $serviceData, $returnPhotos);
+            $this->inventoryService->returnBorrowing($borrowing, $request->validated(), $returnPhotos);
 
             return response()->json([
                 'status' => 'success',
@@ -152,6 +124,13 @@ class BorrowingController extends Controller
                 'data' => $borrowing->fresh(['sparepart', 'returns']),
             ]);
         } catch (\Exception $e) {
+            // Hapus file foto yang terlanjur terupload jika gagal
+            foreach ($returnPhotos as $photoPath) {
+                if (\Illuminate\Support\Facades\Storage::disk('public')->exists($photoPath)) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($photoPath);
+                }
+            }
+
             return response()->json([
                 'status' => 'error',
                 'message' => $e->getMessage(),

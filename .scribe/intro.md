@@ -1,13 +1,17 @@
 # Introduction
 
-
+Dokumentasi resmi API Azventory
 
 <aside>
     <strong>Base URL</strong>: <code>http://127.0.0.1:8000</code>
 </aside>
 
-    This documentation aims to provide all the information you need to work with our API.
+Selamat datang di Dokumentasi API **Azventory**.
 
-    <aside>As you scroll, you'll see code examples for working with the API in different programming languages in the dark area to the right (or as part of the content on mobile).
-    You can switch the language used with the tabs at the top right (or from the nav menu at the top left on mobile).</aside>
+Halaman ini berisi panduan untuk menggunakan API Azventory. Anda dapat menggunakan API ini untuk mengintegrasikan sistem inventaris dengan aplikasi lain (misalnya aplikasi web, kasir, atau seluler).
+
+Di dokumentasi ini, Anda akan menemukan daftar URL (*endpoint*) yang tersedia, data apa saja yang perlu dikirim (*parameter*), serta contoh balasan (*response*) dari sistem kami.
+
+**Autentikasi (Token)**  
+Sebagian besar fungsi API ini memerlukan proses login. Pastikan Anda menyertakan *header* `Authorization: Bearer {token}` di setiap permintaan (*request*) yang dikirimkan.
 

@@ -2,6 +2,7 @@
 
 // Controller khusus untuk mengelola data dan aktivitas akun Pengguna (User).
 // Mulai dari pembuatan akun baru, edit profil, reset password, sampai penghapusan akun.
+
 namespace App\Http\Controllers\Users;
 
 use App\Http\Controllers\Controller;
@@ -20,7 +21,7 @@ class UserController extends Controller
     {
         // Memastikan pengguna memiliki hak akses untuk melihat daftar akun
         $this->authorize('viewAny', User::class);
-        
+
         // Memulai query ke tabel users
         $query = User::query();
 
@@ -73,17 +74,17 @@ class UserController extends Controller
     {
         // Memastikan pengguna memiliki izin untuk menambahkan data pengguna baru
         $this->authorize('create', User::class);
-        
+
         // Membuat username sementara dengan format: bagian depan email + angka acak
         $username = explode('@', $request->email)[0].rand(100, 999);
-        
+
         // Memastikan username tersebut unik dan belum ada di database (termasuk di tong sampah)
         while (User::withTrashed()->where('username', $username)->exists()) {
             $username = explode('@', $request->email)[0].rand(100, 999);
         }
 
         // Menyiapkan password default untuk pengguna yang baru dibuat
-        $password = 'password123'; 
+        $password = 'password123';
 
         // Memasukkan data pengguna baru ke dalam database
         $user = User::create([
@@ -110,7 +111,7 @@ class UserController extends Controller
     {
         // Memastikan pengguna memiliki izin untuk melihat detail pengguna lain
         $this->authorize('view', $user);
-        
+
         // Memuat relasi data peminjaman beserta detail barang yang dipinjam oleh user tersebut
         $user->load(['borrowings.sparepart']);
 
@@ -183,7 +184,7 @@ class UserController extends Controller
 
         // Mendefinisikan password default untuk fitur reset password
         $defaultPassword = 'password123';
-        
+
         // Memperbarui data password dengan nilai yang dienkripsi
         $user->update([
             'password' => \Illuminate\Support\Facades\Hash::make($defaultPassword),
@@ -207,7 +208,7 @@ class UserController extends Controller
     {
         // Mengecek izin pengguna untuk melakukan soft delete data akun
         $this->authorize('delete', $user);
-        
+
         // Validasi agar pengguna tidak bisa menghapus akun yang sedang digunakannya sendiri
         if (auth()->id() === $user->id) {
             return back()->with('error', __('messages.cannot_delete_self'));
@@ -234,10 +235,10 @@ class UserController extends Controller
     {
         // Mencari data pengguna yang sudah di-soft delete berdasarkan UUID
         $user = User::withTrashed()->where('uuid', $id)->firstOrFail();
-        
+
         // Memastikan pengguna yang login memiliki izin untuk memulihkan data
         $this->authorize('restore', $user);
-        
+
         // Memulihkan data akun agar aktif dan dapat digunakan kembali
         $user->restore();
 
@@ -254,7 +255,7 @@ class UserController extends Controller
     {
         // Mengambil data pengguna dari tempat sampah (soft deleted data) berdasarkan UUID
         $user = User::withTrashed()->where('uuid', $id)->firstOrFail();
-        
+
         // Memeriksa izin pengguna untuk melakukan penghapusan data secara permanen
         $this->authorize('forceDelete', $user);
 
@@ -289,7 +290,7 @@ class UserController extends Controller
     {
         // Memastikan bahwa pengguna memiliki hak akses untuk memulihkan data massal
         $this->authorize('restore', User::class);
-        
+
         // Memvalidasi request agar data 'ids' wajib ada dan harus berbentuk array
         $request->validate([
             'ids' => 'required|array',
@@ -314,7 +315,7 @@ class UserController extends Controller
 
         // Mencatat aktivitas pemulihan massal ke dalam log sistem
         $this->logActivity('Bulk Restore User', __('messages.log_bulk_user_restored', ['count' => $count]), [
-            'names' => ['old' => '-', 'new' => $namesList]
+            'names' => ['old' => '-', 'new' => $namesList],
         ]);
 
         // Kembali ke halaman sebelumnya dengan pesan jumlah data yang berhasil dipulihkan
@@ -326,14 +327,14 @@ class UserController extends Controller
     {
         // Memeriksa hak akses untuk melakukan penghapusan data massal secara permanen
         $this->authorize('forceDelete', User::class);
-        
+
         // Memastikan kumpulan ID pengguna wajib ada dan valid sebagai array
         $request->validate([
             'ids' => 'required|array',
         ]);
 
         $ids = $request->ids;
-        
+
         // Mengambil data dari keranjang sampah yang cocok dengan kumpulan ID
         $users = User::onlyTrashed()->whereIn('id', $ids)->get();
 
@@ -344,12 +345,12 @@ class UserController extends Controller
 
         $count = 0;
         $skipped = 0;
-        
+
         $names = [];
         // Memproses satu per satu data pengguna yang akan dihapus permanen
         foreach ($users as $user) {
             /** @var \App\Models\User $user */
-            
+
             // Melewati proses hapus jika pengguna tersebut adalah diri sendiri
             if ($user->id === auth()->id()) {
                 continue;
@@ -358,6 +359,7 @@ class UserController extends Controller
             // Melewati proses hapus jika pengguna masih memiliki barang pinjaman yang belum selesai
             if ($user->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
                 $skipped++;
+
                 continue;
             }
 
@@ -365,7 +367,7 @@ class UserController extends Controller
             if ($user->avatar) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
             }
-            
+
             $names[] = $user->name;
             // Menghapus data akun dari database selamanya
             $user->forceDelete();
@@ -376,7 +378,7 @@ class UserController extends Controller
 
         // Mencatat jumlah pengguna yang berhasil dihapus ke dalam log
         $this->logActivity('Bulk Force Delete User', __('messages.log_bulk_user_deleted_force', ['count' => $count]), [
-            'names' => ['old' => $namesList, 'new' => '-']
+            'names' => ['old' => $namesList, 'new' => '-'],
         ]);
 
         // Menyusun pesan keberhasilan beserta informasi jika ada akun yang gagal dihapus (dilewati)

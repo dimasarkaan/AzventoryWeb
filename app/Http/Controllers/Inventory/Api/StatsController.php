@@ -7,9 +7,11 @@ use App\Services\DashboardService;
 use Illuminate\Http\Request;
 
 /**
- * @group System Reports
+ * @group Laporan & Aktivitas
  *
- * API endpoints untuk mengambil ringkasan metrik statistik aplikasi.
+ * Modul ini mencatat riwayat penggunaan aplikasi.
+ *
+ * Anda bisa melihat log aktivitas pengguna (siapa yang mengubah data, kapan, dan apa yang diubah) serta mengambil ringkasan statistik seperti total barang dan stok yang menipis.
  */
 class StatsController extends Controller
 {

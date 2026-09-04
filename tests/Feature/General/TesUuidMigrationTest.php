@@ -38,36 +38,36 @@ class TesUuidMigrationTest extends TestCase
     public function helper_route_menggunakan_uuid_untuk_sparepart()
     {
         $sparepart = Sparepart::factory()->create();
-        
+
         $url = route('inventory.show', $sparepart);
-        
+
         $this->assertStringContainsString($sparepart->uuid, $url);
-        $this->assertStringNotContainsString('/inventory/' . $sparepart->id, $url);
+        $this->assertStringEndsWith($sparepart->uuid, $url);
     }
 
     #[Test]
     public function helper_route_menggunakan_uuid_untuk_user()
     {
         $user = User::factory()->create();
-        
+
         $url = route('users.show', $user);
-        
+
         $this->assertStringContainsString($user->uuid, $url);
-        $this->assertStringNotContainsString('/users/' . $user->id, $url);
+        $this->assertStringEndsWith($user->uuid, $url);
     }
 
     #[Test]
     public function qrcode_service_menghasilkan_url_dengan_uuid()
     {
         $sparepart = Sparepart::factory()->create();
-        $service = new QrCodeService();
-        
+        $service = new QrCodeService;
+
         // Generate label SVG
         $svg = $service->generateLabelSvg($sparepart);
-        
-        // The QR code SVG payload is base64 encoded or path based, but the renderer 
-        // will process the route string which we can verify implicitly because 
-        // it uses route('inventory.show', $inventory). 
+
+        // The QR code SVG payload is base64 encoded or path based, but the renderer
+        // will process the route string which we can verify implicitly because
+        // it uses route('inventory.show', $inventory).
         // But let's verify the direct string output of route helper first.
         $this->assertStringContainsString('<svg', $svg, 'The SVG should be generated successfully.');
         $this->assertStringContainsString('<path class="qr', $svg, 'The SVG should contain QR paths.');

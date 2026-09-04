@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
 		"name": "Azventory API v1.5 (FINAL)",
-		"description": "Koleksi API Azventory v1.5 - Edisi Mega CRUD (Lengkap 100% untuk Inventaris, Master Data, User, Peminjaman, dll).",
+		"description": "Koleksi API Azventory v1.5 - Edisi Mega CRUD. \n\nSemua response API mengembalikan header `X-API-Version: 1.5`.\nStandar response berbentuk JSON: `{ status: \"...\", message: \"...\", data: {...} }`.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -101,10 +101,13 @@
 			"name": "System, Profile & Notifications",
 			"item": [
 				{ "name": "Get My Profile", "request": { "method": "GET", "url": "{{base_url}}/me" } },
+				{ "name": "Update Profile", "request": { "method": "PUT", "body": { "mode": "raw", "raw": "{\"name\": \"API Client Updated\", \"phone\": \"08123456789\"}", "options": { "raw": { "language": "json" } } }, "url": "{{base_url}}/me" } },
 				{ "name": "Get Stats Summary", "request": { "method": "GET", "url": "{{base_url}}/stats" } },
-				{ "name": "Get Activity Logs", "request": { "method": "GET", "url": "{{base_url}}/activity-logs" } },
+				{ "name": "Get Activity Logs (Global)", "request": { "method": "GET", "url": "{{base_url}}/activity-logs" } },
+				{ "name": "Get Activity Logs (User Specific)", "request": { "method": "GET", "url": "{{base_url}}/activity-logs/user/1" } },
 				{ "name": "Get Notifications", "request": { "method": "GET", "url": "{{base_url}}/notifications" } },
-				{ "name": "Mark Read", "request": { "method": "POST", "url": "{{base_url}}/notifications/{{id}}/read" } }
+				{ "name": "Mark Read", "request": { "method": "POST", "url": "{{base_url}}/notifications/{{id}}/read" } },
+				{ "name": "Mark All Read", "request": { "method": "POST", "url": "{{base_url}}/notifications/mark-all-read" } }
 			]
 		}
 	],

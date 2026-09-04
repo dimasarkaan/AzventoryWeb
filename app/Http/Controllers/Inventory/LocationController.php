@@ -3,19 +3,29 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Inventory\StoreLocationRequest;
+use App\Http\Requests\Inventory\UpdateLocationRequest;
 use App\Models\Location;
 use App\Traits\ActivityLogger;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 // Controller khusus untuk mengelola Master Data Lokasi (Nama Gudang/Ruangan).
 // Menangani fungsi CRUD (Tambah, Edit, Hapus) beserta aturan ketat khusus untuk lokasi utama (Default).
+/**
+ * @group Master Data
+ *
+ * API ini digunakan untuk mengatur data dasar aplikasi seperti daftar Merk, Kategori, dan Lokasi Cabang. Data ini diperlukan sebelum Anda bisa menambahkan barang baru ke dalam sistem.
+ */
 class LocationController extends Controller
 {
     use ActivityLogger;
 
-    // Menampilkan daftar seluruh lokasi yang ada, lengkap dengan jumlah barang yang tersimpan di dalamnya
+    /**
+     * Menampilkan daftar seluruh lokasi yang ada, lengkap dengan jumlah barang yang tersimpan di dalamnya
+     *
+     * @authenticated
+     */
     public function index()
     {
         // Menarik data dari database dan menghitung otomatis (withCount) relasi jumlah barangnya
@@ -34,20 +44,15 @@ class LocationController extends Controller
         return response()->json($locations);
     }
 
-    // Memproses pembuatan lokasi gudang baru
-    public function store(Request $request)
+    /**
+     * Memproses pembuatan lokasi gudang baru
+     *
+     * @authenticated
+     */
+    public function store(StoreLocationRequest $request)
     {
-        // Pengecekan Keamanan Ekstra (Otorisasi): 
-        // Hanya petinggi tertinggi (Superadmin) yang diizinkan membangun ruangan/gudang baru
-        $this->authorize('create', Location::class);
-
-        // Validasi: Nama harus ada dan tidak boleh kembar dengan lokasi yang sudah ada
-        $request->validate([
-            'name' => 'required|string|max:191|unique:locations,name',
-        ]);
-
         $location = Location::create(['name' => $request->name]);
-        
+
         // Hapus cache daftar lokasi lama agar formulir pendaftaran barang bisa melihat lokasi baru ini
         Cache::forget('inventory_locations');
         Cache::forget('inventory_location_options');
@@ -62,16 +67,13 @@ class LocationController extends Controller
         ], 201);
     }
 
-    // Menyimpan perubahan data lokasi (mengganti nama atau status aktifnya)
-    public function update(Request $request, Location $location)
+    /**
+     * Menyimpan perubahan data lokasi (mengganti nama atau status aktifnya)
+     *
+     * @authenticated
+     */
+    public function update(UpdateLocationRequest $request, Location $location)
     {
-        $this->authorize('update', $location);
-
-        // Validasi: Nama tidak boleh sama dengan ruangan lain KECUALI namanya sendiri
-        $request->validate([
-            'name' => 'required|string|max:191|unique:locations,name,'.$location->id,
-            'is_active' => 'sometimes|boolean',
-        ]);
 
         // Tampung data lama sebagai bahan perbandingan
         $oldName = $location->name;
@@ -79,7 +81,7 @@ class LocationController extends Controller
         $oldActive = (bool) $location->is_active;
         $newActive = $request->has('is_active') ? (bool) $request->is_active : $oldActive;
 
-        // Aturan Ketat Bisnis (Business Rule): 
+        // Aturan Ketat Bisnis (Business Rule):
         // Gudang utama (Default) yang dipakai operasional tidak boleh dinonaktifkan, bisa merusak sistem.
         if ($location->is_default && ! $newActive) {
             return response()->json([
@@ -134,7 +136,11 @@ class LocationController extends Controller
         ]);
     }
 
-    // Menghapus data lokasi/gudang dari sistem selamanya
+    /**
+     * Menghapus data lokasi/gudang dari sistem selamanya
+     *
+     * @authenticated
+     */
     public function destroy(Location $location)
     {
         $this->authorize('delete', $location);

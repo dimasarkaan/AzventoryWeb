@@ -11,9 +11,28 @@
                 </div>
             </div>
 
+            <!-- Tab Navigation for Status -->
+            <div class="mb-4 border-b border-secondary-200">
+                <nav class="-mb-px flex space-x-6" aria-label="Tabs">
+                    <a href="{{ route('inventory.stock-approvals.index', ['status' => 'pending', 'filter_type' => request('filter_type'), 'search' => request('search')]) }}" 
+                       class="{{ request('status', 'pending') === 'pending' ? 'border-primary-500 text-primary-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-black text-sm transition-colors flex items-center gap-2">
+                        Menunggu
+                    </a>
+                    <a href="{{ route('inventory.stock-approvals.index', ['status' => 'approved', 'filter_type' => request('filter_type'), 'search' => request('search')]) }}" 
+                       class="{{ request('status') === 'approved' ? 'border-success-500 text-success-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-black text-sm transition-colors flex items-center gap-2">
+                        Disetujui
+                    </a>
+                    <a href="{{ route('inventory.stock-approvals.index', ['status' => 'rejected', 'filter_type' => request('filter_type'), 'search' => request('search')]) }}" 
+                       class="{{ request('status') === 'rejected' ? 'border-danger-500 text-danger-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-black text-sm transition-colors flex items-center gap-2">
+                        Ditolak
+                    </a>
+                </nav>
+            </div>
+
             <!-- Modern Search & Filter Bar -->
             <div class="mb-6 card p-4 overflow-visible">
                 <form method="GET" action="{{ route('inventory.stock-approvals.index') }}" id="approval-filter-form" novalidate>
+                    <input type="hidden" name="status" value="{{ request('status', 'pending') }}">
                     <div class="flex flex-col lg:flex-row gap-4 items-center">
                         <div class="relative flex-1 w-full"
                              x-data="{ searchQuery: '{{ request('search') ? addslashes(request('search')) : '' }}' }"
@@ -43,7 +62,7 @@
                                 <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
                             </div>
 
-                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('approval-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" style="display: none;">
+                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('approval-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" x-cloak>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
@@ -64,28 +83,6 @@
                                     :options="$typeOptions" 
                                     :selected="request('filter_type', 'all')" 
                                     placeholder="{{ __('ui.type_all') }}" 
-                                    :submitOnChange="true" 
-                                    width="w-full" 
-                                    :allowClear="false"
-                                />
-                            </div>
-
-                            <div class="w-full sm:w-64">
-                                @php
-                                    $statusOptions = [
-                                        'all' => __('ui.status_all'),
-                                        'pending' => __('ui.status_pending_label'),
-                                        'approved' => __('ui.status_approved_label'),
-                                        'rejected' => __('ui.status_rejected_label'),
-                                    ];
-                                @endphp
-                                <label for="status-filter" class="sr-only">{{ __('ui.status_all') }}</label>
-                                <x-select 
-                                    name="status" 
-                                    id="status-filter"
-                                    :options="$statusOptions" 
-                                    :selected="request('status', 'pending')" 
-                                    placeholder="{{ __('ui.status_all') }}" 
                                     :submitOnChange="true" 
                                     width="w-full" 
                                     :allowClear="false"
@@ -267,296 +264,35 @@
         </div>
     </div>
 
-    <!-- Bulk Actions — Sticky bottom bar -->
+    <!-- Bulk Actions â€” Sticky bottom bar -->
     @if($pendingApprovals->isNotEmpty() && request('status', 'pending') === 'pending')
     <div id="bulk-actions-container" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-secondary-200 p-2.5 sm:px-6 sm:py-4 animate-fade-in-up items-center justify-between sm:justify-start gap-3 sm:gap-6 w-[calc(100%-2rem)] sm:w-auto">
-        <div class="flex items-center gap-2 sm:gap-3 sm:border-r border-secondary-200 sm:pr-6 pl-1 sm:pl-0">
-            <span class="text-xl sm:text-2xl font-black text-primary-600 tabular-nums" id="selected-count">0</span>
-            <div class="flex flex-col leading-tight">
-                <span class="text-[10px] sm:text-xs font-bold text-secondary-500 uppercase tracking-wider">Item</span>
-                <span class="text-[10px] sm:text-xs font-bold text-secondary-400 uppercase tracking-widest">Dipilih</span>
+        <div class="flex items-center gap-3 sm:border-r border-secondary-200 sm:pr-6 pl-1 sm:pl-0">
+            <button type="button" onclick="clearBulkSelection()" class="p-1.5 rounded-full text-secondary-400 hover:text-danger-500 hover:bg-danger-50 transition-colors" title="Batalkan Pilihan">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div class="flex items-center gap-1.5">
+                <span class="text-xl sm:text-2xl font-black text-primary-600 tabular-nums" id="selected-count">0</span>
+                <div class="flex flex-col leading-tight">
+                    <span class="text-[10px] sm:text-xs font-bold text-secondary-500 uppercase tracking-wider">Item</span>
+                    <span class="text-[10px] sm:text-xs font-bold text-secondary-400 uppercase tracking-widest">Dipilih</span>
+                </div>
             </div>
         </div>
         <div class="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-initial">
             <button type="button" onclick="submitBulk('approved')" class="flex-1 sm:flex-none btn btn-success flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" id="bulk-approve-btn">
                 <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">Setujui <span class="hidden sm:inline">Semua</span></span>
+                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">Setujui <span class="hidden sm:inline">Terpilih</span></span>
             </button>
             <button type="button" onclick="submitBulk('rejected')" class="flex-1 sm:flex-none btn btn-danger flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" id="bulk-reject-btn">
                 <x-icon.close class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">Tolak <span class="hidden sm:inline">Semua</span></span>
+                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">Tolak <span class="hidden sm:inline">Terpilih</span></span>
             </button>
         </div>
     </div>
     @endif
 
-    @push('scripts')
-    <script>
-        // JS scripts remain largely the same, but with updated selectors if needed
-        function confirmReject(event) {
-            event.preventDefault();
-            const form = event.target.closest('form');
-            const button = event.target.closest('button');
-
-            Swal.fire({
-                title: '{{ __('ui.confirm_reject_title') }}',
-                html: '<p class="text-sm text-secondary-500">{{ __('ui.confirm_reject_text') }}</p>',
-                input: 'textarea',
-                inputLabel: '{{ __('ui.rejection_reason') }}',
-                inputPlaceholder: '{{ __('ui.rejection_reason') }}... ({{ __('ui.required') ?? 'wajib diisi' }})',
-                inputAttributes: { 'aria-label': 'Alasan Penolakan', maxlength: 500 },
-                inputValidator: (value) => {
-                    if (!value || value.trim() === '') {
-                        return 'Mohon cantumkan alasan penolakan yang jelas.';
-                    }
-                },
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: '{{ __('ui.btn_yes_reject') }}',
-                cancelButtonText: '{{ __('ui.btn_cancel') }}',
-                reverseButtons: true,
-                customClass: {
-                    popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
-                    title: '!text-secondary-900 !text-xl !font-bold !mt-2',
-                    htmlContainer: '!text-secondary-500 !text-sm',
-                    inputLabel: '!text-secondary-700 !text-sm !font-bold !mt-4 !mb-2 !text-left !block',
-                    input: '!rounded-xl !border-secondary-300 !p-3 !text-sm focus:!ring-primary-500 focus:!border-primary-500 !shadow-sm transition-all',
-                    validationMessage: '!bg-danger-50 !text-danger-600 !border !border-danger-100 !rounded-xl !p-3 !text-xs !mt-2 !mb-0 !flex !items-center !justify-center !gap-2 !w-full !font-medium',
-                    actions: '!flex !justify-center !gap-3 !w-full !mt-6',
-                    confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
-                    cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
-                },
-                buttonsStyling: false,
-                iconColor: '#ef4444',
-                width: '28em',
-                backdrop: `rgba(15, 23, 42, 0.5)`
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const reasonInput = form.querySelector('.rejection-reason-input');
-                    if (reasonInput) reasonInput.value = result.value;
-                    button.disabled = true;
-                    button.style.opacity = '0.6';
-                    form.submit();
-                }
-            });
-        }
-
-        function confirmApprove(event) {
-            event.preventDefault();
-            const form = event.target.closest('form');
-            const button = event.target.closest('button');
-
-            Swal.fire({
-                title: '{{ __('ui.confirm_approve_title') ?? 'Konfirmasi Persetujuan' }}',
-                text: "{{ __('ui.confirm_approve_text') ?? 'Apakah Anda yakin ingin menyetujui pengajuan stok ini?' }}",
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonText: '{{ __('ui.btn_yes_approve') ?? 'Ya, Setujui' }}',
-                cancelButtonText: '{{ __('ui.btn_cancel') }}',
-                reverseButtons: true,
-                customClass: {
-                    popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
-                    title: '!text-secondary-900 !text-xl !font-bold !mt-2',
-                    htmlContainer: '!text-secondary-500 !text-sm',
-                    actions: '!flex !justify-center !gap-3 !w-full !mt-6',
-                    confirmButton: 'btn btn-success !px-6 !py-2.5 !m-0 !rounded-xl',
-                    cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
-                },
-                buttonsStyling: false,
-                iconColor: '#10b981',
-                width: '26em',
-                backdrop: `rgba(15, 23, 42, 0.5)`
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    button.disabled = true;
-                    button.style.opacity = '0.6';
-                    form.submit();
-                }
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAll = document.getElementById('select-all');
-            const selectAllMobile = document.getElementById('select-all-mobile');
-            const bulkContainer = document.getElementById('bulk-actions-container');
-            const selectedCountDisplay = document.getElementById('selected-count');
-
-            function updateBulkUI() {
-                const checkboxesByClass = document.querySelectorAll('.row-checkbox');
-                const checkedCount = Array.from(checkboxesByClass).filter(cb => cb.checked).length;
-                
-                if (checkedCount > 0) {
-                    bulkContainer.classList.remove('hidden');
-                    bulkContainer.classList.add('flex');
-                    selectedCountDisplay.textContent = checkedCount;
-                } else {
-                    bulkContainer.classList.add('hidden');
-                    bulkContainer.classList.remove('flex');
-                }
-
-                // Sync select all status
-                const allChecked = checkedCount > 0 && checkedCount === checkboxesByClass.length;
-                if (selectAll) selectAll.checked = allChecked;
-                if (selectAllMobile) selectAllMobile.checked = allChecked;
-            }
-
-            if (selectAll) {
-                selectAll.addEventListener('change', function() {
-                    document.querySelectorAll('.row-checkbox').forEach(cb => {
-                        cb.checked = selectAll.checked;
-                    });
-                    if (selectAllMobile) selectAllMobile.checked = selectAll.checked;
-                    updateBulkUI();
-                });
-            }
-
-            if (selectAllMobile) {
-                selectAllMobile.addEventListener('change', function() {
-                    document.querySelectorAll('.row-checkbox').forEach(cb => {
-                        cb.checked = selectAllMobile.checked;
-                    });
-                    if (selectAll) selectAll.checked = selectAllMobile.checked;
-                    updateBulkUI();
-                });
-            }
-
-            document.body.addEventListener('change', function(e) {
-                if(e.target.classList.contains('row-checkbox')) {
-                    updateBulkUI();
-                }
-            });
-
-            window.rebindBulkEvents = function() {
-                const newSelectAll = document.getElementById('select-all');
-                const newSelectAllMobile = document.getElementById('select-all-mobile');
-                
-                if (newSelectAll) {
-                    newSelectAll.addEventListener('change', function() {
-                        document.querySelectorAll('.row-checkbox').forEach(cb => {
-                            cb.checked = newSelectAll.checked;
-                        });
-                        if (newSelectAllMobile) newSelectAllMobile.checked = newSelectAll.checked;
-                        updateBulkUI();
-                    });
-                }
-
-                if (newSelectAllMobile) {
-                    newSelectAllMobile.addEventListener('change', function() {
-                        document.querySelectorAll('.row-checkbox').forEach(cb => {
-                            cb.checked = newSelectAllMobile.checked;
-                        });
-                        if (newSelectAll) newSelectAll.checked = newSelectAllMobile.checked;
-                        updateBulkUI();
-                    });
-                }
-            };
-            
-            if (window.Echo) {
-                window.Echo.private('stock-approvals')
-                    .listen('.StockApprovalUpdated', (e) => {
-                        const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
-                        fetch(window.location.href)
-                            .then(res => res.text())
-                            .then(html => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(html, 'text/html');
-                                const newContainer = doc.getElementById('approvals-list-container');
-                                if (newContainer) {
-                                    document.getElementById('approvals-list-container').innerHTML = newContainer.innerHTML;
-                                    checkedIds.forEach(id => {
-                                        const cb = document.querySelector(`.row-checkbox[value="${id}"]`);
-                                        if (cb) cb.checked = true;
-                                    });
-                                    window.rebindBulkEvents();
-                                    updateBulkUI();
-                                }
-                            });
-                    });
-            }
-        });
-
-        function submitBulk(status) {
-            const form = document.getElementById('bulk-approval-form');
-            const statusInput = document.getElementById('bulk-status');
-            const rejectionReasonInput = document.getElementById('bulk-rejection-reason');
-            const idsContainer = document.getElementById('bulk-ids-container');
-            const selectedCheckBoxes = document.querySelectorAll('.row-checkbox:checked');
-            const checkedCount = selectedCheckBoxes.length;
-            const approveBtn = document.getElementById('bulk-approve-btn');
-            const rejectBtn = document.getElementById('bulk-reject-btn');
-
-            if (checkedCount === 0) return;
-
-            idsContainer.innerHTML = '';
-            selectedCheckBoxes.forEach(cb => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'ids[]';
-                input.value = cb.value;
-                idsContainer.appendChild(input);
-            });
-
-            statusInput.value = status;
-            const icon = status === 'approved' ? 'question' : 'warning';
-            const iconColor = status === 'approved' ? '#10b981' : '#ef4444';
-            const btnClass = status === 'approved' ? 'btn btn-success' : 'btn btn-danger';
-            const ringColor = status === 'approved' ? 'ring-success-500' : 'ring-danger-500';
-
-            const swalConfig = {
-                title: `{{ __('ui.bulk_title') ?? 'Konfirmasi Bulk' }} ${status === 'approved' ? 'Approve' : 'Reject'}`,
-                icon: icon,
-                showCancelButton: true,
-                confirmButtonText: '{{ __('ui.btn_yes_process') ?? 'Ya, Lanjutkan' }}',
-                cancelButtonText: '{{ __('ui.btn_cancel') }}',
-                reverseButtons: true,
-                customClass: {
-                    popup: '!rounded-3xl !shadow-2xl !border !border-secondary-100',
-                    title: '!text-secondary-900 !text-xl !font-bold !mt-2',
-                    htmlContainer: '!text-secondary-500 !text-sm',
-                    inputLabel: '!text-secondary-700 !text-sm !font-bold !mt-4 !mb-2 !text-left !block',
-                    input: '!rounded-xl !border-secondary-300 !p-3 !text-sm focus:!ring-primary-500 focus:!border-primary-500 !shadow-sm transition-all',
-                    validationMessage: '!bg-danger-50 !text-danger-600 !border !border-danger-100 !rounded-xl !p-3 !text-xs !mt-2 !mb-0 !flex !items-center !justify-center !gap-2 !w-full !font-medium',
-                    actions: '!flex !justify-center !gap-3 !w-full !mt-6',
-                    confirmButton: `${btnClass} !px-6 !py-2.5 !m-0 !rounded-xl`,
-                    cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
-                },
-                buttonsStyling: false,
-                iconColor: iconColor,
-                width: '28em',
-                backdrop: `rgba(15, 23, 42, 0.5)`
-            };
-
-            if (status === 'approved') {
-                swalConfig.html = `<p class="text-sm text-secondary-500">Anda akan menyetujui <strong>${checkedCount}</strong> pengajuan sekaligus. Lanjutkan?</p>`;
-                Swal.fire(swalConfig).then((result) => {
-                    if (result.isConfirmed) {
-                        rejectionReasonInput.value = '';
-                        if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.6'; }
-                        if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.style.opacity = '0.6'; }
-                        form.submit();
-                    }
-                });
-            } else {
-                swalConfig.html = `<p class="text-sm text-secondary-500">Anda akan menolak <strong>${checkedCount}</strong> pengajuan sekaligus.</p>`;
-                swalConfig.input = 'textarea';
-                swalConfig.inputLabel = '{{ __('ui.rejection_reason') }}';
-                swalConfig.inputPlaceholder = '{{ __('ui.rejection_reason') }}... ({{ __('ui.required') ?? 'wajib diisi' }})';
-                swalConfig.inputAttributes = { maxlength: 500 };
-                swalConfig.inputValidator = (value) => {
-                    if (!value || value.trim() === '') return 'Mohon cantumkan alasan penolakan yang jelas.';
-                };
-
-                Swal.fire(swalConfig).then((result) => {
-                    if (result.isConfirmed) {
-                        rejectionReasonInput.value = result.value;
-                        if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.6'; }
-                        if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.style.opacity = '0.6'; }
-                        form.submit();
-                    }
-                });
-            }
-        }
-    </script>
-    @endpush
+    @include('inventory.approvals.partials.scripts')
 </x-app-layout>
+
 

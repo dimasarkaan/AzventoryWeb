@@ -55,7 +55,7 @@ class StockRequestController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         // Pengecekan Kasta (Role): Superadmin dan Admin punya jalur VIP, perubahan stok akan otomatis langsung di-ACC (Approved).
         // Sedangkan Operator masuk ke jalur antrean (Pending).
         $isAutoApproved = in_array($user->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]);
@@ -70,7 +70,7 @@ class StockRequestController extends Controller
             if ($isAutoApproved) {
                 // Re-query dengan pessimistic locking untuk mencegah race condition (TOCTOU)
                 $lockedSparepart = \App\Models\Sparepart::where('id', $sparepart->id)->lockForUpdate()->first();
-                if (!$lockedSparepart) {
+                if (! $lockedSparepart) {
                     throw \Illuminate\Validation\ValidationException::withMessages(['quantity' => 'Barang tidak ditemukan atau sudah dihapus.']);
                 }
 
@@ -110,7 +110,7 @@ class StockRequestController extends Controller
 
             // ================= PENANGANAN NOTIFIKASI & AUDIT TRAIL =================
             if ($isAutoApproved) {
-                
+
                 // Catat secara formal di tabel Riwayat Aktivitas Sistem
                 $actionTitle = $request->type === 'masuk' ? 'Penambahan Stok' : 'Pengurangan Stok';
 
@@ -129,7 +129,7 @@ class StockRequestController extends Controller
                     if ($sparepart->minimum_stock > 0 && $sparepart->stock <= $sparepart->minimum_stock) {
                         $admins = User::whereIn('role', [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN])->get();
                         Notification::send($admins, new \App\Notifications\LowStockNotification($sparepart));
-                        
+
                         $severity = $sparepart->stock === 0 ? 'depleted' : 'critical';
                         try {
                             broadcast(new \App\Events\StockCriticalEvent($sparepart, $severity));
@@ -143,7 +143,7 @@ class StockRequestController extends Controller
 
             } else {
                 // --- JALUR REGULER: Menunggu Persetujuan (Hanya Operator) ---
-                
+
                 // Karena stoknya belum berubah, kita cukup mencatat log "Pengajuan"-nya saja
                 $this->logActivity('Pengajuan Stok', "Pengajuan stok {$request->type} sebanyak {$request->quantity} untuk '{$sparepart->name}' dengan alasan '{$request->reason}'.");
 

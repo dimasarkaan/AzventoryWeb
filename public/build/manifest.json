@@ -4,7 +4,7 @@
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Cy2DKwh0.css",
+    "file": "assets/app-Ct-I444_.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -12,8 +12,17 @@
       "app.css"
     ]
   },
+  "resources/css/print.css": {
+    "file": "assets/print-D8IEzBYb.css",
+    "src": "resources/css/print.css",
+    "isEntry": true,
+    "name": "print",
+    "names": [
+      "print.css"
+    ]
+  },
   "resources/js/app.js": {
-    "file": "assets/app-DfQJg92a.js",
+    "file": "assets/app-DLpfQj0r.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
@@ -22,7 +31,7 @@
     ]
   },
   "resources/js/pages/superadmin/inventory/index.js": {
-    "file": "assets/index-CdBTp4vK.js",
+    "file": "assets/index-DcSB4IeS.js",
     "name": "index",
     "src": "resources/js/pages/superadmin/inventory/index.js",
     "isEntry": true,

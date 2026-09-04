@@ -11,13 +11,16 @@ use App\Models\User;
 use Illuminate\Http\Request;
 
 /**
- * @group Inventory Management
+ * @group Manajemen Inventaris
  *
- * API endpoints untuk mengelola katalog, manipulasi stok, dan log stok sparepart.
+ * Ini adalah fungsi inti aplikasi untuk mengelola barang.
+ *
+ * Anda bisa menggunakan API ini untuk menambah daftar barang baru, melihat stok, memperbarui informasi barang, serta mencatat riwayat barang masuk atau keluar.
  */
 class InventoryController extends Controller
 {
     use \App\Traits\ActivityLogger;
+
     protected $inventoryService;
 
     protected $qrCodeService;
@@ -48,54 +51,43 @@ class InventoryController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(\App\Http\Requests\Inventory\StoreSparepartRequest $request)
     {
-        $this->authorize('create', Sparepart::class);
+        $result = $this->inventoryService->createSparepart($request->validated());
 
-        $validated = $request->validate([
-            'part_number' => 'required|unique:spareparts,part_number',
-            'name' => 'required|string',
-            'brand_id' => 'required|exists:brands,id',
-            'location_id' => 'required|exists:locations,id',
-            'type' => 'required|in:sale,asset',
-            'stock' => 'required|integer|min:0',
-            'price' => 'nullable|numeric|min:0',
-            'unit' => 'nullable|string',
-            'minimum_stock' => 'nullable|integer|min:0',
-            'category_id' => 'required|exists:categories,id',
-            'condition' => 'required|string',
-            'age' => 'nullable|string|max:50',
-            'status' => 'required|in:aktif,nonaktif',
-        ]);
+        if ($result['status'] === 'error_zero_stock') {
+            return response()->json([
+                'status' => 'error',
+                'message' => $result['message'],
+            ], 422);
+        }
 
-        $sparepart = Sparepart::create($validated);
-        $this->qrCodeService->generate($sparepart);
-
-        $this->logActivity('Barang Dibuat (API)', "Barang baru '{$sparepart->name}' ditambahkan melalui API.");
+        if (isset($result['data'])) {
+            $sparepart = $result['data'];
+            if ($sparepart->type === 'sale' && ($sparepart->price === null || $sparepart->price == 0)) {
+                $superadmins = User::where('role', \App\Enums\UserRole::SUPERADMIN)->get();
+                foreach ($superadmins as $superadmin) {
+                    $superadmin->notify(new \App\Notifications\MissingPriceNotification($sparepart, auth()->user()));
+                }
+            }
+        }
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Barang baru berhasil ditambahkan',
-            'data' => new SparepartResource($sparepart),
+            'message' => $result['message'] ?? 'Barang baru berhasil ditambahkan',
+            'data' => new SparepartResource($result['data']),
         ], 201);
     }
 
     /**
      * Mendapatkan detail satu barang inventaris.
      *
-     * @param  int  $id
+     * @urlParam inventory string required UUID dari barang inventaris. Example: 9a5f3b...
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(Sparepart $inventory)
     {
-        $inventory = Sparepart::where('uuid', $id)->first();
-        if (! $inventory) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Data Barang tidak ditemukan di katalog.',
-            ], 404);
-        }
-
         $inventory->load(['brand', 'category', 'location']);
 
         return response()->json([
@@ -108,66 +100,30 @@ class InventoryController extends Controller
     /**
      * Memperbarui barang inventaris.
      *
-     * @param  int  $id
+     * @urlParam inventory string required UUID dari barang inventaris yang akan diupdate. Example: 9a5f3b...
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(\App\Http\Requests\Inventory\UpdateSparepartRequest $request, Sparepart $inventory)
     {
-        $inventory = Sparepart::where('uuid', $id)->first();
-        if (! $inventory) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Data Barang tidak ditemukan di katalog.',
-            ], 404);
-        }
-
-        $this->authorize('update', $inventory);
-
-        $validated = $request->validate([
-            'part_number' => 'sometimes|unique:spareparts,part_number,'.$inventory->id,
-            'name' => 'sometimes|string',
-            'brand_id' => 'sometimes|exists:brands,id',
-            'location_id' => 'sometimes|exists:locations,id',
-            'type' => 'sometimes|in:sale,asset',
-            'stock' => 'sometimes|integer|min:0',
-            'price' => 'nullable|numeric|min:0',
-            'unit' => 'nullable|string',
-            'minimum_stock' => 'nullable|integer|min:0',
-            'category_id' => 'sometimes|exists:categories,id',
-            'condition' => 'sometimes|string',
-            'age' => 'sometimes|string|max:50',
-            'status' => 'sometimes|in:aktif,nonaktif',
-        ]);
-
-        $inventory->update($validated);
-        $inventory->load(['brand', 'category', 'location']);
-        $this->qrCodeService->generate($inventory);
-
-        $this->logActivity('Barang Diupdate (API)', "Data barang '{$inventory->name}' diperbarui melalui API.");
+        $result = $this->inventoryService->updateSparepart($inventory, $request->validated());
 
         return response()->json([
             'status' => 'success',
             'message' => 'Data Barang berhasil diperbarui',
-            'data' => new SparepartResource($inventory),
+            'data' => new SparepartResource($result['data']),
         ]);
     }
 
     /**
      * Menghapus barang inventaris.
      *
-     * @param  int  $id
+     * @urlParam inventory string required UUID dari barang inventaris. Example: 9a5f3b...
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Sparepart $inventory)
     {
-        $inventory = Sparepart::where('uuid', $id)->first();
-        if (! $inventory) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Data Barang tidak ditemukan di katalog.',
-            ], 404);
-        }
-
         $this->authorize('delete', $inventory);
 
         $this->logActivity('Barang Dihapus (API)', "Barang '{$inventory->name}' dihapus melalui API.");
@@ -184,6 +140,9 @@ class InventoryController extends Controller
      *
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @bodyParam quantity integer required Jumlah penyesuaian stok (bisa minus). Example: 5
+     * @bodyParam notes string required Alasan penyesuaian stok. Example: Penambahan stok baru
      */
     public function adjustStock(Request $request, $id)
     {
@@ -236,9 +195,9 @@ class InventoryController extends Controller
                 'approved_by' => $apiUser->id,
                 'approved_at' => now(),
             ]);
-            
+
             $actionWord = $request->type === 'increment' ? 'Penambahan' : 'Pengurangan';
-            $this->logActivity("{$actionWord} Stok API", "{$actionWord} {$request->quantity} unit untuk barang '{$lockedSparepart->name}' via API. Alasan: " . ($request->description ?? '-'));
+            $this->logActivity("{$actionWord} Stok API", "{$actionWord} {$request->quantity} unit untuk barang '{$lockedSparepart->name}' via API. Alasan: ".($request->description ?? '-'));
 
             return ['status' => 'success', 'data' => $lockedSparepart];
         });

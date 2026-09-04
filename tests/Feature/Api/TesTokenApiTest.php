@@ -49,6 +49,7 @@ class TesTokenApiTest extends TestCase
         $response = $this->actingAs($user)
             ->post(route('profile.api-tokens.store'), [
                 'token_name' => 'Token Integrasi Eksternal',
+                'abilities' => ['inventory:read'],
             ]);
 
         $response->assertRedirect();
@@ -67,8 +68,8 @@ class TesTokenApiTest extends TestCase
     {
         $user = $this->superadmin();
 
-        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'Token A']);
-        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'Token B']);
+        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'Token A', 'abilities' => ['inventory:read']]);
+        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'Token B', 'abilities' => ['inventory:read']]);
 
         $this->assertEquals(2, $user->tokens()->count());
     }
@@ -79,7 +80,7 @@ class TesTokenApiTest extends TestCase
         $user = $this->superadmin();
 
         $this->actingAs($user)
-            ->post(route('profile.api-tokens.store'), ['token_name' => ''])
+            ->post(route('profile.api-tokens.store'), ['token_name' => '', 'abilities' => ['inventory:read']])
             ->assertSessionHasErrors('token_name');
     }
 
@@ -89,7 +90,7 @@ class TesTokenApiTest extends TestCase
         $admin = $this->makeUser('admin');
 
         $this->actingAs($admin)
-            ->post(route('profile.api-tokens.store'), ['token_name' => 'Coba Token'])
+            ->post(route('profile.api-tokens.store'), ['token_name' => 'Coba Token', 'abilities' => ['inventory:read']])
             ->assertStatus(403);
     }
 
@@ -99,14 +100,14 @@ class TesTokenApiTest extends TestCase
         $operator = $this->makeUser('operator');
 
         $this->actingAs($operator)
-            ->post(route('profile.api-tokens.store'), ['token_name' => 'Coba Token'])
+            ->post(route('profile.api-tokens.store'), ['token_name' => 'Coba Token', 'abilities' => ['inventory:read']])
             ->assertStatus(403);
     }
 
     #[Test]
     public function guest_tidak_bisa_membuat_api_token()
     {
-        $this->post(route('profile.api-tokens.store'), ['token_name' => 'Coba Token'])
+        $this->post(route('profile.api-tokens.store'), ['token_name' => 'Coba Token', 'abilities' => ['inventory:read']])
             ->assertRedirect();
     }
 
@@ -227,7 +228,7 @@ class TesTokenApiTest extends TestCase
     }
 
     #[Test]
-    public function superadmin_tidak_bisa_mencabut_token_milik_user_lain()
+    public function superadmin_bisa_mencabut_token_milik_user_lain()
     {
         $superadminA = $this->superadmin();
         $superadminB = $this->superadmin();
@@ -235,12 +236,12 @@ class TesTokenApiTest extends TestCase
 
         $this->actingAs($superadminA)
             ->delete(route('profile.api-tokens.destroy', $tokenB->accessToken->id))
-            ->assertRedirect();
+            ->assertRedirect()
+            ->assertSessionHas('success');
 
-        // Token B masih ada (controller hanya hapus token milik sendiri)
-        $this->assertDatabaseHas('personal_access_tokens', [
+        // Token B seharusnya sudah terhapus
+        $this->assertDatabaseMissing('personal_access_tokens', [
             'id' => $tokenB->accessToken->id,
-            'tokenable_id' => $superadminB->id,
         ]);
     }
 
@@ -272,9 +273,9 @@ class TesTokenApiTest extends TestCase
         $user = $this->superadmin();
 
         $this->assertEquals(0, $user->tokens()->count());
-        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'T1']);
+        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'T1', 'abilities' => ['inventory:read']]);
         $this->assertEquals(1, $user->fresh()->tokens()->count());
-        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'T2']);
+        $this->actingAs($user)->post(route('profile.api-tokens.store'), ['token_name' => 'T2', 'abilities' => ['inventory:read']]);
         $this->assertEquals(2, $user->fresh()->tokens()->count());
     }
 

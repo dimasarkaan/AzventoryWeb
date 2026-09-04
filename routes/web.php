@@ -125,6 +125,7 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         Route::get('/borrow/{borrowing}', [BorrowingController::class, 'show'])->name('borrow.show');
 
         // Resource Utama (Letakkan di bawah rute spesifik agar tidak tertimpa wildcard)
+        Route::get('/{inventory}/quick-view', [InventoryController::class, 'quickView'])->name('quick-view');
         Route::resource('/', InventoryController::class)->parameters(['' => 'inventory']);
     });
 
@@ -179,11 +180,13 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
         Route::patch('/profile/settings', [ProfileController::class, 'updateSettings'])->name('profile.settings.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
         Route::delete('/profile/avatar', [ProfileController::class, 'deleteAvatar'])->name('profile.avatar.delete');
+        Route::delete('/profile/sessions/{id?}', [ProfileController::class, 'destroyOtherSessions'])->name('profile.sessions.destroy');
         Route::get('/my-inventory', [ProfileController::class, 'myInventory'])->name('profile.inventory');
 
         // API Tokens
         Route::middleware('role:superadmin')->group(function () {
             Route::post('/profile/api-tokens', [ApiTokenController::class, 'store'])->name('profile.api-tokens.store');
+            Route::put('/profile/api-tokens/{tokenId}', [ApiTokenController::class, 'update'])->name('profile.api-tokens.update');
             Route::delete('/profile/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])->name('profile.api-tokens.destroy');
         });
 

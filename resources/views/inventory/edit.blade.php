@@ -55,370 +55,22 @@
 
                             <!-- Row 1: PN & Name -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-full">
-                                <!-- Part Number -->
-                                <div>
-                                    <label for="part_number" class="input-label">{{ __('ui.part_number') }} <span class="text-danger-500">*</span></label>
-                                    <div class="relative flex gap-2" x-data="{
-                                        open: false,
-                                        search: @js(old('part_number', $sparepart->part_number)),
-                                        selected: @js(old('part_number', $sparepart->part_number)),
-                                        options: {{ json_encode($partNumbers) }} || [],
-                                        get filteredOptions() {
-                                            if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
-                                            return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
-                                        },
-                                        select(value) {
-                                            this.selected = value;
-                                            this.search = value;
-                                            this.$dispatch('update-pn', value);
-                                            this.open = false;
-                                            this.$dispatch('trigger-check-pn', false);
-                                        },
-                                        createNew() {
-                                            let term = this.search.toUpperCase();
-                                            this.select(term);
-                                        },
-                                        init() {
-                                            if (this.selected) {
-                                                this.$dispatch('update-pn', this.selected);
-                                                this.$dispatch('trigger-check-pn', true);
-                                                this.search = this.selected;
-                                            }
-                                            this.$watch('partNumber', value => {
-                                                if (value !== this.selected) {
-                                                    this.selected = value;
-                                                    this.search = value;
-                                                }
-                                            });
-                                        }
-                                    }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                        <div class="relative w-full">
-                                            <input type="hidden" name="part_number" x-model="selected">
-                                            <input id="part_number" class="input-field pr-10 w-full" type="text" 
-                                                   x-model="search" 
-                                                   @focus="!isLocked && (open = true, $el.select())"
-                                                   @input="!isLocked && (open = true, selected = search, partNumber = search.toUpperCase(), search = search.toUpperCase())"
-                                                   @change="checkPN"
-                                                   @keydown.enter.prevent="createNew()" 
-                                                   placeholder="{{ __('ui.placeholder_pn') }}" 
-                                                   autocomplete="off" minlength="3" maxlength="255" pattern="[a-zA-Z0-9\-\_\/]+" title="Part Number hanya boleh berisi huruf, angka, strip (-), dan underscore (_)" required />
-                                            
-                                            <!-- Chevron Button -->
-                                            <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
-                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                                </svg>
-                                            </button>
+                                <!-- Part Number Component -->
+                                @include('inventory.partials.form.part_number', ['defaultPartNumber' => $sparepart->part_number])
 
-                                            <!-- Loading Spinner -->
-                                            <div x-show="isLoading" class="absolute right-10 top-3">
-                                                <svg class="animate-spin h-5 w-5 text-primary-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                            </div>
-
-                                            <!-- Dropdown -->
-                                            <div x-show="open" 
-                                                 x-transition:leave="transition ease-in duration-100"
-                                                 x-transition:leave-start="opacity-100"
-                                                 x-transition:leave-end="opacity-0"
-                                                 class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                                
-                                                <template x-for="option in filteredOptions" :key="option">
-                                                    <div @click="select(option)" 
-                                                         class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                                        <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
-                                                    </div>
-                                                </template>
-
-                                                <!-- No Data State -->
-                                                <div x-show="filteredOptions.length === 0 && search.length === 0" class="px-3 py-2 text-sm text-secondary-500 italic">
-                                                    {{ __('ui.no_data') }}
-                                                </div>
-
-                                                <!-- Create New Option -->
-                                                <div x-show="search.length > 0 && !options.some(o => o === search)" 
-                                                     @click="createNew()"
-                                                     class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
-                                                    <span class="block truncate">
-                                                        {!! __('ui.use_search', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <button type="button" @click="window.triggerScanModal()" class="btn btn-secondary px-3" title="{{ __('ui.scan_pn') }}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z" />
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75h-.75v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75h-.75v-.75zM16.5 19.5h.75v.75h-.75v-.75z" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('part_number')" class="mt-2" />
-                                </div>
-
-                                <!-- Nama Barang (Creatable Select) -->
-                                <div class="relative" x-data="{
-                                    open: false,
-                                    search: @js(old('name', $sparepart->name)),
-                                    selected: @js(old('name', $sparepart->name)),
-                                    options: {{ json_encode($names) }} || [],
-                                    get filteredOptions() {
-                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
-                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
-                                    },
-                                    select(value) {
-                                        this.selected = value;
-                                        this.search = value;
-                                        this.itemName = value;
-                                        this.$dispatch('update-name', value);
-                                        this.open = false;
-                                    },
-                                    createNew() {
-                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-                                        this.select(newValue);
-                                    },
-                                    init() {
-                                        if (this.selected) {
-                                            this.search = this.selected;
-                                            this.itemName = this.selected;
-                                            this.$dispatch('update-name', this.selected);
-                                        }
-                                        this.$watch('itemName', value => {
-                                             if (value !== this.selected) { this.selected = value; this.search = value; }
-                                        });
-                                    }
-                                }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                    <label for="name" class="input-label">{{ __('ui.name') }} <span class="text-danger-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="hidden" name="name" x-model="selected">
-                                        <input type="text" 
-                                               id="name"
-                                               class="input-field w-full pr-10 cursor-text" 
-                                               :class="{'bg-secondary-100 text-secondary-500': isLocked}"
-                                               x-model="search" 
-                                               :readonly="isLocked"
-                                               @focus="!isLocked && (open = true, $el.select())" 
-                                               @input="!isLocked && (open = true, selected = search, itemName = search)" 
-                                               @keydown.enter.prevent="createNew()"
-                                               placeholder="{{ __('ui.placeholder_name') }}" 
-                                               autocomplete="off" minlength="3" maxlength="255" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama barang harus mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
-                                        
-                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
-                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div x-show="open" 
-                                         x-transition:leave="transition ease-in duration-100"
-                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in filteredOptions" :key="option">
-                                            <div @click="select(option)" 
-                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option, 'font-normal': selected !== option }"></span>
-                                            </div>
-                                        </template>
-
-                                        <!-- No Data State -->
-                                        <div x-show="filteredOptions.length === 0 && search.length === 0" class="px-3 py-2 text-sm text-secondary-500 italic">
-                                            {{ __('ui.no_data') }}
-                                        </div>
-                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
-                                             @click="createNew()"
-                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
-                                            <span class="block truncate">{!! __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}</span>
-                                        </div>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                                </div>
+                                <!-- Name Component -->
+                                @include('inventory.partials.form.name', ['defaultName' => $sparepart->name])
                             </div>
                         
                             <!-- Continued in next steps due to size constraints... (Merk, Kategori, Warna, etc) -->
                             <!-- TEMPORARY PLACEHOLDER FOR REMAINING BASIC INFO -->
                             <!-- Row 2: Merk & Kategori -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 col-span-full">
-                                <!-- Merk (Creatable Select) -->
-                                <div class="relative" x-data="{
-                                    open: false,
-                                    search: @js(old('brand_name', $sparepart->brand->name ?? '')),
-                                    selected: @js(old('brand_id', $sparepart->brand_id)),
-                                    options: {{ json_encode($brands) }},
-                                    get filteredOptions() {
-                                        let found = this.options.find(o => o.id == this.selected);
-                                        if (this.search === '' || (found && this.search === found.name)) return this.options;
-                                        return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
-                                    },
-                                    select(option) {
-                                        this.selected = option.id;
-                                        this.search = option.name;
-                                        this.$dispatch('update-brand', option.id);
-                                        this.open = false;
-                                    },
-                                    async createNew() {
-                                        let newName = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-                                        try {
-                                            const res = await fetch('{{ route('brands.store') }}', {
-                                                method: 'POST',
-                                                headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                                                body: JSON.stringify({name: newName})
-                                            });
-                                            const data = await res.json();
-                                            if (data.brand) {
-                                                this.options.push({id: data.brand.id, name: data.brand.name});
-                                                this.select({id: data.brand.id, name: data.brand.name});
-                                            }
-                                        } catch(e) { this.search = newName; }
-                                    },
-                                    init() {
-                                        if (this.selected) {
-                                            let found = this.options.find(o => o.id == this.selected);
-                                            if (found) this.search = found.name;
-                                            this.$dispatch('update-brand', this.selected);
-                                        }
-                                        this.$watch('itemBrand', value => {
-                                             if (value != this.selected) {
-                                                this.selected = value;
-                                                let f = this.options.find(o => o.id == value);
-                                                if(f) {
-                                                    this.search = f.name;
-                                                } else if (value && isNaN(value)) {
-                                                    this.search = value;
-                                                }
-                                             }
-                                        });
-                                    }
-                                }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                    <label for="brand" class="input-label">{{ __('ui.brand') }} <span class="text-danger-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="hidden" name="brand_id" x-model="selected">
-                                        <input type="text" 
-                                               id="brand"
-                                               name="brand_name"
-                                               class="input-field w-full pr-10 cursor-text" 
-                                               :class="{'bg-secondary-100 text-secondary-500': isLocked}"
-                                               x-model="search" 
-                                               :readonly="isLocked"
-                                               @focus="!isLocked && (open = true, $el.select())" 
-                                               @input="open = true" 
-                                               @keydown.enter.prevent="createNew()"
-                                               placeholder="{{ __('ui.placeholder_brand') }}" 
-                                               autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama merk harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
-                                        
-                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
-                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div x-show="open" 
-                                         x-transition:leave="transition ease-in duration-100"
-                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in filteredOptions" :key="option.id">
-                                            <div @click="select(option)" 
-                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                                <span x-text="option.name" class="block truncate" :class="{ 'font-semibold': selected == option.id, 'font-normal': selected != option.id }"></span>
-                                            </div>
-                                        </template>
-                                        <div x-show="search.length > 0 && !options.some(o => o.name.toLowerCase() === search.toLowerCase())" 
-                                             @click="createNew()"
-                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
-                                            <span class="block truncate">{!! __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}</span>
-                                        </div>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('brand_id')" class="mt-2" />
-                                </div>
+                                <!-- Brand Component -->
+                                @include('inventory.partials.form.brand', ['defaultBrandName' => $sparepart->brand->name ?? '', 'defaultBrandId' => $sparepart->brand_id])
 
-                                <!-- Kategori (Creatable Select) -->
-                                <div class="relative" x-data="{
-                                    open: false,
-                                    search: @js(old('category_name', $sparepart->category->name ?? '')),
-                                    selected: @js(old('category_id', $sparepart->category_id)),
-                                    options: {{ json_encode($categories) }},
-                                    get filteredOptions() {
-                                        let found = this.options.find(o => o.id == this.selected);
-                                        if (this.search === '' || (found && this.search === found.name)) return this.options;
-                                        return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
-                                    },
-                                    select(option) {
-                                        this.selected = option.id;
-                                        this.search = option.name;
-                                        this.$dispatch('update-category', option.id);
-                                        this.open = false;
-                                    },
-                                    async createNew() {
-                                        let newName = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-                                        try {
-                                            const res = await fetch('{{ route('categories.store') }}', {
-                                                method: 'POST',
-                                                headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                                                body: JSON.stringify({name: newName})
-                                            });
-                                            const data = await res.json();
-                                            if (data.category) {
-                                                this.options.push({id: data.category.id, name: data.category.name});
-                                                this.select({id: data.category.id, name: data.category.name});
-                                            }
-                                        } catch(e) { this.search = newName; }
-                                    },
-                                    init() {
-                                        if (this.selected) {
-                                            let found = this.options.find(o => o.id == this.selected);
-                                            if (found) this.search = found.name;
-                                            this.$dispatch('update-category', this.selected);
-                                        }
-                                        this.$watch('itemCategory', value => {
-                                             if (value != this.selected) {
-                                                this.selected = value;
-                                                let f = this.options.find(o => o.id == value);
-                                                if(f) {
-                                                    this.search = f.name;
-                                                } else if (value && isNaN(value)) {
-                                                    this.search = value;
-                                                }
-                                             }
-                                        });
-                                    }
-                                }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                    <label for="category" class="input-label">{{ __('ui.category') }} <span class="text-danger-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="hidden" name="category_id" x-model="selected">
-                                        <input type="text" 
-                                               id="category"
-                                               name="category_name"
-                                               class="input-field w-full pr-10 cursor-text" 
-                                               :class="{'bg-secondary-100 text-secondary-500': isLocked}"
-                                               x-model="search" 
-                                               :readonly="isLocked"
-                                               @focus="!isLocked && (open = true, $el.select())" 
-                                               @input="open = true" 
-                                               @keydown.enter.prevent="createNew()"
-                                               placeholder="{{ __('ui.placeholder_category') }}" 
-                                               autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama kategori harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)" required>
-                                        
-                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="!isLocked && (open = !open)" :disabled="isLocked">
-                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div x-show="open" 
-                                         x-transition:leave="transition ease-in duration-100"
-                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in filteredOptions" :key="option.id">
-                                            <div @click="select(option)" 
-                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                                <span x-text="option.name" class="block truncate" :class="{ 'font-semibold': selected == option.id, 'font-normal': selected != option.id }"></span>
-                                            </div>
-                                        </template>
-                                        <div x-show="search.length > 0 && !options.some(o => o.name.toLowerCase() === search.toLowerCase())" 
-                                             @click="createNew()"
-                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
-                                            <span class="block truncate">{!! __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}</span>
-                                        </div>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
-                                </div>
+                                <!-- Category Component -->
+                                @include('inventory.partials.form.category', ['defaultCategoryName' => $sparepart->category->name ?? '', 'defaultCategoryId' => $sparepart->category_id])
                             </div>
 
                             <!-- Row 3: Warna, Usia & Kondisi -->
@@ -426,150 +78,14 @@
                                 selectedAge: @js(old('age', $sparepart->age ?? '')),
                                 selectedCondition: @js(old('condition', $sparepart->condition ?? ''))
                             }" x-effect="if(selectedAge === 'Baru' && !selectedCondition) { selectedCondition = 'Baik'; }">
-                                <!-- Warna (Creatable Select) -->
-                                <div class="relative" x-data="{
-                                    open: false,
-                                    search: @js(old('color', $sparepart->color ?? '')),
-                                    selected: @js(old('color', $sparepart->color)),
-                                    options: {{ json_encode($colors) }},
-                                    get filteredOptions() {
-                                        if (this.search === '' || (this.options.includes(this.search) && this.search === this.selected)) return this.options;
-                                        return this.options.filter(option => option.toLowerCase().includes(this.search.toLowerCase()));
-                                    },
-                                    select(value) {
-                                        this.selected = value;
-                                        this.search = value;
-                                        this.itemColor = value;
-                                        this.open = false;
-                                    },
-                                    createNew() {
-                                        let newValue = this.search.toLowerCase().replace(/\b\w/g, s => s.toUpperCase());
-                                        this.select(newValue);
-                                    },
-                                    init() {
-                                        if (this.selected) {
-                                            this.search = this.selected;
-                                        }
-                                        this.$watch('itemColor', value => {
-                                             if (value !== this.selected) { this.selected = value; this.search = value; }
-                                        });
-                                    }
-                                }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                    <label for="color" class="input-label">{{ __('ui.color') }}</label>
-                                    <div class="relative">
-                                        <input type="hidden" name="color" x-model="selected">
-                                        <input type="text" 
-                                               id="color"
-                                               class="input-field w-full pr-10 cursor-text" 
-                                               x-model="search" 
-                                               @focus="open = true; $el.select()" 
-                                               @input="open = true; selected = search; itemColor = search" 
-                                               @keydown.enter.prevent="createNew()"
-                                               placeholder="{{ __('ui.placeholder_color') }}" 
-                                               autocomplete="off" minlength="2" maxlength="50" pattern="[a-zA-Z\s\-]+" title="Warna hanya boleh berisi huruf, spasi, dan strip">
-                                        <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
-                                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div x-show="open" 
-                                         x-transition:leave="transition ease-in duration-100"
-                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in filteredOptions" :key="option">
-                                            <div @click="select(option)" 
-                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option }"></span>
-                                            </div>
-                                        </template>
-                                        <div x-show="search.length > 0 && !options.some(o => o.toLowerCase() === search.toLowerCase())" 
-                                             @click="createNew()"
-                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
-                                            <span class="block truncate">{!! __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}</span>
-                                        </div>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('color')" class="mt-2" />
-                                </div>
+                                <!-- Color Component -->
+                                @include('inventory.partials.form.color', ['defaultColor' => $sparepart->color])
 
-                                <!-- Status Pemakaian (Age) -->
-                                <div class="relative" x-data="{
-                                    open: false,
-                                    selected: selectedAge,
-                                    options: ['{{ __('ui.age_new') }}', '{{ __('ui.age_used') }}'],
-                                    placeholder: '{{ __('ui.select_age') }}',
-                                    select(value) {
-                                        this.selected = value;
-                                        selectedAge = value;
-                                        this.open = false;
-                                    }
-                                }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                    <label for="age-dropdown-btn" class="input-label">{{ __('ui.age') }} <span class="text-danger-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="hidden" name="age" x-model="selected">
-                                        <button type="button" 
-                                                id="age-dropdown-btn"
-                                                @click="open = !open"
-                                                class="input-field w-full text-left pr-10"
-                                                :class="{'text-secondary-400': !selected, 'text-secondary-900': selected}">
-                                            <span x-text="selected || placeholder"></span>
-                                            <svg class="h-5 w-5 text-secondary-400 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="margin: auto 0.5rem auto auto;">
-                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div x-show="open" 
-                                         x-transition:leave="transition ease-in duration-100"
-                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in options" :key="option">
-                                            <div @click="select(option)" 
-                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900"
-                                                 :class="{'bg-primary-50': selected === option}">
-                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option }"></span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('age')" class="mt-2" />
-                                </div>
+                                <!-- Age Component -->
+                                @include('inventory.partials.form.age', ['defaultAge' => $sparepart->age])
 
-                                <!-- Kondisi Barang -->
-                                <div class="relative" x-data="{
-                                    open: false,
-                                    selected: selectedCondition,
-                                    options: ['{{ __('ui.condition_good') }}', '{{ __('ui.condition_bad') }}', '{{ __('ui.condition_lost') }}'],
-                                    placeholder: '{{ __('ui.select_condition') }}',
-                                    select(value) {
-                                        this.selected = value;
-                                        selectedCondition = value;
-                                        this.open = false;
-                                    }
-                                }" @click.outside="open = false" @keydown.escape.window="open = false" x-effect="selected = selectedCondition">
-                                    <label for="condition-dropdown-btn" class="input-label">{{ __('ui.condition') }} <span class="text-danger-500">*</span></label>
-                                    <div class="relative">
-                                        <input type="hidden" name="condition" x-model="selected">
-                                        <button type="button" 
-                                                id="condition-dropdown-btn"
-                                                @click="open = !open"
-                                                class="input-field w-full text-left pr-10"
-                                                :class="{'text-secondary-400': !selected, 'text-secondary-900': selected}">
-                                            <span x-text="selected || placeholder"></span>
-                                            <svg class="h-5 w-5 text-secondary-400 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="margin: auto 0.5rem auto auto;">
-                                                <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                    <div x-show="open" 
-                                         x-transition:leave="transition ease-in duration-100"
-                                         class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                        <template x-for="option in options" :key="option">
-                                            <div @click="select(option)" 
-                                                 class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900"
-                                                 :class="{'bg-primary-50': selected === option}">
-                                                <span x-text="option" class="block truncate" :class="{ 'font-semibold': selected === option }"></span>
-                                            </div>
-                                        </template>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('condition')" class="mt-2" />
-                                </div>
+                                <!-- Condition Component -->
+                                @include('inventory.partials.form.condition', ['defaultCondition' => $sparepart->condition])
                             </div>
 
                             <!-- Gambar (Optional) -->
@@ -578,7 +94,8 @@
                                 
                                 <input type="hidden" name="existing_image" x-model="existingImage">
                                 
-                                <div x-data="{ isDragging: false, fileName: null }" 
+                                <div x-data="{ isDragging: false, fileName: null, isZoomed: false }" 
+                                     @keydown.window.escape="if(isZoomed) { isZoomed = false; $event.preventDefault(); }"
                                      class="mt-1 flex flex-col items-center justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md transition-colors duration-200"
                                      :class="{ 'border-primary-400 bg-primary-50': isDragging, 'border-gray-300 hover:border-primary-400': !isDragging }"
                                      x-on:dragover.prevent="isDragging = true"
@@ -622,12 +139,45 @@
                                     <!-- Preview Area -->
                                     <template x-if="imagePreview">
                                         <div class="mb-4 relative group">
-                                            <img :src="imagePreview" class="h-40 w-auto object-contain rounded-md shadow-sm border border-secondary-200">
+                                            <!-- Image Thumbnail with Zoom Hover -->
+                                            <div class="relative cursor-zoom-in" @click="isZoomed = true">
+                                                <img :src="imagePreview" class="h-40 w-auto object-contain rounded-md shadow-sm border border-secondary-200 group-hover:opacity-90 transition-opacity">
+                                                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity bg-secondary-900/10 rounded-md">
+                                                    <svg class="w-8 h-8 text-white drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Delete Button -->
                                             <button type="button" @click="imagePreview = null; fileName = null; existingImage = ''; $refs.fileInput.value = ''" 
-                                                class="absolute -top-2 -right-2 bg-danger-500 text-white rounded-full p-1 shadow-md hover:bg-danger-600 focus:outline-none transition-colors"
+                                                class="absolute -top-2 -right-2 z-10 bg-danger-500 text-white rounded-full p-1 shadow-md hover:bg-danger-600 focus:outline-none transition-colors"
                                                 title="{{ __('ui.delete') }}">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                             </button>
+
+                                            <!-- Lightbox Modal via Teleport -->
+                                            <template x-teleport="body">
+                                                <div x-show="isZoomed" 
+                                                     class="fixed inset-0 z-[100] flex items-center justify-center bg-secondary-900/90 backdrop-blur-sm p-4"
+                                                     x-transition:enter="ease-out duration-300"
+                                                     x-transition:enter-start="opacity-0"
+                                                     x-transition:enter-end="opacity-100"
+                                                     x-transition:leave="ease-in duration-200"
+                                                     x-transition:leave-start="opacity-100"
+                                                     x-transition:leave-end="opacity-0"
+                                                     x-cloak>
+                                                    <button type="button" @click="isZoomed = false" class="absolute top-6 right-6 text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-full p-2 transition-colors cursor-pointer z-10 focus:outline-none focus:ring-2 focus:ring-white">
+                                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
+                                                    <img :src="imagePreview" @click.away="isZoomed = false" class="max-h-[90vh] max-w-[90vw] object-contain rounded-lg shadow-2xl cursor-zoom-out"
+                                                         x-show="isZoomed"
+                                                         x-transition:enter="ease-out duration-300"
+                                                         x-transition:enter-start="opacity-0 scale-90"
+                                                         x-transition:enter-end="opacity-100 scale-100"
+                                                         x-transition:leave="ease-in duration-200"
+                                                         x-transition:leave-start="opacity-100 scale-100"
+                                                         x-transition:leave-end="opacity-0 scale-90">
+                                                </div>
+                                            </template>
                                         </div>
                                     </template>
 
@@ -673,102 +223,8 @@
                              <h3 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_location_stock') }}</h3>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Lokasi Penyimpanan (Creatable Select) -->
-                            <div class="relative" x-data="{
-                                open: false,
-                                search: @js(old('location_name', $sparepart->location->name ?? '')),
-                                selected: @js(old('location_id', $sparepart->location_id)),
-                                options: {{ json_encode($locations) }},
-                                get filteredOptions() {
-                                    let found = this.options.find(o => o.id == this.selected);
-                                    if (this.search === '' || (found && this.search === found.name)) return this.options;
-                                    return this.options.filter(o => o.name.toLowerCase().includes(this.search.toLowerCase()));
-                                },
-                                select(option) {
-                                    this.selected = option.id;
-                                    this.search = option.name;
-                                    this.open = false;
-                                },
-                                async createNew() {
-                                    let newName = this.search;
-                                    try {
-                                        const res = await fetch('{{ route('locations.store') }}', {
-                                            method: 'POST',
-                                            headers: {'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}'},
-                                            body: JSON.stringify({name: newName})
-                                        });
-                                        const data = await res.json();
-                                        if (data.location) {
-                                            this.options.push({id: data.location.id, name: data.location.name});
-                                            this.select({id: data.location.id, name: data.location.name});
-                                        }
-                                    } catch(e) { this.search = newName; }
-                                },
-                                init() {
-                                    if (this.selected) {
-                                        let found = this.options.find(o => o.id == this.selected);
-                                        if (found) this.search = found.name;
-                                    }
-                                }
-                            }" @click.outside="open = false" @keydown.escape.window="open = false">
-                                <label for="location" class="input-label">{{ __('ui.location') }} <span class="text-danger-500">*</span></label>
-                                <div class="relative">
-                                    <input type="hidden" name="location_id" x-model="selected">
-                                    <input type="text" 
-                                           id="location"
-                                           name="location_name"
-                                           class="input-field w-full pr-10 cursor-text" 
-                                           x-model="search" 
-                                           @focus="open = true; $el.select()" 
-                                           @input="open = true" @keydown.enter.prevent="createNew()" 
-                                           placeholder="{{ __('ui.select_location') }}"  
-                                           autocomplete="off" minlength="2" maxlength="100" pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-\(\)\/]*$" title="Nama lokasi harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)">
-                                    
-                                    <button type="button" class="absolute inset-y-0 right-0 flex items-center pr-2 text-secondary-400" @click="open = !open">
-                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                            <path fill-rule="evenodd" d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </div>
-
-                                <!-- Dropdown -->
-                                <div x-show="open" 
-                                     x-transition:leave="transition ease-in duration-100"
-                                     x-transition:leave-start="opacity-100"
-                                     x-transition:leave-end="opacity-0"
-                                    class="absolute z-50 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                    
-                                    <template x-for="option in filteredOptions" :key="option.id">
-                                        <div @click="select(option)" 
-                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-primary-50 text-secondary-900">
-                                            <span x-text="option.name" class="block truncate" :class="{ 'font-semibold': selected == option.id, 'font-normal': selected != option.id }"></span>
-                                            
-                                            <span x-show="selected == option.id" class="absolute inset-y-0 right-0 flex items-center pr-4 text-primary-600">
-                                                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                </svg>
-                                            </span>
-                                        </div>
-                                    </template>
-
-                                    <!-- Create New Option (Superadmin Only) -->
-                                    @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
-                                        <div x-show="search.length > 0 && !options.some(o => o.name.toLowerCase() === search.toLowerCase())" 
-                                             @click="createNew()"
-                                             class="cursor-pointer select-none relative py-2 pl-3 pr-9 text-primary-600 hover:bg-primary-50 border-t border-secondary-100">
-                                            <span class="block truncate">
-                                                {!! __('ui.add_new', ['search' => '<span x-text="search" class="font-bold"></span>']) !!}
-                                            </span>
-                                        </div>
-
-                                    @else
-                                         <div x-show="filteredOptions.length === 0" class="cursor-default select-none relative py-2 pl-3 pr-9 text-secondary-500 italic">
-                                            {{ __('ui.location_not_found') }}
-                                        </div>
-                                    @endif
-                                </div>
-                                <x-input-error :messages="$errors->get('location_id')" class="mt-2" />
-                            </div>
+                            <!-- Location Component -->
+                            @include('inventory.partials.form.location', ['defaultLocationName' => $sparepart->location->name ?? '', 'defaultLocationId' => $sparepart->location_id])
 
                             <!-- Minimum Stok -->
                             <div>
@@ -951,7 +407,7 @@
                     <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
                         {{ __('ui.cancel') }}
                     </a>
-                    <button type="submit" class="btn btn-primary" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
+                    <button type="submit" data-testid="btn-submit-inventory-edit" class="btn btn-primary" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
                         <span x-show="!isSubmitting">{{ __('ui.save_changes') }}</span>
                         <span x-show="isSubmitting" class="flex items-center gap-2">
                             <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -966,449 +422,12 @@
         </div>
     </div>
     @push('scripts')
-    <!-- Tesseract.js (Di-host secara LOKAL untuk mengantisipasi blokir CORS ISP Indonesia / Browser Security) -->
-    <script src="{{ asset('vendor/tesseract/tesseract.min.js') }}"></script>
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('inventoryForm', () => ({
-                type: @js(old('type', $sparepart->type)),
-                partNumber: @js(old('part_number', $sparepart->part_number)),
-                isLocked: false,
-                itemName: @js(old('name', $sparepart->name)),
-                itemBrand: @js(old('brand_id', $sparepart->brand_id)),
-                itemCategory: @js(old('category_id', $sparepart->category_id)),
-                itemColor: @js(old('color', $sparepart->color)), 
-                itemUnit: @js(old('unit', $sparepart->unit)),
-                itemPrice: @js(old('price', $sparepart->price)),
-                imagePreview: null,
-                existingImage: @js(old('existing_image', $sparepart->image ? asset('storage/' . $sparepart->image) : '')),
-                isLoading: false,
-                isSubmitting: false,
-
-                saveDraft() {
-                    const draft = {
-                        type: this.type,
-                        partNumber: this.partNumber,
-                        itemName: this.itemName,
-                        itemBrand: this.itemBrand,
-                        itemCategory: this.itemCategory,
-                        itemColor: this.itemColor,
-                        itemUnit: this.itemUnit,
-                        itemPrice: this.itemPrice
-                    };
-                    localStorage.setItem('inventory_draft_' + window.location.pathname, JSON.stringify(draft));
-                },
-
-                init() {
-                    // 1. Setup Global Trigger for Scan Modal
-                    window.triggerScanModal = () => {
-                        console.log('Trigger Scan Modal via Global Function');
-                        this.openScanModal();
-                    }
-
-                    // 2. Check for Pre-filled PN
-                    if (this.partNumber) {
-                         this.checkPN(true);
-                    }
-
-                    // Pre-fill image preview if existing
-                    if (this.existingImage) {
-                        this.imagePreview = this.existingImage;
-                    }
-
-                    // Restore Image from LocalStorage if Validation Failed (same logic as create)
-                    const hasErrors = {{ $errors->any() ? 'true' : 'false' }};
-                    if (hasErrors) {
-                        const storedImage = localStorage.getItem('temp_inventory_image');
-                        if (storedImage) {
-                            this.imagePreview = storedImage;
-                            fetch(storedImage)
-                                .then(res => res.blob())
-                                .then(blob => {
-                                    const file = new File([blob], "restored-image.png", { type: blob.type });
-                                    const dataTransfer = new DataTransfer();
-                                    dataTransfer.items.add(file);
-                                    this.$nextTick(() => {
-                                        if (this.$refs.fileInput) {
-                                            this.$refs.fileInput.files = dataTransfer.files;
-                                            this.fileName = file.name;
-                                        }
-                                    });
-                                });
-                        }
-                    } else {
-                        localStorage.removeItem('temp_inventory_image');
-                        
-                        // Restore form draft if no validation errors
-                        const draftStr = localStorage.getItem('inventory_draft_' + window.location.pathname);
-                        if (draftStr) {
-                            try {
-                                const draft = JSON.parse(draftStr);
-                                this.type = draft.type || this.type;
-                                this.partNumber = draft.partNumber || this.partNumber;
-                                this.itemName = draft.itemName || this.itemName;
-                                this.itemBrand = draft.itemBrand || this.itemBrand;
-                                this.itemCategory = draft.itemCategory || this.itemCategory;
-                                this.itemColor = draft.itemColor || this.itemColor;
-                                this.itemUnit = draft.itemUnit || this.itemUnit;
-                                this.itemPrice = draft.itemPrice || this.itemPrice;
-                            } catch(e) {}
-                        }
-                    }
-
-                    // Setup auto-save watchers
-                    this.$watch('type', () => this.saveDraft());
-                    this.$watch('partNumber', () => this.saveDraft());
-                    this.$watch('itemName', () => this.saveDraft());
-                    this.$watch('itemBrand', () => this.saveDraft());
-                    this.$watch('itemCategory', () => this.saveDraft());
-                    this.$watch('itemColor', () => this.saveDraft());
-                    this.$watch('itemUnit', () => this.saveDraft());
-                    this.$watch('itemPrice', () => this.saveDraft());
-
-                    // Clear draft on submit
-                    document.querySelector('form').addEventListener('submit', () => {
-                        localStorage.removeItem('inventory_draft_' + window.location.pathname);
-                    });
-                },
-
-                // Auto-fill Logic
-                async checkPN(isInitialLoad = false) {
-                    if (!this.partNumber) return;
-                    
-                    this.isLoading = true;
-                    try {
-                        const response = await axios.get('{{ route("inventory.check-part-number") }}', {
-                            params: { part_number: this.partNumber }
-                        });
-
-                        if (response.data.exists) {
-                            const data = response.data.data;
-                            
-                            if (!isInitialLoad) {
-                                this.itemName = data.name;
-                                this.itemBrand = data.brand_id;
-                                this.itemCategory = data.category_id;
-                                this.type = data.type;
-                                this.itemUnit = data.unit;
-                                this.itemPrice = data.price; // Auto-fill price
-                                
-                                // Handle Image
-                                if (data.image_url) {
-                                    this.imagePreview = data.image_url;
-                                    this.existingImage = data.image_path;
-                                }
-                            }
-
-                            this.isLocked = true;
-                            console.log('Produk ditemukan, data diisi otomatis (atau dilock).');
-                        } else {
-                            // PN baru (belum ada di database): unlock semua field
-                            this.isLocked = false;
-                        }
-                    } catch (error) {
-                        console.error('Error checking PN:', error);
-                    } finally {
-                        this.isLoading = false;
-                    }
-                },
-
-                // OCR Functionality
-                scanModalOpen: false,
-                ocrLoading: false,
-                
-                scanErrorMsg: null,
-                scanSuccessMsg: null,
-                scanRawText: null,
-                stream: null,
-                debugMode: false,
-                debugImage: null,
-                debugLog: '',
-                
-                log(msg) {
-                    if (this.debugMode) {
-                        this.debugLog += msg + "\n";
-                    }
-                    console.log("[OCR] " + msg);
-                },
-                videoDevices: [],
-                currentDeviceIndex: 0,
-                currentDeviceLabel: '',
-
-                openScanModal() {
-                    this.scanModalOpen = true;
-                    this.getVideoDevices().then(() => {
-                        this.startCamera();
-                    });
-                },
-
-                closeScanModal() {
-                    this.stopCamera();
-                    this.scanModalOpen = false;
-                    this.ocrLoading = false;
-                    this.scanErrorMsg = null;
-                    this.scanSuccessMsg = null;
-                    this.scanRawText = null;
-                    this.debugLog = '';
-                },
-
-                async getVideoDevices() {
-                    try {
-                        const devices = await navigator.mediaDevices.enumerateDevices();
-                        this.videoDevices = devices.filter(device => device.kind === 'videoinput');
-                    } catch (err) {
-                        console.error("Error enumerating devices:", err);
-                    }
-                },
-
-                async switchCamera() {
-                    if (this.videoDevices.length < 2) return;
-                    this.currentDeviceIndex = (this.currentDeviceIndex + 1) % this.videoDevices.length;
-                    this.stopCamera();
-                    await this.startCamera();
-                },
-
-                async startCamera() {
-                    try {
-                        const constraints = { video: {} };
-                        if (this.videoDevices.length > 0) {
-                            const deviceId = this.videoDevices[this.currentDeviceIndex].deviceId;
-                            constraints.video.deviceId = { exact: deviceId };
-                            this.currentDeviceLabel = this.videoDevices[this.currentDeviceIndex].label;
-                        } else {
-                            constraints.video.facingMode = 'environment';
-                        }
-                        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-                        this.$refs.video.srcObject = this.stream;
-                        if (!this.currentDeviceLabel && this.videoDevices.length > 0) {
-                            this.getVideoDevices().then(() => {
-                                if (this.videoDevices[this.currentDeviceIndex]) {
-                                    this.currentDeviceLabel = this.videoDevices[this.currentDeviceIndex].label;
-                                }
-                            });
-                        }
-                    } catch (err) {
-                        console.error("Error detecting camera:", err);
-                        this.scanErrorMsg = "{{ __('ui.camera_access_denied') }}";
-                    }
-                },
-
-                stopCamera() {
-                    if (this.stream) {
-                        this.stream.getTracks().forEach(track => track.stop());
-                        this.stream = null;
-                    }
-                },
-
-                async captureAndScan() {
-                    if (!this.stream) return;
-
-                    this.ocrLoading = true;
-                    this.scanErrorMsg = null;
-                    this.scanSuccessMsg = null;
-                    this.scanRawText = null;
-                    this.debugLog = '';
-
-                    const video = this.$refs.video;
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    canvas.getContext('2d').drawImage(video, 0, 0);
-                    const image = canvas.toDataURL('image/png');
-                    const processedImage = await this.preprocessImage(image);
-                    this.debugImage = processedImage; 
-                    await this.processFullAnalysis(processedImage);
-                },
-
-                async preprocessImage(imageSource) {
-                    return new Promise((resolve) => {
-                        this.log("Memulai Pra-Pemrosesan Gambar...");
-                        const img = new Image();
-                        img.onload = () => {
-                            this.log(`Resolusi Asli: ${img.width}x${img.height}`);
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            
-                            let width = img.width;
-                            let height = img.height;
-                            const MAX_WIDTH = 1200;
-                            const MAX_HEIGHT = 1200;
-
-                            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
-                                if (width > height) {
-                                    height = Math.round((MAX_WIDTH / width) * height);
-                                    width = MAX_WIDTH;
-                                } else {
-                                    width = Math.round((MAX_HEIGHT / height) * width);
-                                    height = MAX_HEIGHT;
-                                }
-                            }
-                            this.log(`Resolusi Setelah Skala: ${width}x${height}`);
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            
-                            ctx.imageSmoothingEnabled = true; 
-                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                            
-                            this.log("Mengubah format gambar tanpa filter agresif...");
-                            resolve(canvas.toDataURL('image/png'));
-                        };
-                        img.onerror = () => {
-                            this.log("Gagal memuat gambar untuk canvas.");
-                            resolve(imageSource); // fallback
-                        };
-                        img.src = imageSource;
-                    });
-                },
-
-                handleFileUpload(e) {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    this.ocrLoading = true;
-                    this.scanErrorMsg = null;
-                    this.scanSuccessMsg = null;
-                    this.scanRawText = null;
-                    this.debugLog = '';
-
-                    const reader = new FileReader();
-                    reader.onload = async (event) => {
-                        const processedImage = await this.preprocessImage(event.target.result);
-                        this.debugImage = processedImage; 
-                        await this.processFullAnalysis(processedImage);
-                    };
-                    reader.readAsDataURL(file);
-                },
-
-                async processFullAnalysis(imageSource) {
-                    let worker = null;
-                    try {
-                        this.ocrLoading = true;
-                        this.log("Menginisialisasi Mesin OCR Tesseract...");
-                        worker = Tesseract.createWorker({
-                            workerPath: '{{ asset("vendor/tesseract/worker.min.js") }}',
-                            corePath: '{{ asset("vendor/tesseract/tesseract-core.wasm.js") }}',
-                            langPath: '{{ asset("vendor/tesseract/lang-data") }}',
-                            logger: m => {
-                                if(m.status === 'recognizing text') {
-                                    this.log(`Proses OCR: ${Math.round(m.progress * 100)}%`);
-                                } else {
-                                    this.log(`Tesseract: ${m.status}`);
-                                }
-                            },
-                        });
-                        this.log("Pekerja Tesseract disiapkan. Memuat bahasa...");
-                        await worker.load();
-                        await worker.loadLanguage('eng');
-                        await worker.initialize('eng');
-                        await worker.setParameters({ 
-                            tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-/. ',
-                            tessedit_pageseg_mode: '11' 
-                        });
-                        const { data: { text } } = await worker.recognize(imageSource);
-                        this.log("Teks berhasil diekstrak.");
-                        const rawText = text.toUpperCase();
-                        this.scanRawText = rawText;
-                        
-                        const knownBrands = ['LENOVO', 'DELL', 'HP', 'ASUS', 'ACER', 'APPLE', 'SAMSUNG', 'TOSHIBA', 'SONY', 'MSI', 'LOGITECH', 'CANON', 'EPSON', 'PROLINK', 'UGREEN'];
-                        let foundBrand = '';
-                        for (const brand of knownBrands) {
-                            if (rawText.toUpperCase().includes(brand)) {
-                                foundBrand = brand.charAt(0) + brand.slice(1).toLowerCase(); 
-                                break; 
-                            }
-                        }
-
-                        // 1.5. Name / Description Detection
-                        let foundName = '';
-                        const descRegex = /(?:DESC|DESCRIPTION|NAME)[\s.:]*([^\n\r]+)/i;
-                        const matchDesc = rawText.match(descRegex);
-                        if (matchDesc && matchDesc[1]) {
-                            foundName = matchDesc[1].trim();
-                            console.log("Found Description:", foundName);
-                        }
-
-                        // 2. Part Number Detection
-                        let foundPN = '';
-                        
-                        // Heuristic A: Explicit Label "PN", "P/N", "Part No", "Orig.PN", etc.
-                        const pnRegex = /(?:ORIG\.?|SHIP|MACHINE)?[\s\.]*(?:P\/N|PN|PART NO|PART NUMBER)[\s.:]*([A-Z0-9\-\/]{3,})/i;
-                        const matchA = rawText.match(pnRegex);
-                        if (matchA && matchA[1]) {
-                            foundPN = matchA[1].trim();
-                            console.log("Found PN using Heuristic A:", foundPN);
-                        }
-                        
-                        // Heuristic B: Line by line inspection
-                        if (!foundPN) {
-                            const lines = rawText.split('\n');
-                            for (let i = 0; i < lines.length; i++) {
-                                let line = lines[i].trim();
-                                if(!line) continue;
-                                
-                                // Look for standalone standard PN formats
-                                if (/^[A-Z0-9]{2,}-[A-Z0-9]{3,}$/i.test(line) && line.length > 5 && line.length < 20) {
-                                     foundPN = line;
-                                     console.log("Found PN using Heuristic B (Regex pattern):", foundPN);
-                                     break;
-                                }
-                                
-                                // If the line contains "S/N" (Serial Number) or "MAC", we skip it
-                                if (/S\/N|SN:|MAC/i.test(line)) continue;
-                            }
-                        }
-
-                        if (foundPN) {
-                            // Typos correction: Lenovo specific PNs often start with '5' but OCR reads 'S' or vice-versa
-                            if (foundPN.startsWith('555') && foundPN.length >= 8) {
-                                foundPN = '5SS' + foundPN.substring(3);
-                            } else if (foundPN.startsWith('582') && foundPN.length >= 8) {
-                                // '8' is often misread from 'B' (e.g. 5B2...)
-                                foundPN = '5B2' + foundPN.substring(3);
-                            } else if (foundPN.startsWith('S82') && foundPN.length >= 8) {
-                                // 'S' for '5' and '8' for 'B'
-                                foundPN = '5B2' + foundPN.substring(3);
-                            } else if (foundPN.startsWith('SB2') && foundPN.length >= 8) {
-                                foundPN = '5B2' + foundPN.substring(3);
-                            }
-                            // Clean stray characters from extremities
-                            this.partNumber = foundPN.replace(/^[^A-Z0-9]+|[^A-Z0-9]+$/g, '');
-                            this.scanSuccessMsg = `Part Number terdeteksi: ${this.partNumber}`;
-                            
-                            // Di halaman Edit, kita isi jika kosong agar tidak menimpa data eksisting sembarangan
-                            if (foundBrand && !this.itemBrand) this.itemBrand = foundBrand;
-                            if (foundName && (!this.itemName || this.itemName.trim() === '')) this.itemName = foundName;
-                            
-                            // Beri jeda 1 detik agar pengguna sempat membaca 'Sukses', lalu tutuplah pop-up modal
-                            setTimeout(() => {
-                                this.closeScanModal();
-                            }, 1000);
-                        } else {
-                            this.scanErrorMsg = "Part Number tidak dapat ditemukan dalam gambar. Coba pastikan gambar lebih jelas dan terang.";
-                            this.log("Gagal mengekstrak Part Number yang valid.");
-                        }
-
-                    } catch (error) {
-                        console.error('OCR Error:', error);
-                        this.log(`Error Terjadi: ${error.message || error}`);
-                        this.scanErrorMsg = `Gagal menganalisis: ${error.message || error}`;
-                    } finally {
-                        this.ocrLoading = false;
-                        if (worker) {
-                            await worker.terminate();
-                            this.log("Pekerja Tesseract dihentikan.");
-                        }
-                    }
-                }
-            }))
-        })
-    </script>
+    @include('inventory.partials._edit_scripts')
     @endpush
 
     {{-- Merge Confirmation Modal --}}
     @if(session('duplicate_detected'))
-    <div x-data="{ showMergeModal: true }" x-show="showMergeModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+    <div x-data="{ showMergeModal: true, isSubmitting: false }" x-show="showMergeModal" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             {{-- Background Overlay --}}
             <div x-show="showMergeModal"
@@ -1520,31 +539,47 @@
                 {{-- Footer Actions --}}
                 <div class="bg-secondary-50 px-6 py-4 flex flex-col sm:flex-row gap-3 sm:gap-3 border-t border-secondary-200">
                     {{-- Keep Separate Form --}}
-                    <form action="{{ route('inventory.update', $sparepart) }}" method="POST" class="flex-1" novalidate>
+                    <form action="{{ route('inventory.update', $sparepart) }}" method="POST" class="flex-1" @submit="isSubmitting = true" novalidate>
                         @csrf
                         @method('PUT')
                         @foreach(old() as $key => $value)
-                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @if(is_string($value) || is_numeric($value))
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endif
                         @endforeach
                         <input type="hidden" name="keep_separate" value="true">
-                        <button type="submit" class="btn btn-secondary w-full justify-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Simpan Terpisah
+                        <button type="submit" class="btn btn-secondary w-full justify-center" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
+                            <span x-show="!isSubmitting" class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Simpan Terpisah
+                            </span>
+                            <span x-show="isSubmitting" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Memproses...
+                            </span>
                         </button>
                     </form>
 
                     {{-- Merge Form --}}
-                    <form action="{{ route('inventory.update', $sparepart) }}" method="POST" class="flex-1" novalidate>
+                    <form action="{{ route('inventory.update', $sparepart) }}" method="POST" class="flex-1" @submit="isSubmitting = true" novalidate>
                         @csrf
                         @method('PUT')
                         @foreach(old() as $key => $value)
-                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @if(is_string($value) || is_numeric($value))
+                                <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                            @endif
                         @endforeach
                         <input type="hidden" name="merge_confirmed" value="true">
                         <input type="hidden" name="duplicate_id" value="{{ session('duplicate_item')['id'] }}">
-                        <button type="submit" class="btn btn-primary w-full justify-center">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-                            Gabungkan Stock (Merge)
+                        <button type="submit" class="btn btn-primary w-full justify-center" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
+                            <span x-show="!isSubmitting" class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                                Gabungkan Stock (Merge)
+                            </span>
+                            <span x-show="isSubmitting" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                Memproses...
+                            </span>
                         </button>
                     </form>
                 </div>
@@ -1553,33 +588,7 @@
     </div>
     @endif
 
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('focus') === 'price') {
-                const priceInput = document.getElementById('price');
-                if (priceInput) {
-                    setTimeout(() => {
-                        priceInput.focus();
-                        priceInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 500);
-                }
-            }
-            
-            // Auto-scroll to first validation error if exists
-            setTimeout(() => {
-                const firstError = document.querySelector('.text-red-600, .text-danger-500, .text-danger-600, [class*="text-red-"]');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    const input = firstError.closest('div, .relative, .card')?.querySelector('input:not([type="hidden"]), select, textarea');
-                    if (input) {
-                        input.focus({preventScroll: true});
-                    }
-                }
-            }, 300);
-        });
-    </script>
-    @endpush
+    <x-unsaved-changes-warning />
 </x-app-layout>
+
 

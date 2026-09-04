@@ -2,6 +2,7 @@
 
 // Pengatur lalu lintas (Controller) khusus untuk menangani proses peminjaman dan pengembalian barang.
 // Mengatur tampilan detail pinjaman, pencatatan peminjaman, hingga proses pengembalian beserta bukti fotonya.
+
 namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
@@ -118,7 +119,7 @@ class BorrowingController extends Controller
 
         try {
             // Panggil relasi user dan returns secara bersamaan agar mempercepat query database
-            $borrowing->load('user', 'returns'); 
+            $borrowing->load('user', 'returns');
 
             // Susun data JSON rapi yang siap dikonsumsi oleh frontend
             return response()->json([

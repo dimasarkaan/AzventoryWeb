@@ -20,16 +20,14 @@ class ReturnBorrowingRequest extends FormRequest
         $remaining = $borrowing ? $borrowing->remaining_quantity : 999999;
 
         return [
-            'return_quantity' => 'required|integer|min:1|max:'.$remaining,
-            'return_condition' => 'required|in:good,bad,lost',
-            'return_notes' => 'nullable|string',
+            'return_quantity' => ['required', 'integer', 'min:1'],
+            'return_condition' => ['required', 'in:good,bad,lost'],
+            'return_notes' => ['nullable', 'string'],
             'return_photos' => [
                 'required_if:return_condition,good,bad',
                 'array',
-                'min:1',
-                'max:5',
             ],
-            'return_photos.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:17408', // Max 17MB
+            'return_photos.*' => 'file|image|mimes:jpeg,png,jpg,gif,webp', // Max 17MB
         ];
     }
 
@@ -50,6 +48,28 @@ class ReturnBorrowingRequest extends FormRequest
             'return_photos.*.image' => 'File harus berupa gambar.',
             'return_photos.*.mimes' => 'Format file harus jpeg, png, jpg, gif, atau webp.',
             'return_photos.*.max' => 'Ukuran file Gambar maksimal 17MB.',
+        ];
+    }
+
+    // Dokumentasi API (Scribe)
+    public function bodyParameters(): array
+    {
+        return [
+            'return_quantity' => [
+                'description' => 'Jumlah barang yang dikembalikan.',
+                'example' => 2,
+            ],
+            'return_condition' => [
+                'description' => 'Kondisi barang saat dikembalikan (good, bad, lost).',
+                'example' => 'good',
+            ],
+            'return_notes' => [
+                'description' => 'Catatan pengembalian (opsional).',
+                'example' => 'Dikembalikan dengan kondisi mulus.',
+            ],
+            'return_photos' => [
+                'description' => 'Array dari file foto bukti pengembalian (wajib jika kondisi good atau bad).',
+            ],
         ];
     }
 }
