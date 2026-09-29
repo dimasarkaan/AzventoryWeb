@@ -1,8 +1,9 @@
-﻿@props(['user', 'trash' => false])
+@props(['user', 'trash' => false])
 
-<tr class="group hover:bg-secondary-50/60 transition-colors border-b border-secondary-50 last:border-b-0">
-    @if($trash)
-        <td class="px-4 py-3 text-center">
+<tr onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('input') && !event.target.closest('.no-click')) window.location.href = '{{ route('users.show', $user) }}'"
+    class="group hover:bg-secondary-50/60 transition-colors border-b border-secondary-50 last:border-b-0 cursor-pointer">
+    @if($trash || auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
+        <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
             <input type="checkbox" name="ids[]" value="{{ $user->id }}" class="user-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
         </td>
     @endif
@@ -71,7 +72,7 @@
                     <form action="{{ route('users.force-delete', $user->uuid) }}" method="POST" class="inline-block" novalidate>
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-ghost p-2 text-danger-600 hover:text-danger-700 bg-danger-50 hover:bg-danger-100 rounded-lg transition-all" title="{{ __('ui.force_delete') }}" onclick="confirmUserForceDelete(event)">
+                        <button type="submit" class="btn btn-ghost p-2 text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition-all" title="{{ __('ui.force_delete') }}" onclick="confirmUserForceDelete(event)">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </form>

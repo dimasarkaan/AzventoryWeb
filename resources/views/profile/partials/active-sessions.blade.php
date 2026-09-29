@@ -1,6 +1,6 @@
 <section x-data="{ sessionIdToLogout: null }">
     <div class="text-sm text-secondary-600 mb-4 w-full">
-        {{ __('Jika diperlukan, Anda dapat keluar (log out) dari semua sesi browser dan perangkat Anda yang lain. Beberapa sesi terakhir Anda tercantum di bawah ini; namun, daftar ini mungkin tidak lengkap. Jika Anda merasa akun Anda telah disusupi, Anda juga harus memperbarui kata sandi Anda.') }}
+        {{ __('ui.active_sessions_info') }}
     </div>
 
     @if (count($sessions) > 0)
@@ -29,9 +29,9 @@
                                 {{ $session->ip_address }},
 
                                 @if ($session->is_current_device)
-                                    <span class="text-success-500 font-semibold">{{ __('Perangkat ini') }}</span>
+                                    <span class="text-success-500 font-semibold">{{ __('ui.this_device') }}</span>
                                 @else
-                                    {{ __('Aktif') }} {{ $session->last_active }}
+                                    {{ __('ui.active_status') }} {{ $session->last_active }}
                                 @endif
                             </div>
                         </div>
@@ -43,7 +43,7 @@
                                 x-on:click.prevent="sessionIdToLogout = '{{ $session->id }}'; $dispatch('open-modal', 'confirm-logout-other-browser-sessions')"
                                 data-testid="btn-logout-session-{{ $session->id }}"
                                 class="text-xs font-bold text-danger-600 hover:text-danger-800 hover:underline px-2 py-1 rounded transition-colors">
-                            Cabut Akses
+                            {{ __('ui.revoke_access') }}
                         </button>
                     </div>
                     @endif
@@ -61,15 +61,15 @@
             class="btn btn-secondary flex items-center gap-2"
         >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-            {{ __('Log Out Semua Perangkat Lain') }}
+            {{ __('ui.logout_all_other_devices') }}
         </button>
     </div>
     @else
     <div class="mt-6 p-4 bg-secondary-50 border border-secondary-200 rounded-lg flex items-start gap-3">
         <svg class="w-5 h-5 text-secondary-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <div>
-            <h4 class="text-sm font-bold text-secondary-900">Sesi Tunggal</h4>
-            <p class="text-xs text-secondary-600 mt-1">Saat ini Anda hanya login di perangkat ini. Tidak ada sesi aktif di perangkat atau browser lain.</p>
+            <h4 class="text-sm font-bold text-secondary-900">{{ __('ui.single_session') }}</h4>
+            <p class="text-xs text-secondary-600 mt-1">{{ __('ui.single_session_desc') }}</p>
         </div>
     </div>
     @endif
@@ -81,10 +81,10 @@
             @csrf
             @method('delete')
 
-            <h2 class="text-lg font-bold text-secondary-900" x-text="sessionIdToLogout ? 'Cabut Akses Perangkat Tersebut' : 'Cabut Akses Semua Perangkat Lain'">
+            <h2 class="text-lg font-bold text-secondary-900" x-text="sessionIdToLogout ? '{{ __('ui.revoke_this_device') }}' : '{{ __('ui.revoke_all_other_devices') }}'">
             </h2>
 
-            <p class="mt-2 text-sm text-secondary-600" x-text="sessionIdToLogout ? 'Silakan masukkan kata sandi Anda untuk mengonfirmasi bahwa Anda ingin keluar (log out) secara paksa dari sesi perangkat tersebut.' : 'Silakan masukkan kata sandi Anda untuk mengonfirmasi bahwa Anda ingin keluar (log out) dari semua sesi perangkat Anda yang lain di seluruh browser.'">
+            <p class="mt-2 text-sm text-secondary-600" x-text="sessionIdToLogout ? '{{ __('ui.revoke_this_device_desc') }}' : '{{ __('ui.revoke_all_other_devices_desc') }}'">
             </p>
 
             <div class="mt-6 w-full">
@@ -103,7 +103,7 @@
 
                 <button type="submit" data-testid="btn-confirm-logout-session" class="btn btn-primary flex items-center gap-2" :class="{ 'opacity-75 cursor-not-allowed': submitting }" :disabled="submitting">
                     <svg x-show="submitting" x-cloak class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <span x-text="submitting ? '{{ __('ui.saving') }}...' : '{{ __('Log Out Perangkat Lain') }}'"></span>
+                    <span x-text="submitting ? '{{ __('ui.saving') }}...' : '{{ __('ui.logout_other_devices_btn') }}'"></span>
                 </button>
             </div>
         </form>

@@ -31,9 +31,9 @@
                                                         <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                                     </div>
                                                     <div class="ml-4 text-left">
-                                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                                        <h2 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                                                             {{ __('ui.stock_change') }}
-                                                        </h3>
+                                                        </h2>
                                                     </div>
                                                 </div>
                                             </div>

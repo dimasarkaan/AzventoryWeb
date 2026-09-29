@@ -24,9 +24,9 @@
                                                         <svg class="h-6 w-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                                                     </div>
                                                     <div class="ml-4 text-left">
-                                                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                                        <h2 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                                                             {{ __('ui.borrow_item') }}
-                                                        </h3>
+                                                        </h2>
                                                     </div>
                                                 </div>
                                             </div>
@@ -68,7 +68,7 @@
 
                                                             <div>
                                                                 <label for="expected_return_at" class="block text-sm font-medium text-gray-700">{{ __('ui.expected_return_date') }} <span class="text-danger-500">*</span></label>
-                                                                <input type="date" name="expected_return_at" id="expected_return_at" x-model="dueDate" min="{{ date('Y-m-d') }}" class="form-input mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" required>
+                                                                <input type="text" name="expected_return_at" id="expected_return_at" x-model="dueDate" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime('+1 year')) }}" class="flatpickr-single form-input mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="{{ __('ui.select_date') }}" required>
                                                             </div>
 
                                                             <div>
@@ -97,3 +97,4 @@
                                 </div>
                             </div>
                             </template>
+<x-flatpickr />

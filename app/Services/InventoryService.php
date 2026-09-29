@@ -609,7 +609,7 @@ class InventoryService
             ->where('condition', $checkData['condition'])
             ->where('type', $checkData['type']);
 
-        foreach (['color', 'price', 'unit'] as $field) {
+        foreach (['color', 'price', 'unit', 'age'] as $field) {
             if (isset($checkData[$field])) {
                 $query->where($field, $checkData[$field]);
             } else {
@@ -680,7 +680,7 @@ class InventoryService
             ->where('condition', $data['condition'])
             ->where('type', $data['type']);
 
-        foreach (['color', 'price', 'unit'] as $field) {
+        foreach (['color', 'price', 'unit', 'age'] as $field) {
             if (isset($data[$field])) {
                 $existingItemQuery->where($field, $data[$field]);
             } else {

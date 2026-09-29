@@ -5,9 +5,9 @@
             <!-- Standardized Header -->
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                    <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.scan_qr_title') }}
-                    </h2>
+                    </h1>
                     <p class="mt-1 text-sm text-secondary-500">{{ __('ui.scan_qr_desc') }}</p>
                 </div>
                 <div>

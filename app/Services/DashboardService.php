@@ -324,14 +324,15 @@ class DashboardService
     public function getStockByAttribute(string $attribute): Collection
     {
         if (in_array($attribute, ['category', 'brand', 'location'])) {
-            $table = $attribute === 'category' ? 'categories' : ($attribute === 'brand' ? 'brands' : 'locations');
-            $fk = $attribute.'_id';
-
-            return Sparepart::join($table, "spareparts.{$fk}", '=', "{$table}.id")
-                ->where('spareparts.condition', '!=', 'Hilang')
-                ->select("{$table}.name as label", DB::raw('sum(spareparts.stock) as total'))
-                ->groupBy("{$table}.name")
-                ->pluck('total', 'label');
+            $modelClass = $attribute === 'category' ? \App\Models\Category::class : ($attribute === 'brand' ? \App\Models\Brand::class : \App\Models\Location::class);
+            
+            return $modelClass::withSum(['spareparts' => function($query) {
+                    $query->where('condition', '!=', 'Hilang');
+                }], 'stock')
+                ->get()
+                ->mapWithKeys(function ($item) {
+                    return [$item->name => (int) ($item->spareparts_sum_stock ?? 0)];
+                });
         }
 
         return Sparepart::where('condition', '!=', 'Hilang')

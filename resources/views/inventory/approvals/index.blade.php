@@ -4,9 +4,9 @@
             <!-- Header -->
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                    <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.approvals_title') }}
-                    </h2>
+                    </h1>
                     <p class="mt-1 text-sm text-secondary-500">{{ __('ui.approvals_desc') }}</p>
                 </div>
             </div>
@@ -16,15 +16,15 @@
                 <nav class="-mb-px flex space-x-6" aria-label="Tabs">
                     <a href="{{ route('inventory.stock-approvals.index', ['status' => 'pending', 'filter_type' => request('filter_type'), 'search' => request('search')]) }}" 
                        class="{{ request('status', 'pending') === 'pending' ? 'border-primary-500 text-primary-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-black text-sm transition-colors flex items-center gap-2">
-                        Menunggu
+                        {{ __('ui.status_pending_label') }}
                     </a>
                     <a href="{{ route('inventory.stock-approvals.index', ['status' => 'approved', 'filter_type' => request('filter_type'), 'search' => request('search')]) }}" 
                        class="{{ request('status') === 'approved' ? 'border-success-500 text-success-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-black text-sm transition-colors flex items-center gap-2">
-                        Disetujui
+                        {{ __('ui.status_approved_label') }}
                     </a>
                     <a href="{{ route('inventory.stock-approvals.index', ['status' => 'rejected', 'filter_type' => request('filter_type'), 'search' => request('search')]) }}" 
                        class="{{ request('status') === 'rejected' ? 'border-danger-500 text-danger-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }} whitespace-nowrap py-4 px-1 border-b-2 font-black text-sm transition-colors flex items-center gap-2">
-                        Ditolak
+                        {{ __('ui.status_rejected_label') }}
                     </a>
                 </nav>
             </div>
@@ -62,7 +62,7 @@
                                 <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
                             </div>
 
-                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('approval-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" x-cloak>
+                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; $nextTick(() => { document.getElementById('approval-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="{{ __('ui.clear_search') }}" x-cloak>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
@@ -90,7 +90,7 @@
                             </div>
 
                             @if(request('search') || request('filter_type') || request('status'))
-                                <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-secondary flex items-center justify-center p-2.5 h-[42px] w-[42px] flex-shrink-0" title="Reset Filter">
+                                <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-secondary flex items-center justify-center p-2.5 h-[42px] w-[42px] flex-shrink-0" title="{{ __('ui.reset_filter') }}">
                                     <x-icon.restore class="h-5 w-5" />
                                 </a>
                             @endif
@@ -130,12 +130,14 @@
 
             <div id="approvals-list-container">
                 <!-- Mobile Card View -->
+                @if(request('status', 'pending') === 'pending' && $pendingApprovals->count() > 0)
                 <div class="md:hidden mb-4 flex items-center justify-between px-1">
                     <label class="flex items-center gap-2.5 cursor-pointer group bg-white border border-secondary-100 rounded-xl px-4 py-2.5 shadow-sm active:scale-95 transition-all">
                         <input type="checkbox" id="select-all-mobile" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition-all">
                         <span class="text-sm font-bold text-secondary-600 group-hover:text-primary-600 transition-colors">Pilih Semua</span>
                     </label>
                 </div>
+                @endif
                 <div class="md:hidden space-y-4" id="mobile-approvals-list">
                     @forelse ($pendingApprovals as $approval)
                         <x-approval.card :approval="$approval" />
@@ -197,7 +199,9 @@
                             <thead>
                                 <tr class="bg-secondary-50/50">
                                     <th class="w-10 px-2 py-4">
-                                        <input type="checkbox" id="select-all" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition-all">
+                                        @if(request('status', 'pending') === 'pending' && $pendingApprovals->count() > 0)
+                                            <input type="checkbox" id="select-all" class="rounded border-secondary-300 text-primary-600 shadow-sm focus:ring-primary-500 transition-all">
+                                        @endif
                                     </th>
                                     <th class="px-2 py-4 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-wider">{{ __('ui.item_column') }}</th>
                                     <th class="px-2 py-4 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-wider">{{ __('ui.applicant_column') }}</th>
@@ -243,7 +247,7 @@
                                                     <div class="mt-4">
                                                         <a href="{{ route('inventory.stock-approvals.index') }}" class="btn btn-secondary px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 mx-auto w-fit">
                                                             <x-icon.restore class="w-4 h-4" />
-                                                            Hapus Filter & Pencarian
+                                                            {{ __('ui.clear_filter_search') }}
                                                         </a>
                                                     </div>
                                                 @endif
@@ -266,27 +270,27 @@
 
     <!-- Bulk Actions â€” Sticky bottom bar -->
     @if($pendingApprovals->isNotEmpty() && request('status', 'pending') === 'pending')
-    <div id="bulk-actions-container" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-secondary-200 p-2.5 sm:px-6 sm:py-4 animate-fade-in-up items-center justify-between sm:justify-start gap-3 sm:gap-6 w-[calc(100%-2rem)] sm:w-auto">
-        <div class="flex items-center gap-3 sm:border-r border-secondary-200 sm:pr-6 pl-1 sm:pl-0">
-            <button type="button" onclick="clearBulkSelection()" class="p-1.5 rounded-full text-secondary-400 hover:text-danger-500 hover:bg-danger-50 transition-colors" title="Batalkan Pilihan">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div id="bulk-actions-container" class="hidden fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-secondary-200 p-2 sm:p-3 animate-fade-in-up items-center justify-center gap-2 sm:gap-4 w-auto max-w-[95vw]">
+        <!-- Left Side: Selection Count & Clear -->
+        <div class="flex items-center gap-2 sm:gap-3 pl-1 sm:pl-3 border-r border-secondary-200 pr-2 sm:pr-4">
+            <button type="button" onclick="clearBulkSelection()" class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary-100 text-secondary-500 hover:text-danger-600 hover:bg-danger-50 transition-colors" title="{{ __('ui.cancel_selection') }}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <div class="flex items-center gap-1.5">
-                <span class="text-xl sm:text-2xl font-black text-primary-600 tabular-nums" id="selected-count">0</span>
-                <div class="flex flex-col leading-tight">
-                    <span class="text-[10px] sm:text-xs font-bold text-secondary-500 uppercase tracking-wider">Item</span>
-                    <span class="text-[10px] sm:text-xs font-bold text-secondary-400 uppercase tracking-widest">Dipilih</span>
-                </div>
+            <div class="flex items-baseline gap-1.5">
+                <span class="font-bold text-lg sm:text-xl text-primary-600 tabular-nums" id="selected-count">0</span>
+                <span class="text-[10px] sm:text-xs text-secondary-500 font-bold uppercase tracking-wider hidden sm:inline">{{ __('ui.selected_label') ?? 'TERPILIH' }}</span>
             </div>
         </div>
-        <div class="flex items-center gap-2 sm:gap-3 flex-1 sm:flex-initial">
-            <button type="button" onclick="submitBulk('approved')" class="flex-1 sm:flex-none btn btn-success flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" id="bulk-approve-btn">
-                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">Setujui <span class="hidden sm:inline">Terpilih</span></span>
+        
+        <!-- Right Side: Actions -->
+        <div class="flex items-center gap-2">
+            <button type="button" onclick="submitBulk('approved')" class="btn btn-success flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" id="bulk-approve-btn">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">{{ __('ui.btn_approve') ?? 'Setujui' }}</span>
             </button>
-            <button type="button" onclick="submitBulk('rejected')" class="flex-1 sm:flex-none btn btn-danger flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" id="bulk-reject-btn">
-                <x-icon.close class="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">Tolak <span class="hidden sm:inline">Terpilih</span></span>
+            <button type="button" onclick="submitBulk('rejected')" class="btn btn-danger flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" id="bulk-reject-btn">
+                <x-icon.close class="w-4 h-4 text-white" />
+                <span class="font-bold text-[11px] sm:text-sm whitespace-nowrap">{{ __('ui.btn_reject') ?? 'Tolak' }}</span>
             </button>
         </div>
     </div>

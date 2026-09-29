@@ -1,4 +1,4 @@
-﻿<section x-data="{ 
+<section x-data="{ 
     isEditing: {{ $errors->has('token_name') ? 'true' : 'false' }}, 
     isSubmitting: false,
     tokenIdToDelete: null, 
@@ -82,12 +82,11 @@
         for (const key in this.abilities) this.abilities[key] = false;
         this.checkPresetMatch();
     }
-}"
-         x-init="if ({{ session('new_api_token') || session('api_token_deleted') || $errors->has('token_name') ? 'true' : 'false' }}) { setTimeout(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 300); }">
+}">
 
     @if (session('new_api_token'))
         <div class="mt-4 p-4 border border-success-200 bg-success-50 rounded-lg shadow-sm" x-data="{ copied: false }">
-            <p class="text-sm font-bold text-success-800 mb-2">Token Berhasil Dibuat!</p>
+            <p class="text-sm font-bold text-success-800 mb-2">{{ __('ui.token_created') }}</p>
             <div class="flex items-center gap-2">
                 <code id="new-api-token" class="px-3 py-2 bg-white border border-success-300 rounded-lg font-mono text-sm font-semibold break-all w-full select-all text-success-900">{{ session('new_api_token') }}</code>
                 <button type="button" 
@@ -98,7 +97,7 @@
                     <span x-text="copied ? 'Copied!' : 'Copy'"></span>
                 </button>
             </div>
-            <p class="mt-2 text-xs font-medium text-success-700">Harap salin token ini sekarang. Anda tidak akan bisa melihatnya lagi setelah memuat ulang halaman.</p>
+            <p class="mt-2 text-xs font-medium text-success-700">{{ __('ui.copy_token_warning') }}</p>
         </div>
     @endif
 
@@ -106,7 +105,7 @@
     <div x-show="!isEditing" class="flex items-center gap-4 mt-4">
         <button type="button" @click="isEditing = true; $nextTick(() => $refs.tokenNameInput.focus())" class="btn btn-secondary flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            {{ __('Buat Token Baru') }}
+            {{ __('ui.create_new_token') }}
         </button>
     </div>
 
@@ -122,27 +121,27 @@
         @csrf
 
         <div>
-            <x-input-label for="token_name" :value="__('Nama Perangkat / Integrasi')" />
+            <x-input-label for="token_name" :value="__('ui.token_name_label')" />
             <x-text-input x-ref="tokenNameInput" id="token_name" name="token_name" type="text" 
                           class="mt-1 block w-full sm:w-1/2 {{ $errors->has('token_name') ? '!border-red-500' : '' }}" 
                           :value="old('token_name')"
-                          placeholder="Contoh: Web Ecommerce Utama" />
+                          placeholder="{{ __('ui.token_name_placeholder') }}" />
             <x-input-error class="mt-2" :messages="$errors->get('token_name')" />
-            <p class="text-xs text-secondary-500 mt-1">Beri nama yang jelas agar Anda mudah mengenalinya.</p>
+            <p class="text-xs text-secondary-500 mt-1">{{ __('ui.token_name_hint') }}</p>
         </div>
 
         <div class="mt-4 border border-secondary-200 rounded-lg overflow-hidden">
             <div class="bg-secondary-50 p-3 border-b border-secondary-200 flex sm:flex-row flex-col justify-between sm:items-center gap-3">
                 <div>
-                    <label class="text-sm font-bold text-secondary-900">Hak Akses Modul (Abilities)</label>
-                    <p class="text-xs text-secondary-500">Pilih aksi spesifik yang diizinkan untuk token ini.</p>
+                    <label class="text-sm font-bold text-secondary-900">{{ __('ui.abilities_label') }}</label>
+                    <p class="text-xs text-secondary-500">{{ __('ui.abilities_desc') }}</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" @click="selectAll()" class="text-xs text-primary-600 hover:underline font-bold whitespace-nowrap">Pilih Semua</button>
-                    <button type="button" @click="resetAll()" class="text-xs text-danger-600 hover:underline font-bold whitespace-nowrap mr-2">Bersihkan</button>
+                    <button type="button" @click="selectAll()" class="text-xs text-primary-600 hover:underline font-bold whitespace-nowrap">{{ __('ui.select_all_btn') }}</button>
+                    <button type="button" @click="resetAll()" class="text-xs text-danger-600 hover:underline font-bold whitespace-nowrap mr-2">{{ __('ui.clear_all_btn') }}</button>
                     <div x-on:selected="if($event.detail) { preset = $event.detail; setPreset() }">
                         <x-select name="preset_select" 
-                                  :options="['custom' => '-- Preset Cepat (Role) --', 'superadmin' => 'Setara Superadmin', 'admin' => 'Setara Admin', 'operator' => 'Setara Operator']" 
+                                  :options="['custom' => __('ui.preset_custom'), 'superadmin' => __('ui.preset_superadmin'), 'admin' => __('ui.preset_admin'), 'operator' => __('ui.preset_operator')]" 
                                   selected="{{ old('preset_select', 'custom') }}" 
                                   width="w-full sm:w-auto" 
                                   :allowClear="false" />
@@ -153,11 +152,11 @@
                 <table class="w-full text-sm text-left">
                     <thead class="bg-white border-b border-secondary-200 text-secondary-600">
                         <tr>
-                            <th class="px-4 py-2 font-semibold">Modul</th>
-                            <th class="px-4 py-2 font-semibold text-center">Lihat</th>
-                            <th class="px-4 py-2 font-semibold text-center">Buat</th>
-                            <th class="px-4 py-2 font-semibold text-center">Edit</th>
-                            <th class="px-4 py-2 font-semibold text-center">Hapus</th>
+                            <th class="px-4 py-2 font-semibold">{{ __('ui.module_col') }}</th>
+                            <th class="px-4 py-2 font-semibold text-center">{{ __('ui.view_col') }}</th>
+                            <th class="px-4 py-2 font-semibold text-center">{{ __('ui.create_col') }}</th>
+                            <th class="px-4 py-2 font-semibold text-center">{{ __('ui.edit_col') }}</th>
+                            <th class="px-4 py-2 font-semibold text-center">{{ __('ui.delete_col') }}</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-secondary-100 bg-white">
@@ -225,7 +224,7 @@
 
         <div class="flex items-center gap-3 pt-4 border-t border-secondary-100">
             <button type="submit" class="btn btn-primary flex items-center gap-2" :disabled="Object.values(abilities).filter(Boolean).length === 0 || isSubmitting" :class="{ 'opacity-50 cursor-not-allowed': Object.values(abilities).filter(Boolean).length === 0 || isSubmitting }">
-                <span x-show="!isSubmitting">{{ __('Generate Token') }}</span>
+                <span x-show="!isSubmitting">{{ __('ui.generate_token') }}</span>
                 <span x-show="isSubmitting" class="flex items-center gap-2">
                     <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     Memproses...
@@ -245,10 +244,10 @@
         <div class="mt-4 pt-4 border-t border-secondary-200">
             <header class="mb-4">
                 <h2 class="text-lg font-medium text-secondary-900">
-                    {{ (isset($allTokens) && count($allTokens) > 0) ? 'Daftar Semua Token Aktif di Sistem' : 'Daftar Token Aktif' }}
+                    {{ (isset($allTokens) && count($allTokens) > 0) ? __('ui.active_tokens_all') : __('ui.active_tokens') }}
                 </h2>
                 <p class="mt-1 text-sm text-secondary-600">
-                    {{ __('Token di bawah ini sedang memiliki izin akses ke sistem API. Jika ada integrasi yang sudah tidak dipakai, segera cabut aksesnya.') }}
+                    {{ __('ui.active_tokens_desc') }}
                 </p>
             </header>
 
@@ -260,20 +259,20 @@
                                 <p class="font-bold text-secondary-900">{{ $token->name }}</p>
                                 @if($token->expires_at && \Carbon\Carbon::parse($token->expires_at)->isPast())
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-danger-100 text-danger-800">
-                                        Kedaluwarsa
+                                        {{ __('ui.status_expired') }}
                                     </span>
                                 @elseif($token->last_used_at && \Carbon\Carbon::parse($token->last_used_at)->diffInDays(now()) < 7)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary-100 text-primary-800">
-                                        Aktif
+                                        {{ __('ui.status_active') }}
                                     </span>
                                 @elseif(!$token->last_used_at)
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-success-100 text-success-800">
-                                        Baru
+                                        {{ __('ui.status_new') }}
                                     </span>
                                 @endif
                             </div>
                             @if(isset($allTokens) && count($allTokens) > 0)
-                                <p class="text-xs text-secondary-700 mt-1 font-medium">Pemilik: {{ $token->tokenable->name ?? 'Sistem' }}</p>
+                                <p class="text-xs text-secondary-700 mt-1 font-medium">{{ __('ui.token_owner') }} {{ $token->tokenable->name ?? 'Sistem' }}</p>
                             @endif
                             <div x-data="{ expandedAbilities: false }" class="mt-1.5 flex flex-wrap gap-1">
                                 @php
@@ -335,13 +334,13 @@
                                     @click="$dispatch('open-edit-modal', { id: {{ $token->id }}, name: '{{ addslashes($token->name) }}', abilities: {{ json_encode($token->abilities ?? []) }} })"
                                     class="btn btn-secondary py-1.5 px-3 text-sm flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                                Edit Akses
+                                {{ __('ui.edit_access') }}
                             </button>
                             <button type="button" 
                                     @click="tokenIdToDelete = {{ $token->id }}; tokenNameToDelete = '{{ addslashes($token->name) }}'; tokenOwnerToDelete = '{{ addslashes($token->tokenable->name ?? 'Sistem') }}'; $dispatch('open-modal', 'confirm-token-revocation')"
                                     class="btn btn-danger py-1.5 px-3 text-sm flex items-center gap-1">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                Cabut Akses
+                                {{ __('ui.revoke_access') }}
                             </button>
                         </div>
                     </div>
@@ -352,15 +351,15 @@
         <div class="mt-4 pt-4 border-t border-secondary-200">
             <header class="mb-4">
                 <h2 class="text-lg font-medium text-secondary-900">
-                    {{ (isset($allTokens) && count($allTokens) > 0) ? 'Daftar Semua Token Aktif di Sistem' : 'Daftar Token Aktif' }}
+                    {{ (isset($allTokens) && count($allTokens) > 0) ? __('ui.active_tokens_all') : __('ui.active_tokens') }}
                 </h2>
             </header>
             <div class="flex flex-col items-center justify-center p-8 text-center bg-secondary-50 border border-secondary-200 border-dashed rounded-lg">
                 <div class="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center mb-3">
                     <svg class="w-6 h-6 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                 </div>
-                <h3 class="text-sm font-bold text-secondary-900">Belum Ada Kunci API Aktif</h3>
-                <p class="text-xs text-secondary-500 mt-1 max-w-sm">Anda belum memiliki token yang aktif. Klik "Buat Token Baru" di atas untuk mulai mengintegrasikan sistem luar.</p>
+                <h3 class="text-sm font-bold text-secondary-900">{{ __('ui.no_active_tokens') }}</h3>
+                <p class="text-xs text-secondary-500 mt-1 max-w-sm">{{ __('ui.no_active_tokens_desc') }}</p>
             </div>
         </div>
     @endif
@@ -371,10 +370,10 @@
             <summary class="flex items-center justify-between p-4 cursor-pointer select-none bg-white hover:bg-secondary-50 group-open:bg-secondary-50 transition-colors">
                 <div>
                     <h2 class="text-lg font-medium text-secondary-900">
-                        {{ __('Dokumentasi Integrasi API') }}
+                        {{ __('ui.api_docs_title') }}
                     </h2>
                     <p class="mt-1 text-sm text-secondary-600">
-                        Gunakan panduan singkat ini untuk menyambungkan web e-commerce atau layanan lain ke sistem Azventory Anda.
+                        {{ __('ui.api_docs_desc') }}
                     </p>
                 </div>
                 <!-- Icon Dropdown -->
@@ -476,7 +475,7 @@
 
                 <div class="mt-8 pt-6 border-t border-secondary-200 text-center flex flex-col items-center">
                     <p class="text-sm text-secondary-600 mb-4 max-w-xl mx-auto">
-                        Butuh daftar rute lengkap? Atau ingin tahu detail parameter untuk <strong>GET, POST, PUT, DELETE</strong>? Anda bahkan bisa mencoba API-nya langsung dari <em>browser</em>. Buka halaman dokumentasi interaktif berikut.
+                        Buka halaman dokumentasi berikut untuk daftar rute lengkap atau detail parameter untuk <strong>GET, POST, PUT, DELETE</strong>.
                     </p>
                     <a href="{{ url('/docs') }}" target="_blank" class="btn btn-primary shadow-sm hover:shadow-md transition-shadow flex items-center gap-2">
                         Buka Dokumentasi API Interaktif

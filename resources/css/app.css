@@ -3,6 +3,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide Alpine.js elements before initialization */
+[x-cloak] { display: none !important; }
+
 @layer components {
     html {
         @apply overflow-y-scroll;

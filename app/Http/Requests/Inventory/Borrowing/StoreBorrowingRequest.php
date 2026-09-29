@@ -19,7 +19,7 @@ class StoreBorrowingRequest extends FormRequest
         return [
             'quantity' => ['required', 'integer', 'min:1'],
             'notes' => ['nullable', 'string'],
-            'expected_return_at' => ['required', 'date', 'after_or_equal:today'],
+            'expected_return_at' => ['required', 'date', 'after_or_equal:today', 'before_or_equal:+1 year'],
         ];
     }
 

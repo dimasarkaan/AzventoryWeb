@@ -1,13 +1,13 @@
-<x-app-layout>
+﻿<x-app-layout>
     <div class="py-6" x-data="inventoryDetail()" @open-return-modal.window="initReturn($event.detail)">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header & Actions -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                        <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                             Detail Riwayat Peminjaman
-                        </h2>
+                        </h1>
                         @if($borrowing->status === 'borrowed')
                             <span class="badge badge-warning">Dipinjam</span>
                         @elseif($borrowing->status === 'returned')
@@ -37,7 +37,7 @@
                     $expectedDate = \Carbon\Carbon::parse($borrowing->expected_return_at);
                     if ($expectedDate->isPast() && !$expectedDate->isToday()) {
                         $isOverdue = true;
-                        $daysOverdue = $expectedDate->diffInDays(now());
+                        $daysOverdue = ceil($expectedDate->diffInDays(now()));
                     }
                 }
             @endphp
@@ -48,7 +48,7 @@
                         <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                     </div>
                     <div>
-                        <h3 class="text-danger-800 font-bold text-lg">Peringatan Keterlambatan!</h3>
+                        <h2 class="text-danger-800 font-bold text-lg">Peringatan Keterlambatan!</h2>
                         <p class="text-danger-600 text-sm mt-0.5">Barang ini sudah melewati batas waktu pengembalian selama <strong class="text-danger-700">{{ $daysOverdue }} hari</strong>.</p>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                 <div class="lg:col-span-1 flex flex-col gap-6 lg:sticky lg:top-6 self-start max-h-[calc(100vh-2rem)] overflow-y-auto pr-2 pb-4 scrollbar-thin scrollbar-thumb-secondary-200 hover:scrollbar-thumb-secondary-300">
                     <!-- Borrower Info Card -->
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Informasi Peminjam</h3>
+                        <h2 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Informasi Peminjam</h2>
                         
                         <div class="flex items-center gap-4 mb-4">
                             <div class="w-16 h-16 rounded-full bg-secondary-200 overflow-hidden flex-shrink-0">
@@ -90,7 +90,7 @@
 
                     <!-- Borrowing Details Card -->
                     <div class="card p-6" id="borrowing-details">
-                        <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Detail Peminjaman</h3>
+                        <h2 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Detail Peminjaman</h2>
                         
                         <div class="space-y-4">
                             <div>
@@ -162,7 +162,7 @@
                 <!-- Right Column: Returns Timeline -->
                 <div class="lg:col-span-2">
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Riwayat Pengembalian</h3>
+                        <h2 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">Riwayat Pengembalian</h2>
                         
                         @if($borrowing->returns->isEmpty())
                             <!-- Empty State -->

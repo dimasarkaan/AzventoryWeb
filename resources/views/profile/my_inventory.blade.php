@@ -20,11 +20,11 @@
             
             // Dropdown Logic
             dropdownOpen: false,
-            conditionLabel: 'Pilih Kondisi',
+            conditionLabel: '{{ __('ui.choose_condition') }}',
             conditionOptions: [
-                { value: 'good', label: 'Baik (Layak Pakai)' },
-                { value: 'bad', label: 'Rusak (Perlu Perbaikan/Ganti)' },
-                { value: 'lost', label: 'Hilang' }
+                { value: 'good', label: '{{ __('ui.condition_good_label') }}' },
+                { value: 'bad', label: '{{ __('ui.condition_bad_label') }}' },
+                { value: 'lost', label: '{{ __('ui.condition_lost_label') }}' }
             ],
 
             selectCondition(option) {
@@ -44,7 +44,7 @@
                 this.maxReturnQty = borrowing.quantity; 
                 this.returnQty = 1;
                 this.returnCondition = '';
-                this.conditionLabel = 'Pilih Kondisi';
+                this.conditionLabel = '{{ __('ui.choose_condition') }}';
                 this.returnNotes = '';
                 this.errors = {};
                 this.successMessage = '';
@@ -87,18 +87,18 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        this.successMessage = data.message || 'Berhasil dikembalikan!';
+                        this.successMessage = data.message || '{{ __('ui.return_success') }}';
                         setTimeout(() => window.location.reload(), 1000);
                     } else {
                         if (response.status === 422) {
                             this.errors = data.errors;
                         } else {
-                            window.showAlert('Error', data.message || 'Terjadi kesalahan sistem.', 'error');
+                            window.showAlert('{{ __('ui.error_title') }}', data.message || '{{ __('ui.system_error') }}', 'error');
                         }
                     }
                 } catch (error) {
                     console.error('Submission error:', error);
-                    window.showAlert('Error', 'Gagal menghubungi server.', 'error');
+                    window.showAlert('{{ __('ui.error_title') }}', '{{ __('ui.server_error') }}', 'error');
                 } finally {
                     this.isSubmitting = false;
                 }
@@ -108,9 +108,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                    <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.my_inventory_title') }}
-                    </h2>
+                    </h1>
                     <p class="mt-1 text-sm text-secondary-500">
                         {{ __('ui.my_inventory_desc') }}
                     </p>
@@ -189,12 +189,12 @@
                         @if($activeBorrowings->isEmpty())
                             <div class="p-12 text-center">
                                 <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <h3 class="text-lg font-medium text-gray-900">{{ __('ui.no_active_borrowings') }}</h3>
+                                <h2 class="text-lg font-medium text-gray-900">{{ __('ui.no_active_borrowings') }}</h2>
                                 <p class="text-gray-500 mt-1">{{ __('ui.no_active_borrowings_desc') }}</p>
                                 <div class="mt-6">
                                     <a href="{{ route('inventory.index') }}" class="btn btn-primary inline-flex items-center">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                                        Jelajahi Inventaris
+                                        {{ __('ui.explore_inventory') }}
                                     </a>
                                 </div>
                             </div>
@@ -286,11 +286,11 @@
                         @if($historyBorrowings->isEmpty())
                             <div class="p-12 text-center">
                                 <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                <h3 class="text-lg font-medium text-gray-900">{{ __('ui.no_history_borrowings') }}</h3>
+                                <h2 class="text-lg font-medium text-gray-900">{{ __('ui.no_history_borrowings') }}</h2>
                                 <p class="text-gray-500 mt-1">{{ __('ui.no_history_borrowings_desc') }}</p>
                                 <div class="mt-6">
                                     <a href="{{ route('inventory.index') }}" class="btn btn-secondary inline-flex items-center">
-                                        Pinjam Barang Baru
+                                        {{ __('ui.borrow_new_item') }}
                                     </a>
                                 </div>
                             </div>
@@ -366,9 +366,9 @@
                                                                                         default => 'bg-gray-100 text-gray-800 border-gray-200',
                                                                                     };
                                                                                     $condText = match($item['condition']) {
-                                                                                        'good' => 'Baik',
-                                                                                        'bad' => 'Rusak',
-                                                                                        'lost' => 'Hilang',
+                                                                                        'good' => __('ui.condition_good'),
+                                                                                        'bad' => __('ui.condition_bad'),
+                                                                                        'lost' => __('ui.condition_lost'),
                                                                                         default => ucfirst($item['condition']),
                                                                                     };
                                                                                 @endphp
@@ -423,9 +423,9 @@
                                                                         default => 'bg-gray-100 text-gray-800 border-gray-200',
                                                                     };
                                                                     $condText = match($item['condition']) {
-                                                                        'good' => 'Baik',
-                                                                        'bad' => 'Rusak',
-                                                                        'lost' => 'Hilang',
+                                                                        'good' => __('ui.condition_good'),
+                                                                        'bad' => __('ui.condition_bad'),
+                                                                        'lost' => __('ui.condition_lost'),
                                                                         default => ucfirst($item['condition']),
                                                                     };
                                                                 @endphp

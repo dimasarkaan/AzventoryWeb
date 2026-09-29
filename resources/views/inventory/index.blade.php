@@ -1,14 +1,14 @@
 <x-app-layout>
-    <div class="py-6" x-data="{ isFiltering: false }">
+    <div class="py-6" x-data="{ isFiltering: false }" @filter-done.window="isFiltering = false">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Flash Messages -->
 
             <!-- Header -->
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                    <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.inventory_management') }}
-                    </h2>
+                    </h1>
                     <p class="mt-1 text-sm text-secondary-500">{{ __('ui.inventory_management_desc') }}</p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -69,6 +69,7 @@
                     @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                      <!-- Trash Toggle Button -->
                      <a href="{{ request('trash') ? route('inventory.index') : route('inventory.index', ['trash' => 'true']) }}" 
+                        onclick="clearBulkSelection()"
                         class="btn flex items-center justify-center p-2.5 {{ request('trash') ? 'btn-danger' : 'btn-secondary' }}" 
                         title="{{ request('trash') ? __('ui.exit_trash') : __('ui.view_trash') }}">
                         @if(request('trash'))
@@ -93,57 +94,60 @@
             </div>
 
             @if(auth()->user()->role !== \App\Enums\UserRole::OPERATOR)
-            <!-- Floating Bulk Action Bar (Styled like Users) -->
+            <!-- Floating Bulk Action Bar -->
             <div id="bulk-action-bar" 
                  data-bulk-print-route="{{ route('inventory.qr.bulk-print') }}"
                  data-bulk-destroy-route="{{ route('inventory.bulk-destroy') }}"
-                 class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl border border-secondary-200 px-6 py-3 flex items-center gap-6 z-50 transition-all duration-300 translate-y-24 opacity-0">
-                <div class="flex items-center gap-3 border-r border-secondary-200 pr-6">
-                    <button type="button" onclick="clearBulkSelection()" class="p-1.5 rounded-full text-secondary-400 hover:text-danger-500 hover:bg-danger-50 transition-colors" title="Batalkan Pilihan">
+                 class="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-secondary-200 p-2 sm:p-3 flex items-center justify-center gap-3 sm:gap-4 z-50 transition-all duration-300 translate-y-24 opacity-0 w-auto max-w-[95vw]">
+                
+                <!-- Left Side: Selection Count & Clear -->
+                <div class="flex items-center gap-3 pl-2 sm:pl-3 border-r border-secondary-200 pr-3 sm:pr-4">
+                    <button type="button" onclick="clearBulkSelection()" class="flex items-center justify-center w-8 h-8 rounded-full bg-secondary-100 text-secondary-500 hover:text-danger-600 hover:bg-danger-50 transition-colors" title="{{ __('ui.clear_selection') }}">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <div class="flex items-center gap-1.5">
+                    <div class="flex items-baseline gap-1.5">
                         <span class="font-bold text-lg text-primary-600" id="selected-count">0</span>
-                        <span class="text-sm text-secondary-500 font-medium">{{ __('ui.selected') }}</span>
+                        <span class="text-xs sm:text-sm text-secondary-500 font-medium">{{ __('ui.selected') }}</span>
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-3">
+                <!-- Right Side: Actions -->
+                <div class="flex items-center gap-2">
                     @if(request('trash'))
                         @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
-                        <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST" novalidate>
+                        <form id="bulk-restore-form" action="{{ route('inventory.bulk-restore') }}" method="POST" novalidate class="m-0">
                             @csrf
                             <div id="bulk-restore-inputs"></div>
-                            <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
-                                <x-icon.restore class="w-5 h-5" />
-                                <span class="font-medium">{{ __('ui.restore') }}</span>
+                            <button type="button" onclick="submitInventoryBulkRestore()" class="btn btn-success border-0 bg-success-50 hover:bg-success-500 text-success-600 hover:text-white flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all">
+                                <x-icon.restore class="w-4 h-4" />
+                                <span class="font-semibold text-xs sm:text-sm whitespace-nowrap hidden sm:inline">{{ __('ui.restore') }}</span>
                             </button>
                         </form>
                         @endif
 
                         @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
-                        <form id="bulk-delete-form" action="{{ route('inventory.bulk-force-delete') }}" method="POST" novalidate>
+                        <form id="bulk-delete-form" action="{{ route('inventory.bulk-force-delete') }}" method="POST" novalidate class="m-0">
                             @csrf
                             @method('DELETE')
                             <div id="bulk-delete-inputs"></div>
-                            <button type="button" onclick="submitInventoryBulkDelete()" class="btn btn-danger flex items-center gap-2 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all">
+                            <button type="button" onclick="submitInventoryBulkDelete()" class="btn border-0 bg-rose-600 hover:bg-rose-800 focus:ring-rose-500 text-white flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-[0_4px_12px_rgb(225,29,72,0.3)] hover:shadow-lg transition-all">
                                 <x-icon.trash class="w-4 h-4" />
-                                <span>{{ __('ui.force_delete') }}</span>
+                                <span class="font-semibold text-xs sm:text-sm whitespace-nowrap">{{ __('ui.force_delete') }}</span>
                             </button>
                         </form>
                         @endif
                     @else
                         {{-- Normal Mode Bulk Actions --}}
-                        <div class="flex items-center gap-1">
-                            <button type="button" onclick="submitInventoryBulkPrint()" class="btn btn-white text-secondary-700 hover:text-primary-600 flex items-center gap-2 border-0 bg-transparent hover:bg-secondary-50">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                                <span class="font-medium">Cetak Label</span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="submitInventoryBulkPrint()" class="btn btn-white border border-secondary-200 bg-white hover:bg-secondary-50 text-secondary-700 flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl transition-all shadow-sm">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                                <span class="font-semibold text-xs sm:text-sm whitespace-nowrap hidden sm:inline">{{ __('ui.print_label') }}</span>
                             </button>
 
                             @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
-                            <button type="button" onclick="submitInventoryBulkDestroy()" class="btn btn-white text-danger-600 hover:text-danger-700 flex items-center gap-2 border-0 bg-transparent hover:bg-danger-50">
-                                <x-icon.trash class="w-5 h-5" />
-                                <span class="font-medium">Hapus Masal</span>
+                            <button type="button" onclick="submitInventoryBulkDestroy()" class="btn btn-danger border-0 text-white flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl shadow-[0_4px_12px_rgb(239,68,68,0.3)] transition-all">
+                                <x-icon.trash class="w-4 h-4 sm:w-5 sm:h-5" />
+                                <span class="font-semibold text-xs sm:text-sm whitespace-nowrap">{{ __('ui.bulk_delete') }}</span>
                             </button>
                             @endif
                         </div>
@@ -183,12 +187,12 @@
                         <nav class="-mb-px flex space-x-6 overflow-x-auto" aria-label="Tabs">
                             <a href="{{ route('inventory.index', array_merge(request()->except(['filter', 'page']), ['filter' => null])) }}" 
                                class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {{ request('filter') != 'problematic' ? 'border-primary-500 text-primary-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }}">
-                                Semua Inventaris
+                                {{ __('ui.all_inventory') }}
                             </a>
                             @if(in_array(auth()->user()->role, [\App\Enums\UserRole::SUPERADMIN, \App\Enums\UserRole::ADMIN]))
                                 <a href="{{ route('inventory.index', array_merge(request()->except(['filter', 'page']), ['filter' => 'problematic'])) }}" 
                                    class="whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 flex items-center gap-2 {{ request('filter') == 'problematic' ? 'border-danger-500 text-danger-600' : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300' }}">
-                                    Aset Bermasalah
+                                    {{ __('ui.problematic_assets') }}
                                     @if(request('filter') == 'problematic')
                                         <span class="bg-danger-100 text-danger-600 py-0.5 px-2 rounded-full text-xs font-bold">{{ $spareparts->total() }}</span>
                                     @endif
@@ -201,7 +205,7 @@
                     <!-- Top: Search Bar & Filter Toggle -->
                     <div class="mb-4 flex gap-2">
                         <div class="relative w-full" 
-                             x-data="{ searchQuery: '{{ request('search') ? addslashes(request('search')) : '' }}' }"
+                             x-data="{ searchQuery: @js(request('search', '')) }"
                              @keydown.window="
                                 if ($event.key === '/' && $event.target.tagName !== 'INPUT' && $event.target.tagName !== 'TEXTAREA') {
                                     $event.preventDefault();
@@ -225,7 +229,7 @@
                                 <kbd class="px-2 py-1 text-[10px] font-semibold text-secondary-500 bg-secondary-100 border border-secondary-200 rounded-md shadow-sm">/</kbd>
                             </div>
 
-                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; isFiltering = true; $nextTick(() => { document.getElementById('inventory-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="Hapus Pencarian" x-cloak>
+                            <button type="button" x-show="searchQuery.length > 0" @click="searchQuery = ''; isFiltering = true; $nextTick(() => { document.getElementById('inventory-filter-form').submit(); })" class="absolute inset-y-0 right-0 pr-3 flex items-center text-secondary-400 hover:text-danger-500 transition-colors cursor-pointer" title="{{ __('ui.clear_search') }}" x-cloak>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
@@ -249,12 +253,12 @@
                     </template>
 
                     <!-- Bottom: Filters & Sort -->
-                    <div class="fixed md:static inset-y-0 right-0 z-[100] md:z-auto w-[85vw] max-w-sm md:w-full bg-white md:bg-transparent shadow-2xl md:shadow-none p-6 md:p-0 overflow-y-auto md:overflow-visible transition-transform duration-300 flex flex-col md:flex-row md:flex-wrap gap-4 md:gap-3 h-full md:h-auto"
+                    <div class="fixed md:relative inset-y-0 right-0 z-[100] md:z-[60] w-[85vw] max-w-sm md:max-w-none md:w-full bg-white md:bg-transparent shadow-2xl md:shadow-none p-6 md:p-0 overflow-y-auto md:overflow-visible transition-transform duration-300 flex flex-col md:flex-row md:flex-wrap gap-4 md:gap-3 h-full md:h-auto"
                          :class="showFilters ? 'translate-x-0' : 'translate-x-full md:translate-x-0'">
                         
                         <!-- Mobile Drawer Header -->
                         <div class="flex items-center justify-between mb-4 md:hidden">
-                            <h3 class="text-lg font-bold text-secondary-900">Filter Data</h3>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.filter_data') }}</h2>
                             <button type="button" @click="showFilters = false" class="text-secondary-400 hover:text-secondary-600 bg-secondary-50 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-primary-500 transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
@@ -273,8 +277,8 @@
                             <div class="flex-1 w-full sm:w-auto min-w-[150px]">
                                 @php
                                     $typeOptions = [
-                                        'sale' => 'Barang Dijual (Sale)',
-                                        'asset' => 'Inventaris (Asset)',
+                                        'sale' => __('ui.type_sale'),
+                                        'asset' => __('ui.type_asset'),
                                     ];
                                 @endphp
                                 <label for="type-filter" class="sr-only">{{ __('ui.all_types') }}</label>

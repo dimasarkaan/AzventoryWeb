@@ -2,7 +2,6 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" 
              x-data="inventoryDetail()"
-             x-init="console.log('Alpine Scope Initialized')"
              x-effect="document.body.style.overflow = (stockModalOpen || borrowModalOpen) ? 'hidden' : ''"
              @open-return-modal.window="initReturn($event.detail)"
         >
@@ -10,9 +9,9 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                        <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                             {{ $sparepart->name }}
-                        </h2>
+                        </h1>
                         <x-status-badge :status="$sparepart->status" type="pill" />
                     </div>
                     <div class="flex items-center gap-2 mt-1.5 text-secondary-500 font-mono text-sm">
@@ -22,7 +21,7 @@
                             <span>{{ $sparepart->part_number }}</span>
                             <button @click="navigator.clipboard.writeText('{{ $sparepart->part_number }}'); copied = true; setTimeout(() => copied = false, 2000)" 
                                     class="p-1 rounded-md hover:bg-secondary-100 transition-colors text-secondary-400 hover:text-secondary-600 focus:outline-none"
-                                    :title="copied ? 'Tersalin!' : 'Salin Part Number'">
+                                    :title="copied ? '{{ __('ui.copied') }}' : '{{ __('ui.copy_pn') }}'">
                                 <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                 <svg x-show="copied" class="w-4 h-4 text-success-500" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                             </button>
@@ -34,10 +33,10 @@
                         <div x-data="{ shared: false }" class="flex items-center">
                             <button @click="navigator.clipboard.writeText(window.location.href); shared = true; setTimeout(() => shared = false, 2000)" 
                                     class="flex items-center gap-1.5 px-2 py-1 rounded-md hover:bg-secondary-100 transition-colors text-secondary-400 hover:text-secondary-600 focus:outline-none"
-                                    :title="shared ? 'Tautan disalin!' : 'Salin Tautan'">
+                                    :title="shared ? '{{ __('ui.link_copied') }}' : '{{ __('ui.copy_link') }}'">
                                 <svg x-show="!shared" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                                 <svg x-show="shared" class="w-4 h-4 text-success-500" x-cloak fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                <span class="text-xs hidden sm:inline" x-text="shared ? 'Tersalin' : 'Bagikan'"></span>
+                                <span class="text-xs hidden sm:inline" x-text="shared ? '{{ __('ui.copied') }}' : '{{ __('ui.share') }}'"></span>
                             </button>
                         </div>
                     </div>
@@ -49,24 +48,11 @@
                     </a>
                     
                     @can('update', $sparepart)
-                    <!-- Desktop Edit Button -->
-                    <a href="{{ route('inventory.edit', $sparepart) }}" data-testid="btn-edit" class="btn btn-warning hidden md:flex">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        {{ __('ui.edit') }}
+                    <!-- Responsive Edit Button -->
+                    <a href="{{ route('inventory.edit', $sparepart) }}" data-testid="btn-edit" class="btn btn-warning px-2 md:px-4">
+                        <svg class="w-5 h-5 md:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        <span class="hidden md:inline">{{ __('ui.edit') }}</span>
                     </a>
-
-                    <!-- Mobile Dropdown -->
-                    <div class="relative md:hidden" x-data="{ openMenu: false }">
-                        <button @click="openMenu = !openMenu" class="btn btn-secondary px-2" aria-label="Opsi">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path></svg>
-                        </button>
-                        <div x-show="openMenu" @click.away="openMenu = false" x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-secondary-200 z-50">
-                            <a href="{{ route('inventory.edit', $sparepart) }}" class="flex items-center gap-3 px-4 py-3 text-secondary-700 hover:bg-secondary-50 hover:text-warning-600 transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                {{ __('ui.edit') }}
-                            </a>
-                        </div>
-                    </div>
                     @endcan
                 </div>
             </div>
@@ -107,7 +93,7 @@
 
                     <!-- Details Card -->
                     <div class="card p-6 flex-1 flex flex-col">
-                        <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">{{ __('ui.detail_info') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2">{{ __('ui.detail_info') }}</h2>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.category') }}</span>
@@ -178,6 +164,30 @@
                 <div class="flex flex-col gap-6">
                     <!-- Stock Card -->
                     <div class="card p-6 border-t-4 border-primary-500">
+                        {{-- Inline Flash Message (Fallback agar feedback pasti terlihat) --}}
+                        @if(session('success'))
+                        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 8000)"
+                             x-transition:leave="transition ease-in duration-300"
+                             x-transition:leave-start="opacity-100 max-h-20"
+                             x-transition:leave-end="opacity-0 max-h-0"
+                             class="mb-4 bg-success-50 text-success-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-success-200 overflow-hidden">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="flex-1 font-medium">{{ session('success') }}</span>
+                            <button @click="show = false" class="text-success-500 hover:text-success-700 flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        @endif
+                        @if(session('error') || $errors->any())
+                        <div x-data="{ show: true }" x-show="show"
+                             class="mb-4 bg-danger-50 text-danger-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-danger-200 overflow-hidden">
+                            <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span class="flex-1 font-medium">{{ session('error') ?? $errors->first() }}</span>
+                            <button @click="show = false" class="text-danger-500 hover:text-danger-700 flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                        @endif
                         <div class="flex items-start justify-between">
                             <div>
                                 <span class="text-xs text-secondary-400 uppercase tracking-wider font-semibold">{{ __('ui.available_stock') }}</span>
@@ -216,6 +226,36 @@
                                      <span>{{ __('ui.stock_safe') }} (Min: {{ $sparepart->minimum_stock }} {{ $sparepart->unit ?? 'Pcs' }})</span>
                                 </div>
                             </template>
+                        @endif
+
+                        <!-- Pending Requests Indicator -->
+                        @php
+                            $isOperator = auth()->user()->role === \App\Enums\UserRole::OPERATOR;
+                            $isAdmin = auth()->user()->role === \App\Enums\UserRole::ADMIN;
+                        @endphp
+                        
+                        @if($isOperator || $isAdmin)
+                            @php
+                                $pendingQuery = $sparepart->stockLogs()->where('status', 'pending');
+                                if ($isOperator) {
+                                    $pendingQuery->where('user_id', auth()->id());
+                                }
+                                $pendingRequestsCount = $pendingQuery->count();
+                            @endphp
+                            
+                            @if($pendingRequestsCount > 0)
+                                <div class="mt-4 bg-primary-50 text-primary-700 p-3 rounded-lg text-sm flex items-start gap-2 border border-primary-200">
+                                    <svg class="w-5 h-5 flex-shrink-0 mt-0.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    <div>
+                                        <span class="font-bold block">Status Pengajuan</span>
+                                        @if($isOperator)
+                                            Anda memiliki <span class="font-bold">{{ $pendingRequestsCount }}</span> pengajuan perubahan stok yang sedang menunggu persetujuan Admin.
+                                        @else
+                                            Ada <span class="font-bold">{{ $pendingRequestsCount }}</span> pengajuan perubahan stok yang membutuhkan persetujuan Anda. <a href="{{ route('inventory.stock-approvals.index') }}?search={{ urlencode($sparepart->name) }}" class="underline font-bold hover:text-primary-800 transition-colors">Tinjau Sekarang</a>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
                         @endif
 
                         <!-- Actions Wrapper -->
@@ -293,7 +333,7 @@
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                                         {{ __('ui.download') }}
                                     </a>
-                                     <a href="{{ route('inventory.qr.print', $sparepart) }}" target="_blank" class="btn btn-secondary justify-center text-sm py-2">
+                                     <a href="{{ route('inventory.qr.print', $sparepart) }}" class="btn btn-secondary justify-center text-sm py-2">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
                                         {{ __('ui.print') }}
                                     </a>
@@ -322,20 +362,22 @@
                         <!-- History Card -->
                         <div id="activity-history-container" class="card p-6" x-data="{ searchQuery: '', filterStatus: 'all' }">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 border-b border-secondary-100 pb-2 gap-4">
-                                <h3 class="text-lg font-bold text-secondary-900">{{ __('ui.borrowing_history') }}</h3>
+                                <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.borrowing_history') }}</h2>
                                 
                                 <div class="flex items-center gap-2">
                                     <div class="relative">
                                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <svg class="h-4 w-4 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                                         </div>
-                                        <input type="text" x-model="searchQuery" placeholder="Cari peminjam..." class="input-field pl-9 py-1.5 text-sm w-full sm:w-48 transition-all">
+                                        <input type="text" x-model="searchQuery" placeholder="{{ __('ui.search_borrower') }}" class="input-field pl-9 py-1.5 text-sm w-full sm:w-48 transition-all">
                                     </div>
-                                    <select x-model="filterStatus" class="input-field py-1.5 pl-3 pr-8 text-sm cursor-pointer border-secondary-200">
-                                        <option value="all">Semua Status</option>
-                                        <option value="borrowed">Dipinjam</option>
-                                        <option value="returned">Selesai</option>
-                                    </select>
+                                    <div x-on:selected="filterStatus = $event.detail" class="w-full sm:w-40">
+                                        <x-select name="filterStatus" 
+                                                  :options="['all' => __('ui.all_status'), 'borrowed' => __('ui.borrowed'), 'returned' => __('ui.status_completed')]" 
+                                                  selected="all" 
+                                                  :allowClear="false" 
+                                                  width="w-full" />
+                                    </div>
                                 </div>
                             </div>
 
@@ -388,7 +430,7 @@
                                                         @endif
                                                     </div>
                                                     <div class="flex flex-col">
-                                                        <span>{{ $borrowing->user->name ?? 'User Terhapus' }}</span>
+                                                        <span>{{ $borrowing->user->name ?? __('ui.user_deleted') }}</span>
                                                         <span class="text-xs text-secondary-500">{{ $borrowing->user->role ?? '-' }}</span>
                                                     </div>
                                                 </div>
@@ -399,7 +441,7 @@
                                                         {{ $borrowing->quantity }} {{ $sparepart->unit }}
                                                     </span>
                                                     @if($borrowing->remaining_quantity < $borrowing->quantity)
-                                                        <span class="text-xs text-secondary-500 font-normal">Sisa: {{ $borrowing->remaining_quantity }}</span>
+                                                        <span class="text-xs text-secondary-500 font-normal">{{ __('ui.remaining_qty') }}: {{ $borrowing->remaining_quantity }}</span>
                                                     @endif
                                                 </div>
                                             </td>
@@ -447,7 +489,7 @@
                                                                 image: '{{ asset('storage/' . $borrowing->return_evidence) }}',
                                                                 notes: '{{ addslashes($borrowing->return_notes ?? '-') }}',
                                                                 date: '{{ $borrowing->actual_return_date ? \Carbon\Carbon::parse($borrowing->actual_return_date)->translatedFormat('d F Y H:i') : '-' }}',
-                                                                condition: '{{ $borrowing->return_condition ?? 'Baik' }}'
+                                                                condition: '{{ $borrowing->return_condition ?? __('ui.condition_good_label') }}'
                                                             };
                                                             evidenceModalOpen = true;
                                                         "
@@ -511,7 +553,7 @@
                                                     @endif
                                                 </div>
                                                 <div>
-                                                    <h4 class="text-sm font-bold text-secondary-900">{{ $borrowing->user->name ?? 'User Terhapus' }}</h4>
+                                                    <h4 class="text-sm font-bold text-secondary-900">{{ $borrowing->user->name ?? __('ui.user_deleted') }}</h4>
                                                     <span class="text-xs text-secondary-500 block">{{ $borrowing->user->role ?? '-' }}</span>
                                                 </div>
                                             </div>
@@ -541,7 +583,7 @@
                                                 <div class="font-medium text-secondary-900 flex items-center gap-1">
                                                     {{ $borrowing->quantity }} {{ $sparepart->unit }}
                                                     @if($borrowing->remaining_quantity < $borrowing->quantity)
-                                                        <span class="text-xs text-secondary-500 font-normal bg-secondary-100 px-1.5 rounded">(Sisa: {{ $borrowing->remaining_quantity }})</span>
+                                                        <span class="text-xs text-secondary-500 font-normal bg-secondary-100 px-1.5 rounded">({{ __('ui.remaining_qty') }}: {{ $borrowing->remaining_quantity }})</span>
                                                     @endif
                                                 </div>
                                             </div>
@@ -575,7 +617,7 @@
                                                             image: '{{ asset('storage/' . $borrowing->return_evidence) }}',
                                                             notes: '{{ addslashes($borrowing->return_notes ?? '-') }}',
                                                             date: '{{ $borrowing->actual_return_date ? \Carbon\Carbon::parse($borrowing->actual_return_date)->translatedFormat('d F Y H:i') : '-' }}',
-                                                            condition: '{{ $borrowing->return_condition ?? 'Baik' }}'
+                                                            condition: '{{ $borrowing->return_condition ?? __('ui.condition_good_label') }}'
                                                         };
                                                         evidenceModalOpen = true;
                                                     "
@@ -618,12 +660,12 @@
                 <!-- Similar Items Section -->
                 <div class="col-span-1 lg:col-span-3">
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2 flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-secondary-900 mb-4 border-b border-secondary-100 pb-2 flex items-center justify-between">
                             <span>{{ __('ui.similar_items') }}</span>
                             @if(isset($similarItems) && $similarItems->count() > 0)
                                 <span class="text-xs font-normal text-secondary-500 bg-secondary-100 px-2 py-1 rounded-full">{{ $similarItems->total() }} {{ __('ui.items_found') }}</span>
                             @endif
-                        </h3>
+                        </h2>
                         
                         @if(isset($similarItems) && $similarItems->count() > 0)
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -647,7 +689,7 @@
                                     <!-- Info -->
                                     <div class="flex-1 min-w-0">
                                         <h4 class="text-sm font-bold text-secondary-900 truncate group-hover:text-primary-600 transition-colors">{{ $item->name }}</h4>
-                                        <p class="text-xs text-secondary-500 mb-2 truncate">{{ $item->brand->name ?? __('ui.no_brand') }} â€¢ {{ $item->category->name ?? '-' }}</p>
+                                        <p class="text-xs text-secondary-500 mb-2 truncate">{{ $item->brand->name ?? __('ui.no_brand') }} &bull; {{ $item->category->name ?? '-' }}</p>
                                         
                                         <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-xs">
                                             <div>

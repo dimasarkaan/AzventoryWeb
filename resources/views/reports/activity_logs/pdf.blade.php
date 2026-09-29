@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan Aktivitas Sistem</title>
+    <title>{{ __('ui.report_activity_title') }}</title>
     @include('reports.partials.pdf_style')
     <style>
         .badges { font-size: 8pt; padding: 2px 5px; border-radius: 4px; border: 1px solid #ccc; display: inline-block; }

@@ -39,9 +39,9 @@
                                             </svg>
                                         </div>
                                         <div class="ml-4 text-left">
-                                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                            <h2 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                                                 {{ __('ui.return_item_title') }}
-                                            </h3>
+                                            </h2>
                                         </div>
                                     </div>
                                 </div>
@@ -149,7 +149,7 @@
             
                                             processFiles(newFiles) {
                                                 if (this.files.length + newFiles.length > 5) {
-                                                    window.showAlert('Peringatan', 'Maksimal 5 foto', 'warning');
+                                                    window.showAlert('{{ __('ui.warning') }}', '{{ __('ui.max_photo_warning') }}', 'warning');
                                                     return;
                                                 }
                                                 this.files = this.files.concat(newFiles);
@@ -190,7 +190,7 @@
                                                         else if (errStr.includes('NotFoundError')) msg = '{{ __('ui.camera_error_not_found') }}';
                                                         else if (errStr.includes('NotReadableError')) msg = '{{ __('ui.camera_error_not_readable') }}';
                                                         
-                                                        window.showAlert('Peringatan', msg, 'warning');
+                                                        window.showAlert('{{ __('ui.warning') }}', msg, 'warning');
                                                         this.cameraOpen = false;
                                                     }
                                                 });
@@ -233,7 +233,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     </svg>
-                                                    <span class="text-sm font-semibold">Buka Kamera</span>
+                                                    <span class="text-sm font-semibold">{{ __('ui.open_camera') }}</span>
                                                 </button>
             
                                                 <button type="button" @click="triggerGallery" 
@@ -241,7 +241,7 @@
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                     </svg>
-                                                    <span class="text-sm font-semibold">Pilih Galeri</span>
+                                                    <span class="text-sm font-semibold">{{ __('ui.choose_gallery') }}</span>
                                                 </button>
                                             </div>
             
@@ -264,7 +264,7 @@
                                                         </button>
                                                     </div>
                                                 </div>
-                                                <p class="text-white mt-4 text-sm font-medium">Pose dan ambil foto</p>
+                                                <p class="text-white mt-4 text-sm font-medium">{{ __('ui.camera_pose_hint') }}</p>
                                             </div>
             
                                             <!-- Hidden Inputs -->
@@ -282,14 +282,14 @@
                                                     </div>
                                                 </template>
                                             </div>
-                                            <p class="mt-2 text-xs text-gray-500" x-show="files.length > 0">Maksimal 5 foto (Wajib)</p>
+                                            <p class="mt-2 text-xs text-gray-500" x-show="files.length > 0">{{ __('ui.max_photo_hint') }}</p>
                                             <input type="hidden" id="file_count" :value="files.length">
                                         </div>
             
                                         <!-- Notes -->
                                         <div>
-                                            <label for="return_notes" class="block text-sm font-medium text-gray-700">{{ __('ui.notes') }} <span class="text-secondary-400 font-normal">(Opsional)</span></label>
-                                            <textarea name="return_notes" id="return_notes" x-model="returnNotes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="Catatan tambahan..."></textarea>
+                                            <label for="return_notes" class="block text-sm font-medium text-gray-700">{{ __('ui.notes') }} <span class="text-secondary-400 font-normal">{{ __('ui.optional') }}</span></label>
+                                            <textarea name="return_notes" id="return_notes" x-model="returnNotes" rows="2" class="form-textarea mt-1 block w-full rounded-md border-gray-300 focus:border-primary-500 focus:ring-primary-500 sm:text-sm" placeholder="{{ __('ui.additional_notes') }}"></textarea>
                                         </div>
                                     </div>
             
@@ -301,10 +301,10 @@
                                                 :disabled="!isValid || isSubmitting || (returnCondition !== 'lost' && !hasFiles)"
                                                 :class="{ 'opacity-50 cursor-not-allowed': !isValid || isSubmitting || (returnCondition !== 'lost' && !hasFiles), 'hover:bg-primary-700': isValid && !isSubmitting && (returnCondition === 'lost' || hasFiles) }"
                                                 class="w-full sm:w-auto inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm transition-all">
-                                            <span x-show="!isSubmitting">Konfirmasi</span>
+                                            <span x-show="!isSubmitting">{{ __('ui.confirm') }}</span>
                                             <span x-show="isSubmitting" class="flex items-center gap-2">
                                                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                                Proses...
+                                                {{ __('ui.processing') }}
                                             </span>
                                         </button>
                                         <button type="button" @click="returnModalOpen = false" class="mt-0 w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm">

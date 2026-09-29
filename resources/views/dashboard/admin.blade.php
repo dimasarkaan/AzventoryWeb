@@ -1,5 +1,5 @@
-{{-- ================================================================
-     DASHBOARD ADMIN — AzventoryWeb
+﻿{{-- ================================================================
+     DASHBOARD ADMIN â€” AzventoryWeb
      resources/views/dashboard/admin.blade.php
 
      Scope:
@@ -85,10 +85,10 @@
                 @php
                     $activePeriod = $period ?? 'this_month';
                     $tabDefs = [
-                        'today'      => 'Hari Ini',
-                        'this_week'  => 'Minggu Ini',
-                        'this_month' => 'Bulan Ini',
-                        'this_year'  => 'Tahun Ini',
+                        'today'      => __('ui.today'),
+                        'this_week'  => __('ui.this_week'),
+                        'this_month' => __('ui.this_month'),
+                        'this_year'  => __('ui.this_year'),
                     ];
                 @endphp
                 <div x-data="globalPeriodFilter()" class="flex flex-col gap-2">
@@ -117,7 +117,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <span>Custom</span>
+                            <span>{{ __('ui.custom') }}</span>
                             @if(in_array($activePeriod, ['custom','custom_year']))
                                 <span class="text-xs text-secondary-500">
                                     ({{ $year }}{{ isset($month) && $month !== 'all' ? '/' . str_pad($month,2,'0',STR_PAD_LEFT) : '' }})
@@ -126,7 +126,7 @@
                         </button>
 
                         <span class="ml-auto text-xs text-secondary-400 hidden sm:block">
-                            Data: {{ \Carbon\Carbon::parse($start)->format('d M Y') }} — {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
+                            Data: {{ \Carbon\Carbon::parse($start)->format('d M Y') }} â€” {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
                         </span>
                     </div>
 
@@ -138,13 +138,13 @@
                          x-cloak>
                         @php
                             $bulanList = [
-                                '' => 'Semua Bulan',
+                                '' => __('ui.all_months'),
                                 '1' => 'Januari', '2' => 'Februari', '3' => 'Maret',
                                 '4' => 'April', '5' => 'Mei', '6' => 'Juni',
                                 '7' => 'Juli', '8' => 'Agustus', '9' => 'September',
                                 '10' => 'Oktober', '11' => 'November', '12' => 'Desember',
                             ];
-                            $activeMonthLabel = $bulanList[$month ?? ''] ?? 'Semua Bulan';
+                            $activeMonthLabel = $bulanList[$month ?? ''] ?? __('ui.all_months');
                         @endphp
                         <form method="GET" action="{{ route('dashboard.admin') }}"
                               x-data="{ isSubmitting: false }" @submit="isSubmitting = true"
@@ -190,7 +190,7 @@
                                     selectedVal: '{{ $month ?? '' }}',
                                     selectedLabel: '{{ $activeMonthLabel }}',
                                     options: [
-                                        { val: '', label: 'Semua Bulan' },
+                                        { val: '', label: '{{ __('ui.all_months') }}' },
                                         { val: '1', label: 'Januari' }, { val: '2', label: 'Februari' },
                                         { val: '3', label: 'Maret' }, { val: '4', label: 'April' },
                                         { val: '5', label: 'Mei' }, { val: '6', label: 'Juni' },
@@ -227,20 +227,20 @@
                             </div>
 
                             <button type="submit" class="btn btn-primary text-sm flex items-center gap-2" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
-                                <span x-show="!isSubmitting">Terapkan</span>
+                                <span x-show="!isSubmitting">{{ __('ui.apply') }}</span>
                                 <span x-show="isSubmitting" class="flex items-center gap-2" x-cloak>
                                     <svg class="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    Memproses...
+                                    {{ __('ui.processing') }}
                                 </span>
                             </button>
-                            <a href="{{ route('dashboard.admin') }}" class="btn btn-secondary text-sm">Reset</a>
+                            <a href="{{ route('dashboard.admin') }}" class="btn btn-secondary text-sm">{{ __('ui.reset') }}</a>
                         </form>
                     </div>
                 </div>
             </div>
 
             {{-- ================================================================
-                 STAT CARDS — Skeleton Loading
+                 STAT CARDS â€” Skeleton Loading
                  ================================================================ --}}
             <div x-show="showStats && isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-8 animate-pulse">
                 @for($i = 0; $i < 5; $i++)
@@ -255,7 +255,7 @@
                 @endfor
             </div>
 
-            {{-- STAT CARDS — Konten Asli --}}
+            {{-- STAT CARDS â€” Konten Asli --}}
             <div x-show="showStats && !isLoading"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
@@ -320,7 +320,7 @@
                 </div>
 
                 {{-- Card 4: Sedang Dipinjam --}}
-                <div x-show="showBorrowings" class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-indigo-900/5 transition-all duration-500 relative overflow-hidden group">
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-indigo-900/5 transition-all duration-500 relative overflow-hidden group">
                     <div class="absolute -right-6 -top-6 w-32 h-32 bg-gradient-to-br from-indigo-100 to-indigo-50 rounded-full opacity-50 group-hover:scale-150 transition-transform duration-700 pointer-events-none"></div>
                     <div class="relative z-10 flex justify-between items-start">
                         <div>
@@ -387,7 +387,7 @@
                     <div class="card-header p-4 bg-gradient-to-r from-red-500 to-orange-600 flex justify-between items-center">
                         <div class="flex items-center gap-2">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                            <h3 class="font-bold text-white">{{ __('ui.attention_overdue') }} ({{ $totalOverdueCount }})</h3>
+                            <h2 class="text-lg font-bold text-white">{{ __('ui.attention_overdue') }} ({{ $totalOverdueCount }})</h2>
                         </div>
                         @if($totalOverdueCount > 0)
                             <a href="{{ route('inventory.index', ['filter' => 'overdue']) }}" class="text-xs text-white hover:text-red-100 font-bold underline decoration-white/50">{{ __('ui.view_all') }}</a>
@@ -463,7 +463,7 @@
                 <div class="card-header border-b border-secondary-100 p-5">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
-                            <h3 class="font-bold text-secondary-900">{{ __('ui.stock_movement') }}</h3>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.stock_movement') }}</h2>
                             <p class="text-xs text-secondary-500">{{ __('ui.stock_movement_desc') }}</p>
                         </div>
                         {{-- KPI Summary Badges --}}
@@ -546,7 +546,7 @@
                             <svg class="w-4 h-4 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900">{{ __('ui.top_exiting_items') }}</h3>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.top_exiting_items') }}</h2>
                             <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
                         </div>
                     </div>
@@ -568,19 +568,19 @@
                         </template>
                         <div x-show="topExited.length === 0" class="px-6 py-10 text-center text-secondary-400">
                             <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                            <p class="text-sm italic">{{ __('ui.no_data') }}</p>
+                            <p class="text-sm italic">{{ __('ui.no_data_short') }}</p>
                         </div>
                     </div>
                 </div>
 
-                {{-- Barang Sering Masuk — emerald border + pill badge --}}
+                {{-- Barang Sering Masuk â€” emerald border + pill badge --}}
                 <div class="card flex flex-col overflow-hidden border-l-4 border-emerald-400">
                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900">{{ __('ui.top_entering_items') }}</h3>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.top_entering_items') }}</h2>
                             <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
                         </div>
                     </div>
@@ -609,7 +609,7 @@
                         @empty
                             <div class="px-6 py-10 text-center text-secondary-400">
                                 <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                                <p class="text-sm italic">{{ __('ui.no_data') }}</p>
+                                <p class="text-sm italic">{{ __('ui.no_data_short') }}</p>
                             </div>
                         @endforelse
                     </div>
@@ -647,7 +647,7 @@
                 <!-- Grafik Donut: Kategori -->
                 <div class="card flex flex-col">
                     <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
-                        <h3 class="font-bold text-secondary-900">{{ __('ui.stock_distribution_category') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.stock_distribution_category') }}</h2>
                     </div>
                     <div class="card-body p-6 flex-grow flex items-center justify-center bg-white min-h-[300px]">
                         <div class="w-full h-full max-h-[300px]">
@@ -658,7 +658,7 @@
                 <!-- Grafik Batang: Lokasi -->
                 <div class="card flex flex-col">
                     <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
-                        <h3 class="font-bold text-secondary-900">{{ __('ui.stock_location') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.stock_location') }}</h2>
                     </div>
                     <div class="card-body p-6 flex-grow flex items-center justify-center bg-white min-h-[300px]">
                         <div class="w-full h-full max-h-[300px]">
@@ -708,7 +708,7 @@
                             <div class="p-1.5 bg-white/20 text-white rounded-lg backdrop-blur-sm">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                             </div>
-                            <h3 class="font-bold text-white">{{ __('ui.warning_low_stock') }}</h3>
+                            <h2 class="text-lg font-bold text-white">{{ __('ui.warning_low_stock') }}</h2>
                         </div>
                         <a href="{{ route('inventory.index', ['filter' => 'low_stock']) }}" class="text-sm text-white hover:text-amber-100 font-medium underline decoration-white/50">{{ __('ui.view_all') }}</a>
                     </div>
@@ -780,7 +780,7 @@
                      class="card p-0 flex flex-col h-full print-safe"
                      :class="{ 'lg:col-span-3': !showLowStock, 'lg:col-span-1': showLowStock }">
                     <div class="card-header p-5 border-b border-secondary-100 flex justify-between items-center bg-white">
-                        <h3 class="font-bold text-secondary-900">{{ __('ui.recent_activities') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.recent_activities') }}</h2>
                         <a href="{{ route('reports.activity-logs.index') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 transition-colors bg-primary-50 px-3 py-1.5 rounded-full border border-primary-100 shadow-sm hover:bg-primary-100">{{ __('ui.view_all') }}</a>
                     </div>
                     <div class="card-body p-0 overflow-y-auto max-h-[500px] custom-scrollbar">
@@ -868,8 +868,8 @@
                             <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900">{{ __('ui.dead_stock_title') }}</h3>
-                            <p class="text-xs text-secondary-400">Barang tidak bergerak dalam periode ini</p>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.dead_stock_title') }}</h2>
+                            <p class="text-xs text-secondary-400">{{ __('ui.dead_stock_desc') }}</p>
                         </div>
                     </div>
                     <div class="flex-grow">
@@ -887,8 +887,8 @@
                         <div x-show="deadStockItems.length === 0" class="px-6 py-10 text-center">
                             <div class="flex flex-col items-center gap-2">
                                 <svg class="w-10 h-10 text-success-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <p class="text-sm font-medium text-secondary-700">Semua barang bergerak aktif</p>
-                                <p class="text-xs text-secondary-400">Tidak ada barang yang stagnan dalam periode ini</p>
+                                <p class="text-sm font-medium text-secondary-700">{{ __('ui.all_active_desc') }}</p>
+                                <p class="text-xs text-secondary-400">{{ __('ui.no_dead_stock_desc') }}</p>
                             </div>
                         </div>
                     </div>
@@ -901,7 +901,7 @@
                             <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900">{{ __('ui.top_contributors_title') }}</h3>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.top_contributors_title') }}</h2>
                             <p class="text-xs text-secondary-400">Pengguna paling aktif dalam periode ini</p>
                         </div>
                     </div>
@@ -1070,7 +1070,7 @@
         const gradMasuk = makeGradient(movCtx, 'rgba(16,185,129,0.85)', 'rgba(16,185,129,0.15)');
         const gradKeluar = makeGradient(movCtx, 'rgba(239,68,68,0.85)', 'rgba(239,68,68,0.15)');
 
-        const movLabels = movementDataKey.labels.length > 0 ? movementDataKey.labels : ['Tidak ada data'];
+        const movLabels = movementDataKey.labels.length > 0 ? movementDataKey.labels : ['{{ __('ui.no_data_short') }}'];
         const movMasuk  = movementDataKey.masuk.length  > 0 ? movementDataKey.masuk  : [0];
         const movKeluar = movementDataKey.keluar.length > 0 ? movementDataKey.keluar : [0];
 
@@ -1134,7 +1134,7 @@
                                 const masuk  = ctx.find(c => c.datasetIndex === 0)?.parsed.y ?? 0;
                                 const keluar = ctx.find(c => c.datasetIndex === 1)?.parsed.y ?? 0;
                                 const net = masuk - keluar;
-                                return [`  ─────────────────`, `  Net Stok: ${net >= 0 ? '+' : ''}${net.toLocaleString('id-ID')} unit`];
+                                return [`  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`, `  Net Stok: ${net >= 0 ? '+' : ''}${net.toLocaleString('id-ID')} unit`];
                             }
                         }
                     }
@@ -1266,7 +1266,7 @@
         // =====================================================================
         window.updateDashboardCharts = function(movementData, stockByCategory, stockByLocation) {
             if (movementData && movementChart) {
-                movementChart.data.labels = movementData.labels.length > 0 ? movementData.labels : ['Tidak ada data'];
+                movementChart.data.labels = movementData.labels.length > 0 ? movementData.labels : ['{{ __('ui.no_data_short') }}'];
                 movementChart.data.datasets[0].data = movementData.masuk.length  > 0 ? movementData.masuk  : [0];
                 movementChart.data.datasets[1].data = movementData.keluar.length > 0 ? movementData.keluar : [0];
                 movementChart.update();
@@ -1289,8 +1289,8 @@
         // =====================================================================
         function dashboardData() {
             return {
-                // Widget visibility — persisted di localStorage
-                // Widget visibility — dipaksa tampil semua untuk Admin (tidak bisa diubah)
+                // Widget visibility â€” persisted di localStorage
+                // Widget visibility â€” dipaksa tampil semua untuk Admin (tidak bisa diubah)
                 showStats:       true,
                 showCharts:      true,
                 showMovement:    true,
@@ -1299,7 +1299,6 @@
                 showRecent:      true,
                 showDeadStock:   false,
                 showLeaderboard: false,
-                showBorrowings:  true,
                 showOverdue:     true,
 
                 isLoading: true,
@@ -1417,7 +1416,7 @@
                 const data = await response.json();
 
                 if (movementChart) {
-                    movementChart.data.labels = (data.labels  || []).length > 0 ? data.labels  : ['Tidak ada data'];
+                    movementChart.data.labels = (data.labels  || []).length > 0 ? data.labels  : ['{{ __('ui.no_data_short') }}'];
                     movementChart.data.datasets[0].data = (data.masuk   || []).length > 0 ? data.masuk   : [0];
                     movementChart.data.datasets[1].data = (data.keluar  || []).length > 0 ? data.keluar  : [0];
                     movementChart.update('active');

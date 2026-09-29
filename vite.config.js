@@ -13,10 +13,11 @@ export default defineConfig({
         }),
         VitePWA({
             registerType: 'autoUpdate',
+            injectRegister: false, // We handle SW registration manually in app.js
             devOptions: {
-                enabled: true // Allow testing service worker in dev mode
+                enabled: false // Disable SW in dev mode to avoid precaching issues
             },
-            outDir: 'public/build', // Laravel specific: output manifest to public/build so it's accessible
+            outDir: 'public/build', // Keep everything in public/build so relative paths work
 
             workbox: {
                 globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
@@ -24,7 +25,6 @@ export default defineConfig({
                     { url: '/offline', revision: null }
                 ],
                 navigateFallback: '/offline',
-                navigateFallbackDenylist: [/^\/api/, /^\/broadcasting/], // Only exclude API and Echo calls
                 runtimeCaching: [
                     {
                         urlPattern: /\/offline$/,

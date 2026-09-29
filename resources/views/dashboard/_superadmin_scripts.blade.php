@@ -32,19 +32,23 @@
 <script>
     function dashboardData() {
         const userSettings = @json(auth()->user()->settings ?? []);
+        
+        const parseBool = (val, defaultVal) => {
+            if (val === undefined || val === null) return defaultVal;
+            return val === true || String(val).toLowerCase() === 'true' || String(val) === '1';
+        };
 
         return {
-            showStats: userSettings.showStats ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showStats') !== 'false'),
-            showCharts: userSettings.showCharts ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showCharts') !== 'false'),
-            showLowStock: userSettings.showLowStock ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showLowStock') !== 'false'),
-            showBorrowings: userSettings.showBorrowings ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showBorrowings') !== 'false'),
-            showOverdue: userSettings.showOverdue ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showOverdue') !== 'false'),
-            showNoPriceItems: userSettings.showNoPriceItems ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showNoPriceItems') !== 'false'),
-            showMovement: userSettings.showMovement ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showMovement') !== 'false'),
-            showRecent: userSettings.showRecent ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showRecent') !== 'false'),
-            showTopItems: userSettings.showTopItems ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showTopItems') === 'true'),
-            showDeadStock: userSettings.showDeadStock ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showDeadStock') === 'true'),
-            showLeaderboard: userSettings.showLeaderboard ?? (localStorage.getItem('dashboard_{{ auth()->id() }}_showLeaderboard') === 'true'),
+            showStats: parseBool(userSettings.showStats, localStorage.getItem('dashboard_{{ auth()->id() }}_showStats') !== 'false'),
+            showCharts: parseBool(userSettings.showCharts, localStorage.getItem('dashboard_{{ auth()->id() }}_showCharts') !== 'false'),
+            showLowStock: parseBool(userSettings.showLowStock, localStorage.getItem('dashboard_{{ auth()->id() }}_showLowStock') !== 'false'),
+            showOverdue: parseBool(userSettings.showOverdue, localStorage.getItem('dashboard_{{ auth()->id() }}_showOverdue') !== 'false'),
+            showNoPriceItems: parseBool(userSettings.showNoPriceItems, localStorage.getItem('dashboard_{{ auth()->id() }}_showNoPriceItems') !== 'false'),
+            showMovement: parseBool(userSettings.showMovement, localStorage.getItem('dashboard_{{ auth()->id() }}_showMovement') !== 'false'),
+            showRecent: parseBool(userSettings.showRecent, localStorage.getItem('dashboard_{{ auth()->id() }}_showRecent') !== 'false'),
+            showTopItems: parseBool(userSettings.showTopItems, localStorage.getItem('dashboard_{{ auth()->id() }}_showTopItems') === 'true'),
+            showDeadStock: parseBool(userSettings.showDeadStock, localStorage.getItem('dashboard_{{ auth()->id() }}_showDeadStock') === 'true'),
+            showLeaderboard: parseBool(userSettings.showLeaderboard, localStorage.getItem('dashboard_{{ auth()->id() }}_showLeaderboard') === 'true'),
             
             isLoading: true,
             showActivityModal: false,
@@ -58,6 +62,60 @@
                     window.Swal.fire({ toast: true, position: 'top-end', icon: type, title: message, showConfirmButton: false, timer: 3000 });
                 } else {
                     window.showAlert('Info', message, 'info');
+                }
+            },
+
+            async fetchDashboardData(form) {
+                const url = new URL(form.action);
+                const formData = new FormData(form);
+                const searchParams = new URLSearchParams(formData);
+                url.search = searchParams.toString();
+
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        // Update Alpine state with the fetched JSON
+                        this.movementData = data.movementData || {};
+                        this.stockByCategory = data.stockByCategory || {};
+                        this.stockByLocation = data.stockByLocation || {};
+                        
+                        this.recentActivities = data.recentActivities || [];
+                        this.topExited = data.topExited || [];
+                        this.topEntered = data.topEntered || [];
+                        this.deadStockItems = data.deadStockItems || [];
+                        this.activeUsers = data.activeUsers || [];
+                        this.activeBorrowingsList = data.activeBorrowingsList || [];
+                        this.overdueBorrowingsList = data.overdueBorrowingsList || [];
+                        this.lowStockItems = data.lowStockItems || [];
+                        this.noPriceItems = data.noPriceItems || [];
+
+                        // Update charts if global function exists
+                        if (window.updateDashboardCharts) {
+                            window.updateDashboardCharts(this.movementData, this.stockByCategory, this.stockByLocation);
+                        }
+
+                        // Close custom date panel if open
+                        if (typeof this.showCustom !== 'undefined') {
+                            this.showCustom = false;
+                        }
+
+                        this.showToast('success', '{{ __("ui.dashboard_data_updated") ?? "Data dashboard berhasil diperbarui" }}');
+                    } else {
+                        throw new Error('Failed to fetch data');
+                    }
+                } catch (error) {
+                    console.error('AJAX Error:', error);
+                    this.showToast('error', 'Terjadi kesalahan saat memuat data');
+                } finally {
+                    this.isLoading = false;
                 }
             },
 
@@ -229,9 +287,7 @@
             },
 
             async openCategoryModal() {
-                console.log('📂 [Alpine] openCategoryModal called');
                 this.showCategoryModal = true;
-                console.log('📂 [Alpine] showCategoryModal set to true');
                 await this.fetchCategories();
             },
 
@@ -689,9 +745,20 @@
                 // Tampilkan konten setelah loading selesai
                 setTimeout(() => {
                     this.isLoading = false;
-                    if (this.showMovement && window.fetchMovementData) {
-                        window.fetchMovementData(30);
-                    }
+                    
+                    // Gunakan nextTick + setTimeout agar DOM benar-benar selesai di-paint oleh browser
+                    // sebelum Chart.js menghitung ulang dimensinya (menghindari ukuran 0x0)
+                    this.$nextTick(() => {
+                        setTimeout(() => {
+                            if (window.updateDashboardCharts) {
+                                window.updateDashboardCharts(this.movementData, this.stockByCategory, this.stockByLocation);
+                            }
+                            
+                            if (this.showMovement && window.fetchMovementData) {
+                                window.fetchMovementData(30);
+                            }
+                        }, 100);
+                    });
                 }, 300);
 
                 // Listener untuk event real-time global (dari realtime-inventory.js)
@@ -704,6 +771,7 @@
             movementData: @json($movementData),
             stockByCategory: @json($stockByCategory),
             stockByLocation: @json($stockByLocation),
+            noPriceItems: @json($noPriceItems ?? []),
             
             updateState(data) {
                 if (!data) return;
@@ -718,6 +786,7 @@
                 if (data.recentActivities) this.recentActivities = data.recentActivities;
                 if (data.activeBorrowingsList) this.activeBorrowingsList = data.activeBorrowingsList;
                 if (data.overdueBorrowingsList) this.overdueBorrowingsList = data.overdueBorrowingsList;
+                if (data.noPriceItems) this.noPriceItems = data.noPriceItems;
 
                 if (window.updateDashboardCharts) {
                     window.updateDashboardCharts(data.movementData, data.stockByCategory, data.stockByLocation, data);
@@ -749,13 +818,19 @@
 
             async toggle(key) {
                 const widgetKeys = ['showStats', 'showCharts', 'showMovement', 'showTopItems', 'showLowStock', 'showRecent', 'showDeadStock', 'showLeaderboard', 'showBorrowings', 'showOverdue', 'showNoPriceItems'];
-                const activeCount = widgetKeys.filter(k => this[k]).length;
-                if (this[key] && activeCount <= 1) {
+                
+                // Parse strings to boolean just in case
+                this[key] = (this[key] === true || String(this[key]) === 'true');
+
+                const activeCount = widgetKeys.filter(k => this[k] === true || String(this[k]) === 'true').length;
+                
+                // If they unchecked the last one, activeCount will be 0
+                if (activeCount < 1) {
                      if (window.showToast) window.showToast('warning', 'Minimal satu widget harus tetap aktif.');
+                     this[key] = true; // Revert it
                      return;
                 }
 
-                this[key] = !this[key];
                 localStorage.setItem('dashboard_{{ auth()->id() }}_' + key, this[key]);
                 if (key === 'showMovement' && this[key] && window.fetchMovementData) {
                     window.fetchMovementData(30);

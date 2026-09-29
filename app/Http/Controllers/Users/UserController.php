@@ -112,11 +112,18 @@ class UserController extends Controller
         // Memastikan pengguna memiliki izin untuk melihat detail pengguna lain
         $this->authorize('view', $user);
 
-        // Memuat relasi data peminjaman beserta detail barang yang dipinjam oleh user tersebut
-        $user->load(['borrowings.sparepart']);
+        // Mengambil statistik peminjaman langsung dari database (menghindari load semua relasi ke memori)
+        $totalBorrowings = $user->borrowings()->count();
+        $activeBorrowings = $user->borrowings()->where('status', 'borrowed')->count();
+        $overdueBorrowings = $user->borrowings()->where('status', 'borrowed')
+                                               ->where('expected_return_at', '<', now())
+                                               ->count();
+
+        // Memuat riwayat peminjaman dengan pagination (5 per halaman)
+        $borrowings = $user->borrowings()->with('sparepart')->latest()->paginate(5);
 
         // Mengembalikan tampilan halaman detail pengguna
-        return view('users.show', compact('user'));
+        return view('users.show', compact('user', 'borrowings', 'totalBorrowings', 'activeBorrowings', 'overdueBorrowings'));
     }
 
     // Menampilkan form untuk mengedit data pengguna yang sudah ada
@@ -383,6 +390,69 @@ class UserController extends Controller
 
         // Menyusun pesan keberhasilan beserta informasi jika ada akun yang gagal dihapus (dilewati)
         $message = __('messages.bulk_user_force_deleted', ['count' => $count]);
+        if ($skipped > 0) {
+            $message .= " ($skipped pengguna dilewati karena memiliki pinjaman aktif).";
+        }
+
+        // Kembali ke halaman sebelumnya dan menampilkan pesan yang telah disusun
+        return redirect()->back()->with('success', $message);
+    }
+
+    // Menghapus banyak pengguna secara sementara (Bulk Soft Delete)
+    public function bulkDestroy(Request $request)
+    {
+        // Memeriksa hak akses untuk melakukan penghapusan data massal
+        $this->authorize('delete', User::class);
+
+        // Memastikan kumpulan ID pengguna wajib ada dan valid sebagai array
+        $request->validate([
+            'ids' => 'required|array',
+        ]);
+
+        $ids = $request->ids;
+
+        // Mengambil data pengguna yang cocok dengan kumpulan ID
+        $users = User::whereIn('id', $ids)->get();
+
+        // Jika tidak ada data yang ditemukan, kembalikan dengan pesan error
+        if ($users->isEmpty()) {
+            return redirect()->back()->with('error', __('messages.no_user_selected_delete'));
+        }
+
+        $count = 0;
+        $skipped = 0;
+
+        $names = [];
+        // Memproses satu per satu data pengguna yang akan dihapus
+        foreach ($users as $user) {
+            /** @var \App\Models\User $user */
+
+            // Melewati proses hapus jika pengguna tersebut adalah diri sendiri
+            if ($user->id === auth()->id()) {
+                continue;
+            }
+
+            // Melewati proses hapus jika pengguna masih memiliki barang pinjaman yang belum selesai
+            if ($user->borrowings()->whereIn('status', ['borrowed', 'overdue'])->exists()) {
+                $skipped++;
+                continue;
+            }
+
+            $names[] = $user->name;
+            // Menghapus data akun dari database sementara
+            $user->delete();
+            $count++;
+        }
+
+        $namesList = implode(', ', $names);
+
+        // Mencatat jumlah pengguna yang berhasil dihapus ke dalam log
+        $this->logActivity('Bulk Delete User', __('messages.log_bulk_user_deleted_soft', ['count' => $count]), [
+            'names' => ['old' => $namesList, 'new' => '-'],
+        ]);
+
+        // Menyusun pesan keberhasilan beserta informasi jika ada akun yang gagal dihapus (dilewati)
+        $message = __('messages.bulk_user_deleted', ['count' => $count]);
         if ($skipped > 0) {
             $message .= " ($skipped pengguna dilewati karena memiliki pinjaman aktif).";
         }

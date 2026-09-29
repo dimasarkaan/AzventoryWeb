@@ -102,12 +102,15 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section
-        class="relative flex flex-col items-center justify-center min-h-[100dvh] pt-20 pb-10 text-center px-4 sm:px-6 z-10 bg-white overflow-hidden">
-        <!-- Grid/Dot Pattern Background -->
-        <div class="absolute inset-0 z-0 opacity-[0.3]"
-            style="background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 32px 32px;"></div>
+    <!-- Top White Section Wrapper -->
+    <div class="relative bg-white w-full overflow-hidden">
+        <!-- Global Dot Pattern for White Section -->
+        <div class="absolute inset-0 z-0 opacity-40"
+            style="background-image: radial-gradient(#94a3b8 1.2px, transparent 1.2px); background-size: 32px 32px;"></div>
+
+        <!-- Hero Section -->
+        <section
+            class="relative flex flex-col items-center justify-center min-h-[100dvh] pt-20 pb-10 text-center px-4 sm:px-6 z-10">
 
         <!-- Ambient Glows -->
         <div
@@ -152,8 +155,9 @@
         </div>
     </section>
 
-    <!-- Spacer to push Logo Card out of initial viewport -->
-    <div class="h-40 sm:h-56 bg-white relative z-10 w-full"></div>
+        <!-- Spacer to push Logo Card out of initial viewport -->
+        <div class="h-40 sm:h-56 relative z-10 w-full pointer-events-none"></div>
+    </div>
 
     <!-- Features Section -->
     <section id="features"
@@ -268,7 +272,7 @@
 
     <!-- Footer -->
     <footer class="bg-[#cceaff] py-6 text-center z-20 relative border-t border-primary-200">
-        <div class="max-w-7xl mx-auto px-6">
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
             <p class="text-secondary-600 text-xs sm:text-sm font-medium">
                 &copy; 2026 Azzahra Computer, dibuat oleh : <span
                     class="text-secondary-900 font-bold tracking-wide">Dimas Arkaan</span>

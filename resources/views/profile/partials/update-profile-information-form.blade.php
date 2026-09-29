@@ -22,7 +22,7 @@
                                     x-on:click.prevent="$dispatch('open-modal', 'confirm-avatar-deletion')"
                                     data-testid="btn-delete-avatar-trigger"
                                     class="absolute -bottom-1 -right-1 bg-danger-500 text-white rounded-full p-1.5 shadow-lg hover:bg-danger-600 focus:outline-none focus:ring-2 ring-offset-2 ring-danger-500 transition-all" 
-                                    title="Hapus Foto">
+                                    title="{{ __('ui.delete_avatar') }}">
                                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </div>
@@ -84,7 +84,7 @@
                            autocomplete="username"
                            x-bind:disabled="!isEditing">
                     <p x-show="isEditing" x-transition class="mt-1 text-xs text-amber-600 font-medium">
-                        Perhatian: Username hanya dapat diubah 1 kali. 
+                        {{ __('ui.profile_username_warning') }}
                     </p>
                     <x-input-error class="mt-2" :messages="$errors->get('username')" />
                 @else
@@ -111,7 +111,7 @@
                             <svg class="h-5 w-5 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
                      </div>
-                     <p class="mt-1 text-xs text-secondary-400">Hubungi Superadmin jika perlu merubah email.</p>
+                     <p class="mt-1 text-xs text-secondary-400">{{ __('ui.profile_email_hint') }}</p>
                 @endif
             </div>
 
@@ -179,11 +179,11 @@
     <x-modal name="confirm-avatar-deletion" focusable>
         <div class="p-6" x-data="{ submitting: false }">
             <h2 class="text-lg font-bold text-secondary-900">
-                Hapus Foto Profil?
+                {{ __('ui.delete_avatar_title') }}
             </h2>
 
             <p class="mt-2 text-sm text-secondary-600">
-                Apakah Anda yakin ingin menghapus foto profil saat ini? Tindakan ini akan mengembalikan foto profil Anda ke inisial nama.
+                {{ __('ui.delete_avatar_desc') }}
             </p>
 
             <div class="mt-6 flex justify-end gap-3">
@@ -196,7 +196,7 @@
                         :class="{ 'opacity-75 cursor-not-allowed': submitting }" :disabled="submitting"
                         @click="submitting = true; document.getElementById('delete-avatar-form').submit();">
                     <svg x-show="submitting" x-cloak class="animate-spin w-4 h-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                    <span x-text="submitting ? 'Menghapus...' : 'Hapus'"></span>
+                    <span x-text="submitting ? '{{ __('ui.deleting') }}' : '{{ __('ui.delete_avatar') }}'"></span>
                 </button>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <title>{{ $title }}</title>
@@ -34,8 +34,8 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $row->user?->name ?? $row->borrower_name }}</td>
                 <td>
-                    <b>{{ $row->sparepart?->name ?? 'Deleted Item' }}</b>
-                    <br><span style="color: #666; font-size: 8pt;">Jml: {{ $row->quantity }}</span>
+                    <b>{{ $row->sparepart?->name ?? __('ui.deleted_item') }}</b>
+                    <br><span style="color: #666; font-size: 8pt;">{{ __('ui.qty') }}: {{ $row->quantity }}</span>
                 </td>
                 <td>{{ $row->borrowed_at->translatedFormat('d F Y') }}</td>
                 <td>

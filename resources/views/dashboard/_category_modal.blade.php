@@ -32,8 +32,8 @@
                         <x-icon.category class="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 id="category-modal-title" class="text-xl font-bold text-secondary-900">Manajemen Kategori</h3>
-                        <p class="text-xs text-secondary-500">Kelola master data kategori inventaris</p>
+                        <h3 id="category-modal-title" class="text-xl font-bold text-secondary-900">{{ __('ui.modal_category_title') }}</h3>
+                        <p class="text-xs text-secondary-500">{{ __('ui.modal_category_desc') }}</p>
                     </div>
                 </div>
                 <button @click="showCategoryModal = false" 
@@ -49,7 +49,7 @@
                 <div class="mb-6 bg-white p-4 rounded-2xl border border-amber-100 shadow-sm">
                     <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <x-icon.plus class="w-3 h-3" />
-                        Tambah Kategori Baru
+                        {{ __('ui.add_new_category') }}
                     </h4>
                     <form @submit.prevent="addCategory()" class="flex gap-2" novalidate>
                         <div class="relative flex-grow">
@@ -58,13 +58,13 @@
                                    id="new_category_name"
                                    name="category_name"
                                    x-model="newCategoryName"
-                                   placeholder="Masukkan Nama Kategori Di Sini" 
+                                   placeholder="{{ __('ui.category_name_placeholder') }}" 
                                    class="w-full bg-secondary-50 border border-secondary-200 rounded-xl px-4 py-2.5 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all outline-none"
                                    required
                                    minlength="2"
                                    maxlength="100"
                                    pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-]*$"
-                                   title="Nama kategori harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)">
+                                   title="{{ __('ui.name_validation_help') }}">
                         </div>
                         <button type="submit" 
                                 :disabled="isAddingCategory || !newCategoryName.trim()"
@@ -75,20 +75,20 @@
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             </template>
-                            <span class="font-bold text-sm" x-text="isAddingCategory ? 'Menyimpan...' : 'Tambah'"></span>
+                            <span class="font-bold text-sm" x-text="isAddingCategory ? '{{ __('ui.saving') }}' : '{{ __('ui.btn_add') }}'"></span>
                         </button>
                         </button>
                     </form>
                 </div>
 
                 <div class="flex items-center justify-between mb-3 px-1">
-                    <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-wider">Daftar Kategori</h4>
-                    <span class="text-[10px] text-secondary-400 font-medium px-2 py-0.5 bg-secondary-100 rounded-full" x-text="categoriesList.length + ' Kategori'"></span>
+                    <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-wider">{{ __('ui.category_list') }}</h4>
+                    <span class="text-[10px] text-secondary-400 font-medium px-2 py-0.5 bg-secondary-100 rounded-full" x-text="categoriesList.length + ' {{ __('ui.category') }}'"></span>
                 </div>
 
                 <div x-show="isLoadingCategories" class="flex flex-col items-center justify-center py-12 gap-3">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
-                    <p class="text-sm text-secondary-500">Memuat data kategori...</p>
+                    <p class="text-sm text-secondary-500">{{ __('ui.loading_data') }}</p>
                 </div>
 
                 <div x-show="!isLoadingCategories" class="relative">
@@ -103,14 +103,14 @@
                                         <div class="flex items-center gap-2 mb-1">
                                             <h4 class="font-bold text-secondary-900 truncate" x-text="cat.name"></h4>
                                             <template x-if="!cat.is_active">
-                                                <span class="px-2 py-0.5 text-[10px] bg-secondary-100 text-secondary-500 font-bold rounded-full border border-secondary-200 uppercase tracking-wider">Nonaktif</span>
+                                                <span class="px-2 py-0.5 text-[10px] bg-secondary-100 text-secondary-500 font-bold rounded-full border border-secondary-200 uppercase tracking-wider">{{ __('ui.status_inactive') }}</span>
                                             </template>
                                             <template x-if="cat.is_active">
-                                                <span class="px-2 py-0.5 text-[10px] bg-success-50 text-success-600 font-bold rounded-full border border-success-100 uppercase tracking-wider">Aktif</span>
+                                                <span class="px-2 py-0.5 text-[10px] bg-success-50 text-success-600 font-bold rounded-full border border-success-100 uppercase tracking-wider">{{ __('ui.status_active') }}</span>
                                             </template>
                                         </div>
                                         <p class="text-xs text-secondary-500 flex items-center gap-1">
-                                            <span class="font-bold text-secondary-900" x-text="cat.items_count"></span> Barang dalam kategori ini
+                                            <span class="font-bold text-secondary-900" x-text="cat.items_count"></span> {{ __('ui.items_in_this', ['type' => __('ui.category')]) }}
                                         </p>
                                     </div>
 
@@ -123,12 +123,12 @@
                                                @keydown.escape="cancelCatEdit()"
                                                class="w-full bg-white border border-amber-300 rounded-xl px-3 py-2 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all outline-none"
                                                required
-                                               placeholder="Nama kategori..."
+                                               placeholder="{{ __('ui.edit_category_placeholder') ?? __('ui.category') }}"
                                                minlength="2"
                                                maxlength="100"
                                                pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-]*$"
-                                               title="Nama kategori harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)">
-                                        <p class="text-[10px] text-secondary-400 mt-1 ml-1 font-medium italic">Tekan Enter untuk simpan, Esc untuk batal</p>
+                                               title="{{ __('ui.name_validation_help') }}">
+                                        <p class="text-[10px] text-secondary-400 mt-1 ml-1 font-medium italic">{{ __('ui.press_enter_to_save') }}</p>
                                         <button type="submit" class="hidden"></button>
                                     </form>
                                 </div>
@@ -138,20 +138,20 @@
                                     <button @click="toggleCategoryStatus(cat)"
                                             class="p-2 rounded-xl transition-all"
                                             :class="cat.is_active ? 'text-secondary-400 hover:text-amber-600 hover:bg-amber-50' : 'text-secondary-400 hover:text-success-600 hover:bg-success-50'"
-                                            :title="cat.is_active ? 'Nonaktifkan' : 'Aktifkan'">
+                                            :title="cat.is_active ? '{{ __('ui.btn_deactivate') }}' : '{{ __('ui.btn_activate') }}'">
                                         <svg x-show="cat.is_active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                                         <svg x-show="!cat.is_active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     </button>
 
                                     <button @click="startCatEdit(cat)"
                                             class="p-2 text-secondary-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"
-                                            title="Ubah Nama">
+                                            title="{{ __('ui.btn_edit_name') }}">
                                         <x-icon.edit class="w-5 h-5" />
                                     </button>
 
                                     <button @click="askCatDelete(cat)"
                                             class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-all"
-                                            title="Hapus Kategori">
+                                            title="{{ __('ui.btn_delete_category') }}">
                                         <x-icon.trash class="w-5 h-5" />
                                     </button>
                                 </div>
@@ -161,14 +161,14 @@
                                     <button @click="saveCatEdit(cat.id)"
                                             :disabled="isUpdatingCategory"
                                             class="p-2 bg-success-500 text-white hover:bg-success-600 rounded-xl shadow-sm hover:shadow-md transition-all disabled:opacity-50"
-                                            title="Simpan">
+                                            title="{{ __('ui.save') }}">
                                         <svg x-show="!isUpdatingCategory" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                                         <svg x-show="isUpdatingCategory" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     </button>
 
                                     <button @click="cancelCatEdit()"
                                             class="p-2 bg-secondary-100 text-secondary-600 hover:bg-secondary-200 rounded-xl transition-all"
-                                            title="Batal">
+                                            title="{{ __('ui.cancel') }}">
                                         <x-icon.close class="w-5 h-5" />
                                     </button>
                                 </div>
@@ -182,8 +182,8 @@
                         <div class="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4 text-secondary-400">
                             <x-icon.category class="w-8 h-8" />
                         </div>
-                        <h4 class="text-secondary-900 font-bold">Belum Ada Kategori</h4>
-                        <p class="text-sm text-secondary-500">Kategori akan otomatis bertambah saat Anda menyimpan barang baru.</p>
+                        <h4 class="text-secondary-900 font-bold">{{ __('ui.no_categories_title') }}</h4>
+                        <p class="text-sm text-secondary-500">{{ __('ui.no_categories_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -203,9 +203,9 @@
                     <div class="w-16 h-16 bg-danger-50 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-danger-100">
                         <x-icon.trash class="w-8 h-8" />
                     </div>
-                    <h4 class="text-secondary-900 font-bold text-lg mb-1">Hapus Kategori?</h4>
+                    <h4 class="text-secondary-900 font-bold text-lg mb-1">{{ __('ui.delete_category_title') }}</h4>
                     <p class="text-sm text-secondary-500 mb-4">
-                        Anda yakin ingin menghapus kategori <span class="font-bold text-secondary-900" x-text="catConfirmDeleteName"></span>? Tindakan ini tidak dapat dibatalkan.
+                        {{ __('ui.delete_confirm_desc', ['type' => __('ui.category')]) }} <span class="font-bold text-secondary-900" x-text="catConfirmDeleteName"></span>? {{ __('ui.cannot_be_undone') }}
                     </p>
                     {{-- Inline error message saat hapus gagal --}}
                     <div x-show="deleteCategoryError" x-cloak
@@ -216,7 +216,7 @@
                     <div class="flex items-center justify-center gap-3">
                         <button @click="cancelCatDelete()" 
                                 :disabled="isDeletingCat"
-                                class="btn btn-secondary px-6 py-2.5 rounded-2xl font-bold disabled:opacity-50 transition-all">Batal</button>
+                                class="btn btn-secondary px-6 py-2.5 rounded-2xl font-bold disabled:opacity-50 transition-all">{{ __('ui.cancel') }}</button>
                         <button @click="deleteCategory(catConfirmDeleteId)" 
                                 :disabled="isDeletingCat"
                                 class="btn btn-danger px-6 py-2.5 rounded-2xl font-bold shadow-lg shadow-danger-200 disabled:opacity-50 transition-all flex items-center gap-2">
@@ -226,7 +226,7 @@
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             </template>
-                            <span x-text="isDeletingCat ? 'Menghapus...' : 'Ya, Hapus'"></span>
+                            <span x-text="isDeletingCat ? '{{ __('ui.deleting') }}' : '{{ __('ui.btn_yes_delete_short') }}'"></span>
                         </button>
                     </div>
                 </div>

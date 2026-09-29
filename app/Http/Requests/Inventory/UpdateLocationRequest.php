@@ -25,7 +25,7 @@ class UpdateLocationRequest extends FormRequest
         $locationId = $location ? $location->id : null;
 
         return [
-            'name' => 'required|string|max:191|unique:locations,name,'.$locationId,
+            'name' => 'required|string|min:3|max:191|unique:locations,name,'.$locationId,
             'is_active' => 'sometimes|boolean',
         ];
     }

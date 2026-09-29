@@ -7,7 +7,7 @@
             </div>
         </div>
         <div>
-            <h3 class="text-lg font-medium text-danger-900">{{ __('ui.profile_delete_warning_title') }}</h3>
+            <h2 class="text-lg font-medium text-danger-900">{{ __('ui.profile_delete_warning_title') }}</h2>
              <p class="mt-1 text-sm text-secondary-600 leading-relaxed">
                 {{ __('ui.profile_delete_warning_desc') }}
             </p>

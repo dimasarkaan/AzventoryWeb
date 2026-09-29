@@ -35,6 +35,7 @@ Route::get('/offline', function () {
     return view('offline');
 })->name('offline');
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -150,6 +151,7 @@ Route::middleware(['auth', 'verified', 'password.changed', 'user.active'])->grou
     // --- Manajemen Pengguna (Superadmin) ---
     Route::prefix('users')->name('users.')->middleware('role:superadmin')->group(function () {
         Route::patch('/{user}/reset-password', [UserController::class, 'resetPassword'])->name('reset-password');
+        Route::delete('/bulk-destroy', [UserController::class, 'bulkDestroy'])->name('bulk-destroy');
         Route::post('/bulk-restore', [UserController::class, 'bulkRestore'])->name('bulk-restore');
         Route::delete('/bulk-force-delete', [UserController::class, 'bulkForceDelete'])->name('bulk-force-delete');
         Route::patch('/{id}/restore', [UserController::class, 'restore'])->name('restore');

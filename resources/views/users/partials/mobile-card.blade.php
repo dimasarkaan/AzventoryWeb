@@ -1,8 +1,9 @@
-                    <div class="card p-4">
+                    <div class="card p-4 relative cursor-pointer transition-colors hover:bg-secondary-50/60"
+                         @click="if(!event.target.closest('button') && !event.target.closest('input') && !event.target.closest('a') && !event.target.closest('.no-click')) window.location.href = '{{ route('users.show', $user) }}'">
                         <!-- Header: Avatar, Name, Role -->
                         <div class="flex items-start gap-4 mb-4">
                             <!-- Avatar -->
-                            @if(request('trash'))
+                            @if(request('trash') || auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                                 <div class="flex items-center self-center mr-2">
                                     <input type="checkbox" name="ids[]" value="{{ $user->id }}" class="user-checkbox rounded border-secondary-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 w-5 h-5">
                                 </div>

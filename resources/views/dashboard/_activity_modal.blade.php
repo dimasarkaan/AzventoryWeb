@@ -25,9 +25,9 @@
             
             {{-- Header --}}
             <div class="px-6 py-4 border-b border-secondary-100 flex items-center justify-between bg-secondary-50/50">
-                <h3 id="activity-modal-title" class="text-base font-bold text-secondary-900">Detail Aktivitas</h3>
+                <h3 id="activity-modal-title" class="text-base font-bold text-secondary-900">{{ __('ui.activity_detail_title') }}</h3>
                 <button @click="showActivityModal = false" 
-                        aria-label="Tutup Modal"
+                        aria-label="{{ __('ui.close_modal') }}"
                         class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
@@ -47,16 +47,16 @@
 
                 <div class="bg-secondary-50 rounded-xl p-4 border border-secondary-100 space-y-3">
                     <div class="flex justify-between items-center text-sm">
-                        <span class="text-secondary-500 font-medium">Pengguna</span>
-                        <span class="text-secondary-900 font-bold" x-text="selectedActivity?.user_name || selectedActivity?.user?.name || 'Sistem'"></span>
+                        <span class="text-secondary-500 font-medium">{{ __('ui.user_label') }}</span>
+                        <span class="text-secondary-900 font-bold" x-text="selectedActivity?.user_name || selectedActivity?.user?.name || '{{ __('ui.system_user') }}'"></span>
                     </div>
                     <div class="flex justify-between items-center text-sm">
-                        <span class="text-secondary-500 font-medium">Role</span>
+                        <span class="text-secondary-500 font-medium">{{ __('ui.role') }}</span>
                         <span class="px-2 py-0.5 rounded-full bg-white border border-secondary-200 text-[10px] font-bold uppercase tracking-wider text-secondary-600" 
                               x-text="selectedActivity?.user?.role || '-'"></span>
                     </div>
                     <div class="flex justify-between items-center text-sm">
-                        <span class="text-secondary-500 font-medium">Waktu Presisi</span>
+                        <span class="text-secondary-500 font-medium">{{ __('ui.precise_time') }}</span>
                         <span class="text-secondary-700 font-mono text-xs" x-text="selectedActivity?.created_at ? new Date(selectedActivity.created_at).toLocaleString('id-ID') : '-'"></span>
                     </div>
                 </div>

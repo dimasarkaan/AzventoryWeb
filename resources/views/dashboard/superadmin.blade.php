@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     @include('dashboard.partials.dashboard-styles')
 @include('dashboard._superadmin_scripts')
     <div class="py-6">
@@ -21,13 +21,13 @@
                                 <img src="{{ asset('images/logo/logo_azzahracomputer.png') }}" class="h-12 w-auto" alt="Logo Azzahra">
                                 <div>
                                     <h1 class="text-2xl font-bold text-gray-900 uppercase">AZZAHRA COMPUTER</h1>
-                                    <p class="text-sm text-gray-500">Solusi Teknologi Terpercaya &bull; Laporan Resmi Inventaris</p>
+                                    <p class="text-sm text-gray-500">{!! __('ui.official_inventory_report') !!}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <h2 class="text-xl font-bold text-primary-900">LAPORAN DASHBOARD</h2>
-                                <p class="text-sm text-gray-600 mt-1">Dicetak: {{ now()->translatedFormat('d F Y, H:i') }}</p>
-                                <p class="text-sm text-gray-600">Oleh: {{ auth()->user()->name }}</p>
+                                <h2 class="text-xl font-bold text-primary-900">{{ __('ui.dashboard_report') }}</h2>
+                                <p class="text-sm text-gray-600 mt-1">{{ __('ui.printed_at') }} {{ now()->translatedFormat('d F Y, H:i') }}</p>
+                                <p class="text-sm text-gray-600">{{ __('ui.printed_by_full') }} {{ auth()->user()->name }}</p>
                             </div>
                         </div>
                     </td></tr>
@@ -64,57 +64,52 @@
                                  class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-56 bg-white rounded-xl shadow-xl py-1 z-50 border border-secondary-100 max-h-[80vh] overflow-y-auto">
                                 <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">{{ __('ui.active_widgets') }}</div>
                                 <label for="setting_showStats" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showStats" name="showStats" :checked="showStats" @change="toggle('showStats')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showStats" name="showStats" x-model="showStats" @change="toggle('showStats')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_main_stats') }}</span>
                                 </label>
                                 <label for="setting_showCharts" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showCharts" name="showCharts" :checked="showCharts" @change="toggle('showCharts')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showCharts" name="showCharts" x-model="showCharts" @change="toggle('showCharts')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_distribution_location') }}</span>
                                 </label>
                                 <label for="setting_showLowStock" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showLowStock" name="showLowStock" :checked="showLowStock" @change="toggle('showLowStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showLowStock" name="showLowStock" x-model="showLowStock" @change="toggle('showLowStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_stock_alerts') }}</span>
                                 </label>
-                                <label for="setting_showBorrowings" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showBorrowings" name="showBorrowings" :checked="showBorrowings" @change="toggle('showBorrowings')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
-                                    <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_active_borrowings') }}</span>
-                                </label>
                                 <label for="setting_showOverdue" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showOverdue" name="showOverdue" :checked="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showOverdue" name="showOverdue" x-model="showOverdue" @change="toggle('showOverdue')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_overdue') }}</span>
                                 </label>
                                 <label for="setting_showNoPriceItems" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showNoPriceItems" name="showNoPriceItems" :checked="showNoPriceItems" @change="toggle('showNoPriceItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showNoPriceItems" name="showNoPriceItems" x-model="showNoPriceItems" @change="toggle('showNoPriceItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_missing_price') }}</span>
                                 </label>
                                 <div class="border-t border-secondary-100 my-1"></div>
                                 <div class="px-4 py-2 text-xs font-semibold text-secondary-400 uppercase tracking-wider">{{ __('ui.widget_analytics') }}</div>
                                 <label for="setting_showMovement" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showMovement" name="showMovement" :checked="showMovement" @change="toggle('showMovement')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showMovement" name="showMovement" x-model="showMovement" @change="toggle('showMovement')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_stock_movement') }}</span>
                                 </label>
                                 <label for="setting_showTopItems" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showTopItems" name="showTopItems" :checked="showTopItems" @change="toggle('showTopItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showTopItems" name="showTopItems" x-model="showTopItems" @change="toggle('showTopItems')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_popular_items') }}</span>
                                 </label>
-
                                 <label for="setting_showDeadStock" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showDeadStock" name="showDeadStock" :checked="showDeadStock" @change="toggle('showDeadStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showDeadStock" name="showDeadStock" x-model="showDeadStock" @change="toggle('showDeadStock')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_dead_stock') }}</span>
                                 </label>
                                 <label for="setting_showLeaderboard" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showLeaderboard" name="showLeaderboard" :checked="showLeaderboard" @change="toggle('showLeaderboard')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showLeaderboard" name="showLeaderboard" x-model="showLeaderboard" @change="toggle('showLeaderboard')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_top_contributors') }}</span>
                                 </label>
                                 <label for="setting_showRecent" class="flex items-center px-4 py-2 hover:bg-secondary-50 cursor-pointer">
-                                    <input type="checkbox" id="setting_showRecent" name="showRecent" :checked="showRecent" @change="toggle('showRecent')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
+                                    <input type="checkbox" id="setting_showRecent" name="showRecent" x-model="showRecent" @change="toggle('showRecent')" class="rounded border-secondary-300 text-primary-600 shadow-sm">
                                     <span class="ml-2 text-sm text-secondary-700">{{ __('ui.widget_recent_activity') }}</span>
                                 </label>
                                 {{-- Tombol Reset ke Default --}}
                                 <div class="border-t border-secondary-100 my-1"></div>
                                 <div class="px-4 py-2">
                                     <button @click="resetWidgets()" class="w-full text-xs text-center text-secondary-500 hover:text-danger-600 transition-colors py-1 rounded hover:bg-danger-50">
-                                        ↺ Reset ke Tampilan Default
+                                        {{ __('ui.reset_default_view') }}
                                     </button>
                                 </div>
                             </div>
@@ -124,23 +119,23 @@
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" @click.away="open = false"
                                     class="btn btn-secondary flex items-center gap-2 text-sm"
-                                    aria-label="Ekspor Laporan"
+                                    aria-label="{{ __('ui.export_report') }}"
                                     aria-expanded="false"
                                     :aria-expanded="open.toString()">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                                 </svg>
-                                <span class="hidden sm:inline">Ekspor</span>
+                                <span class="hidden sm:inline">{{ __('ui.export_report') }}</span>
                             </button>
                             <div x-show="open" x-transition
                                  class="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-xl py-1 z-50 border border-secondary-100">
                                 <button onclick="exportDashboardPDF()" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                                    Cetak / PDF
+                                    {{ __('ui.print_pdf') }}
                                 </button>
                                 <button onclick="exportDashboardPNG()" class="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-secondary-700 hover:bg-primary-50 hover:text-primary-700 transition-colors">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                    Simpan sebagai PNG
+                                    {{ __('ui.save_png') }}
                                 </button>
                             </div>
                         </div>
@@ -155,10 +150,10 @@
                 @php
                     $activePeriod = $period ?? 'today';
                     $tabDefs = [
-                        'today'      => 'Hari Ini',
-                        'this_week'  => 'Minggu Ini',
-                        'this_month' => 'Bulan Ini',
-                        'this_year'  => 'Tahun Ini',
+                        'today'      => __('ui.today'),
+                        'this_week'  => __('ui.this_week'),
+                        'this_month' => __('ui.this_month'),
+                        'this_year'  => __('ui.this_year'),
                     ];
                 @endphp
                 {{-- Sticky wrapper: tab period menempel di atas saat scroll mobile --}}
@@ -187,7 +182,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
-                            <span>Custom</span>
+                            <span>{{ __('ui.custom') }}</span>
                             @if(in_array($activePeriod, ['custom','custom_year']) && $year)
                                 <span class="text-xs text-secondary-500">
                                     ({{ $year }}{{ isset($month) && $month !== 'all' ? '/' . str_pad($month,2,'0',STR_PAD_LEFT) : '' }})
@@ -197,7 +192,7 @@
 
                         {{-- Indikator rentang tanggal aktif --}}
                         <span class="ml-auto text-xs text-secondary-400 hidden sm:block">
-                            Data: {{ \Carbon\Carbon::parse($start)->format('d M Y') }} — {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
+                            {{ __('ui.data_range') }} {{ \Carbon\Carbon::parse($start)->format('d M Y') }} â€” {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
                         </span>
                     </div>
 
@@ -209,32 +204,32 @@
                          x-cloak
                          class="mt-4">
                         <form method="GET" action="{{ route('dashboard.superadmin') }}"
-                              x-data="{ isSubmitting: false }" @submit="isSubmitting = true"
+                              x-data="{ isSubmitting: false }" 
+                              @submit.prevent="isSubmitting = true; isLoading = true; await fetchDashboardData($event.target); isSubmitting = false;"
                               class="bg-white border border-secondary-100 rounded-[24px] p-5 shadow-xl shadow-secondary-900/5 flex flex-col md:flex-row items-stretch md:items-end gap-6 transition-all" novalidate>
                             <input type="hidden" name="period" id="superadmin_period_input" value="custom">
 
                             {{-- Form Group: Date Range --}}
                             <div class="flex-grow space-y-3">
                                 <div class="flex items-center justify-between px-1">
-                                    <label for="date_range_picker" class="text-[11px] font-extrabold text-secondary-400 uppercase tracking-[0.1em]">Rentang Tanggal</label>
+                                    <label for="date_range_picker" class="text-[11px] font-extrabold text-secondary-400 uppercase tracking-[0.1em]">{{ __('ui.date_range') }}</label>
                                     <div class="flex items-center gap-3">
-                                        <button type="button" onclick="setPickerRange(0)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">HARI INI</button>
-                                        <button type="button" onclick="setPickerRange(7)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">7 HARI TERAKHIR</button>
-                                        <button type="button" onclick="setPickerRange(30)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">30 HARI TERAKHIR</button>
+                                        <button type="button" onclick="setPickerRange(0)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">{{ mb_strtoupper(__('ui.today')) }}</button>
+                                        <button type="button" onclick="setPickerRange(7)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">{{ __('ui.last_7_days') }}</button>
+                                        <button type="button" onclick="setPickerRange(30)" class="text-[10px] font-bold text-secondary-500 hover:text-primary-600 transition-colors bg-secondary-50 px-2 py-0.5 rounded-md hover:bg-primary-50">{{ __('ui.last_30_days') }}</button>
                                     </div>
                                 </div>
                                 
-                                <div class="relative group">
+                                <div class="relative group flatpickr-range-container">
                                     <input type="text" id="date_range_picker_hidden" name="date_range"
-                                           class="w-full pl-12 pr-4 py-3 text-sm bg-secondary-50/50 border-secondary-200 rounded-2xl text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer font-semibold placeholder:text-secondary-400"
-                                           placeholder="Pilih rentang tanggal...">
+                                           class="range-picker-input w-full pl-12 pr-4 py-3 text-sm bg-secondary-50/50 border-secondary-200 rounded-2xl text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer font-semibold placeholder:text-secondary-400"
+                                           placeholder="{{ __('ui.select_date_range') }}">
                                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-secondary-400 group-focus-within:text-primary-500 transition-colors">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     </div>
+                                    <input type="hidden" name="start_date" id="start_date" class="range-start" value="{{ $start->format('Y-m-d') }}">
+                                    <input type="hidden" name="end_date" id="end_date" class="range-end" value="{{ $end->format('Y-m-d') }}">
                                 </div>
-
-                                <input type="hidden" name="start_date" id="start_date" value="{{ $start->format('Y-m-d') }}">
-                                <input type="hidden" name="end_date" id="end_date" value="{{ $end->format('Y-m-d') }}">
                             </div>
 
                             {{-- Form Group: Actions --}}
@@ -242,16 +237,16 @@
                                 <button type="submit" class="flex-grow md:flex-none btn btn-primary px-8 h-[44px] rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 active:scale-95 transition-transform" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
                                     <span x-show="!isSubmitting" class="flex items-center gap-2">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                        <span class="font-bold tracking-wide">Terapkan</span>
+                                        <span class="font-bold tracking-wide">{{ __('ui.apply') }}</span>
                                     </span>
                                     <span x-show="isSubmitting" class="flex items-center gap-2 font-bold tracking-wide" x-cloak>
                                         <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                        Memproses...
+                                        {{ __('ui.processing') }}
                                     </span>
                                 </button>
                                 <button type="button" 
                                         onclick="resetCustomPicker()"
-                                        class="btn btn-secondary h-[44px] px-6 rounded-xl border-secondary-200 hover:bg-secondary-50 font-bold active:scale-95 transition-transform flex items-center justify-center">Reset</button>
+                                        class="btn btn-secondary h-[44px] px-6 rounded-xl border-secondary-200 hover:bg-secondary-50 font-bold active:scale-95 transition-transform flex items-center justify-center">{{ __('ui.reset') }}</button>
                             </div>
                         </form>
                     </div>
@@ -260,7 +255,7 @@
 
             {{-- ====================================================================
                  Mobile Quick Summary Bar (hanya tampil di layar < md)
-                 Ringkasan 1 baris di atas stat cards — above the fold
+                 Ringkasan 1 baris di atas stat cards â€” above the fold
                  ==================================================================== --}}
             {{-- Mobile Quick Summary removed as requested --}}
 
@@ -283,7 +278,7 @@
             </div>
 
             <!-- Konten Asli -->
-            <div x-show="!isLoading" 
+            <div x-show="showStats && !isLoading" 
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100"
@@ -317,90 +312,267 @@
                 </x-dashboard.stat-card>
 
                 <!-- 3. Widget Peminjaman Aktif (Interactive) -->
-                <div @click="window.location.href='{{ route('inventory.index', ['filter' => 'borrowed']) }}'" 
-                     x-show="showBorrowings" 
-                     role="button"
-                     tabindex="0"
-                     @keydown.enter="window.location.href='{{ route('inventory.index', ['filter' => 'borrowed']) }}'"
-                     aria-label="Klik untuk melihat daftar barang yang sedang dipinjam"
-                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-fuchsia-100">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-fuchsia-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-fuchsia-200"></div>
-                    <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Sedang<br>Dipinjam</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="activeBorrowingsCount">{{ $activeBorrowingsCount }}</h3>
-                    </div>
-                    <div class="mt-4 flex items-center text-fuchsia-600 z-10 relative">
-                        <div class="p-2 bg-fuchsia-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.borrow-user class="w-5 h-5" />
-                        </div>
-                        <span class="ml-2 text-xs font-semibold bg-fuchsia-50 text-fuchsia-700 px-2 py-0.5 rounded-full">{{ __('ui.units_out') }}</span>
-                    </div>
-                </div>
+                <x-dashboard.stat-card 
+                    title="Sedang<br>Dipinjam" 
+                    value="{{ $activeBorrowingsCount }}" 
+                    badgeText="{{ __('ui.units_out') }}" 
+                    color="fuchsia"
+                    onClick="window.location.href='{{ route('inventory.index', ['filter' => 'borrowed']) }}'">
+                    <x-slot name="icon">
+                        <x-icon.borrow-user class="w-5 h-5" />
+                    </x-slot>
+                </x-dashboard.stat-card>
 
                 <!-- 4. Total Kategori (Interactive - Trigger Modal) -->
-                <div @click="openCategoryModal()" 
-                     role="button"
-                     tabindex="0"
-                     @keydown.enter="openCategoryModal()"
-                     aria-label="Klik untuk manajemen kategori barang"
-                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-warning-100">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-warning-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-warning-200"></div>
-                     <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Kategori<br>Barang</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalCategories">{{ $totalCategories }}</h3>
-                    </div>
-                    <div class="mt-4 flex items-center text-warning-600 z-10 relative">
-                        <div class="p-2 bg-warning-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.category class="w-5 h-5" />
-                        </div>
-                        <span class="ml-2 text-xs font-semibold bg-warning-50 text-warning-700 px-2 py-0.5 rounded-full">{{ __('ui.item_types') }}</span>
-                    </div>
-                </div>
+                <x-dashboard.stat-card 
+                    title="Kategori<br>Barang" 
+                    value="{{ $totalCategories }}" 
+                    badgeText="{{ __('ui.item_types') }}" 
+                    color="warning"
+                    onClick="openCategoryModal()">
+                    <x-slot name="icon">
+                        <x-icon.category class="w-5 h-5" />
+                    </x-slot>
+                </x-dashboard.stat-card>
 
                 <!-- 5. Total Merk (Interactive - Trigger Modal) -->
-                <div @click="openBrandModal()" 
-                     role="button"
-                     tabindex="0"
-                     @keydown.enter="openBrandModal()"
-                     aria-label="Klik untuk manajemen merk barang"
-                     class="card p-6 flex flex-col justify-between relative overflow-hidden group hover:scale-[1.02] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg border-2 border-transparent hover:border-pink-100">
-                    <div class="absolute right-0 top-0 h-24 w-24 bg-pink-100 rounded-bl-full -mr-4 -mt-4 transition-colors group-hover:bg-pink-200"></div>
-                     <div>
-                        <p class="text-sm font-medium text-secondary-500 z-10 relative leading-tight">Total<br>Merk</p>
-                        <h3 class="text-3xl font-bold text-secondary-900 mt-2 z-10 relative" x-text="totalBrands">{{ $totalBrands }}</h3>
-                    </div>
-                    <div class="mt-4 flex items-center text-pink-600 z-10 relative">
-                        <div class="p-2 bg-pink-100 rounded-lg group-hover:bg-white group-hover:shadow-sm transition-all">
-                            <x-icon.tag class="w-5 h-5" />
-                        </div>
-                        <span class="ml-2 text-xs font-semibold bg-pink-50 text-pink-700 px-2 py-0.5 rounded-full">Daftar Merk</span>
-                    </div>
-                </div>
+                <x-dashboard.stat-card 
+                    title="Total<br>Merk" 
+                    value="{{ $totalBrands }}" 
+                    badgeText="Daftar Merk" 
+                    color="pink"
+                    onClick="openBrandModal()">
+                    <x-slot name="icon">
+                        <x-icon.tag class="w-5 h-5" />
+                    </x-slot>
+                </x-dashboard.stat-card>
 
                                 <!-- 6. Total Lokasi -->
                 <x-dashboard.stat-card 
                     title="Lokasi<br>Penyimpanan" 
                     value="{{ $totalLocations }}" 
                     badgeText="{{ __('ui.zones') }}" 
-                    color="secondary">
+                    color="secondary"
+                    onClick="openLocationModal()">
                     <x-slot name="icon">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                     </x-slot>
                 </x-dashboard.stat-card>
             </div>
 
-            <!-- Skeleton Teratas Masuk -->
-                 <div class="card">
-                    <div class="card-header border-b border-gray-100 p-4">
-                        <div class="h-4 bg-gray-200 rounded w-32"></div>
+            <div x-show="showOverdue && {{ $totalOverdueCount ?? 0 }} > 0 && isLoading" class="mb-6 animate-pulse print:hidden">
+                <div class="card border-l-4 border-danger-200">
+                    <div class="card-header p-4 border-b border-gray-100 flex justify-between">
+                        <div class="h-6 bg-gray-200 rounded w-64"></div>
                     </div>
                     <div class="p-4 space-y-3">
-                       @for($i=0; $i<5; $i++)
-                           <div class="flex justify-between">
-                               <div class="h-4 bg-gray-200 rounded w-2/3"></div>
-                               <div class="h-4 bg-gray-200 rounded w-8"></div>
-                           </div>
-                       @endfor
+                        @for($i=0; $i<3; $i++)
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+                                <div class="h-4 bg-gray-200 rounded w-20"></div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="showOverdue && {{ $totalOverdueCount ?? 0 }} > 0 && !isLoading"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-4"
+                 class="mb-6 print:hidden">
+                <div class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden">
+                    <div class="card-header p-4 bg-gradient-to-r from-red-500 to-orange-600 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <h2 class="text-lg font-bold text-white">{{ __('ui.attention_overdue') }} ({{ $totalOverdueCount ?? 0 }})</h2>
+                        </div>
+                        @if(($totalOverdueCount ?? 0) > 0)
+                            <a href="{{ route('inventory.index', ['filter' => 'overdue']) }}" class="text-xs text-white hover:text-red-100 font-bold underline decoration-white/50">{{ __('ui.view_all') }}</a>
+                        @endif
+                    </div>
+                    <!-- Desktop table -->
+                    <div class="overflow-x-auto md:block hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-secondary-500 uppercase bg-secondary-50 border-b border-secondary-200">
+                                <tr>
+                                    <th class="px-6 py-3">{{ __('ui.borrower') }}</th>
+                                    <th class="px-6 py-3">{{ __('ui.item') }}</th>
+                                    <th class="px-6 py-3 text-center">{{ __('ui.due_date_short') }}</th>
+                                    <th class="px-6 py-3 text-center">{{ __('ui.late') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-secondary-100">
+                                <template x-for="borrow in overdueBorrowingsList" :key="borrow.id">
+                                    <tr class="hover:bg-secondary-50 cursor-pointer" @click="window.location.href = '/inventory/borrow/' + borrow.id">
+                                        <td class="px-6 py-3 font-medium text-secondary-900" x-text="borrow.user_name || borrow.borrower_name"></td>
+                                        <td class="px-6 py-3"><span x-text="borrow.sparepart_name"></span> (<span x-text="borrow.quantity"></span>)</td>
+                                        <td class="px-6 py-3 text-center font-bold text-danger-600" x-text="borrow.due_date_formatted"></td>
+                                        <td class="px-6 py-3 text-center text-danger-500" x-text="borrow.due_date_rel"></td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Mobile stacked -->
+                    <div class="md:hidden divide-y divide-secondary-100">
+                        <template x-for="borrow in overdueBorrowingsList" :key="borrow.id">
+                            <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href = '/inventory/borrow/' + borrow.id">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="font-bold text-secondary-900" x-text="borrow.user_name || borrow.borrower_name"></div>
+                                    <span class="text-xs font-bold text-danger-600 bg-danger-50 px-2 py-1 rounded-full" x-text="borrow.due_date_rel"></span>
+                                </div>
+                                <div class="text-sm text-secondary-600 mb-1"><span x-text="borrow.sparepart_name"></span> (<span x-text="borrow.quantity"></span> unit)</div>
+                                <div class="text-xs text-secondary-500 flex items-center gap-1">
+                                    <span>{{ __('ui.due_date_short') }}:</span>
+                                    <span class="font-semibold text-danger-600" x-text="borrow.due_date_formatted"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="showNoPriceItems && (noPriceItems || []).length > 0 && isLoading" class="mb-6 animate-pulse print:hidden">
+                <div class="card border-l-4 border-amber-300">
+                    <div class="card-header p-4 border-b border-gray-100 flex justify-between">
+                        <div class="h-6 bg-gray-200 rounded w-64"></div>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        @for($i=0; $i<3; $i++)
+                            <div class="flex justify-between">
+                                <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+                                <div class="h-4 bg-gray-200 rounded w-20"></div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="showNoPriceItems && (noPriceItems || []).length > 0 && !isLoading"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-4"
+                 class="mb-6 print:hidden">
+                <div class="card bg-white shadow-lg transform hover:scale-[1.01] transition-all duration-300 border-none overflow-hidden">
+                    <div class="card-header p-4 bg-gradient-to-r from-amber-400 to-orange-400 flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            <h2 class="text-lg font-bold text-white">Harga Barang Belum Diisi (<span x-text="(noPriceItems || []).length"></span>)</h2>
+                        </div>
+                    </div>
+                    <!-- Desktop table -->
+                    <div class="overflow-x-auto md:block hidden">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-secondary-500 uppercase bg-secondary-50 border-b border-secondary-200">
+                                <tr>
+                                    <th class="px-6 py-3">Nama Barang</th>
+                                    <th class="px-6 py-3">Part Number</th>
+                                    <th class="px-6 py-3 text-center">Status Harga</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-secondary-100">
+                                <template x-for="item in noPriceItems" :key="item.id">
+                                    <tr class="hover:bg-secondary-50 cursor-pointer" @click="window.location.href = '/inventory/' + item.uuid + '/edit'">
+                                        <td class="px-6 py-3 font-medium text-secondary-900" x-text="item.name"></td>
+                                        <td class="px-6 py-3 font-mono text-xs text-secondary-600" x-text="item.part_number || '-'"></td>
+                                        <td class="px-6 py-3 text-center text-amber-600 font-bold">Belum Diisi</td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Mobile stacked -->
+                    <div class="md:hidden divide-y divide-secondary-100">
+                        <template x-for="item in noPriceItems" :key="item.id">
+                            <div class="p-4 bg-white hover:bg-secondary-50 transition-colors cursor-pointer" @click="window.location.href = '/inventory/' + item.uuid + '/edit'">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="font-bold text-secondary-900" x-text="item.name"></div>
+                                    <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-full">Belum Diisi</span>
+                                </div>
+                                <div class="text-xs text-secondary-500 flex items-center gap-1 font-mono">
+                                    <span x-text="item.part_number || '-'"></span>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ================================================================
+                 CHART PERGERAKAN STOK
+                 ================================================================ --}}
+            <div x-show="showMovement && isLoading" class="card mb-4 animate-pulse">
+                <div class="card-header border-b border-gray-100 p-5">
+                    <div class="h-5 bg-gray-200 rounded w-48 mb-2"></div>
+                    <div class="h-3 bg-gray-200 rounded w-64"></div>
+                </div>
+                <div class="card-body p-6">
+                    <div class="h-[250px] w-full bg-gray-100 rounded flex items-end justify-between px-4 pb-4 gap-2">
+                        @for($i=0; $i<12; $i++)
+                            <div class="w-full bg-gray-200 rounded-t" style="height: {{ rand(20, 80) }}%"></div>
+                        @endfor
+                    </div>
+                </div>
+            </div>
+
+            <div x-show="showMovement && !isLoading"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-4"
+                 class="card mb-4">
+                <div class="card-header border-b border-secondary-100 p-5">
+                    <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-4">
+                        <div class="flex-shrink-0">
+                            <h2 class="text-lg font-bold text-secondary-900">Pergerakan Stok</h2>
+                            <p class="text-xs text-secondary-500 mb-1">Aktivitas barang masuk vs keluar periode ini.</p>
+                            <div class="text-[10px] text-secondary-400 font-medium" id="movement-period-label">Data: 30 hari terakhir</div>
+                        </div>
+                        
+                        <div class="flex flex-col sm:flex-row items-center gap-3 flex-shrink-0">
+                            {{-- KPI Summary Badges --}}
+                            <div class="flex flex-wrap items-center gap-2" id="movement-kpi-badges">
+                                <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 rounded-lg px-2.5 py-1">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                                    <span class="text-xs text-emerald-700 font-medium whitespace-nowrap">Masuk: <span id="kpi-masuk" class="font-bold">0</span> <span id="kpi-masuk-pct" class="text-[10px] ml-0.5 font-bold text-emerald-600"></span></span>
+                                </div>
+                                <div class="flex items-center gap-1.5 bg-red-50 border border-red-200 rounded-lg px-2.5 py-1">
+                                    <span class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></span>
+                                    <span class="text-xs text-red-700 font-medium whitespace-nowrap">Keluar: <span id="kpi-keluar" class="font-bold">0</span> <span id="kpi-keluar-pct" class="text-[10px] ml-0.5 font-bold text-red-600"></span></span>
+                                </div>
+                                <div class="flex items-center gap-1.5 bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-1" id="kpi-net-badge">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" id="kpi-net-dot"></span>
+                                    <span class="text-xs font-medium whitespace-nowrap" id="kpi-net-label">Net: <span id="kpi-net" class="font-bold">0</span> <span id="kpi-net-pct" class="text-[10px] ml-0.5 font-bold text-blue-600"></span></span>
+                                </div>
+                            </div>
+                            
+                            {{-- Quick-filter Periode Widget --}}
+                            <div class="flex items-center gap-1 bg-secondary-100 rounded-lg p-0.5 flex-shrink-0" id="movement-range-btns">
+                                <button onclick="fetchMovementData(7)" id="mov-btn-7"
+                                        class="mov-range-btn px-3 py-1 rounded-md text-xs font-medium transition-all
+                                               {{ in_array($activePeriod ?? '', ['today', 'this_week']) ? 'bg-white shadow-sm text-primary-700' : 'text-secondary-600 hover:bg-white/70' }}">7 Hari</button>
+                                <button onclick="fetchMovementData(30)" id="mov-btn-30"
+                                        class="mov-range-btn px-3 py-1 rounded-md text-xs font-medium transition-all
+                                               {{ ($activePeriod ?? '') === 'this_month' ? 'bg-white shadow-sm text-primary-700' : 'text-secondary-600 hover:bg-white/70' }}">30 Hari</button>
+                                <button onclick="fetchMovementData(90)" id="mov-btn-90"
+                                        class="mov-range-btn px-3 py-1 rounded-md text-xs font-medium transition-all
+                                               {{ in_array($activePeriod ?? '', ['this_year', 'custom', 'custom_year']) ? 'bg-white shadow-sm text-primary-700' : 'text-secondary-600 hover:bg-white/70' }}">3 Bulan</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4 md:p-6">
+                    <div class="min-h-[200px] md:h-[280px] w-full relative">
+                        <canvas id="stockMovementChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -413,77 +585,87 @@
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-4"
                  class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                 
                  {{-- Barang Sering Keluar --}}
-                 <div class="card flex flex-col overflow-hidden">
-                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
-                         <div class="w-8 h-8 rounded-lg bg-danger-50 flex items-center justify-center flex-shrink-0">
-                             <svg class="w-4 h-4 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                 <div class="card flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3 bg-gradient-to-r from-rose-50/50 to-transparent">
+                         <div class="w-9 h-9 rounded-xl bg-white shadow-sm border border-rose-100 flex items-center justify-center flex-shrink-0">
+                             <svg class="w-4.5 h-4.5 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                          </div>
                          <div>
-                             <h3 class="font-bold text-secondary-900">{{ __('ui.top_exiting_items') }}</h3>
+                             <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.top_exiting_items') }}</h2>
                              <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
                          </div>
                      </div>
-                     <div class="flex-grow divide-y divide-secondary-100">
-                         <template x-for="(item, index) in topExited" :key="item.sparepart_uuid">
-                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-danger-50/40 transition-all duration-150 cursor-pointer"
-                                  @click="window.location.href = '/inventory/' + item.sparepart_uuid">
-                                 <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110"
+                     <div class="flex-grow divide-y divide-secondary-50">
+                         <template x-for="(item, index) in topExited" :key="item.sparepart_uuid || index">
+                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-rose-50/30 transition-all duration-200 cursor-pointer"
+                                  @click="window.location.href = '/inventory/' + (item.sparepart_uuid || '')">
+                                 <div class="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold transition-transform duration-300 group-hover:scale-110"
                                       :class="{
-                                         'bg-amber-100 text-amber-700 shadow shadow-amber-200':  index === 0,
-                                         'bg-slate-100  text-slate-600  shadow shadow-slate-200': index === 1,
-                                         'bg-orange-100 text-orange-700 shadow shadow-orange-200': index === 2,
-                                         'bg-secondary-100 text-secondary-500': index > 2
+                                         'bg-amber-100 text-amber-700':  index === 0,
+                                         'bg-slate-100 text-slate-600': index === 1,
+                                         'bg-orange-100 text-orange-700': index === 2,
+                                         'bg-secondary-50 text-secondary-400': index > 2
                                       }"
                                       x-text="index + 1"></div>
-                                 <span class="flex-grow font-semibold text-secondary-800 text-sm group-hover:text-primary-700 transition-colors truncate" x-text="item.sparepart_name || 'Unknown'"></span>
-                                 <span class="flex-shrink-0 font-bold text-sm text-danger-600 tabular-nums" x-text="'− ' + parseInt(item.total_qty).toLocaleString('id-ID')"></span>
+                                 <span class="flex-grow font-semibold text-secondary-700 text-sm group-hover:text-rose-700 transition-colors truncate" x-text="item.sparepart_name || 'Unknown'"></span>
+                                 <div class="flex flex-col items-end justify-center">
+                                     <span class="inline-flex items-center gap-1 font-bold text-sm text-rose-600 tabular-nums">
+                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                                         <span x-text="parseInt(item.total_qty || 0).toLocaleString('id-ID')"></span>
+                                     </span>
+                                     <span class="text-[10px] text-secondary-400 font-medium uppercase tracking-wider mt-0.5">Unit</span>
+                                 </div>
                              </div>
                          </template>
-                         <div x-show="topExited.length === 0" class="px-6 py-10 text-center text-secondary-400">
+                         <div x-show="!topExited || topExited.length === 0" class="px-6 py-10 text-center text-secondary-400">
                              <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                             <p class="text-sm italic">{{ __('ui.no_data') }}</p>
+                             <p class="text-sm italic">{{ __('ui.no_data_short') }}</p>
                          </div>
                      </div>
                  </div>
 
-                 {{-- Barang Sering Masuk — style: emerald border + pill qty badge --}}
-                 <div class="card flex flex-col overflow-hidden border-l-4 border-emerald-400">
-                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
-                         <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                             <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
+                 {{-- Barang Sering Masuk --}}
+                 <div class="card flex flex-col overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3 bg-gradient-to-r from-emerald-50/50 to-transparent">
+                         <div class="w-9 h-9 rounded-xl bg-white shadow-sm border border-emerald-100 flex items-center justify-center flex-shrink-0">
+                             <svg class="w-4.5 h-4.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path></svg>
                          </div>
                          <div>
-                             <h3 class="font-bold text-secondary-900">{{ __('ui.top_entering_items') }}</h3>
+                             <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.top_entering_items') }}</h2>
                              <p class="text-xs text-secondary-400">Berdasarkan periode yang dipilih</p>
                          </div>
                      </div>
-                     <div class="flex-grow divide-y divide-secondary-100">
+                     <div class="flex-grow divide-y divide-secondary-50">
                          @forelse($topEntered as $item)
                              @php
                                   $rank = $loop->iteration;
                                   $badgeClass = match(true) {
-                                      $rank === 1 => 'bg-amber-100 text-amber-700 shadow shadow-amber-200',
-                                      $rank === 2 => 'bg-slate-100  text-slate-600 shadow shadow-slate-200',
-                                      $rank === 3 => 'bg-orange-100 text-orange-700 shadow shadow-orange-200',
-                                      default     => 'bg-secondary-100 text-secondary-500',
+                                      $rank === 1 => 'bg-amber-100 text-amber-700',
+                                      $rank === 2 => 'bg-slate-100 text-slate-600',
+                                      $rank === 3 => 'bg-orange-100 text-orange-700',
+                                      default     => 'bg-secondary-50 text-secondary-400',
                                   };
                              @endphp
-                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-emerald-50/50 transition-all duration-150 cursor-pointer"
-                                  onclick="window.location.href='{{ route('inventory.show', $item->sparepart_uuid) }}'">
-                                 <div class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-transform duration-200 group-hover:scale-110 {{ $badgeClass }}">
+                             <div class="group flex items-center gap-4 px-6 py-3.5 hover:bg-emerald-50/30 transition-all duration-200 cursor-pointer"
+                                  onclick="window.location.href='{{ route('inventory.show', $item->sparepart_uuid ?? $item->sparepart_id ?? '') }}'">
+                                 <div class="flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold transition-transform duration-300 group-hover:scale-110 {{ $badgeClass }}">
                                      {{ $rank }}
                                  </div>
-                                 <span class="flex-grow font-semibold text-secondary-800 text-sm group-hover:text-primary-700 transition-colors truncate">{{ $item->sparepart_name ?? 'Unknown' }}</span>
-                                 <span class="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs tabular-nums">
-                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-                                     {{ number_format($item->total_qty, 0, ',', '.') }}
-                                 </span>
+                                 <span class="flex-grow font-semibold text-secondary-700 text-sm group-hover:text-emerald-700 transition-colors truncate">{{ $item->sparepart_name ?? 'Unknown' }}</span>
+                                 <div class="flex flex-col items-end justify-center">
+                                     <span class="inline-flex items-center gap-1 font-bold text-sm text-emerald-600 tabular-nums">
+                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                                         {{ number_format($item->total_qty ?? 0, 0, ',', '.') }}
+                                     </span>
+                                     <span class="text-[10px] text-secondary-400 font-medium uppercase tracking-wider mt-0.5">Unit</span>
+                                 </div>
                              </div>
                          @empty
                               <div class="px-6 py-10 text-center text-secondary-400">
                                   <svg class="w-8 h-8 mx-auto text-secondary-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
-                                  <p class="text-sm italic">{{ __('ui.no_data') }}</p>
+                                  <p class="text-sm italic">{{ __('ui.no_data_short') }}</p>
                               </div>
                          @endforelse
                      </div>
@@ -526,12 +708,16 @@
                 <!-- Grafik Donut -->
                 <div class="card flex flex-col">
                     <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
-                        <h3 class="font-bold text-secondary-900">{{ __('ui.stock_distribution_category') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">Distribusi Stok per Kategori</h2>
  
                     </div>
-                    <div class="card-body p-6 flex-grow flex items-center justify-center bg-white min-h-[300px]">
-                        <div class="w-full h-full max-h-[300px]">
+                    <div class="card-body p-6 flex-grow flex flex-col items-center justify-center bg-white min-h-[300px]">
+                        <div x-show="stockByCategory && Object.keys(stockByCategory).length > 0" class="w-full h-full max-h-[300px] relative">
                             <canvas id="stockByCategoryChart"></canvas>
+                        </div>
+                        <div x-show="!stockByCategory || Object.keys(stockByCategory).length === 0" class="text-center text-secondary-400 flex flex-col items-center justify-center w-full h-full">
+                            <svg class="w-12 h-12 mb-3 text-secondary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                            <p class="text-sm italic">{{ __('ui.no_category_data') }}</p>
                         </div>
                     </div>
                 </div>
@@ -539,16 +725,23 @@
                 <!-- Grafik Batang -->
                 <div class="card flex flex-col">
                      <div class="card-header border-b border-secondary-100 p-5 flex justify-between items-center">
-                        <h3 class="font-bold text-secondary-900">{{ __('ui.stock_location') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">Stok per Lokasi</h2>
 
                     </div>
-                    <div class="card-body p-6 flex-grow flex items-center justify-center bg-white min-h-[300px]">
-                        <div class="w-full h-full max-h-[300px]">
+                    <div class="card-body p-6 flex-grow flex flex-col items-center justify-center bg-white min-h-[300px]">
+                        <div x-show="stockByLocation && Object.keys(stockByLocation).length > 0" class="w-full h-full max-h-[300px] relative">
                             <canvas id="stockByLocationChart"></canvas>
+                        </div>
+                        <div x-show="!stockByLocation || Object.keys(stockByLocation).length === 0" class="text-center text-secondary-400 flex flex-col items-center justify-center w-full h-full">
+                            <svg class="w-12 h-12 mb-3 text-secondary-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            <p class="text-sm italic">{{ __('ui.no_location_data') }}</p>
                         </div>
                     </div>
                 </div>
             </div>
+
+
+
 
             <!-- Bagian Bawah: Stok Rendah & Aktivitas -->
             <div class="grid grid-cols-1 lg:grid-cols-3 print:grid-cols-1 gap-4 print:gap-y-8">
@@ -587,7 +780,7 @@
                              <div class="p-1.5 bg-white/20 text-white rounded-lg backdrop-blur-sm">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                              </div>
-                            <h3 class="font-bold text-white">{{ __('ui.warning_low_stock') }}</h3>
+                            <h2 class="text-lg font-bold text-white">{{ __('ui.warning_low_stock') }}</h2>
                         </div>
                         <a href="{{ route('inventory.index', ['filter' => 'low_stock']) }}" class="text-sm text-white hover:text-amber-100 font-medium underline decoration-white/50">{{ __('ui.view_all') }}</a>
                     </div>
@@ -617,7 +810,7 @@
                                     </tr>
                                 </template>
                                 <tr x-show="lowStockItems.length === 0">
-                                    <td colspan="5" class="px-6 py-8 text-center text-secondary-500">
+                                    <td colspan="5" class="px-6 h-[250px] text-center align-middle text-secondary-500">
                                         <div class="flex flex-col items-center justify-center">
                                             <svg class="w-12 h-12 text-success-200 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                             <p>{{ __('ui.all_stock_safe') }}</p>
@@ -658,7 +851,7 @@
                      x-transition:leave-end="opacity-0 translate-y-4"
                      class="card p-0 flex flex-col h-full print-safe" :class="{ 'lg:col-span-3 print:col-span-1': !showLowStock, 'lg:col-span-1 print:col-span-1': showLowStock }">
                      <div class="card-header p-5 border-b border-secondary-100 flex justify-between items-center">
-                        <h3 class="font-bold text-secondary-900">{{ __('ui.recent_activities') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.recent_activities') }}</h2>
                         <a href="{{ route('reports.activity-logs.index') }}" class="text-sm text-primary-600 hover:text-primary-700 font-medium">{{ __('ui.view_all') }}</a>
                      </div>
                     <div class="card-body p-0 overflow-y-auto max-h-[500px] custom-scrollbar">
@@ -745,17 +938,17 @@
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-4"
-                 class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 print-grid-3">
+                 class="flex flex-col lg:flex-row gap-4 mt-4 print:grid print:grid-cols-2">
 
-                {{-- Widget Stok Mati — style: amber border, alternating rows, no rank badges, warning pill qty --}}
-                <div x-show="showDeadStock" x-transition class="card flex flex-col overflow-hidden border-l-4 border-amber-400">
+                {{-- Widget Stok Mati --}}
+                <div x-show="showDeadStock" x-transition class="card flex-1 flex flex-col overflow-hidden border-l-4 border-amber-400 min-w-0">
                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900">{{ __('ui.dead_stock_title') }}</h3>
-                            <p class="text-xs text-secondary-400">Barang tidak bergerak dalam periode ini</p>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.dead_stock_title') }}</h2>
+                            <p class="text-xs text-secondary-400">{{ __('ui.dead_stock_desc') }}</p>
                         </div>
                     </div>
                     <div class="flex-grow">
@@ -773,21 +966,21 @@
                         <div x-show="deadStockItems.length === 0" class="px-6 py-10 text-center">
                             <div class="flex flex-col items-center gap-2">
                                 <svg class="w-10 h-10 text-success-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                <p class="text-sm font-medium text-secondary-700">Semua barang bergerak aktif</p>
-                                <p class="text-xs text-secondary-400">Tidak ada barang yang stagnan dalam periode ini</p>
+                                <p class="text-sm font-medium text-secondary-700">{{ __('ui.all_active_desc') }}</p>
+                                <p class="text-xs text-secondary-400">{{ __('ui.no_dead_stock_desc') }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {{-- Papan Peringkat Pengguna — style: user initial avatar, green pill action count --}}
-                <div x-show="showLeaderboard" x-transition class="card flex flex-col overflow-hidden border-l-4 border-success-400">
+                {{-- Papan Peringkat Pengguna --}}
+                <div x-show="showLeaderboard" x-transition class="card flex-1 flex flex-col overflow-hidden border-l-4 border-success-400 min-w-0">
                     <div class="card-header border-b border-secondary-100 px-6 py-4 flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-success-50 flex items-center justify-center flex-shrink-0">
                             <svg class="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900">{{ __('ui.top_contributors_title') }}</h3>
+                            <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.top_contributors_title') }}</h2>
                             <p class="text-xs text-secondary-400">Pengguna paling aktif dalam periode ini</p>
                         </div>
                     </div>
@@ -876,7 +1069,7 @@
             const updateTrend = (el, val) => {
                 if (!el) return;
                 if (val === undefined || val === null) { el.textContent = ''; return; }
-                const prefix = val > 0 ? '↑' : (val < 0 ? '↓' : '');
+                const prefix = val > 0 ? 'â†‘' : (val < 0 ? 'â†“' : '');
                 el.textContent = `${prefix} ${Math.abs(val)}%`;
                 el.className = `text-[10px] ml-1 font-bold ${val >= 0 ? 'text-emerald-600' : 'text-red-600'}`;
             };
@@ -902,12 +1095,9 @@
             }
         }
 
-        // =====================================================================
-        // Grafik Pergerakan Stok — Grouped Bar Chart
-        // =====================================================================
 
         // =====================================================================
-        // Export Dashboard — PDF (Print) and PNG (html2canvas)
+        // Export Dashboard â€” PDF (Print) and PNG (html2canvas)
         // =====================================================================
         function exportDashboardPDF() {
             document.title = 'Dashboard Azventory - ' + new Date().toLocaleDateString('id-ID');
@@ -960,7 +1150,7 @@
             }, 300);
         }
 
-        // Muat data 7 hari via AJAX saat pertama load — ini adalah default tampilan chart
+        // Muat data 7 hari via AJAX saat pertama load â€” ini adalah default tampilan chart
         const movementDataKey = { labels: [], masuk: [], keluar: [] };
 
         // Inisialisasi KPI Badge saat load
@@ -979,7 +1169,7 @@
         const gradKeluar = makeGradient(movCtx, 'rgba(239,68,68,0.85)', 'rgba(239,68,68,0.15)');
 
         // Jika tidak ada label (periode kosong), tampilkan placeholder
-        const movLabels = movementDataKey.labels.length > 0 ? movementDataKey.labels : ['Tidak ada data'];
+        const movLabels = movementDataKey.labels.length > 0 ? movementDataKey.labels : ['{{ __('ui.no_data_short') }}'];
         const movMasuk  = movementDataKey.masuk.length > 0  ? movementDataKey.masuk  : [0];
         const movKeluar = movementDataKey.keluar.length > 0 ? movementDataKey.keluar : [0];
 
@@ -1067,13 +1257,15 @@
                         borderWidth: 1,
                         padding: 12,
                         cornerRadius: 8,
+                        usePointStyle: true,
+                        boxPadding: 6,
                         callbacks: {
                             title(ctx) {
                                 return ctx[0].label;
                             },
                             label(ctx) {
                                 const val = ctx.parsed.y.toLocaleString('id-ID');
-                                return `  ${ctx.dataset.label}: ${val} unit`;
+                                return `${ctx.dataset.label}: ${val} unit`;
                             },
                             afterBody(ctx) {
                                 if (ctx.length < 2) return '';
@@ -1081,7 +1273,7 @@
                                 const keluar = ctx.find(c => c.datasetIndex === 1)?.parsed.y ?? 0;
                                 const net = masuk - keluar;
                                 const prefix = net >= 0 ? '+' : '';
-                                return [`  ─────────────────`, `  Net Stok: ${prefix}${net.toLocaleString('id-ID')} unit`];
+                                return [`â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`, `Net Stok: ${prefix}${net.toLocaleString('id-ID')} unit`];
                             }
                         }
                     }
@@ -1194,7 +1386,7 @@
                         ctx.save();
                         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                         ctx.font = '14px sans-serif'; ctx.fillStyle = '#94a3b8';
-                        ctx.fillText('Tidak ada data distribusi', left + width / 2, top + height / 2);
+                        ctx.fillText('{{ __('ui.no_distribution_data') }}', left + width / 2, top + height / 2);
                         ctx.restore();
                     }
                 }
@@ -1277,7 +1469,7 @@
                         ctx.save();
                         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                         ctx.font = '14px sans-serif'; ctx.fillStyle = '#94a3b8';
-                        ctx.fillText('Tidak ada data lokasi', left + width / 2, top + height / 2);
+                        ctx.fillText('{{ __('ui.no_location_data') }}', left + width / 2, top + height / 2);
                         ctx.restore();
                     }
                 }
@@ -1332,12 +1524,13 @@
         window.updateDashboardCharts = function(movementData, stockByCategory, stockByLocation) {
             // Update Movement Chart + KPI Badges
             if (movementData && movementChart) {
-                const newLabels  = movementData.labels.length > 0 ? movementData.labels : ['Tidak ada data'];
-                const newMasuk   = movementData.masuk.length  > 0 ? movementData.masuk  : [0];
-                const newKeluar  = movementData.keluar.length > 0 ? movementData.keluar : [0];
+                const newLabels  = (movementData.labels || []).length > 0 ? movementData.labels : ['{{ __('ui.no_data_short') }}'];
+                const newMasuk   = (movementData.masuk || []).length  > 0 ? movementData.masuk  : [0];
+                const newKeluar  = (movementData.keluar || []).length > 0 ? movementData.keluar : [0];
                 movementChart.data.labels = newLabels;
                 movementChart.data.datasets[0].data = newMasuk;
                 movementChart.data.datasets[1].data = newKeluar;
+                movementChart.resize();
                 movementChart.update();
                 // Sinkronkan KPI badges dengan data terbaru
                 updateMovementKPI(movementData);
@@ -1347,6 +1540,7 @@
             if (stockByCategory && stockCategoryChart) {
                 stockCategoryChart.data.labels = Object.keys(stockByCategory);
                 stockCategoryChart.data.datasets[0].data = Object.values(stockByCategory);
+                stockCategoryChart.resize();
                 stockCategoryChart.update();
             }
 
@@ -1354,6 +1548,7 @@
             if (stockByLocation && stockLocationChart) {
                 stockLocationChart.data.labels = Object.keys(stockByLocation);
                 stockLocationChart.data.datasets[0].data = Object.values(stockByLocation);
+                stockLocationChart.resize();
                 stockLocationChart.update();
             }
         };
@@ -1417,7 +1612,7 @@
 
                 // Update chart dengan data baru
                 if (movementChart) {
-                    const newLabels  = (data.labels  || []).length > 0 ? data.labels  : ['Tidak ada data'];
+                    const newLabels  = (data.labels  || []).length > 0 ? data.labels  : ['{{ __('ui.no_data_short') }}'];
                     const newMasuk   = (data.masuk   || []).length > 0 ? data.masuk   : [0];
                     const newKeluar  = (data.keluar  || []).length > 0 ? data.keluar  : [0];
 
@@ -1444,172 +1639,23 @@
         }
     </script>
     @endpush
+    <x-flatpickr />
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr/dist/l10n/id.js"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const startInput = document.getElementById('start_date');
-                const endInput = document.getElementById('end_date');
-                const pickerInput = document.getElementById('date_range_picker_hidden');
-                
-                if (pickerInput) {
-                    const picker = flatpickr("#date_range_picker_hidden", {
-                        locale: {
-                            rangeSeparator: " - ",
-                            weekdays: {
-                                shorthand: ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"],
-                                longhand: ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"]
-                            },
-                            months: {
-                                shorthand: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"],
-                                longhand: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
-                            }
-                        },
-                        mode: "range",
-                        position: "below center", // Precise alignment
-                        monthSelectorType: 'static', // MUST be static to replace with custom
-                        conjunction: " - ",
-                        altInput: true,
-                        altFormat: "j F Y",
-                        dateFormat: "Y-m-d",
-                        altInputClass: "w-full pl-12 pr-4 py-3 text-sm bg-secondary-50/50 border-secondary-200 rounded-2xl text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer font-semibold placeholder:text-secondary-400",
-                        allowInput: false,
-                        animate: true,
-                        minDate: "2010-01-01",
-                        maxDate: new Date().getFullYear() + 20 + "-12-31",
-                        defaultDate: ["{{ \Carbon\Carbon::parse($start)->format('Y-m-d') }}", "{{ \Carbon\Carbon::parse($end)->format('Y-m-d') }}"],
-                        onOpen: function(selectedDates, dateStr, instance) {
-                            // Selalu lompat ke hari ini saat dibuka agar tidak "nyasar" ke Januari
-                            instance.jumpToDate(new Date());
-                        },
-                        onReady: function(selectedDates, dateStr, instance) {
-                            // Accessibility Fix: Label 'for="date_range_picker"' must point to the visible input
-                            if (instance.altInput) {
-                                instance.altInput.id = 'date_range_picker';
-                                instance.altInput.name = 'date_range_display';
-                            }
-
-                            const injectCustomUI = () => {
-                                const container = instance.calendarContainer.querySelector('.flatpickr-current-month');
-                                if (!container) return;
-
-                                container.innerHTML = `
-                                    <div class="custom-month-selector" id="custom-month-btn" role="button" tabindex="0" aria-label="Pilih Bulan" aria-haspopup="listbox">
-                                        <span class="month-name">
-                                            <span class="hidden sm:inline">${instance.l10n.months.longhand[instance.currentMonth]}</span>
-                                            <span class="sm:hidden font-extrabold text-lg">${instance.currentMonth + 1}</span>
-                                        </span>
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'></path></svg>
-                                        <div class="custom-month-list" id="custom-month-panel" role="listbox" aria-label="Daftar Bulan">
-                                            ${instance.l10n.months.longhand.map((m, i) => `
-                                                <div class="${i === instance.currentMonth ? 'active' : ''}" data-index="${i}" role="option" aria-selected="${i === instance.currentMonth ? 'true' : 'false'}">${m}</div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                    <div class="numInputWrapper">
-                                        <input id="flatpickr_year_input" name="flatpickr_year" class="numInput cur-year" type="text" inputmode="numeric" value="${instance.currentYear}" aria-label="Input Tahun">
-                                    </div>
-                                `;
-
-                                const trigger = container.querySelector('#custom-month-btn');
-                                const panel = container.querySelector('#custom-month-panel');
-                                const yearInput = container.querySelector('.numInput');
-
-                                trigger.addEventListener('click', (e) => {
-                                    e.stopPropagation();
-                                    const isVisible = panel.style.display === 'block';
-                                    panel.style.display = isVisible ? 'none' : 'block';
-                                    trigger.classList.toggle('active', !isVisible);
-                                });
-
-                                panel.querySelectorAll('div').forEach(item => {
-                                    item.addEventListener('click', (e) => {
-                                        const index = parseInt(item.getAttribute('data-index'));
-                                        instance.changeMonth(index);
-                                        panel.style.display = 'none';
-                                        trigger.classList.remove('active');
-                                    });
-                                });
-
-                                // Year Input Logic - Block 'e' and non-digits
-                                if (yearInput) {
-                                    yearInput.addEventListener('keydown', (e) => {
-                                        // Allow navigation keys, backspace, delete, etc.
-                                        if (['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'].includes(e.key)) return;
-                                        if (!/[0-9]/.test(e.key)) e.preventDefault();
-                                    });
-
-                                    yearInput.addEventListener('input', function() {
-                                        this.value = this.value.replace(/[^0-9]/g, ''); // Double safety
-                                        if (this.value.length > 4) this.value = this.value.slice(0, 4);
-                                        if (this.value.length === 4) instance.changeYear(parseInt(this.value));
-                                    });
-
-                                    yearInput.addEventListener('blur', function() {
-                                        const val = parseInt(this.value);
-                                        if (isNaN(val) || val < 2010) {
-                                            if (window.showToast) window.showToast('warning', 'Tahun tidak valid, dikembalikan ke tahun saat ini.');
-                                            this.value = new Date().getFullYear();
-                                            instance.changeYear(parseInt(this.value));
-                                        }
-                                    });
-                                }
-                            };
-
-                            injectCustomUI();
-
-                            // Ensure logic persists on navigation
-                            instance.currentInject = injectCustomUI;
-                            document.addEventListener('click', () => {
-                                const panels = document.querySelectorAll('.custom-month-list');
-                                panels.forEach(p => p.style.display = 'none');
-                                document.querySelectorAll('.custom-month-selector').forEach(s => s.classList.remove('active'));
-                            });
-                        },
-                        onMonthChange: function(selectedDates, dateStr, instance) {
-                            if (instance.currentInject) instance.currentInject();
-                        },
-                        onYearChange: function(selectedDates, dateStr, instance) {
-                            if (instance.currentInject) instance.currentInject();
-                        },
-                        onChange: function(selectedDates, dateStr, instance) {
-                            if (selectedDates.length === 2) {
-                                // Validasi: max range 365 hari
-                                const diffDays = Math.round((selectedDates[1] - selectedDates[0]) / (1000 * 60 * 60 * 24));
-                                if (diffDays > 365) {
-                                    instance.clear();
-                                    if (startInput) startInput.value = '';
-                                    if (endInput) endInput.value = '';
-                                    if (window.showToast) window.showToast('warning', 'Rentang tanggal maksimal 365 hari. Silakan pilih ulang.');
-                                    return;
-                                }
-                                if (startInput) startInput.value = instance.formatDate(selectedDates[0], "Y-m-d");
-                                if (endInput) endInput.value = instance.formatDate(selectedDates[1], "Y-m-d");
-                            }
-                        }
-                    });
-
-                    window.setPickerRange = function(days) {
+                window.setPickerRange = function(days) {
+                    const pickerInput = document.getElementById('date_range_picker_hidden');
+                    if (pickerInput && pickerInput._flatpickr) {
                         const end = new Date();
                         const start = new Date();
-                        start.setDate(end.getDate() - (days > 0 ? days - 1 : 0)); // Adjust to include today if 7/30
-                        picker.setDate([start, end], true);
-                    };
+                        start.setDate(end.getDate() - (days > 0 ? days - 1 : 0));
+                        pickerInput._flatpickr.setDate([start, end], true);
+                    }
+                };
 
-                    window.resetCustomPicker = function() {
-                        // Reset ke default "Hari Ini" (tanpa query string)
-                        window.location.href = '{{ route("dashboard.superadmin") }}';
-                    };
-
-                    // Responsive altFormat: Gunakan angka jika layar sempit agar tidak terpotong
-                    const updateResponsiveFormat = () => {
-                        const isMobile = window.innerWidth < 480;
-                        picker.set('altFormat', isMobile ? "d/m/y" : "j F Y");
-                    };
-                    window.addEventListener('resize', updateResponsiveFormat);
-                    updateResponsiveFormat();
-                }
+                window.resetCustomPicker = function() {
+                    window.location.href = '{{ route("dashboard.superadmin") }}';
+                };
             });
         </script>
     @endpush

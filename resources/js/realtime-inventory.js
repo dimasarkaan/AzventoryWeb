@@ -186,6 +186,12 @@ document.addEventListener('DOMContentLoaded', function () {
         .listen('.StockCritical', (e) => {
             console.log('⚠️ Stock Critical:', e);
 
+            // Filter out self-notifications to prevent modal flash before page reload
+            if (window.currentUser && window.currentUser.name && e.actor_name === window.currentUser.name) {
+                console.log('🚫 Mengabaikan peringatan stok kritis dari aksi sendiri.');
+                return;
+            }
+
             // Tentukan icon dan title berdasarkan severity.
             const config = getSeverityConfig(e.severity);
 
@@ -194,22 +200,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 icon: config.icon,
                 title: config.title,
                 html: `
-                    <div class="text-left">
-                        <p class="font-semibold text-lg mb-2">${e.name}</p>
-                        <p class="text-sm text-gray-600 mb-3">Part Number: ${e.part_number}</p>
-                        <div class="bg-gray-50 p-3 rounded">
-                            <p class="text-sm">Stok Saat Ini: <strong class="text-danger-600">${e.current_stock}</strong></p>
-                            <p class="text-sm">Minimum Stock: <strong>${e.min_stock}</strong></p>
-                            <p class="text-sm">Persentase: <strong>${e.percentage}%</strong></p>
+                    <div class="text-left mt-2">
+                        <p class="font-bold text-xl text-secondary-900 mb-1">${e.name}</p>
+                        <p class="text-sm font-mono text-secondary-500 mb-4">${e.part_number}</p>
+                        <div class="bg-secondary-50 border border-secondary-100 p-4 rounded-xl space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-secondary-400 uppercase tracking-wider">Stok Saat Ini</span>
+                                <strong class="text-lg text-danger-600">${e.current_stock}</strong>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-secondary-400 uppercase tracking-wider">Batas Minimum</span>
+                                <strong class="text-sm text-secondary-900">${e.min_stock}</strong>
+                            </div>
+                            <div class="flex justify-between items-center pt-2 border-t border-secondary-200/60">
+                                <span class="text-xs font-bold text-secondary-400 uppercase tracking-wider">Sisa Kapasitas</span>
+                                <strong class="text-sm ${e.percentage <= 25 ? 'text-danger-600' : 'text-warning-600'}">${e.percentage}%</strong>
+                            </div>
                         </div>
                     </div>
                 `,
+                customClass: {
+                    popup: '!rounded-3xl !font-sans !shadow-2xl border border-secondary-100',
+                    title: '!text-secondary-900 !text-2xl !font-bold !mt-4',
+                    htmlContainer: '!m-0 !px-6 !pb-2',
+                    confirmButton: 'btn btn-danger px-5 py-2.5 rounded-xl shadow-md transform hover:scale-105 transition-all duration-200 ml-3',
+                    cancelButton: 'btn btn-secondary px-5 py-2.5 rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm transition-all duration-200'
+                },
+                buttonsStyling: false,
+                width: '28em',
+                padding: '2em',
+                backdrop: 'rgba(15, 23, 42, 0.5)',
                 showConfirmButton: true,
                 confirmButtonText: 'Lihat Detail',
-                confirmButtonColor: '#dc2626',
                 showCancelButton: true,
                 cancelButtonText: 'Tutup',
-                timer: 10000,
+                reverseButtons: true,
+                timer: 15000,
                 timerProgressBar: true,
             }).then((result) => {
                 if (result.isConfirmed && e.url) {

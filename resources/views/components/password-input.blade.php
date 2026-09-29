@@ -1,4 +1,4 @@
-﻿@props(['disabled' => false])
+@props(['disabled' => false])
 
 <div x-data="{ show: false }" class="relative w-full">
     <input 
@@ -23,4 +23,3 @@
         </svg>
     </button>
 </div>
-

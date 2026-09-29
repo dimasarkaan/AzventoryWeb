@@ -18,6 +18,18 @@
             .animate-scan {
                 animation: scan 2s linear infinite;
             }
+            /* Override html5-qrcode styles to prevent black letterboxing on mobile */
+            #reader {
+                width: 100% !important;
+                height: 100% !important;
+            }
+            #reader video {
+                object-fit: cover !important;
+                width: 100% !important;
+                height: 100% !important;
+                min-height: 100% !important;
+                min-width: 100% !important;
+            }
         `;
         document.head.appendChild(style);
 

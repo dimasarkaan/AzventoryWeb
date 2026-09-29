@@ -1,4 +1,4 @@
-<div class="space-y-6 pb-20">
+<div class="space-y-6">
     <!-- Image Header -->
     <div class="relative h-48 w-full rounded-xl overflow-hidden bg-secondary-100 flex items-center justify-center">
         @if($inventory->image)
@@ -17,7 +17,7 @@
 
     <!-- Title & Basic Info -->
     <div>
-        <h3 class="text-xl font-bold text-secondary-900">{{ $inventory->name }}</h3>
+        <h2 class="text-xl font-bold text-secondary-900">{{ $inventory->name }}</h2>
         <p class="text-sm font-mono text-secondary-500 mt-1">{{ $inventory->part_number }}</p>
     </div>
 
@@ -57,8 +57,8 @@
         <p class="text-sm text-secondary-600 leading-relaxed">{{ $inventory->problem_chronology ?: 'Tidak ada catatan spesifik.' }}</p>
     </div>
 
-    <!-- Action Button (Fixed Bottom) -->
-    <div class="absolute bottom-0 left-0 right-0 p-4 bg-white border-t border-secondary-100">
+    <!-- Action Button (Sticky Bottom) -->
+    <div class="sticky -bottom-6 -mx-4 sm:-mx-6 -mb-6 pt-4 px-4 sm:px-6 pb-10 bg-white border-t border-secondary-100 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <a href="{{ route('inventory.show', $inventory) }}" class="btn btn-primary w-full flex items-center justify-center gap-2 py-3 shadow-md">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
             Buka Halaman Detail Penuh

@@ -1,4 +1,4 @@
-import Swal from 'sweetalert2';
+﻿import Swal from 'sweetalert2';
 
 // Solid Premium Toast Config
 window.Toast = Swal.mixin({
@@ -106,8 +106,14 @@ const initFlashes = () => {
     }
 };
 
+// Pastikan Alpine sudah start dan component toast sudah di-mount sebelum dispatch event.
+// Delay 500ms cukup untuk Alpine menyelesaikan init di device manapun.
+const scheduleFlashes = () => {
+    setTimeout(initFlashes, 500);
+};
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initFlashes, 150));
+    document.addEventListener('DOMContentLoaded', scheduleFlashes);
 } else {
-    setTimeout(initFlashes, 150);
+    scheduleFlashes();
 }

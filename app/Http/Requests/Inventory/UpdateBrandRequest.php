@@ -25,7 +25,7 @@ class UpdateBrandRequest extends FormRequest
         $brandId = $brand ? $brand->id : null;
 
         return [
-            'name' => 'required|string|max:191|unique:brands,name,'.$brandId,
+            'name' => 'required|string|min:2|max:191|unique:brands,name,'.$brandId,
             'is_active' => 'sometimes|boolean',
         ];
     }

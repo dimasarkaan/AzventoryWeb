@@ -32,8 +32,8 @@
                         <x-icon.tag class="w-6 h-6" />
                     </div>
                     <div>
-                        <h3 id="brand-modal-title" class="text-xl font-bold text-secondary-900">Manajemen Merk</h3>
-                        <p class="text-xs text-secondary-500">Kelola master data merk inventaris</p>
+                        <h3 id="brand-modal-title" class="text-xl font-bold text-secondary-900">{{ __('ui.modal_brand_title') }}</h3>
+                        <p class="text-xs text-secondary-500">{{ __('ui.modal_brand_desc') }}</p>
                     </div>
                 </div>
                 <button @click="showBrandModal = false" 
@@ -49,7 +49,7 @@
                 <div class="mb-6 bg-white p-4 rounded-2xl border border-pink-100 shadow-sm">
                     <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-wider mb-3 flex items-center gap-2">
                         <x-icon.plus class="w-3 h-3" />
-                        Tambah Merk Baru
+                        {{ __('ui.add_new_brand') }}
                     </h4>
                     <form @submit.prevent="addBrand()" class="flex gap-2" novalidate>
                         <div class="relative flex-grow">
@@ -58,7 +58,7 @@
                                    id="new_brand_name"
                                    name="brand_name"
                                    x-model="newBrandName"
-                                   placeholder="Masukkan Nama Merk Di Sini" 
+                                   placeholder="{{ __('ui.brand_name_placeholder') }}" 
                                    class="w-full bg-secondary-50 border border-secondary-200 rounded-xl px-4 py-2.5 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 transition-all outline-none"
                                    required
                                    minlength="2"
@@ -75,20 +75,19 @@
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             </template>
-                            <span class="font-bold text-sm" x-text="isAddingBrand ? 'Menyimpan...' : 'Tambah'"></span>
-                        </button>
+                            <span class="font-bold text-sm" x-text="isAddingBrand ? '{{ __('ui.saving') }}' : '{{ __('ui.btn_add') }}'"></span>
                         </button>
                     </form>
                 </div>
 
                 <div class="flex items-center justify-between mb-3 px-1">
-                    <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-wider">Daftar Merk</h4>
-                    <span class="text-[10px] text-secondary-400 font-medium px-2 py-0.5 bg-secondary-100 rounded-full" x-text="brandsList.length + ' Merk'"></span>
+                    <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-wider">{{ __('ui.brand_list') }}</h4>
+                    <span class="text-[10px] text-secondary-400 font-medium px-2 py-0.5 bg-secondary-100 rounded-full" x-text="brandsList.length + ' {{ __('ui.brand') }}'"></span>
                 </div>
 
                 <div x-show="isLoadingBrands" class="flex flex-col items-center justify-center py-12 gap-3">
                     <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
-                    <p class="text-sm text-secondary-500">Memuat data merk...</p>
+                    <p class="text-sm text-secondary-500">{{ __('ui.loading_data') }}</p>
                 </div>
 
                 <div x-show="!isLoadingBrands" class="relative">
@@ -103,14 +102,14 @@
                                         <div class="flex items-center gap-2 mb-1">
                                             <h4 class="font-bold text-secondary-900 truncate" x-text="brand.name"></h4>
                                             <template x-if="!brand.is_active">
-                                                <span class="px-2 py-0.5 text-[10px] bg-secondary-100 text-secondary-500 font-bold rounded-full border border-secondary-200 uppercase tracking-wider">Nonaktif</span>
+                                                <span class="px-2 py-0.5 text-[10px] bg-secondary-100 text-secondary-500 font-bold rounded-full border border-secondary-200 uppercase tracking-wider">{{ __('ui.status_inactive') }}</span>
                                             </template>
                                             <template x-if="brand.is_active">
-                                                <span class="px-2 py-0.5 text-[10px] bg-success-50 text-success-600 font-bold rounded-full border border-success-100 uppercase tracking-wider">Aktif</span>
+                                                <span class="px-2 py-0.5 text-[10px] bg-success-50 text-success-600 font-bold rounded-full border border-success-100 uppercase tracking-wider">{{ __('ui.status_active') }}</span>
                                             </template>
                                         </div>
                                         <p class="text-xs text-secondary-500 flex items-center gap-1">
-                                            <span class="font-bold text-secondary-900" x-text="brand.items_count"></span> Barang dalam merk ini
+                                            <span class="font-bold text-secondary-900" x-text="brand.items_count"></span> {{ __('ui.items_in_this', ['type' => __('ui.brand')]) }}
                                         </p>
                                     </div>
 
@@ -123,12 +122,12 @@
                                                @keydown.escape="cancelBrandEdit()"
                                                class="w-full bg-white border border-pink-300 rounded-xl px-3 py-2 text-sm font-bold text-secondary-900 focus:ring-4 focus:ring-pink-500/10 focus:border-pink-500 transition-all outline-none"
                                                required
-                                               placeholder="Nama merk..."
+                                               placeholder="{{ __('ui.brand_name_placeholder') }}"
                                                minlength="2"
                                                maxlength="100"
                                                pattern="^(?=.*[a-zA-Z])[a-zA-Z0-9][a-zA-Z0-9\s\.\,\&\-]*$"
-                                               title="Nama merk harus 2-100 karakter, mengandung huruf, diawali huruf/angka, serta hanya berisi huruf/angka/spasi/simbol (.,&-)">
-                                        <p class="text-[10px] text-secondary-400 mt-1 ml-1 font-medium italic">Tekan Enter untuk simpan, Esc untuk batal</p>
+                                               title="{{ __('ui.name_validation_help') }}">
+                                        <p class="text-[10px] text-secondary-400 mt-1 ml-1 font-medium italic">{{ __('ui.press_enter_to_save') }}</p>
                                         <button type="submit" class="hidden"></button>
                                     </form>
                                 </div>
@@ -138,20 +137,20 @@
                                     <button @click="toggleBrandStatus(brand)"
                                             class="p-2 rounded-xl transition-all"
                                             :class="brand.is_active ? 'text-secondary-400 hover:text-amber-600 hover:bg-amber-50' : 'text-secondary-400 hover:text-success-600 hover:bg-success-50'"
-                                            :title="brand.is_active ? 'Nonaktifkan' : 'Aktifkan'">
+                                            :title="brand.is_active ? '{{ __('ui.btn_deactivate') }}' : '{{ __('ui.btn_activate') }}'">
                                         <svg x-show="brand.is_active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                                         <svg x-show="!brand.is_active" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     </button>
 
                                     <button @click="startBrandEdit(brand)"
                                             class="p-2 text-secondary-400 hover:text-pink-600 hover:bg-pink-50 rounded-xl transition-all"
-                                            title="Ubah Nama">
+                                            title="{{ __('ui.btn_edit_name') }}">
                                         <x-icon.edit class="w-5 h-5" />
                                     </button>
 
                                     <button @click="askBrandDelete(brand)"
                                             class="p-2 text-secondary-400 hover:text-danger-600 hover:bg-danger-50 rounded-xl transition-all"
-                                            title="Hapus Merk">
+                                            title="{{ __('ui.delete_brand_title') }}">
                                         <x-icon.trash class="w-5 h-5" />
                                     </button>
                                 </div>
@@ -161,14 +160,14 @@
                                     <button @click="saveBrandEdit(brand.id)"
                                             :disabled="isUpdatingBrand"
                                             class="p-2 bg-success-500 text-white hover:bg-success-600 rounded-xl shadow-sm hover:shadow-md transition-all disabled:opacity-50"
-                                            title="Simpan">
+                                            title="{{ __('ui.save') }}">
                                         <svg x-show="!isUpdatingBrand" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                                         <svg x-show="isUpdatingBrand" class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                                     </button>
 
                                     <button @click="cancelBrandEdit()"
                                             class="p-2 bg-secondary-100 text-secondary-600 hover:bg-secondary-200 rounded-xl transition-all"
-                                            title="Batal">
+                                            title="{{ __('ui.cancel') }}">
                                         <x-icon.close class="w-5 h-5" />
                                     </button>
                                 </div>
@@ -182,8 +181,8 @@
                         <div class="w-16 h-16 bg-secondary-100 rounded-full flex items-center justify-center mx-auto mb-4 text-secondary-400">
                             <x-icon.tag class="w-8 h-8" />
                         </div>
-                        <h4 class="text-secondary-900 font-bold">Belum Ada Merk</h4>
-                        <p class="text-sm text-secondary-500">Merk akan otomatis bertambah saat Anda menyimpan barang baru.</p>
+                        <h4 class="text-secondary-900 font-bold">{{ __('ui.no_brands_title') }}</h4>
+                        <p class="text-sm text-secondary-500">{{ __('ui.no_brands_desc') }}</p>
                     </div>
                 </div>
             </div>
@@ -203,9 +202,9 @@
                     <div class="w-16 h-16 bg-danger-50 text-danger-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-danger-100">
                         <x-icon.trash class="w-8 h-8" />
                     </div>
-                    <h4 class="text-secondary-900 font-bold text-lg mb-1">Hapus Merk?</h4>
+                    <h4 class="text-secondary-900 font-bold text-lg mb-1">{{ __('ui.delete_brand_title') }}</h4>
                     <p class="text-sm text-secondary-500 mb-4">
-                        Anda yakin ingin menghapus merk <span class="font-bold text-secondary-900" x-text="brandConfirmDeleteName"></span>? Tindakan ini tidak dapat dibatalkan.
+                        {{ __('ui.delete_confirm_desc', ['type' => __('ui.brand')]) }} <span class="font-bold text-secondary-900" x-text="brandConfirmDeleteName"></span>? {{ __('ui.cannot_be_undone') }}
                     </p>
                     {{-- Inline error message saat hapus gagal --}}
                     <div x-show="deleteBrandError" x-cloak
@@ -216,7 +215,7 @@
                     <div class="flex items-center justify-center gap-3">
                         <button @click="cancelBrandDelete()" 
                                 :disabled="isDeletingBrand"
-                                class="btn btn-secondary px-6 py-2.5 rounded-2xl font-bold disabled:opacity-50 transition-all">Batal</button>
+                                class="btn btn-secondary px-6 py-2.5 rounded-2xl font-bold disabled:opacity-50 transition-all">{{ __('ui.cancel') }}</button>
                         <button @click="deleteBrand(brandConfirmDeleteId)" 
                                 :disabled="isDeletingBrand"
                                 class="btn btn-danger px-6 py-2.5 rounded-2xl font-bold shadow-lg shadow-danger-200 disabled:opacity-50 transition-all flex items-center gap-2">
@@ -226,7 +225,7 @@
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             </template>
-                            <span x-text="isDeletingBrand ? 'Menghapus...' : 'Ya, Hapus'"></span>
+                            <span x-text="isDeletingBrand ? '{{ __('ui.deleting') }}' : '{{ __('ui.btn_yes_delete_short') }}'"></span>
                         </button>
                     </div>
                 </div>

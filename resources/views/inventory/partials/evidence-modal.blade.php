@@ -32,9 +32,9 @@
                     
                     <!-- Header -->
                     <div class="bg-white px-4 py-4 sm:px-6 border-b border-gray-200 flex-none z-10 shadow-sm flex justify-between items-center">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                        <h2 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                             {{ __('ui.return_evidence') }}
-                        </h3>
+                        </h2>
                         <button @click="evidenceModalOpen = false" class="text-gray-400 hover:text-gray-500 focus:outline-none">
                             <span class="sr-only">Tutup</span>
                             <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

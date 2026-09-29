@@ -71,7 +71,7 @@ class TesUIFrontendTest extends TestCase
         $responseAd = $this->actingAs($this->admin)->get(route('dashboard.admin'));
         $responseAd->assertStatus(200);
         // Admin melihat status stok barang yaitu "Total Stok Fisik" (dari ui.total_physical_stock)
-        $responseAd->assertSee('Total Stok Fisik');
+        $responseAd->assertSee('Total Inventaris Fisik');
     }
 
     #[Test]

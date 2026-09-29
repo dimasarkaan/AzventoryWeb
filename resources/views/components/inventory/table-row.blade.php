@@ -1,10 +1,11 @@
-﻿@props(['sparepart', 'trash' => false])
+@props(['sparepart', 'trash' => false, 'index' => 0])
 
 <tr x-data="{ isActive: false }"
     @quick-view-opened.window="isActive = ($event.detail.id == '{{ $sparepart->id }}')"
     @quick-view-closed.window="isActive = false"
     onclick="if(!event.target.closest('a') && !event.target.closest('button') && !event.target.closest('input')) window.dispatchEvent(new CustomEvent('open-quick-view', { detail: { url: '{{ route('inventory.quick-view', $sparepart) }}', id: '{{ $sparepart->id }}' } }))" 
-    class="group transition-colors border-b border-secondary-50 last:border-b-0 cursor-pointer"
+    class="group transition-colors border-b border-secondary-50 last:border-b-0 cursor-pointer animate-fade-in-up-row opacity-0"
+    style="animation-delay: {{ $index * 50 }}ms;"
     :class="isActive ? 'bg-primary-50/50 hover:bg-primary-50/70' : 'hover:bg-secondary-50/60'">
     @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!$trash && auth()->user()->role === \App\Enums\UserRole::ADMIN))
         <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
@@ -155,7 +156,7 @@
                 <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="inline-block" novalidate>
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-ghost p-2 text-danger-600 hover:text-danger-700 bg-danger-50 hover:bg-danger-100 rounded-lg transition-all" title="{{ __('ui.force_delete') }}" onclick="confirmInventoryForceDelete(event)">
+                    <button type="submit" class="btn btn-ghost p-2 text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 rounded-lg transition-all" title="{{ __('ui.force_delete') }}" onclick="confirmInventoryForceDelete(event)">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                     </button>
                 </form>

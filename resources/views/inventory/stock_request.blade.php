@@ -2,9 +2,9 @@
     <div class="py-6">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-6">
-                <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                     {{ __('ui.request_stock_change_for') }}
-                </h2>
+                </h1>
                 <p class="mt-1 text-sm text-secondary-500">Item: <span class="font-semibold text-secondary-900">{{ $sparepart->name }}</span> ({{ $sparepart->part_number }})</p>
             </div>
 

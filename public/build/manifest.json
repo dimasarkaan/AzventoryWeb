@@ -1,10 +1,10 @@
 {
-  "_vendor-IEC14Ev2.js": {
-    "file": "assets/vendor-IEC14Ev2.js",
+  "_vendor-C22JqoQO.js": {
+    "file": "assets/vendor-C22JqoQO.js",
     "name": "vendor"
   },
   "resources/css/app.css": {
-    "file": "assets/app-Ct-I444_.css",
+    "file": "assets/app-HRrcxW9Z.css",
     "src": "resources/css/app.css",
     "isEntry": true,
     "name": "app",
@@ -22,21 +22,21 @@
     ]
   },
   "resources/js/app.js": {
-    "file": "assets/app-DLpfQj0r.js",
+    "file": "assets/app-DmV3B3o7.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "imports": [
-      "_vendor-IEC14Ev2.js"
+      "_vendor-C22JqoQO.js"
     ]
   },
   "resources/js/pages/superadmin/inventory/index.js": {
-    "file": "assets/index-DcSB4IeS.js",
+    "file": "assets/index-DjB_jL1H.js",
     "name": "index",
     "src": "resources/js/pages/superadmin/inventory/index.js",
     "isEntry": true,
     "imports": [
-      "_vendor-IEC14Ev2.js"
+      "_vendor-C22JqoQO.js"
     ]
   }
 }

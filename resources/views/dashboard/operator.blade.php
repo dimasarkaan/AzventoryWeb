@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="operatorDashboardData()">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -53,7 +53,7 @@
                 </div>
 
             {{-- ================================================================
-                 STAT CARDS — Bento Workspace Style
+                 STAT CARDS â€” Bento Workspace Style
                  Referensi: ui-ux-pro-max / Bento Grids + Executive Dashboard
                  ================================================================ --}}
             @php
@@ -106,10 +106,15 @@
                             <span class="w-2 h-2 rounded-full bg-danger-500 animate-pulse flex-shrink-0"></span>
                             <span class="text-xs text-danger-600 font-medium">{{ $overdueCount }} item melewati batas waktu</span>
                         </div>
-                    @else
+                    @elseif (($activeBorrowingsCount ?? 0) > 0)
                         <div class="flex items-center gap-2 pt-1 border-t border-secondary-100">
                             <span class="w-2 h-2 rounded-full bg-success-500 flex-shrink-0"></span>
-                            <span class="text-xs text-success-600 font-medium">Semua peminjaman tepat waktu</span>
+                            <span class="text-xs text-success-600 font-medium">{{ __('ui.all_borrowings_on_time') }}</span>
+                        </div>
+                    @else
+                        <div class="flex items-center gap-2 pt-1 border-t border-secondary-100">
+                            <span class="w-2 h-2 rounded-full bg-secondary-300 flex-shrink-0"></span>
+                            <span class="text-xs text-secondary-500 font-medium">Belum ada pinjaman aktif</span>
                         </div>
                     @endif
                 </div>
@@ -136,11 +141,12 @@
                     {{-- Progress Bar --}}
                     <div class="space-y-1.5">
                         <div class="flex justify-between items-center">
-                            <span class="text-xs text-secondary-400">Butuh persetujuan admin</span>
                             @if (($pendingRequestsCount ?? 0) > 0)
+                                <span class="text-xs text-secondary-400">Butuh persetujuan admin</span>
                                 <span class="text-xs font-bold text-warning-600">Menunggu review</span>
                             @else
-                                <span class="text-xs font-bold text-success-600">Semua diproses</span>
+                                <span class="text-xs text-secondary-400">Status antrean</span>
+                                <span class="text-xs font-bold text-secondary-500">Kosong</span>
                             @endif
                         </div>
                         <div class="h-1.5 w-full rounded-full bg-secondary-100 overflow-hidden">
@@ -148,7 +154,7 @@
                                 <div class="h-full rounded-full bg-warning-400 transition-all duration-500 animate-pulse"
                                      style="width: {{ min(100, ($pendingRequestsCount ?? 0) * 10) }}%"></div>
                             @else
-                                <div class="h-full rounded-full bg-success-400 w-full transition-all duration-500"></div>
+                                <div class="h-full rounded-full bg-success-400 w-0 transition-all duration-500"></div>
                             @endif
                         </div>
                     </div>
@@ -159,8 +165,8 @@
                             <span class="w-2 h-2 rounded-full bg-warning-400 animate-pulse flex-shrink-0"></span>
                             <span class="text-xs text-warning-600 font-medium">Admin belum memproses pengajuanmu</span>
                         @else
-                            <span class="w-2 h-2 rounded-full bg-success-500 flex-shrink-0"></span>
-                            <span class="text-xs text-success-600 font-medium">Tidak ada pengajuan yang menunggu</span>
+                            <span class="w-2 h-2 rounded-full bg-secondary-300 flex-shrink-0"></span>
+                            <span class="text-xs text-secondary-500 font-medium">Tidak ada pengajuan yang menunggu</span>
                         @endif
                     </div>
                 </div>
@@ -175,7 +181,7 @@
                             <div class="w-8 h-8 rounded-lg bg-secondary-50 flex items-center justify-center text-secondary-600 flex-shrink-0 border border-secondary-100">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
                             </div>
-                            <h2 class="font-bold text-secondary-900 truncate">Tren Peminjaman</h2>
+                            <h2 class="text-lg font-bold text-secondary-900 truncate">Tren Peminjaman</h2>
                         </div>
                         <div x-data="{ open: false }" class="relative z-20">
                             <form method="GET" action="{{ route('dashboard.operator') }}" x-ref="trendForm" novalidate>
@@ -238,7 +244,7 @@
                         <div class="w-8 h-8 rounded-lg bg-secondary-50 flex items-center justify-center text-secondary-600 flex-shrink-0 border border-secondary-100">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
                         </div>
-                        <h2 class="font-bold text-secondary-900">Status Pengajuan</h2>
+                        <h2 class="text-lg font-bold text-secondary-900">Status Pengajuan</h2>
                     </div>
                     <div class="card-body p-6 flex-1 flex items-center justify-center min-h-[300px]">
                         <div id="operatorRequestStatusChart" class="w-full"></div>
@@ -255,9 +261,9 @@
                              <div class="w-8 h-8 rounded-lg bg-secondary-50 flex items-center justify-center text-secondary-600 flex-shrink-0 border border-secondary-100">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
                             </div>
-                            <h2 class="font-bold text-secondary-900">Barang Saya (Aktif)</h2>
+                            <h2 class="text-lg font-bold text-secondary-900">Barang Saya (Aktif)</h2>
                         </div>
-                        <a href="{{ route('profile.inventory') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 transition-colors bg-primary-50 px-3 py-1.5 rounded-full border border-primary-100 shadow-sm hover:bg-primary-100">Lihat Semua</a>
+                        <a href="{{ route('profile.inventory') }}" class="text-xs font-bold text-primary-600 hover:text-primary-700 transition-colors bg-primary-50 px-3 py-1.5 rounded-full border border-primary-100 shadow-sm hover:bg-primary-100">{{ __('ui.see_all') }}</a>
                     </div>
                     <div class="card-body flex-1 p-0">
                         <template x-if="activeBorrowingsList.length === 0">
@@ -330,14 +336,14 @@
                              <div class="w-8 h-8 rounded-lg bg-secondary-50 flex items-center justify-center text-secondary-600 flex-shrink-0 border border-secondary-100">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
-                            <h2 class="font-bold text-secondary-900">Daftar Pengajuan Stok</h2>
+                            <h2 class="text-lg font-bold text-secondary-900">Daftar Pengajuan Stok</h2>
                         </div>
                     </div>
                     <div class="card-body flex-1 p-0">
                         <template x-if="pendingRequestsList.length === 0">
                             <div class="p-8 text-center text-secondary-500">
                                 <svg class="w-12 h-12 mx-auto mb-3 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                <p>Tidak ada pengajuan stok yang menunggu persetujuan.</p>
+                                <p>{{ __('ui.no_pending_stock_requests') }}</p>
                             </div>
                         </template>
                         <template x-if="pendingRequestsList.length > 0">
@@ -404,13 +410,13 @@
 
             {{-- ================================================================
                  BOTTOM SECTION (3 Columns)
-                 Skill: Bento Grids — rounded-[20px], soft bg, subtle border
+                 Skill: Bento Grids â€” rounded-[20px], soft bg, subtle border
                  UX Rules: no emoji, no layout-shift hover, 8px+ gap between items
                  ================================================================ --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
-                {{-- Card 1: Sering Anda Pinjam — Leaderboard Style --}}
-                {{-- Ref: Sales Intelligence Dashboard — rank-1: gold, rank-2: silver, rank-3: bronze --}}
+                {{-- Card 1: Sering Anda Pinjam â€” Leaderboard Style --}}
+                {{-- Ref: Sales Intelligence Dashboard â€” rank-1: gold, rank-2: silver, rank-3: bronze --}}
                 <div class="card flex flex-col overflow-hidden shadow-soft border-none">
                     {{-- Header: konsisten dengan card lain (plain white + icon + title + subtitle) --}}
                     <div class="border-b border-secondary-100 px-5 py-3 flex items-center gap-3 bg-white flex-shrink-0">
@@ -418,7 +424,7 @@
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900 text-sm leading-tight">Sering Anda Pinjam</h3>
+                            <h2 class="text-lg font-bold text-secondary-900 leading-tight">Sering Anda Pinjam</h2>
                             <p class="text-[11px] text-secondary-400">Top 3 barang favorit Anda</p>
                         </div>
                     </div>
@@ -463,7 +469,7 @@
                                             <span class="text-xs font-bold tabular-nums"
                                                   :class="index === 0 ? 'text-amber-600' : 'text-secondary-500'"
                                                   x-text="pick.total_borrows"></span>
-                                            <span class="text-[10px] text-secondary-400">×</span>
+                                            <span class="text-[10px] text-secondary-400">Ã—</span>
                                         </div>
                                     </div>
                                 </template>
@@ -487,7 +493,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         </div>
                         <div>
-                            <h3 class="font-bold text-secondary-900 text-sm leading-tight">Skor Kedisiplinan</h3>
+                            <h2 class="text-lg font-bold text-secondary-900 leading-tight">Skor Kedisiplinan</h2>
                             <p class="text-[11px] text-secondary-400">Tingkat ketepatan pengembalian barang</p>
                         </div>
                     </div>
@@ -496,7 +502,7 @@
                         {{-- Chart area centered --}}
                         <div class="flex-1 flex flex-col items-center justify-center px-5 py-2">
                             <div id="trustScoreChart" class="w-full flex justify-center"></div>
-                            <div class="text-center mt-3 space-y-1">
+                            <div class="text-center -mt-6 relative z-10 space-y-1">
                                 @if($trustScore >= 90)
                                     <p class="text-success-600 font-bold text-sm">Sangat Disiplin</p>
                                     <p class="text-secondary-400 text-xs">Andal dalam mengembalikan barang tepat waktu.</p>
@@ -509,7 +515,7 @@
                                 @endif
                             </div>
                         </div>
-                        {{-- Stat row pinned di bawah — isi ruang bawah yg kosong --}}
+                        {{-- Stat row pinned di bawah â€” isi ruang bawah yg kosong --}}
                         <div class="border-t border-secondary-100 px-5 py-2.5 grid grid-cols-3 gap-2 bg-secondary-50/40">
                             <div class="text-center">
                                 <p class="text-sm font-black text-secondary-900 tabular-nums">{{ $trustScore }}%</p>
@@ -535,13 +541,13 @@
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                             <div>
-                                <h3 class="font-bold text-secondary-900 text-sm leading-tight">Aktivitas Terakhir</h3>
+                                <h2 class="text-lg font-bold text-secondary-900 leading-tight">Aktivitas Terakhir</h2>
                                 <p class="text-[11px] text-secondary-400">Riwayat interaksi sistem Anda</p>
                             </div>
                         </div>
                         <a href="{{ route('reports.activity-logs.index') }}"
                            class="text-xs font-semibold text-primary-600 hover:text-primary-700 transition-colors whitespace-nowrap">
-                            Lihat Semua
+                            {{ __('ui.see_all') }}
                         </a>
                     </div>
                     {{-- Activity list: clean list rows + divider, no nested cards --}}
@@ -558,7 +564,7 @@
                             <div class="divide-y divide-secondary-50">
                                 <template x-for="log in activityLogs.slice(0, 4)" :key="log.id || Math.random()">
                                     <div class="flex items-center gap-3 px-4 py-2.5 hover:bg-secondary-50/60 transition-colors duration-150">
-                                        {{-- Icon dot —  color badge, no scale transform --}}
+                                        {{-- Icon dot â€”  color badge, no scale transform --}}
                                         <div class="size-8 rounded-lg flex items-center justify-center flex-shrink-0"
                                              :class="{
                                                 'bg-success-50 text-success-600': log.action_lower.includes('tambah') || log.action_lower.includes('create') || log.action_lower.includes('masuk'),
@@ -800,9 +806,9 @@
                 series: [trustScore],
                 chart: {
                     type: 'radialBar',
-                    height: 180,
+                    height: 200,
                     fontFamily: 'inherit',
-                    offsetY: -15
+                    sparkline: { enabled: true }
                 },
                 plotOptions: {
                     radialBar: {
@@ -810,7 +816,7 @@
                         endAngle: 135,
                         hollow: {
                             margin: 15,
-                            size: '60%',
+                            size: '65%',
                             background: 'transparent',
                         },
                         track: {
@@ -828,17 +834,17 @@
                         dataLabels: {
                             show: true,
                             name: {
-                                offsetY: 20,
+                                offsetY: 25,
                                 show: true,
                                 color: '#64748b',
-                                fontSize: '10px',
+                                fontSize: '11px',
                                 fontWeight: 700
                             },
                             value: {
                                 offsetY: -10,
                                 color: trustScoreColor,
-                                fontSize: '32px',
-                                fontWeight: 800,
+                                fontSize: '36px',
+                                fontWeight: 900,
                                 show: true,
                                 formatter: function (val) {
                                     return val + "%";
@@ -1089,7 +1095,7 @@
                             .catch(err => {
                                 Swal.close();
                                 console.warn("Gagal membaca QR dari file gambar.", err);
-                                window.showAlert('Error', 'QR / Barcode tidak ditemukan pada gambar. Pastikan gambar jelas dan tidak buram.', 'error');
+                                window.showAlert('Error', '{{ __('ui.qr_not_found_on_image') }}', 'error');
                             })
                             .finally(() => {
                                 e.target.value = ''; // Reset file input

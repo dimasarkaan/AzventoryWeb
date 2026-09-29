@@ -3,9 +3,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-6">
-                <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                     {{ __('ui.reports_center') }}
-                </h2>
+                </h1>
                 <p class="mt-1 text-sm text-secondary-500">{{ __('ui.reports_desc') }}</p>
             </div>
 
@@ -115,18 +115,21 @@
                         </div>
 
                         <!-- Custom Date Range -->
-                        <div class="grid grid-cols-2 gap-4 mb-4" x-show="period === 'custom' && ['stock_mutation', 'borrowing_history'].includes(reportType)" x-transition>
-                            <div>
-                                <label for="start_date_input" class="block text-xs text-secondary-500 mb-1">{{ __('ui.start_date') }}</label>
-                                <input type="date" id="start_date_input" name="start_date" x-model="startDate" class="input-field w-full" :class="{'border-danger-500 focus:ring-danger-500': isDateInvalid}">
+                        <div class="mb-4 flatpickr-range-container" x-show="period === 'custom' && ['stock_mutation', 'borrowing_history'].includes(reportType)" x-transition>
+                            <label for="date_range_picker_hidden" class="block text-xs font-semibold text-secondary-600 uppercase tracking-wider mb-2">{{ __('ui.date_range') }}</label>
+                            <div class="relative group">
+                                <input type="text" id="date_range_picker_hidden" name="date_range"
+                                       class="range-picker-input w-full pl-12 pr-4 py-3 text-sm bg-white border-secondary-300 rounded-xl text-secondary-900 focus:ring-4 focus:ring-primary-500/10 focus:border-primary-500 transition-all cursor-pointer font-semibold placeholder:text-secondary-400"
+                                       placeholder="{{ __('ui.select_date_range') }}">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-secondary-400 group-focus-within:text-primary-500 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
+                                <input type="hidden" name="start_date" id="start_date_input" class="range-start" x-model="startDate">
+                                <input type="hidden" name="end_date" id="end_date_input" class="range-end" x-model="endDate">
                             </div>
-                            <div>
-                                <label for="end_date_input" class="block text-xs text-secondary-500 mb-1">{{ __('ui.end_date') }}</label>
-                                <input type="date" id="end_date_input" name="end_date" x-model="endDate" class="input-field w-full" :class="{'border-danger-500 focus:ring-danger-500': isDateInvalid}">
-                                <template x-if="isDateInvalid">
-                                    <p class="text-[10px] text-danger-600 mt-1">Tanggal akhir tidak boleh lebih awal dari mulai.</p>
-                                </template>
-                            </div>
+                            <template x-if="isDateInvalid">
+                                <p class="text-[10px] text-danger-600 mt-1">{{ __('ui.invalid_date_range') }}</p>
+                            </template>
                         </div>
 
                         <!-- Location Filter -->
@@ -197,22 +200,22 @@
                         <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 w-full sm:w-auto">
                             <span class="text-sm font-medium text-secondary-700">{{ __('ui.format_label') }}</span>
                             
-                            <div class="flex p-1 bg-secondary-200/50 rounded-xl w-full sm:w-auto">
+                            <div class="flex p-1 bg-secondary-200/50 rounded-xl w-full sm:w-auto gap-1 sm:gap-0">
                                 <!-- PDF Option -->
                                 <label class="relative cursor-pointer flex-1 sm:flex-none">
                                     <input type="radio" name="export_format" value="pdf" checked class="peer sr-only">
-                                    <div class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold text-secondary-500 hover:text-secondary-700 transition-all peer-checked:bg-white peer-checked:text-danger-600 peer-checked:shadow-sm peer-checked:ring-1 peer-checked:ring-secondary-200">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                        {{ __('ui.pdf_document') }}
+                                    <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold text-secondary-500 hover:text-secondary-700 transition-all peer-checked:bg-white peer-checked:text-danger-600 peer-checked:shadow-sm peer-checked:ring-1 peer-checked:ring-secondary-200">
+                                        <svg class="w-5 h-5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                        <span class="whitespace-nowrap text-center">{{ __('ui.pdf_document') }}</span>
                                     </div>
                                 </label>
                                 
                                 <!-- Excel Option -->
                                 <label class="relative cursor-pointer flex-1 sm:flex-none">
                                     <input type="radio" name="export_format" value="excel" class="peer sr-only">
-                                    <div class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold text-secondary-500 hover:text-secondary-700 transition-all peer-checked:bg-white peer-checked:text-success-600 peer-checked:shadow-sm peer-checked:ring-1 peer-checked:ring-secondary-200">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                        {{ __('ui.excel_document') }}
+                                    <div class="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 sm:py-2.5 rounded-lg text-xs sm:text-sm font-bold text-secondary-500 hover:text-secondary-700 transition-all peer-checked:bg-white peer-checked:text-success-600 peer-checked:shadow-sm peer-checked:ring-1 peer-checked:ring-secondary-200">
+                                        <svg class="w-5 h-5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        <span class="whitespace-nowrap text-center">{{ __('ui.excel_document') }}</span>
                                     </div>
                                 </label>
                             </div>
@@ -230,7 +233,7 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            <span x-show="loading" x-cloak>Memproses...</span>
+                            <span x-show="loading" x-cloak>{{ __('ui.processing') }}</span>
                         </button>
                     </div>
                 </form>
@@ -241,6 +244,8 @@
     @push('scripts')
     @include('reports.partials._report_scripts')
     @endpush
+    
+    <x-flatpickr />
 </x-app-layout>
 
 

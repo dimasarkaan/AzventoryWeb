@@ -52,6 +52,7 @@ class StockCriticalEvent implements ShouldBroadcast
             'severity' => $this->severity,
             'percentage' => $this->calculatePercentage(),
             'url' => route('inventory.show', $this->sparepart->id, false),
+            'actor_name' => auth()->user()->name ?? null,
         ];
     }
 

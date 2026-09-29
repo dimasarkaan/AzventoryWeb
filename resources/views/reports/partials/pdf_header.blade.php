@@ -10,7 +10,7 @@
                 }
             @endphp
         </div>
-        <span style="vertical-align: middle;">Azventory &bull; Dicetak oleh: {{ auth()->user()->name }} &bull; {{ now()->translatedFormat('d F Y, H:i') }} WIB</span>
+        <span style="vertical-align: middle;">Azventory &bull; {{ __('ui.printed_by_full') }}: {{ auth()->user()->name }} &bull; {{ now()->translatedFormat('d F Y, H:i') }} WIB</span>
     </div>
     <div class="pdf-footer-right"></div>
 </div>
@@ -22,7 +22,7 @@
     </div>
     <div class="pdf-company-info-cell">
         <div class="pdf-company-name">AZZAHRA COMPUTER</div>
-        <div class="pdf-company-tagline">Solusi Teknologi Terpercaya &bull; Laporan Resmi Inventaris</div>
+        <div class="pdf-company-tagline">{{ __('ui.company_tagline') }} &bull; {{ __('ui.official_inventory_report_short') }}</div>
     </div>
 </div>
 
@@ -31,11 +31,11 @@
     <h1>{{ $title }}</h1>
     <div class="pdf-report-meta">
         @if(!empty($startDate) && !empty($endDate))
-            Periode: {{ $startDate->translatedFormat('d F Y') }} &mdash; {{ $endDate->translatedFormat('d F Y') }}
+            {{ __('ui.period') }}: {{ $startDate->translatedFormat('d F Y') }} &mdash; {{ $endDate->translatedFormat('d F Y') }}
         @else
-            Periode: Semua Data
+            {{ __('ui.period') }}: {{ __('ui.period_all_data') }}
         @endif
         &nbsp;&bull;&nbsp;
-        Lokasi: {{ empty($location) || $location == 'all' ? 'Semua Lokasi' : $location }}
+        {{ __('ui.location') }}: {{ empty($location) || $location == 'all' ? __('ui.all_locations') : $location }}
     </div>
 </div>

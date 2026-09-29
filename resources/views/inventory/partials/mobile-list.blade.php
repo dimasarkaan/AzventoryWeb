@@ -143,7 +143,7 @@
                         <!-- Drag Handle -->
                         <div class="w-12 h-1.5 bg-secondary-200 rounded-full mx-auto mb-6"></div>
 
-                        <h3 class="text-lg font-bold text-secondary-900 mb-4 px-2">{{ $sparepart->name }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900 mb-4 px-2">{{ $sparepart->name }}</h2>
 
                         <div class="space-y-2">
                             @if(request('trash'))
@@ -161,8 +161,8 @@
                                 <form action="{{ route('inventory.force-delete', $sparepart->uuid) }}" method="POST" class="block w-full mt-2" novalidate>
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="flex items-center gap-4 w-full p-4 rounded-2xl bg-danger-50 text-danger-700 font-medium active:bg-danger-100 transition-colors text-left" onclick="confirmInventoryForceDelete(event)">
-                                        <svg class="w-6 h-6 text-danger-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    <button type="submit" class="flex items-center gap-4 w-full p-4 rounded-2xl bg-rose-50 text-rose-700 font-medium active:bg-rose-100 transition-colors text-left" onclick="confirmInventoryForceDelete(event)">
+                                        <svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         <span>{{ __('ui.force_delete') }}</span>
                                     </button>
                                 </form>
@@ -214,7 +214,7 @@
                 @endif
             </div>
 
-            <h3 class="text-xl font-semibold text-secondary-900 tracking-tight mb-2 text-center w-full">
+            <h2 class="text-xl font-semibold text-secondary-900 tracking-tight mb-2 text-center w-full">
                 @if(request('trash'))
                     {{ __('ui.trash_empty') }}
                 @elseif($isFiltered)
@@ -222,7 +222,7 @@
                 @else
                     {{ __('ui.inventory_empty') }}
                 @endif
-            </h3>
+            </h2>
 
             <div class="flex justify-center w-full px-6">
                 <p class="text-sm text-secondary-500 max-w-md leading-relaxed mx-auto text-center">

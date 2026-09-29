@@ -39,9 +39,9 @@
                                     </svg>
                                 </div>
                                 <div class="ml-4 text-left">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                    <h2 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                                         {{ __('ui.return_item_title') }}
-                                    </h3>
+                                    </h2>
 
                                 </div>
                             </div>

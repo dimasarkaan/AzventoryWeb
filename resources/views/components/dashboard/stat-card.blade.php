@@ -66,6 +66,22 @@
             'badge_text' => 'text-purple-700',
             'border' => 'hover:border-purple-100',
         ],
+        'fuchsia' => [
+            'bg' => 'bg-fuchsia-100',
+            'hover_bg' => 'group-hover:bg-fuchsia-200',
+            'text' => 'text-fuchsia-600',
+            'badge_bg' => 'bg-fuchsia-50',
+            'badge_text' => 'text-fuchsia-700',
+            'border' => 'hover:border-fuchsia-100',
+        ],
+        'pink' => [
+            'bg' => 'bg-pink-100',
+            'hover_bg' => 'group-hover:bg-pink-200',
+            'text' => 'text-pink-600',
+            'badge_bg' => 'bg-pink-50',
+            'badge_text' => 'text-pink-700',
+            'border' => 'hover:border-pink-100',
+        ],
     ];
 
     $c = $colors[$color] ?? $colors['primary'];

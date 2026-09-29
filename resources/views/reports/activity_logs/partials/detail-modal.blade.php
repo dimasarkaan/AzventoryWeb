@@ -21,7 +21,7 @@
                         
                         {{-- Header --}}
                         <div class="bg-secondary-50/50 px-6 py-4 border-b border-secondary-100 flex justify-between items-center">
-                            <h3 class="text-base font-bold text-secondary-900">Detail Aktivitas</h3>
+                            <h3 class="text-base font-bold text-secondary-900">{{ __('ui.activity_detail_title') }}</h3>
                             <button @click="showActivityModal = false" class="text-secondary-400 hover:text-secondary-600 transition-colors">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
@@ -42,14 +42,14 @@
 
                             {{-- Properties Table (The Audit Core) --}}
                             <div class="mb-4" x-show="selectedActivity && hasVisibleProperties(selectedActivity.properties)">
-                                <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-widest mb-3">Detail Perubahan Data</h4>
+                                <h4 class="text-xs font-bold text-secondary-400 uppercase tracking-widest mb-3">{{ __('ui.change_details') }}</h4>
                                 <div class="overflow-hidden border border-secondary-200 rounded-xl shadow-sm bg-white">
                                     <table class="min-w-full divide-y divide-secondary-200">
                                         <thead class="bg-secondary-50/50">
                                             <tr>
-                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest">Kolom</th>
-                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-red-50/30">Sebelum</th>
-                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-green-50/30">Sesudah</th>
+                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest">{{ __('ui.column_label') }}</th>
+                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-red-50/30">{{ __('ui.before_label') }}</th>
+                                                <th class="px-4 py-2 text-left text-[10px] font-bold text-secondary-500 uppercase tracking-widest bg-green-50/30">{{ __('ui.after_label') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-secondary-100">
@@ -72,12 +72,12 @@
                             {{-- Metadata Info --}}
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div class="p-3 bg-white rounded-2xl border border-secondary-200 shadow-sm flex flex-col min-w-0">
-                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">Pengguna</p>
+                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">{{ __('ui.user_label') }}</p>
                                     <p class="text-sm font-bold text-secondary-900 leading-tight break-all" x-text="selectedActivity?.user?.name || selectedActivity?.user_name || 'System'"></p>
                                     <p class="text-[10px] text-secondary-500 font-mono mt-1 break-all" x-text="selectedActivity?.user?.email || selectedActivity?.user_email || ''"></p>
                                 </div>
                                 <div class="p-3 bg-white rounded-2xl border border-secondary-200 shadow-sm flex flex-col min-w-0">
-                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">Waktu Presisi</p>
+                                    <p class="text-[10px] font-bold text-secondary-500 uppercase tracking-widest mb-1.5">{{ __('ui.precise_time') }}</p>
                                     <p class="text-sm font-bold text-secondary-900" 
                                        x-text="selectedActivity ? new Date(selectedActivity.created_at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'medium' }) : '-'"></p>
                                 </div>

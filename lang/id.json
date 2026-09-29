@@ -1,4 +1,10 @@
 {
     "The :attribute field is required.": "Kolom :attribute wajib diisi.",
-    "The :attribute has already been taken.": ":attribute sudah digunakan."
+    "The :attribute has already been taken.": ":attribute sudah digunakan.",
+    "Showing": "Menampilkan",
+    "to": "hingga",
+    "of": "dari total",
+    "results": "data",
+    "Pagination Navigation": "Navigasi Halaman",
+    "Go to page :page": "Ke halaman :page"
 }

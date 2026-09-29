@@ -42,22 +42,7 @@
              }"
              x-init="window.addEventListener('online', () => { isOffline = false; showOfflineOverlay = false; }); 
                      window.addEventListener('offline', () => isOffline = true);
-                     
-                     // Global Listener for Navigation while Offline
-                     window.addEventListener('click', (e) => {
-                         const link = e.target.closest('a');
-                         if (link && isOffline && link.href && !link.href.startsWith('#') && !link.href.startsWith('javascript:')) {
-                             e.preventDefault();
-                             showOfflineOverlay = true;
-                         }
-                     }, true);
-                     
-                     window.addEventListener('submit', (e) => {
-                         if (isOffline) {
-                             e.preventDefault();
-                             showOfflineOverlay = true;
-                         }
-                     }, true)">
+                     ">
             
             <!-- Global Offline Overlay (Triggered on Action) -->
             <div x-show="showOfflineOverlay" 
@@ -109,7 +94,7 @@
                         
                         <button @click="showOfflineOverlay = false" 
                                 class="text-slate-400 hover:text-slate-600 font-medium py-2 transition-colors">
-                            Kembali Lihat Halaman
+                            {{ __('ui.back_to_page') }}
                         </button>
                     </div>
                 </div>
@@ -142,7 +127,7 @@
                  class="fixed bottom-24 sm:bottom-12 left-1/2 -translate-x-1/2 z-[100000] w-[calc(100%-2rem)] max-w-sm bg-slate-900/90 backdrop-blur-xl text-white px-5 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10"
                  x-cloak>
                 <div class="flex-shrink-0 w-2.5 h-2.5 bg-orange-500 rounded-full animate-ping"></div>
-                <span class="font-semibold tracking-wide text-sm sm:text-base">Koneksi masih terputus...</span>
+                <span class="font-semibold tracking-wide text-sm sm:text-base">{{ __('ui.connection_lost') }}</span>
             </div>
         </div>
 
@@ -153,6 +138,9 @@
                  <!-- Background Circle Decoration -->
                 <div class="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-primary-500 opacity-50 blur-3xl"></div>
                 <div class="absolute bottom-0 right-0 w-[500px] h-[500px] rounded-full bg-primary-700 opacity-50 blur-3xl"></div>
+                
+                <!-- Dot Pattern Background -->
+                <div class="absolute inset-0 z-0 opacity-20" style="background-image: radial-gradient(#ffffff 1.2px, transparent 1.2px); background-size: 32px 32px;"></div>
                 
                 <div class="relative z-10 text-white max-w-lg">
                     <div class="flex items-center gap-3 mb-8">
@@ -197,5 +185,6 @@
                 </div>
             </div>
         </div>
+        @stack('scripts')
     </body>
 </html>

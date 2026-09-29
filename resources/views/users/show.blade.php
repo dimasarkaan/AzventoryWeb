@@ -4,9 +4,9 @@
             <!-- Header -->
             <div class="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                     <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.user_detail') }}
-                    </h2>
+                    </h1>
                     <p class="mt-1 text-sm text-secondary-500">
                         {{ __('ui.user_detail_desc') }}
                     </p>
@@ -42,7 +42,7 @@
                             </div>
                         </div>
                         
-                        <h3 class="text-xl font-bold text-secondary-900">{{ $user->name }}</h3>
+                        <h2 class="text-xl font-bold text-secondary-900">{{ $user->name }}</h2>
                         <p class="text-sm text-secondary-500 font-mono mb-4">@ {{ $user->username }}</p>
 
                         <div class="flex items-center gap-2 mb-6">
@@ -74,7 +74,7 @@
                 <!-- Right Column: Details -->
                 <div class="lg:col-span-2 space-y-4">
                     <div class="card p-6">
-                        <h3 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">{{ __('ui.contact_detail_info') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">{{ __('ui.contact_detail_info') }}</h2>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -105,33 +105,27 @@
                     </div>
                 <!-- Borrowing History (Moved inside col-span-2) -->
                 <div class="card p-6 mt-4">
-                    <h3 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">{{ __('ui.borrowing_history') }}</h3>
+                    <h2 class="text-lg font-bold text-secondary-900 border-b border-secondary-100 pb-2 mb-4">{{ __('ui.borrowing_history') }}</h2>
                     
-                    @php
-                        $totalBorrowings = $user->borrowings->count();
-                        $activeBorrowings = $user->borrowings->where('status', 'borrowed')->count();
-                        $overdueBorrowings = $user->borrowings->where('status', 'borrowed')->filter(function($b) {
-                            return $b->expected_return_at && $b->expected_return_at < now();
-                        })->count();
-                    @endphp
 
                     <!-- Borrowing Stats -->
                     <div class="grid grid-cols-3 gap-4 mb-6">
                         <div class="bg-secondary-50 rounded-xl p-4 border border-secondary-200 shadow-sm flex flex-col items-center justify-center text-center">
                             <span class="text-2xl md:text-3xl font-black text-secondary-700">{{ $totalBorrowings }}</span>
-                            <span class="text-[10px] md:text-xs font-bold text-secondary-500 uppercase tracking-wide mt-1 text-balance">Total</span>
+                            <span class="text-[10px] md:text-xs font-bold text-secondary-500 uppercase tracking-wide mt-1 text-balance">{{ __('ui.total') }}</span>
                         </div>
                         <div class="bg-warning-50 rounded-xl p-4 border border-warning-200 shadow-sm flex flex-col items-center justify-center text-center">
                             <span class="text-2xl md:text-3xl font-black text-warning-600">{{ $activeBorrowings }}</span>
-                            <span class="text-[10px] md:text-xs font-bold text-warning-600 uppercase tracking-wide mt-1 text-balance">Dipinjam</span>
+                            <span class="text-[10px] md:text-xs font-bold text-warning-600 uppercase tracking-wide mt-1 text-balance">{{ __('ui.borrowed') }}</span>
                         </div>
                         <div class="bg-danger-50 rounded-xl p-4 border border-danger-200 shadow-sm flex flex-col items-center justify-center text-center">
                             <span class="text-2xl md:text-3xl font-black text-danger-600">{{ $overdueBorrowings }}</span>
-                            <span class="text-[10px] md:text-xs font-bold text-danger-600 uppercase tracking-wide mt-1 text-balance">Terlambat</span>
+                            <span class="text-[10px] md:text-xs font-bold text-danger-600 uppercase tracking-wide mt-1 text-balance">{{ __('ui.overdue') }}</span>
                         </div>
                     </div>
                     
-                    <div class="overflow-x-auto">
+                    <!-- Desktop Table View -->
+                    <div class="hidden md:block overflow-hidden">
                         <table class="table-modern w-full">
                             <thead>
                                 <tr>
@@ -143,7 +137,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($user->borrowings->sortByDesc('created_at') as $borrowing)
+                                @forelse($borrowings as $borrowing)
                                     <tr class="group hover:bg-secondary-50 transition-colors">
                                         <td>
                                             <div class="font-medium text-secondary-900">{{ $borrowing->sparepart->name ?? __('ui.item_deleted') }}</div>
@@ -188,8 +182,64 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <div class="block md:hidden space-y-3 mt-4">
+                        @forelse($borrowings as $borrowing)
+                            <div class="bg-white border border-secondary-200 rounded-xl p-4 shadow-sm">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h4 class="font-bold text-secondary-900">{{ $borrowing->sparepart->name ?? __('ui.item_deleted') }}</h4>
+                                        <p class="text-xs text-secondary-500 mt-0.5">{{ $borrowing->quantity }} Barang</p>
+                                    </div>
+                                    @if($borrowing->status === 'returned')
+                                        <span class="badge badge-success text-[10px]">{{ __('ui.status_returned_badge') }}</span>
+                                    @elseif($borrowing->status === 'borrowed')
+                                        @if($borrowing->expected_return_at < now())
+                                            <span class="badge badge-danger text-[10px]">{{ __('ui.status_overdue') }}</span>
+                                        @else
+                                            <span class="badge badge-warning text-[10px]">{{ __('ui.status_borrowed') }}</span>
+                                        @endif
+                                    @else
+                                        <span class="badge badge-secondary text-[10px]">{{ ucfirst($borrowing->status) }}</span>
+                                    @endif
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 text-xs border-t border-secondary-100 pt-3">
+                                    <div>
+                                        <span class="text-secondary-400 block mb-1">{{ __('ui.borrow_date') }}</span>
+                                        <span class="text-secondary-900 font-medium">{{ $borrowing->borrowed_at->translatedFormat('d M Y') }}</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-secondary-400 block mb-1">{{ $borrowing->returned_at ? __('ui.return_date') : __('ui.due_date') }}</span>
+                                        @if($borrowing->returned_at)
+                                            <span class="text-secondary-900 font-medium">{{ $borrowing->returned_at->translatedFormat('d M Y') }}</span>
+                                        @else
+                                            <span class="text-secondary-900 font-medium">{{ $borrowing->expected_return_at ? $borrowing->expected_return_at->translatedFormat('d M Y') : '-' }}</span>
+                                        @endif
+                                    </div>
+                                </div>
+                                @if($borrowing->notes)
+                                    <div class="mt-3 text-xs text-secondary-500 italic bg-secondary-50 p-2 rounded-lg">
+                                        {{ $borrowing->notes }}
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            <div class="text-center py-6 text-secondary-500 bg-secondary-50 rounded-xl border border-secondary-100">
+                                <svg class="w-8 h-8 mx-auto mb-2 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <p class="text-sm">{{ __('ui.borrowing_history_empty') }}</p>
+                            </div>
+                        @endforelse
+                    </div>
+
+                    <!-- Pagination -->
+                    @if($borrowings->hasPages())
+                        <div class="mt-6 border-t border-secondary-100 pt-4">
+                            {{ $borrowings->links() }}
+                        </div>
+                    @endif
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </x-app-layout>

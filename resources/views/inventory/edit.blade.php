@@ -2,9 +2,9 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-6">
-                <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                     {{ __('ui.edit_inventory_title') }}
-                </h2>
+                </h1>
                 <p class="mt-1 text-sm text-secondary-500">{{ __('ui.edit_inventory_subtitle') }}</p>
             </div>
 
@@ -23,7 +23,7 @@
                     <!-- Section 1: Informasi Dasar -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
-                            <h3 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_basic') }}</h3>
+                            <h2 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_basic') }}</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Tipe Barang -->
@@ -220,7 +220,7 @@
                     <!-- Section 2: Detail Lokasi & Stok -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
-                             <h3 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_location_stock') }}</h3>
+                             <h2 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_location_stock') }}</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Location Component -->
@@ -325,7 +325,7 @@
                     <!-- Section 3: Harga & Status -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
-                            <h3 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_price_status') }}</h3>
+                            <h2 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_price_status') }}</h2>
                         </div>
                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                              <!-- Harga -->
@@ -392,8 +392,8 @@
                                 <label for="status" class="input-label">{{ __('ui.status') }} <span class="text-danger-500">*</span></label>
                                 @php
                                     $statusOptions = [
-                                        'aktif' => 'Aktif',
-                                        'nonaktif' => 'Nonaktif',
+                                        'aktif' => __('ui.active'),
+                                        'nonaktif' => __('ui.inactive'),
                                     ];
                                 @endphp
                                 <x-select name="status" :options="$statusOptions" :selected="old('status', $sparepart->status)" placeholder="{{ __('ui.select_status') }}" width="w-full" />
@@ -403,11 +403,11 @@
                     </div>
                     @include('inventory.partials.scan-modal')
                 </div>
-                <div class="flex items-center justify-end gap-3 mt-4">
-                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary">
+                <div class="flex flex-col sm:flex-row items-center sm:justify-end gap-3 mt-6">
+                    <a href="{{ route('inventory.index') }}" class="btn btn-secondary w-full sm:w-auto justify-center">
                         {{ __('ui.cancel') }}
                     </a>
-                    <button type="submit" data-testid="btn-submit-inventory-edit" class="btn btn-primary" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
+                    <button type="submit" data-testid="btn-submit-inventory-edit" class="btn btn-primary w-full sm:w-auto justify-center" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
                         <span x-show="!isSubmitting">{{ __('ui.save_changes') }}</span>
                         <span x-show="isSubmitting" class="flex items-center gap-2">
                             <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -462,7 +462,7 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <h3 class="text-lg font-bold text-secondary-900">Barang Duplikat Terdeteksi!</h3>
+                            <h2 class="text-lg font-bold text-secondary-900">Barang Duplikat Terdeteksi!</h2>
                             <p class="text-sm text-secondary-600 mt-0.5">Perubahan Anda akan membuat item ini identik dengan barang yang sudah ada.</p>
                         </div>
                     </div>

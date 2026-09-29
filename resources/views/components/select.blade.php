@@ -1,4 +1,4 @@
-﻿@props(['name', 'id' => null, 'options' => [], 'selected' => '', 'placeholder' => 'Pilih Opsi', 'submitOnChange' => false, 'width' => 'w-full md:w-auto', 'allowClear' => true])
+@props(['name', 'id' => null, 'options' => [], 'selected' => '', 'placeholder' => __('ui.select_option'), 'submitOnChange' => false, 'width' => 'w-full md:w-auto', 'allowClear' => true])
 @php
     $id = $id ?? $name;
 @endphp

@@ -167,16 +167,20 @@ class OperatorDashboardController extends Controller
 
             // Menghitung angka Nilai Kedisiplinan / Kepercayaan (Trust Score)
             // Sistem akan menilai apakah user ini hobi telat mengembalikan barang atau selalu on-time
-            $stats = \App\Models\Borrowing::where('user_id', $userId)
-                ->selectRaw('COUNT(*) as total, 
-                    SUM(CASE WHEN returned_at IS NOT NULL AND returned_at > expected_return_at THEN 1 ELSE 0 END) as returned_late,
-                    SUM(CASE WHEN returned_at IS NULL AND expected_return_at < ? THEN 1 ELSE 0 END) as active_overdue', [now()])
-                ->first();
+            $allBorrowings = \App\Models\Borrowing::where('user_id', $userId)->get(['expected_return_at', 'returned_at']);
+            
+            $totalEvaluated = $allBorrowings->count();
 
-            $totalEvaluated = $stats->total;
+            $returnedLate = $allBorrowings->filter(function($b) {
+                return $b->returned_at && $b->expected_return_at && $b->returned_at->startOfDay()->gt($b->expected_return_at->startOfDay());
+            })->count();
+
+            $activeOverdue = $allBorrowings->filter(function($b) {
+                return !$b->returned_at && $b->expected_return_at && $b->expected_return_at->startOfDay()->lt(now()->startOfDay());
+            })->count();
 
             // Total poin dosa (jumlah telat mengembalikan + yang sekarang masih dipinjam tapi sudah lewat jatuh tempo)
-            $totalLate = $stats->returned_late + $stats->active_overdue;
+            $totalLate = $returnedLate + $activeOverdue;
 
             // Jika user belum pernah meminjam sama sekali, kita beri modal angka 100 langsung.
             $trustScore = $totalEvaluated > 0 ? round((($totalEvaluated - $totalLate) / $totalEvaluated) * 100) : 100;

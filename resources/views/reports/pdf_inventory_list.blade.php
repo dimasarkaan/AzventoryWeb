@@ -33,9 +33,9 @@
                 <td style="text-align: center;">{{ $item->stock }} {{ $item->unit }}</td>
                 <td>
                     @if(strtolower($item->condition) === 'rusak')
-                        <span class="badge badge-danger">Rusak</span>
+                        <span class="badge badge-danger">{{ __('ui.condition_broken') }}</span>
                     @elseif(strtolower($item->condition) === 'hilang')
-                        <span class="badge badge-secondary" style="background:#f1f5f9;color:#475569;border-color:#cbd5e1;">Hilang</span>
+                        <span class="badge badge-secondary" style="background:#f1f5f9;color:#475569;border-color:#cbd5e1;">{{ __('ui.condition_lost') }}</span>
                     @elseif($item->stock == 0)
                         <span class="badge badge-danger">{{ __('ui.status_out_of_stock') }}</span>
                     @elseif($item->minimum_stock > 0)

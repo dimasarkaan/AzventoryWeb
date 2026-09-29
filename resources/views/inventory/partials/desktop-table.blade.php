@@ -26,10 +26,10 @@
             </thead>
             <tbody id="inventory-desktop-body">
                 @forelse ($spareparts as $sparepart)
-                    <x-inventory.table-row :sparepart="$sparepart" :trash="request('trash')" />
+                    <x-inventory.table-row :sparepart="$sparepart" :trash="request('trash')" :index="$loop->index" />
                 @empty
-                    <tr>
-                        <td colspan="{{ (auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN)) ? (request('filter') == 'problematic' ? '6' : '9') : (request('filter') == 'problematic' ? '5' : '8') }}" class="py-24" style="text-align:center;">
+                    <tr class="hover:bg-transparent">
+                        <td colspan="{{ (auth()->user()->role === \App\Enums\UserRole::SUPERADMIN || (!request('trash') && auth()->user()->role === \App\Enums\UserRole::ADMIN)) ? (request('filter') == 'problematic' ? '6' : '9') : (request('filter') == 'problematic' ? '5' : '8') }}" class="py-24 !bg-white cursor-default" style="text-align:center;">
                             @php
                                 $isFiltered = request('search') || request('category') || request('brand') || request('location') || request('color') || request('type') || request('condition');
                                 $bgCircle = request('trash') ? 'bg-danger-50 text-danger-500' : ($isFiltered ? 'bg-primary-50 text-primary-500' : 'bg-secondary-50 text-secondary-400');
@@ -68,7 +68,7 @@
                                     <div class="mt-5">
                                         <a href="{{ route('inventory.index', request()->only(['trash', 'filter'])) }}" class="btn btn-primary inline-flex items-center">
                                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                            Hapus Semua Filter & Pencarian
+                                            {{ __('ui.clear_all_filters') }}
                                         </a>
                                     </div>
                                 @endif

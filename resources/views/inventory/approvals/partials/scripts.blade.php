@@ -1,4 +1,4 @@
-    @push('scripts')
+﻿    @push('scripts')
     <script>
         // JS scripts remain largely the same, but with updated selectors if needed
         function confirmReject(event) {
@@ -91,93 +91,145 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAll = document.getElementById('select-all');
-            const selectAllMobile = document.getElementById('select-all-mobile');
+        const STORAGE_KEY = 'az_approval_bulk_selections';
+        let lastCheckedBox = null;
+
+        window.getApprovalBulkIds = function() {
+            try {
+                return new Set(JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || []);
+            } catch(e) {
+                return new Set();
+            }
+        };
+
+        window.saveApprovalBulkIds = function(set) {
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
+        };
+
+        function updateBulkUI() {
             const bulkContainer = document.getElementById('bulk-actions-container');
             const selectedCountDisplay = document.getElementById('selected-count');
+            const selectAll = document.getElementById('select-all');
+            const selectAllMobile = document.getElementById('select-all-mobile');
 
-            function updateBulkUI() {
-                const checkboxesByClass = document.querySelectorAll('.row-checkbox');
-                const checkedCount = Array.from(checkboxesByClass).filter(cb => cb.checked).length;
-                
-                if (checkedCount > 0) {
+            const selectedIds = window.getApprovalBulkIds();
+            const checkedCount = selectedIds.size;
+            
+            if (checkedCount > 0) {
+                if (bulkContainer) {
                     bulkContainer.classList.remove('hidden');
                     bulkContainer.classList.add('flex');
-                    selectedCountDisplay.textContent = checkedCount;
-                } else {
+                }
+                if (selectedCountDisplay) selectedCountDisplay.textContent = checkedCount;
+            } else {
+                if (bulkContainer) {
                     bulkContainer.classList.add('hidden');
                     bulkContainer.classList.remove('flex');
                 }
-
-                // Sync select all status
-                const allChecked = checkedCount > 0 && checkedCount === checkboxesByClass.length;
-                if (selectAll) selectAll.checked = allChecked;
-                if (selectAllMobile) selectAllMobile.checked = allChecked;
             }
 
-            window.clearBulkSelection = function() {
-                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
-                if (selectAll) selectAll.checked = false;
-                if (selectAllMobile) selectAllMobile.checked = false;
-                updateBulkUI();
-            };
+            // Sync select all status (if all checkboxes on current page are checked and > 0)
+            const checkboxesByClass = document.querySelectorAll('.row-checkbox');
+            const allChecked = checkboxesByClass.length > 0 && Array.from(checkboxesByClass).every(cb => cb.checked);
+            if (selectAll) selectAll.checked = allChecked;
+            if (selectAllMobile) selectAllMobile.checked = allChecked;
+        }
 
-            if (selectAll) {
-                selectAll.addEventListener('change', function() {
-                    document.querySelectorAll('.row-checkbox').forEach(cb => {
-                        cb.checked = selectAll.checked;
-                    });
-                    if (selectAllMobile) selectAllMobile.checked = selectAll.checked;
-                    updateBulkUI();
-                });
-            }
+        window.clearBulkSelection = function() {
+            sessionStorage.removeItem(STORAGE_KEY);
+            document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+            const selectAll = document.getElementById('select-all');
+            const selectAllMobile = document.getElementById('select-all-mobile');
+            if (selectAll) selectAll.checked = false;
+            if (selectAllMobile) selectAllMobile.checked = false;
+            updateBulkUI();
+        };
 
-            if (selectAllMobile) {
-                selectAllMobile.addEventListener('change', function() {
-                    document.querySelectorAll('.row-checkbox').forEach(cb => {
-                        cb.checked = selectAllMobile.checked;
-                    });
-                    if (selectAll) selectAll.checked = selectAllMobile.checked;
-                    updateBulkUI();
-                });
-            }
+        window.restoreApprovalBulkState = function() {
+            const selectedIds = window.getApprovalBulkIds();
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.checked = selectedIds.has(cb.value);
+            });
+            updateBulkUI();
+        };
 
+        document.addEventListener('DOMContentLoaded', function() {
+            window.restoreApprovalBulkState();
+
+            // Event Delegation for Checkboxes
             document.body.addEventListener('change', function(e) {
-                if(e.target.classList.contains('row-checkbox')) {
+                // Select All Logic
+                if (e.target.id === 'select-all' || e.target.id === 'select-all-mobile') {
+                    const isChecked = e.target.checked;
+                    const selectedIds = window.getApprovalBulkIds();
+                    
+                    document.querySelectorAll('.row-checkbox').forEach(cb => {
+                        cb.checked = isChecked;
+                        if (isChecked) {
+                            selectedIds.add(cb.value);
+                        } else {
+                            selectedIds.delete(cb.value);
+                        }
+                    });
+                    
+                    window.saveApprovalBulkIds(selectedIds);
+                    
+                    const selectAll = document.getElementById('select-all');
+                    const selectAllMobile = document.getElementById('select-all-mobile');
+                    if (selectAll) selectAll.checked = isChecked;
+                    if (selectAllMobile) selectAllMobile.checked = isChecked;
+                    
+                    updateBulkUI();
+                    return;
+                }
+
+                // Individual Checkbox Logic
+                if (e.target.classList.contains('row-checkbox')) {
+                    const selectedIds = window.getApprovalBulkIds();
+                    if (e.target.checked) {
+                        selectedIds.add(e.target.value);
+                    } else {
+                        selectedIds.delete(e.target.value);
+                    }
+                    window.saveApprovalBulkIds(selectedIds);
                     updateBulkUI();
                 }
             });
 
-            window.rebindBulkEvents = function() {
-                const newSelectAll = document.getElementById('select-all');
-                const newSelectAllMobile = document.getElementById('select-all-mobile');
-                
-                if (newSelectAll) {
-                    newSelectAll.addEventListener('change', function() {
-                        document.querySelectorAll('.row-checkbox').forEach(cb => {
-                            cb.checked = newSelectAll.checked;
-                        });
-                        if (newSelectAllMobile) newSelectAllMobile.checked = newSelectAll.checked;
-                        updateBulkUI();
-                    });
+            // Shift-Click Logic
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('row-checkbox')) {
+                    if (e.shiftKey && lastCheckedBox) {
+                        const checkboxes = Array.from(document.querySelectorAll('.row-checkbox'));
+                        const start = checkboxes.indexOf(lastCheckedBox);
+                        const end = checkboxes.indexOf(e.target);
+                        
+                        if (start !== -1 && end !== -1) {
+                            const min = Math.min(start, end);
+                            const max = Math.max(start, end);
+                            
+                            const selectedIds = window.getApprovalBulkIds();
+                            for (let i = min; i <= max; i++) {
+                                if (checkboxes[i] !== e.target) {
+                                    checkboxes[i].checked = e.target.checked;
+                                    if (e.target.checked) {
+                                        selectedIds.add(checkboxes[i].value);
+                                    } else {
+                                        selectedIds.delete(checkboxes[i].value);
+                                    }
+                                }
+                            }
+                            window.saveApprovalBulkIds(selectedIds);
+                            updateBulkUI();
+                        }
+                    }
+                    lastCheckedBox = e.target;
                 }
-
-                if (newSelectAllMobile) {
-                    newSelectAllMobile.addEventListener('change', function() {
-                        document.querySelectorAll('.row-checkbox').forEach(cb => {
-                            cb.checked = newSelectAllMobile.checked;
-                        });
-                        if (newSelectAll) newSelectAll.checked = newSelectAllMobile.checked;
-                        updateBulkUI();
-                    });
-                }
-            };
+            });
             
             if (window.Echo) {
                 window.Echo.private('stock-approvals')
                     .listen('.StockApprovalUpdated', (e) => {
-                        const checkedIds = Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.value);
                         fetch(window.location.href)
                             .then(res => res.text())
                             .then(html => {
@@ -186,12 +238,7 @@
                                 const newContainer = doc.getElementById('approvals-list-container');
                                 if (newContainer) {
                                     document.getElementById('approvals-list-container').innerHTML = newContainer.innerHTML;
-                                    checkedIds.forEach(id => {
-                                        const cb = document.querySelector(`.row-checkbox[value="${id}"]`);
-                                        if (cb) cb.checked = true;
-                                    });
-                                    window.rebindBulkEvents();
-                                    updateBulkUI();
+                                    window.restoreApprovalBulkState();
                                 }
                             });
                     });
@@ -203,19 +250,19 @@
             const statusInput = document.getElementById('bulk-status');
             const rejectionReasonInput = document.getElementById('bulk-rejection-reason');
             const idsContainer = document.getElementById('bulk-ids-container');
-            const selectedCheckBoxes = document.querySelectorAll('.row-checkbox:checked');
-            const checkedCount = selectedCheckBoxes.length;
+            const selectedIds = window.getApprovalBulkIds();
+            const checkedCount = selectedIds.size;
             const approveBtn = document.getElementById('bulk-approve-btn');
             const rejectBtn = document.getElementById('bulk-reject-btn');
 
             if (checkedCount === 0) return;
 
             idsContainer.innerHTML = '';
-            selectedCheckBoxes.forEach(cb => {
+            selectedIds.forEach(id => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = 'ids[]';
-                input.value = cb.value;
+                input.value = id;
                 idsContainer.appendChild(input);
             });
 
@@ -258,6 +305,7 @@
                         rejectionReasonInput.value = '';
                         if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.6'; }
                         if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.style.opacity = '0.6'; }
+                        sessionStorage.removeItem(STORAGE_KEY);
                         form.submit();
                         setTimeout(resolve, 3000);
                     });
@@ -277,6 +325,7 @@
                         rejectionReasonInput.value = value;
                         if (approveBtn) { approveBtn.disabled = true; approveBtn.style.opacity = '0.6'; }
                         if (rejectBtn) { rejectBtn.disabled = true; rejectBtn.style.opacity = '0.6'; }
+                        sessionStorage.removeItem(STORAGE_KEY);
                         form.submit();
                         setTimeout(resolve, 3000);
                     });

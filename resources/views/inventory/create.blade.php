@@ -2,9 +2,9 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-6">
-                <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                     {{ __('ui.create_inventory_title') }}
-                </h2>
+                </h1>
                 <p class="mt-1 text-sm text-secondary-500">{{ __('ui.create_inventory_subtitle') }}</p>
             </div>
 
@@ -24,7 +24,7 @@
                     <!-- Section 1: Informasi Dasar -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
-                            <h3 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_basic') }}</h3>
+                            <h2 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_basic') }}</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Tipe Barang -->
@@ -200,7 +200,7 @@
                     <!-- Section 2: Detail Lokasi & Stok -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
-                            <h3 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_location_stock') }}</h3>
+                            <h2 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_location_stock') }}</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Location Component -->
@@ -305,7 +305,7 @@
                     <!-- Section 3: Harga & Status -->
                     <div class="card p-6 overflow-visible">
                         <div class="mb-4 border-b border-secondary-100 pb-2">
-                            <h3 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_price_status') }}</h3>
+                            <h2 class="text-lg font-semibold text-secondary-900">{{ __('ui.section_price_status') }}</h2>
                         </div>
                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                              <!-- Harga -->
@@ -372,8 +372,8 @@
                                 <label for="status" class="input-label">{{ __('ui.status') }} <span class="text-danger-500">*</span></label>
                                 @php
                                     $statusOptions = [
-                                        'aktif' => 'Aktif',
-                                        'nonaktif' => 'Nonaktif',
+                                        'aktif' => __('ui.active'),
+                                        'nonaktif' => __('ui.inactive'),
                                     ];
                                 @endphp
                                 <x-select name="status" :options="$statusOptions" :selected="old('status', 'aktif')" placeholder="{{ __('ui.select_status') }}" width="w-full" />
@@ -384,31 +384,31 @@
                     @include('inventory.partials.scan-modal')
                 </div>
 
-                <div class="flex items-center justify-between mt-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between mt-6 gap-4">
                     <!-- Left side: Draft status / Auto-save indicator -->
-                    <div class="flex items-center gap-2 text-sm text-secondary-500 font-medium">
+                    <div class="flex items-center gap-2 text-xs sm:text-sm text-secondary-500 font-medium order-2 sm:order-1 w-full justify-center sm:justify-start">
                         <div class="relative flex h-3 w-3">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75" x-show="isSavingDraft"></span>
                             <span class="relative inline-flex rounded-full h-3 w-3" :class="isSavingDraft ? 'bg-primary-500' : (hasDraft ? 'bg-success-500' : 'bg-secondary-300')"></span>
                         </div>
-                        <span x-show="!hasDraft && !isSavingDraft">Belum ada draf</span>
-                        <span x-show="isSavingDraft">Menyimpan draf...</span>
-                        <span x-show="hasDraft && !isSavingDraft">Draf otomatis</span>
+                        <span x-show="!hasDraft && !isSavingDraft">{{ __('ui.draft_empty') }}</span>
+                        <span x-show="isSavingDraft">{{ __('ui.draft_saving') }}</span>
+                        <span x-show="hasDraft && !isSavingDraft">{{ __('ui.draft_auto') }}</span>
                     </div>
 
                     <!-- Right side: Actions -->
-                    <div class="flex items-center gap-3">
-                        <a href="{{ route('inventory.index') }}" class="btn btn-secondary" @click="clearDraft()">
+                    <div class="flex items-center gap-3 w-full sm:w-auto order-1 sm:order-2">
+                        <a href="{{ route('inventory.index') }}" class="btn btn-secondary flex-1 sm:flex-none justify-center" @click="clearDraft()">
                             {{ __('ui.cancel') }}
                         </a>
-                        <button type="submit" data-testid="btn-submit-inventory" class="btn btn-primary" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
+                        <button type="submit" data-testid="btn-submit-inventory" class="btn btn-primary flex-1 sm:flex-none justify-center" :disabled="isSubmitting" :class="{ 'opacity-75 cursor-not-allowed': isSubmitting }">
                             <span x-show="!isSubmitting">{{ __('ui.save_sparepart') }}</span>
                             <span x-show="isSubmitting" class="flex items-center gap-2">
                                 <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
-                                Menyimpan...
+                                {{ __('ui.saving') }}
                             </span>
                         </button>
                     </div>

@@ -1,19 +1,63 @@
-﻿    <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             // --- Bulk Actions Logic ---
             const selectAll = document.getElementById('selectAll');
             const floatingBar = document.getElementById('bulk-action-bar');
             const countLabel = document.getElementById('selected-count');
             
+            // Persistent storage for full page reloads
+            const STORAGE_KEY = 'azventory_user_bulk_selections';
+            
+            window.getSelectedUserIds = function() {
+                try {
+                    return new Set(JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || []);
+                } catch(e) {
+                    return new Set();
+                }
+            };
+            
+            window.saveSelectedUserIds = function(set) {
+                sessionStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
+            };
+
             // Function to attach checkbox listeners (needed for initial load AND after AJAX)
             window.attachCheckboxListeners = function() {
                 const checkboxes = document.querySelectorAll('.user-checkbox');
+                const selectedIds = getSelectedUserIds();
+                
                 checkboxes.forEach(cb => {
-                    // Remove old listener to avoid duplicates if any (though replacement helps)
-                    cb.removeEventListener('change', updateFloatingBar);
-                    cb.addEventListener('change', updateFloatingBar);
+                    // Restore checked state from storage
+                    cb.checked = selectedIds.has(cb.value);
+                    
+                    cb.removeEventListener('change', handleCheckboxChange);
+                    cb.addEventListener('change', handleCheckboxChange);
                 });
+                
+                // Sync select all state
+                syncSelectAllState();
+                updateFloatingBar();
             };
+            
+            function handleCheckboxChange(e) {
+                const selectedIds = getSelectedUserIds();
+                if (e.target.checked) {
+                    selectedIds.add(e.target.value);
+                } else {
+                    selectedIds.delete(e.target.value);
+                }
+                saveSelectedUserIds(selectedIds);
+                syncSelectAllState();
+                updateFloatingBar();
+            }
+            
+            function syncSelectAllState() {
+                const checkboxes = document.querySelectorAll('.user-checkbox');
+                const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every(c => c.checked);
+                
+                if (selectAll) selectAll.checked = allChecked;
+                const mobileSelectAll = document.getElementById('mobile-select-all');
+                if (mobileSelectAll) mobileSelectAll.checked = allChecked;
+            }
 
             // Shift-Click Multiple Selection Logic
             let lastCheckedBox = null;
@@ -29,27 +73,38 @@
                             const max = Math.max(start, end);
                             const isChecked = lastCheckedBox.checked;
                             
+                            const selectedIds = getSelectedUserIds();
                             for (let i = min; i <= max; i++) {
                                 checkboxes[i].checked = isChecked;
+                                if (isChecked) {
+                                    selectedIds.add(checkboxes[i].value);
+                                } else {
+                                    selectedIds.delete(checkboxes[i].value);
+                                }
                             }
+                            saveSelectedUserIds(selectedIds);
                         }
                     }
                     lastCheckedBox = e.target;
+                    syncSelectAllState();
                     updateFloatingBar();
                 }
             });
 
             window.clearBulkSelection = function() {
+                sessionStorage.removeItem(STORAGE_KEY);
                 document.querySelectorAll('.user-checkbox').forEach(cb => cb.checked = false);
                 if (selectAll) selectAll.checked = false;
+                const mobileSelectAll = document.getElementById('mobile-select-all');
+                if (mobileSelectAll) mobileSelectAll.checked = false;
                 updateFloatingBar();
             };
 
             window.updateFloatingBar = function() {
                 if(!floatingBar) return;
                 
-                const selected = document.querySelectorAll('.user-checkbox:checked');
-                const count = selected.length;
+                const selectedIds = getSelectedUserIds();
+                const count = selectedIds.size;
                 
                 if(countLabel) countLabel.textContent = count;
                 
@@ -67,20 +122,56 @@
 
             if(selectAll) {
                 selectAll.addEventListener('change', function() {
-                    const checkboxes = document.querySelectorAll('.user-checkbox');
-                    checkboxes.forEach(cb => cb.checked = this.checked);
+                    const isChecked = this.checked;
+                    const selectedIds = getSelectedUserIds();
+                    
+                    document.querySelectorAll('.user-checkbox').forEach(cb => {
+                        cb.checked = isChecked;
+                        if (isChecked) {
+                            selectedIds.add(cb.value);
+                        } else {
+                            selectedIds.delete(cb.value);
+                        }
+                    });
+                    
+                    saveSelectedUserIds(selectedIds);
+                    
+                    const mobileSelectAll = document.getElementById('mobile-select-all');
+                    if(mobileSelectAll) mobileSelectAll.checked = isChecked;
+                    updateFloatingBar();
+                });
+            }
+
+            const mobileSelectAll = document.getElementById('mobile-select-all');
+            if(mobileSelectAll) {
+                mobileSelectAll.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    const selectedIds = getSelectedUserIds();
+                    
+                    document.querySelectorAll('.user-checkbox').forEach(cb => {
+                        cb.checked = isChecked;
+                        if (isChecked) {
+                            selectedIds.add(cb.value);
+                        } else {
+                            selectedIds.delete(cb.value);
+                        }
+                    });
+                    
+                    saveSelectedUserIds(selectedIds);
+                    
+                    if(selectAll) selectAll.checked = isChecked;
                     updateFloatingBar();
                 });
             }
 
             // Global Submit Functions
             window.submitBulkRestore = function() {
-                const selected = document.querySelectorAll('.user-checkbox:checked');
-                if(selected.length === 0) return;
+                const selectedIds = Array.from(getSelectedUserIds());
+                if(selectedIds.length === 0) return;
 
                 Swal.fire({
                     title: '{{ __('ui.restore_user_title') }}',
-                    text: `${selected.length} {{ __('ui.restore_user_confirm') }}`,
+                    text: `${selectedIds.length} {{ __('ui.restore_user_confirm') }}`,
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: '{{ __('ui.yes_restore') }}',
@@ -106,13 +197,14 @@
                             // Clear previous hidden inputs
                             form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
                             
-                            selected.forEach(cb => {
+                            selectedIds.forEach(id => {
                                 const input = document.createElement('input');
                                 input.type = 'hidden';
                                 input.name = 'ids[]';
-                                input.value = cb.value;
+                                input.value = id;
                                 form.appendChild(input);
                             });
+                            sessionStorage.removeItem(STORAGE_KEY);
                             form.submit();
                             setTimeout(resolve, 3000);
                         });
@@ -121,12 +213,59 @@
             };
 
             window.submitBulkDelete = function() {
-                const selected = document.querySelectorAll('.user-checkbox:checked');
-                if(selected.length === 0) return;
+                const selectedIds = Array.from(getSelectedUserIds());
+                if(selectedIds.length === 0) return;
 
                 Swal.fire({
                     title: '{{ __('ui.delete_user_title') }}',
                     text: "{{ __('ui.delete_permanent_confirm') }}",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: '{{ __('ui.yes_delete') }}',
+                    cancelButtonText: '{{ __('ui.cancel') }}',
+                    reverseButtons: true,
+                    customClass: {
+                        popup: '!rounded-2xl !font-sans',
+                        title: '!text-secondary-900 !text-xl !font-bold',
+                        htmlContainer: '!text-secondary-500 !text-sm',
+                        confirmButton: 'btn border-0 bg-rose-600 hover:bg-rose-800 text-white px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-rose-500',
+                        cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
+                    },
+                    buttonsStyling: false,
+                    width: '24em',
+                    iconColor: '#f43f5e',
+                    padding: '2em',
+                    backdrop: `rgba(0,0,0,0.4)`,
+                    showLoaderOnConfirm: true,
+                    allowOutsideClick: () => !Swal.isLoading(),
+                    preConfirm: () => {
+                        return new Promise((resolve) => {
+                            const form = document.getElementById('bulk-delete-form');
+                            // Clear previous hidden inputs
+                            form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
+                            
+                            selectedIds.forEach(id => {
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'ids[]';
+                                input.value = id;
+                                form.appendChild(input);
+                            });
+                            sessionStorage.removeItem(STORAGE_KEY);
+                            form.submit();
+                            setTimeout(resolve, 3000);
+                        });
+                    }
+                });
+            };
+
+            window.submitBulkDestroy = function() {
+                const selectedIds = Array.from(getSelectedUserIds());
+                if(selectedIds.length === 0) return;
+
+                Swal.fire({
+                    title: '{{ __('ui.delete_user_title') }}',
+                    text: `${selectedIds.length} data pengguna akan dihapus. Anda dapat memulihkannya nanti di tempat sampah.`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: '{{ __('ui.yes_delete') }}',
@@ -148,17 +287,18 @@
                     allowOutsideClick: () => !Swal.isLoading(),
                     preConfirm: () => {
                         return new Promise((resolve) => {
-                            const form = document.getElementById('bulk-delete-form');
+                            const form = document.getElementById('bulk-destroy-form');
                             // Clear previous hidden inputs
                             form.querySelectorAll('input[name="ids[]"]').forEach(el => el.remove());
                             
-                            selected.forEach(cb => {
+                            selectedIds.forEach(id => {
                                 const input = document.createElement('input');
                                 input.type = 'hidden';
                                 input.name = 'ids[]';
-                                input.value = cb.value;
+                                input.value = id;
                                 form.appendChild(input);
                             });
+                            sessionStorage.removeItem(STORAGE_KEY);
                             form.submit();
                             setTimeout(resolve, 3000);
                         });
@@ -216,12 +356,12 @@
                         popup: '!rounded-2xl !font-sans',
                         title: '!text-secondary-900 !text-xl !font-bold',
                         htmlContainer: '!text-secondary-500 !text-sm',
-                        confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
+                        confirmButton: 'btn border-0 bg-rose-600 hover:bg-rose-800 text-white px-6 py-2.5 rounded-lg ml-3 shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-rose-500',
                         cancelButton: 'btn btn-secondary px-6 py-2.5 rounded-lg bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
                     },
                     buttonsStyling: false,
                     width: '24em',
-                    iconColor: '#ef4444',
+                    iconColor: '#f43f5e',
                     padding: '2em',
                     backdrop: `rgba(0,0,0,0.4)`,
                     showLoaderOnConfirm: true,

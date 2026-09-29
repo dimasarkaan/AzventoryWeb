@@ -13,9 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/app.css', 'resources/css/print.css', 'r!important; }
-
-    </style>
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/css/print.css'])
     <!-- Dynamic @page handler.
          Grid mode: respects custom margin per page but defaults to A4 size.
          Thermal mode: forces physical size to 40mm x 20mm and strips browser margins. -->
@@ -175,9 +173,9 @@
         setTimeout(() => this.isPrinting = false, 1000);
     },
 
-    /* ---- Pagination Helpers ---- */
-    get labelW() { return 34; /* label width + gap in mm */ },
-    get labelH() { return 16; /* label height + gap in mm */ },
+    // Configuration values (adjusted for gap and margins)
+    get labelW() { return 35; /* label width (33) + gap (2) in mm */ },
+    get labelH() { return 17; /* label height (15) + gap (2) in mm */ },
     get labelsPerRow() {
         return Math.max(1, Math.floor((210 - this.margin.left - this.margin.right) / this.labelW));
     },
@@ -219,8 +217,8 @@
                 </div>
 
                 <div class="action-group md:order-3">
-                    <button onclick="window.close()" class="btn-close text-slate-400 hover:text-white transition-colors">Tutup</button>
-                    <button @click="logPrint()" class="btn-print group relative" :disabled="isPrinting" :class="{'opacity-75 cursor-wait': isPrinting}">
+                    <button type="button" onclick="window.location.href = '{{ route('inventory.show', $sparepart) }}'" class="btn-close text-slate-400 hover:text-white transition-colors">Tutup</button>
+                    <button type="button" @click="logPrint()" class="btn-print group relative" :disabled="isPrinting" :class="{'opacity-75 cursor-wait': isPrinting}">
                         <svg x-show="!isPrinting" class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
                         <svg x-show="isPrinting" x-cloak class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                         <span x-text="isPrinting ? 'Menyiapkan...' : 'Cetak'"></span>

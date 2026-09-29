@@ -1,4 +1,4 @@
-﻿@once
+@once
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -75,22 +75,22 @@
                 </svg>
             </div>
             <h2 class="text-xl font-bold text-secondary-900">
-                {{ __('Perubahan Belum Disimpan') }}
+                {{ __('ui.unsaved_changes_title') }}
             </h2>
         </div>
 
         <p class="text-secondary-600 leading-relaxed">
-            {{ __('Anda memiliki perubahan yang belum disimpan di halaman ini. Jika Anda pergi sekarang, data yang Anda ketik akan hilang.') }}
+            {{ __('ui.unsaved_changes_desc1') }}
             <br><br>
-            {{ __('Apakah Anda tetap ingin meninggalkan halaman ini?') }}
+            {{ __('ui.unsaved_changes_desc2') }}
         </p>
 
         <div class="mt-8 flex justify-end gap-3">
             <button type="button" class="btn btn-secondary px-6" x-on:click="$dispatch('close')">
-                {{ __('Tetap di Sini') }}
+                {{ __('ui.stay_here') }}
             </button>
             <button type="button" id="confirm-leave-button" class="btn btn-danger px-6">
-                {{ __('Tinggalkan Halaman') }}
+                {{ __('ui.leave_page') }}
             </button>
         </div>
     </div>

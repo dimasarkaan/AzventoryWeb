@@ -1,4 +1,4 @@
-﻿    <script>
+    <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('reportManager', () => ({
                 reportType: 'inventory_list', 
@@ -32,7 +32,7 @@
                     this.loading = true;
 
                     if (window.showToast) {
-                        window.showToast('info', 'Laporan sedang diproses. Mohon tunggu...');
+                        window.showToast('info', '{{ __('ui.report_processing') }}');
                     }
 
                     try {
@@ -70,7 +70,7 @@
                             window.URL.revokeObjectURL(url);
                             
                             if (window.showToast) {
-                                window.showToast('success', 'Laporan berhasil diunduh.');
+                                window.showToast('success', '{{ __('ui.report_success') }}');
                             }
                         } else if (response.ok && contentType && contentType.includes('application/json')) {
                             const data = await response.json();
@@ -79,15 +79,15 @@
                                     window.showToast('info', data.message);
                                 }
                             } else {
-                                window.showToast('error', data.message || 'Gagal mengirim permintaan.');
+                                window.showToast('error', data.message || '{{ __('ui.report_failed') }}');
                             }
                         } else {
-                            throw new Error('Respons tidak dikenali atau server error');
+                            throw new Error('{{ __('ui.report_error') }}');
                         }
                     } catch (error) {
                         console.error('Error:', error);
                         if (window.showToast) {
-                            window.showToast('error', 'Terjadi kesalahan sistem saat mengunduh.');
+                            window.showToast('error', '{{ __('ui.report_system_error') }}');
                         }
                     } finally {
                         this.loading = false;

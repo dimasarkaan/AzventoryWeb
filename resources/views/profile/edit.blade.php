@@ -2,9 +2,9 @@
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-6">
-                <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                     {{ __('ui.profile_title') }}
-                </h2>
+                </h1>
                 <p class="mt-1 text-sm text-secondary-500">
                     {{ __('ui.profile_desc') }}
                 </p>
@@ -63,7 +63,7 @@
                 <!-- Profile Information -->
                 <div class="card">
                     <div class="card-header px-4 py-2 flex flex-col items-start gap-0.5">
-                        <h3 class="text-lg font-bold text-secondary-900">{{ __('ui.profile_info_title') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.profile_info_title') }}</h2>
                         <p class="text-sm text-secondary-500">
                             {{ __('ui.profile_info_desc') }}
                         </p>
@@ -76,7 +76,7 @@
                 <!-- Update Password -->
                 <div class="card">
                     <div class="card-header px-4 py-2 flex flex-col items-start gap-0.5">
-                        <h3 class="text-lg font-bold text-secondary-900">{{ __('ui.profile_password_title') }}</h3>
+                        <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.profile_password_title') }}</h2>
                         <p class="text-sm text-secondary-500">
                             {{ __('ui.profile_password_desc') }}
                         </p>
@@ -87,11 +87,20 @@
                 </div>
 
                 <!-- Advanced / Danger Settings Accordion -->
-                <div x-data="{ openAdvanced: false }" class="mt-8 space-y-4">
+                @php
+                    $shouldOpenAdvanced = $errors->has('token_name') || $errors->has('abilities') || $errors->hasBag('userDeletion') || $errors->hasBag('logoutOtherBrowserSessions') || session('new_api_token') || session('api_token_deleted');
+                @endphp
+                <div x-data="{ openAdvanced: {{ $shouldOpenAdvanced ? 'true' : 'false' }} }" 
+                     x-init="if(openAdvanced) { setTimeout(() => { 
+                         let target = $el.querySelector('.text-danger-500, .text-danger-600, .border-danger-500, .text-red-500, .text-red-600, .border-red-500, .bg-success-50, #new-api-token');
+                         if(!target) target = $el;
+                         window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 250, behavior: 'smooth' });
+                     }, 200); }" 
+                     class="mt-8 space-y-4" id="advanced-settings">
                     <button @click="openAdvanced = !openAdvanced" type="button" class="w-full flex justify-between items-center bg-white p-4 rounded-xl border shadow-sm transition-colors" :class="openAdvanced ? 'border-primary-300 hover:bg-primary-50 text-primary-800' : 'border-gray-200 hover:bg-gray-50 text-secondary-700'">
                         <span class="flex items-center gap-2 font-bold">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            Advanced Security & Settings
+                            {{ __('ui.advanced_security_settings') }}
                         </span>
                         <svg class="w-5 h-5 transform transition-transform duration-200" :class="{'rotate-180': openAdvanced}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                     </button>
@@ -100,9 +109,9 @@
                         <!-- Active Sessions -->
                         <div class="card">
                             <div class="card-header px-4 py-2 flex flex-col items-start gap-0.5">
-                                <h3 class="text-lg font-bold text-secondary-900">{{ __('Sesi Browser Aktif') }}</h3>
+                                <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.active_browser_sessions') }}</h2>
                                 <p class="text-sm text-secondary-500">
-                                    {{ __('Kelola dan logout sesi aktif Anda di perangkat dan browser lain.') }}
+                                    {{ __('ui.active_browser_sessions_desc') }}
                                 </p>
                             </div>
                             <div class="card-body p-4 pt-0">
@@ -114,9 +123,9 @@
                         @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <div class="card">
                             <div class="card-header px-4 py-2 flex flex-col items-start gap-0.5">
-                                <h3 class="text-lg font-bold text-secondary-900">{{ __('Kunci Akses API (Token)') }}</h3>
+                                <h2 class="text-lg font-bold text-secondary-900">{{ __('ui.api_access_tokens') }}</h2>
                                 <p class="text-sm text-secondary-500">
-                                    {{ __('Kelola token API yang mengizinkan layanan eksternal untuk mengakses data inventaris.') }}
+                                    {{ __('ui.api_access_tokens_desc') }}
                                 </p>
                             </div>
                             <div class="card-body p-4 pt-0">
@@ -129,7 +138,7 @@
                         @if(auth()->user()->role === \App\Enums\UserRole::SUPERADMIN)
                         <div class="card border-danger-200">
                             <div class="card-header px-4 py-2 bg-danger-50 border-danger-100 flex flex-col items-start gap-1">
-                                <h3 class="text-lg font-bold text-danger-900">{{ __('ui.profile_delete_title') }}</h3>
+                                <h2 class="text-lg font-bold text-danger-900">{{ __('ui.profile_delete_title') }}</h2>
                                 <p class="text-sm text-danger-700">
                                     {{ __('ui.profile_delete_desc') }}
                                 </p>

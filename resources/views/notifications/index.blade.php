@@ -3,9 +3,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-8 mb-4">
                 <div>
-                     <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                     <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.notification_title') }}
-                    </h2>
+                    </h1>
                     <p class="mt-1 text-sm text-secondary-500">
                         {{ __('ui.notification_desc') }}
                     </p>
@@ -164,9 +164,9 @@
                             </div>
                         </div>
 
-                        <h3 class="relative z-10 text-xl font-semibold text-secondary-900 mb-2">
+                        <h2 class="relative z-10 text-xl font-semibold text-secondary-900 mb-2">
                             {{ request('filter') === 'unread' ? __('ui.no_unread_notifications') : __('ui.notification_empty_title') }}
-                        </h3>
+                        </h2>
                         <p class="relative z-10 text-secondary-500 max-w-sm leading-relaxed">
                             {{ request('filter') === 'unread' ? 'Semua notifikasi penting sudah Anda baca.' : __('ui.notification_empty_desc') }}
                         </p>

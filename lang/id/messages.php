@@ -73,6 +73,7 @@ return [
     'no_user_selected_restore' => 'Tidak ada item yang dipilih untuk dipulihkan.',
     'bulk_user_restored' => ':count user berhasil dipulihkan.',
     'no_user_selected_delete' => 'Tidak ada item yang dipilih untuk dihapus.',
+    'bulk_user_deleted' => ':count user berhasil dihapus.',
     'bulk_user_force_deleted' => ':count user berhasil dihapus permanen.',
 
     // Activity Logs
@@ -93,6 +94,7 @@ return [
     'log_user_restored' => 'Memulihkan user: :name',
     'log_user_deleted_force' => 'Menghapus permanen user: :name',
     'log_bulk_user_restored' => ':count user berhasil dipulihkan.',
+    'log_bulk_user_deleted_soft' => ':count user berhasil dihapus (soft delete).',
     'log_bulk_user_deleted_force' => ':count user dihapus permanen.',
 
     // Borrowing & Real-time

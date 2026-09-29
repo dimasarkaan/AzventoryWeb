@@ -4,27 +4,27 @@
         @csrf
         @method('put')
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 mb-6">
             <div class="md:col-span-2">
-                <x-input-label for="update_password_current_password" :value="__('ui.profile_label_current_password')" />
+                <label for="update_password_current_password" class="input-label">{{ __('ui.profile_label_current_password') }}</label>
                 <x-password-input id="update_password_current_password" name="current_password" data-testid="input-current-password"
-                              class="mt-1 block w-full {{ $errors->updatePassword->has('current_password') ? '!border-red-500' : '' }}" 
+                              class="input-field mt-1 w-full {{ $errors->updatePassword->has('current_password') ? '!border-red-500' : '' }}" 
                               autocomplete="current-password" x-bind:disabled="!isEditing" required />
                 <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
             </div>
 
             <div>
-                <x-input-label for="update_password_password" :value="__('ui.profile_label_new_password')" />
+                <label for="update_password_password" class="input-label">{{ __('ui.profile_label_new_password') }}</label>
                 <x-password-input id="update_password_password" name="password" data-testid="input-new-password"
-                              class="mt-1 block w-full {{ $errors->updatePassword->has('password') ? '!border-red-500' : '' }}" 
+                              class="input-field mt-1 w-full {{ $errors->updatePassword->has('password') ? '!border-red-500' : '' }}" 
                               autocomplete="new-password" x-bind:disabled="!isEditing" minlength="8" maxlength="16" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,16}" title="Kata sandi harus 8-16 karakter dan mengandung kombinasi huruf dan angka" required />
                 <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
             </div>
 
             <div>
-                <x-input-label for="update_password_password_confirmation" :value="__('ui.profile_label_confirm_password')" />
+                <label for="update_password_password_confirmation" class="input-label">{{ __('ui.profile_label_confirm_password') }}</label>
                 <x-password-input id="update_password_password_confirmation" name="password_confirmation" data-testid="input-confirm-password"
-                              class="mt-1 block w-full {{ $errors->updatePassword->has('password_confirmation') ? '!border-red-500' : '' }}" 
+                              class="input-field mt-1 w-full {{ $errors->updatePassword->has('password_confirmation') ? '!border-red-500' : '' }}" 
                               autocomplete="new-password" x-bind:disabled="!isEditing" minlength="8" maxlength="16" pattern="(?=.*\d)(?=.*[a-zA-Z]).{8,16}" title="Konfirmasi kata sandi harus sama dengan kata sandi baru" required />
                 <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
             </div>
@@ -34,7 +34,7 @@
             <!-- Normal Mode -->
             <button type="button" data-testid="btn-edit-password" class="btn btn-secondary flex items-center gap-2" @click="isEditing = true; setTimeout(() => document.getElementById('update_password_current_password').focus(), 100)" x-show="!isEditing">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                Ganti Password
+                {{ __('ui.change_password') }}
             </button>
 
             <!-- Edit Mode -->

@@ -1,4 +1,4 @@
-{{--
+﻿{{--
     Partial: PDF Document Header (company brand + report metadata + page numbering)
     Digunakan oleh semua template PDF laporan.
     

@@ -9,26 +9,26 @@
             @hasSection('title')
                 @yield('title') - {{ config('app.name', 'Azventory') }}
             @else
-                {{ config('app.name', 'Azventory') }} - Sistem Manajemen Stok
+                {{ config('app.name', 'Azventory') }} - {{ __('ui.app_subtitle') }}
             @endif
         </title>
 
         <!-- Primary Meta Tags -->
-        <meta name="title" content="@yield('title', config('app.name', 'Azventory') . ' - Sistem Manajemen Stok')">
-        <meta name="description" content="@yield('description', 'Aplikasi digitalisasi pencatatan masuk, keluar, dan peminjaman stok di CV Azzahra Computer.')">
+        <meta name="title" content="@yield('title', config('app.name', 'Azventory') . ' - ' . __('ui.app_subtitle'))">
+        <meta name="description" content="@yield('description', __('ui.app_description'))">
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ request()->url() }}">
-        <meta property="og:title" content="@yield('title', config('app.name', 'Azventory') . ' - Sistem Manajemen Stok')">
-        <meta property="og:description" content="@yield('description', 'Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.')">
+        <meta property="og:title" content="@yield('title', config('app.name', 'Azventory') . ' - ' . __('ui.app_subtitle'))">
+        <meta property="og:description" content="@yield('description', __('ui.app_og_description'))">
         <meta property="og:image" content="{{ asset('images/bannerazventory.png') }}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ request()->url() }}">
-        <meta property="twitter:title" content="@yield('title', config('app.name', 'Azventory') . ' - Sistem Manajemen Stok')">
-        <meta property="twitter:description" content="@yield('description', 'Sistem informasi manajemen stok barang untuk memantau ketersediaan, pemindaian QR Code, dan pergerakan aset gudang.')">
+        <meta property="twitter:title" content="@yield('title', config('app.name', 'Azventory') . ' - ' . __('ui.app_subtitle'))">
+        <meta property="twitter:description" content="@yield('description', __('ui.app_og_description'))">
         <meta property="twitter:image" content="{{ asset('images/bannerazventory.png') }}">
 
         <!-- PWA Meta Tags -->
@@ -50,8 +50,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @stack('styles')
     </head>
-    <body class="font-sans antialiased">
-        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[99999] focus:p-4 focus:bg-white focus:text-primary-600 focus:font-bold">Skip to main content</a>
+    <body class="font-sans antialiased bg-gray-100">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-[99999] focus:p-4 focus:bg-white focus:text-primary-600 focus:font-bold">{{ __('ui.skip_to_content') }}</a>
         <div class="min-h-screen bg-gray-100 transition-opacity duration-300 opacity-0"
              x-data="{ 
                 isOffline: !navigator.onLine,
@@ -61,22 +61,7 @@
              x-init="$el.classList.remove('opacity-0');
                      window.addEventListener('online', () => { isOffline = false; showOfflineOverlay = false; }); 
                      window.addEventListener('offline', () => isOffline = true);
-                     
-                     // Global Listener for Navigation while Offline
-                     window.addEventListener('click', (e) => {
-                         const link = e.target.closest('a');
-                         if (link && isOffline && link.href && !link.href.startsWith('#') && !link.href.startsWith('javascript:')) {
-                             e.preventDefault();
-                             showOfflineOverlay = true;
-                         }
-                     }, true);
-                     
-                     window.addEventListener('submit', (e) => {
-                         if (isOffline) {
-                             e.preventDefault();
-                             showOfflineOverlay = true;
-                         }
-                     }, true)">
+                     ">
             
             @include('layouts.partials.offline-overlay')
 
@@ -111,6 +96,8 @@
                 @endif
                 @if(session('error'))
                     error: @json(session('error')),
+                @elseif($errors->any())
+                    error: @json($errors->first()),
                 @endif
                 @if(session('warning'))
                     warning: @json(session('warning')),
@@ -124,6 +111,13 @@
             window.currentUser = {
                 name: "{{ auth()->check() ? auth()->user()->name : '' }}"
             };
+
+            // Tandai jika halaman sedang dalam proses berpindah (navigasi/reload)
+            // Berguna untuk mencegah request AJAX menyedot session flash sebelum halaman baru dimuat.
+            window.isPageUnloading = false;
+            window.addEventListener('beforeunload', () => {
+                window.isPageUnloading = true;
+            });
         </script>
 
         <!-- Back to Top Button -->
@@ -139,7 +133,7 @@
                     x-transition:leave-end="opacity-0 translate-y-8"
                     @click="window.scrollTo({top: 0, behavior: 'smooth'})"
                     class="p-3 bg-primary-600 text-white rounded-full shadow-[0_8px_30px_rgb(37,99,235,0.3)] hover:bg-primary-700 hover:shadow-[0_8px_30px_rgb(37,99,235,0.5)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all transform hover:-translate-y-1"
-                    title="Kembali ke Atas"
+                    title="{{ __('ui.back_to_top') }}"
                     x-cloak>
                 <svg aria-hidden="true" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
             </button>

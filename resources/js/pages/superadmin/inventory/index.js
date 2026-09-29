@@ -1,6 +1,20 @@
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 
+const STORAGE_KEY = 'azventory_inventory_bulk_selections';
+
+window.getSelectedBulkIds = function() {
+    try {
+        return new Set(JSON.parse(sessionStorage.getItem(STORAGE_KEY)) || []);
+    } catch(e) {
+        return new Set();
+    }
+};
+
+window.saveSelectedBulkIds = function(set) {
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(set)));
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     const form = document.querySelector('#inventory-filter-form');
     const realBody = document.querySelector('#inventory-desktop-body');
@@ -112,23 +126,31 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
 
+                // Update Active Filter Pills
+                const filtersContainer = document.getElementById('active-filters-container');
+                if (filtersContainer && data.active_filters !== undefined) {
+                    filtersContainer.innerHTML = data.active_filters;
+                }
+
                 // 7. Pagination sudah ter-include di dalam data.desktop dan data.mobile
-                // (tidak perlu inject terpisah — akan menimpa wrapper styling yang benar)
+                // (tidak perlu inject terpisah â€” akan menimpa wrapper styling yang benar)
 
                 // 8. Event delegation handles pagination listeners automatically.
 
                 // 9. Re-initialize Bulk Actions
-                if (window.resetBulkActions) {
-                    window.resetBulkActions();
+                if (window.restoreBulkActionsState) {
+                    window.restoreBulkActionsState();
                 } else {
-                    const desktopSelectAll = document.getElementById('select-all');
-                    if (desktopSelectAll) desktopSelectAll.checked = false;
+                    if (window.resetBulkActions) window.resetBulkActions();
                 }
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             })
             .finally(() => {
+                // Notifikasi ke AlpineJS bahwa AJAX selesai
+                window.dispatchEvent(new CustomEvent('filter-done'));
+
                 // 10. Hide Skeleton
                 setTimeout(() => {
                     const currentSkeletonBody = document.getElementById('skeleton-body');
@@ -161,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let lastCheckedBox = null;
 
     window.clearBulkSelection = function() {
+        sessionStorage.removeItem(STORAGE_KEY);
         document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = false);
         const desktopSelect = document.getElementById('select-all');
         const mobileSelect = document.getElementById('mobile-select-all');
@@ -175,19 +198,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const bulkRestoreInputs = document.getElementById('bulk-restore-inputs');
         const bulkDeleteInputs = document.getElementById('bulk-delete-inputs');
 
-        const selectedCheckboxes = document.querySelectorAll('.bulk-checkbox:checked');
-        const count = selectedCheckboxes.length;
+        const selectedBulkIds = window.getSelectedBulkIds();
+        const count = selectedBulkIds.size;
 
         if (selectedCountSpan) selectedCountSpan.textContent = count;
 
         if (bulkRestoreInputs) bulkRestoreInputs.innerHTML = '';
         if (bulkDeleteInputs) bulkDeleteInputs.innerHTML = '';
 
-        selectedCheckboxes.forEach(cb => {
+        selectedBulkIds.forEach(id => {
             const input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'ids[]';
-            input.value = cb.value;
+            input.value = id;
             if (bulkRestoreInputs) bulkRestoreInputs.appendChild(input.cloneNode());
             if (bulkDeleteInputs) bulkDeleteInputs.appendChild(input.cloneNode());
         });
@@ -206,26 +229,38 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event Delegation for Checkboxes
     document.addEventListener('change', function (e) {
         // Desktop Select All
-        if (e.target.id === 'select-all') {
+        if (e.target.id === 'select-all' || e.target.id === 'mobile-select-all') {
             const isChecked = e.target.checked;
-            document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = isChecked);
-            const mobileSelect = document.getElementById('mobile-select-all');
-            if (mobileSelect) mobileSelect.checked = isChecked;
-            updateBulkActionBar();
-        }
-
-        // Mobile Select All
-        if (e.target.id === 'mobile-select-all') {
-            const isChecked = e.target.checked;
-            document.querySelectorAll('.bulk-checkbox').forEach(cb => cb.checked = isChecked);
+            const selectedBulkIds = window.getSelectedBulkIds();
+            
+            document.querySelectorAll('.bulk-checkbox').forEach(cb => {
+                cb.checked = isChecked;
+                if (isChecked) {
+                    selectedBulkIds.add(cb.value);
+                } else {
+                    selectedBulkIds.delete(cb.value);
+                }
+            });
+            window.saveSelectedBulkIds(selectedBulkIds);
+            
             const desktopSelect = document.getElementById('select-all');
+            const mobileSelect = document.getElementById('mobile-select-all');
             if (desktopSelect) desktopSelect.checked = isChecked;
+            if (mobileSelect) mobileSelect.checked = isChecked;
+            
             updateBulkActionBar();
         }
 
         // Individual Checkbox
         if (e.target.classList.contains('bulk-checkbox')) {
-            // Note: Shift+Click logic is handled in the 'click' event listener below
+            const selectedBulkIds = window.getSelectedBulkIds();
+            if (e.target.checked) {
+                selectedBulkIds.add(e.target.value);
+            } else {
+                selectedBulkIds.delete(e.target.value);
+            }
+            window.saveSelectedBulkIds(selectedBulkIds);
+            
             updateBulkActionBar();
 
             // Sync Select All Checkboxes
@@ -252,40 +287,61 @@ document.addEventListener('DOMContentLoaded', function () {
                     const min = Math.min(start, end);
                     const max = Math.max(start, end);
                     
+                    const selectedBulkIds = window.getSelectedBulkIds();
                     for (let i = min; i <= max; i++) {
                         if (checkboxes[i] !== e.target) {
                             checkboxes[i].checked = e.target.checked;
+                            if (e.target.checked) {
+                                selectedBulkIds.add(checkboxes[i].value);
+                            } else {
+                                selectedBulkIds.delete(checkboxes[i].value);
+                            }
                             // dispatch change event to trigger UI updates in other scripts if any
                             checkboxes[i].dispatchEvent(new Event('change', { bubbles: true }));
                         }
                     }
+                    window.saveSelectedBulkIds(selectedBulkIds);
                 }
             }
             lastCheckedBox = e.target;
         }
     });
 
-    // Helper to reset bulk actions after fetch
-    window.resetBulkActions = function () {
+    // Helper to restore bulk actions after fetch
+    window.restoreBulkActionsState = function () {
+        const selectedBulkIds = window.getSelectedBulkIds();
+        document.querySelectorAll('.bulk-checkbox').forEach(cb => {
+            cb.checked = selectedBulkIds.has(cb.value);
+        });
+        
+        const allCheckboxes = document.querySelectorAll('.bulk-checkbox');
+        const allChecked = allCheckboxes.length > 0 && Array.from(allCheckboxes).every(c => c.checked);
+        
         const desktopSelect = document.getElementById('select-all');
         const mobileSelect = document.getElementById('mobile-select-all');
-        if (desktopSelect) desktopSelect.checked = false;
-        if (mobileSelect) mobileSelect.checked = false;
+        if (desktopSelect) desktopSelect.checked = allChecked;
+        if (mobileSelect) mobileSelect.checked = allChecked;
+        
         updateBulkActionBar();
     };
 
+    // Keep reset for backwards compatibility
+    window.resetBulkActions = function () {
+        window.clearBulkSelection();
+    };
+
     // Initial check on load (in case browser preserved state)
-    updateBulkActionBar();
+    window.restoreBulkActionsState();
 });
 
 // Global Bulk Action Handlers (Inventory)
 window.submitInventoryBulkRestore = function () {
-    const selected = document.querySelectorAll('.bulk-checkbox:checked');
-    if (selected.length === 0) return;
+    const selectedBulkIds = window.getSelectedBulkIds();
+    if (selectedBulkIds.size === 0) return;
 
     Swal.fire({
         title: 'Pulihkan Item?',
-        text: `${selected.length} item akan dipulihkan.`,
+        text: `${selectedBulkIds.size} item akan dipulihkan.`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Ya, Pulihkan!',
@@ -305,6 +361,7 @@ window.submitInventoryBulkRestore = function () {
         backdrop: `rgba(15, 23, 42, 0.5)`,
         showLoaderOnConfirm: true,
         preConfirm: () => {
+            sessionStorage.removeItem(STORAGE_KEY);
             document.getElementById('bulk-restore-form').submit();
             return new Promise(() => {}); // Tetap loading sampai halaman beralih
         }
@@ -314,8 +371,8 @@ window.submitInventoryBulkRestore = function () {
 };
 
 window.submitInventoryBulkDelete = function () {
-    const selected = document.querySelectorAll('.bulk-checkbox:checked');
-    if (selected.length === 0) return;
+    const selectedBulkIds = window.getSelectedBulkIds();
+    if (selectedBulkIds.size === 0) return;
 
     Swal.fire({
         title: 'Apakah Anda yakin?',
@@ -330,15 +387,16 @@ window.submitInventoryBulkDelete = function () {
             title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
             actions: '!flex !justify-center !gap-3 !w-full !mt-6',
-            confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
+            confirmButton: 'btn border-0 bg-rose-600 hover:bg-rose-800 text-white !px-6 !py-2.5 !m-0 !rounded-xl',
             cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
         width: '26em',
-        iconColor: '#ef4444',
+        iconColor: '#f43f5e',
         backdrop: `rgba(15, 23, 42, 0.5)`,
         showLoaderOnConfirm: true,
         preConfirm: () => {
+            sessionStorage.removeItem(STORAGE_KEY);
             document.getElementById('bulk-delete-form').submit();
             return new Promise(() => {}); // Tetap loading sampai halaman beralih
         }
@@ -348,31 +406,31 @@ window.submitInventoryBulkDelete = function () {
 };
 
 window.submitInventoryBulkPrint = function () {
-    const selected = document.querySelectorAll('.bulk-checkbox:checked');
-    if (selected.length === 0) return;
+    const selectedBulkIds = window.getSelectedBulkIds();
+    if (selectedBulkIds.size === 0) return;
 
     const bulkActionBar = document.getElementById('bulk-action-bar');
     const route = bulkActionBar ? bulkActionBar.getAttribute('data-bulk-print-route') : '/inventory/qr-code/bulk-print';
 
-    const ids = Array.from(selected).map(cb => cb.value);
+    const ids = Array.from(selectedBulkIds);
     const url = new URL(route, window.location.origin);
     
     // Append IDs as query params
     ids.forEach(id => url.searchParams.append('ids[]', id));
 
-    window.open(url.toString(), '_blank');
+    window.location.href = url.toString();
 };
 
 window.submitInventoryBulkDestroy = function () {
-    const selected = document.querySelectorAll('.bulk-checkbox:checked');
-    if (selected.length === 0) return;
+    const selectedBulkIds = window.getSelectedBulkIds();
+    if (selectedBulkIds.size === 0) return;
 
     const bulkActionBar = document.getElementById('bulk-action-bar');
     const route = bulkActionBar ? bulkActionBar.getAttribute('data-bulk-destroy-route') : '/inventory/bulk-destroy';
 
     Swal.fire({
         title: 'Hapus Massal?',
-        text: `${selected.length} item akan dipindahkan ke tempat sampah.`,
+        text: `${selectedBulkIds.size} item akan dipindahkan ke tempat sampah.`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Ya, Hapus!',
@@ -384,15 +442,15 @@ window.submitInventoryBulkDestroy = function () {
             title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
             actions: '!flex !justify-center !gap-3 !w-full !mt-6',
-            confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
+            confirmButton: 'btn border-0 bg-rose-600 hover:bg-rose-800 text-white !px-6 !py-2.5 !m-0 !rounded-xl',
             cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
         width: '26em',
-        iconColor: '#ef4444',
+        iconColor: '#f43f5e',
         backdrop: `rgba(15, 23, 42, 0.5)`,
         preConfirm: () => {
-            const ids = Array.from(selected).map(cb => cb.value);
+            const ids = Array.from(window.getSelectedBulkIds());
             return fetch(route, {
                 method: 'DELETE',
                 headers: {
@@ -432,6 +490,7 @@ window.submitInventoryBulkDestroy = function () {
                 iconColor: '#10b981',
                 backdrop: `rgba(0,0,0,0.4)`
             }).then(() => {
+                sessionStorage.removeItem(STORAGE_KEY);
                 window.location.reload();
             });
         }
@@ -446,12 +505,12 @@ window.submitInventoryBulkDestroy = function () {
                         popup: '!rounded-2xl !font-sans',
                         title: '!text-secondary-900 !text-xl !font-bold',
                         htmlContainer: '!text-secondary-500 !text-sm',
-                        confirmButton: 'btn btn-danger px-6 py-2.5 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-danger-500',
+                        confirmButton: 'btn border-0 bg-rose-600 hover:bg-rose-800 text-white px-6 py-2.5 rounded-lg shadow-md transform hover:scale-105 transition-transform duration-200 ring-2 ring-offset-2 ring-rose-500',
                     },
                     buttonsStyling: false,
                     width: '24em',
                     padding: '2em',
-                    iconColor: '#ef4444',
+                    iconColor: '#f43f5e',
                     backdrop: `rgba(0,0,0,0.4)`
                 });
     });
@@ -507,12 +566,12 @@ window.confirmInventoryForceDelete = function (event) {
             title: '!text-secondary-900 !text-xl !font-bold !mt-2',
             htmlContainer: '!text-secondary-500 !text-sm',
             actions: '!flex !justify-center !gap-3 !w-full !mt-6',
-            confirmButton: 'btn btn-danger !px-6 !py-2.5 !m-0 !rounded-xl',
+            confirmButton: 'btn border-0 bg-rose-600 hover:bg-rose-800 text-white !px-6 !py-2.5 !m-0 !rounded-xl',
             cancelButton: 'btn btn-secondary !px-6 !py-2.5 !m-0 !rounded-xl bg-white border border-secondary-200 text-secondary-600 hover:bg-secondary-50 shadow-sm'
         },
         buttonsStyling: false,
         width: '26em',
-        iconColor: '#ef4444',
+        iconColor: '#f43f5e',
         backdrop: `rgba(15, 23, 42, 0.5)`,
         showLoaderOnConfirm: true,
         preConfirm: () => {
@@ -525,10 +584,10 @@ window.confirmInventoryForceDelete = function (event) {
 };
 
 /**
- * confirmDelete — Soft-delete dengan undo countdown 5 detik.
+ * confirmDelete â€” Soft-delete dengan undo countdown 5 detik.
  * Item baris disembunyikan langsung, lalu toast tampil dengan tombol "Batalkan".
- * Jika dibatalkan → baris muncul kembali, form TIDAK dikirim.
- * Jika 5 detik berlalu → form di-submit ke server (soft-delete).
+ * Jika dibatalkan â†’ baris muncul kembali, form TIDAK dikirim.
+ * Jika 5 detik berlalu â†’ form di-submit ke server (soft-delete).
  */
 window.confirmDelete = function (event) {
     event.preventDefault();

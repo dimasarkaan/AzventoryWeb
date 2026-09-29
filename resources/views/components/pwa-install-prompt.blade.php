@@ -24,24 +24,24 @@
             </div>
 
             <div class="flex-1">
-                <h3 class="text-base font-bold text-secondary-900 mb-1">Instal Azventory</h3>
-                <p class="text-sm text-secondary-600 leading-relaxed mb-4">Tambahkan ke layar utama untuk akses instan dan pengalaman offline yang lebih cepat.</p>
+                <h3 class="text-base font-bold text-secondary-900 mb-1">{{ __('ui.pwa_install_title') }}</h3>
+                <p class="text-sm text-secondary-600 leading-relaxed mb-4">{{ __('ui.pwa_install_desc') }}</p>
                 
                 <!-- Android/Chrome Install Button -->
                 <button x-show="canInstall" @click="installApp" class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 px-4 rounded-xl shadow-sm shadow-primary-500/30 transition-all flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Instal Sekarang
+                    {{ __('ui.pwa_install_btn') }}
                 </button>
 
                 <!-- iOS Instructions -->
                 <div x-show="isIOS && !isStandalone && !canInstall" class="bg-secondary-50 border border-secondary-200 rounded-xl p-3 text-xs text-secondary-700">
                     <div class="flex items-center gap-2 mb-2 font-semibold">
                         <svg class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Cara instal di iOS:
+                        {{ __('ui.pwa_ios_instruction_1') }}
                     </div>
                     <ol class="list-decimal list-inside space-y-1.5 pl-1">
-                        <li class="flex items-center gap-1">Tekan ikon <svg class="w-4 h-4 inline pb-0.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> <b>Share</b> di bawah</li>
-                        <li>Geser ke bawah & pilih <b>Add to Home Screen</b> <span class="bg-white border border-secondary-200 rounded-[4px] px-1 shadow-sm ml-1">+</span></li>
+                        <li class="flex items-center gap-1">{{ __('ui.pwa_ios_instruction_2') }} <svg class="w-4 h-4 inline pb-0.5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> <b>Share</b> {{ __('ui.pwa_ios_instruction_2_suffix') }}</li>
+                        <li>{{ __('ui.pwa_ios_instruction_3') }} <b>Add to Home Screen</b> <span class="bg-white border border-secondary-200 rounded-[4px] px-1 shadow-sm ml-1">+</span></li>
                     </ol>
                 </div>
             </div>

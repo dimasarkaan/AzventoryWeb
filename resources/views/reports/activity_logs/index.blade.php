@@ -1,12 +1,12 @@
-﻿<x-app-layout>
+<x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="activityLogComponent()">
             <!-- Header & Actions -->
             <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-bold text-secondary-900 tracking-tight">
+                    <h1 class="text-3xl font-bold text-secondary-900 tracking-tight">
                         {{ __('ui.activity_logs_title') }}
-                    </h2>
+                    </h1>
                     <p class="mt-1 text-sm text-secondary-500">{{ __('ui.activity_logs_desc') }}</p>
                 </div>
                 
@@ -154,27 +154,18 @@
                         </div>
                         @endif
 
-                        <!-- Date Start -->
-                        <div class="space-y-1">
-                            <label for="start_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.from_date') }}</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                </span>
-                                <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}" 
-                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm h-[42px]">
-                            </div>
-                        </div>
-
-                        <!-- Date End -->
-                        <div class="space-y-1">
-                            <label for="end_date" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.to_date') }}</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                </span>
-                                <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}" 
-                                    class="form-input pl-10 block w-full rounded-lg border-secondary-300 focus:ring-primary-500 focus:border-primary-500 text-sm h-[42px]">
+                        <!-- Date Range -->
+                        <div class="space-y-1 flatpickr-range-container col-span-1 md:col-span-2 lg:col-span-1">
+                            <label for="date_range" class="text-xs font-semibold text-secondary-600 uppercase tracking-wider">{{ __('ui.date_range') }}</label>
+                            <div class="relative group">
+                                <input type="text" id="date_range" name="date_range"
+                                       class="range-picker-input w-full pl-10 pr-4 py-2 text-sm bg-white border-secondary-300 rounded-lg text-secondary-900 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all cursor-pointer placeholder:text-secondary-400 h-[42px]"
+                                       placeholder="{{ __('ui.select_date_range') }}">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-secondary-400 group-focus-within:text-primary-500 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                </div>
+                                <input type="hidden" name="start_date" id="start_date" class="range-start" value="{{ request('start_date') }}">
+                                <input type="hidden" name="end_date" id="end_date" class="range-end" value="{{ request('end_date') }}">
                             </div>
                         </div>
 
@@ -275,7 +266,7 @@
                                         @if($log->properties && count($log->properties) > 0)
                                             <button @click="viewActivityDetails({{ $log->id }})" 
                                                     class="p-2 text-secondary-400 hover:text-primary-600 transition-colors rounded-full hover:bg-primary-50 text-eye-btn"
-                                                    title="Lihat Detail Perubahan">
+                                                    title="{{ __('ui.view_change_detail') }}">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                             </button>
                                         @endif
@@ -336,7 +327,7 @@
                             @if($log->properties && count($log->properties) > 0)
                                 <button @click="viewActivityDetails({{ $log->id }})" 
                                         class="px-3 py-1.5 text-sm font-semibold text-primary-600 bg-primary-50 rounded-lg hover:bg-primary-100 transition-colors shadow-sm">
-                                    Detail
+                                    {{ __('ui.detail') }}
                                 </button>
                             @endif
                         </div>
@@ -375,8 +366,5 @@
     </style>
         </div>
     </div>
+    <x-flatpickr />
 </x-app-layout>
-
-
-
-

@@ -3,7 +3,9 @@ import './custom.js';
 import './realtime-inventory.js'; // Real-time inventory updates
 
 import Alpine from 'alpinejs';
+import collapse from '@alpinejs/collapse';
 
+Alpine.plugin(collapse);
 window.Alpine = Alpine;
 
 
@@ -22,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         targetEl.removeAttribute('title');
 
         tooltipEl = document.createElement('div');
-        tooltipEl.className = 'fixed z-[99999] px-2.5 py-1.5 text-xs font-semibold text-white bg-slate-900 rounded-lg shadow-xl pointer-events-none transform scale-95 opacity-0 transition-all duration-150 ease-out whitespace-nowrap border border-slate-700';
+        tooltipEl.className = 'fixed z-[99999] px-2.5 py-1.5 text-xs font-semibold text-white bg-secondary-900 rounded-lg shadow-xl pointer-events-none transform scale-95 opacity-0 transition-all duration-150 ease-out whitespace-nowrap border border-secondary-700';
         tooltipEl.innerText = text;
         document.body.appendChild(tooltipEl);
         
@@ -30,9 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
         tooltipEl.style.left = `${rect.left + (rect.width / 2) - (tooltipEl.offsetWidth / 2)}px`;
         tooltipEl.style.top = `${rect.top - tooltipEl.offsetHeight - 8}px`;
         
+        const currentTooltip = tooltipEl;
         requestAnimationFrame(() => {
-            tooltipEl.classList.remove('scale-95', 'opacity-0');
-            tooltipEl.classList.add('scale-100', 'opacity-100');
+            if (currentTooltip) {
+                currentTooltip.classList.remove('scale-95', 'opacity-0');
+                currentTooltip.classList.add('scale-100', 'opacity-100');
+            }
         });
     };
 

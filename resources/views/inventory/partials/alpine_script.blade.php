@@ -77,6 +77,9 @@
 
             // Fungsi untuk refresh tabel histori via AJAX
             refreshHistory() {
+                // Jangan lakukan fetch jika halaman sedang dalam proses berpindah/reload (mencegah session flash terhapus oleh request AJAX)
+                if (window.isPageUnloading) return;
+
                 console.log('🔄 Refreshing activity history...');
                 const url = window.location.href;
                 
