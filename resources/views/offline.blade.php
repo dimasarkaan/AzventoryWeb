@@ -20,24 +20,29 @@
         body {
             font-family: 'Inter', sans-serif;
             background: radial-gradient(circle at top right, #eff6ff 0%, #f8fafc 100%);
+            background-attachment: fixed;
             color: #1e293b;
             margin: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
+            min-height: 100dvh;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         /* Background Decorations */
         .blob {
-            position: absolute;
+            position: fixed;
             width: 500px;
             height: 500px;
             background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
             filter: blur(80px);
             border-radius: 50%;
             z-index: -1;
+            pointer-events: none;
         }
         .blob-1 { top: -100px; right: -100px; }
         .blob-2 { bottom: -100px; left: -100px; }
@@ -48,12 +53,21 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 2rem;
-            padding: 3rem 2rem;
+            padding: 2.5rem 1.5rem;
             max-width: 440px;
-            width: 90%;
+            width: 100%;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
             animation: slideUp 0.6s ease-out;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (min-width: 640px) {
+            .glass-card {
+                padding: 3rem 2rem;
+            }
         }
 
         @keyframes slideUp {

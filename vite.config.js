@@ -24,8 +24,24 @@ export default defineConfig({
                 additionalManifestEntries: [
                     { url: '/offline', revision: null }
                 ],
-                navigateFallback: '/offline',
+                // navigateFallback DIHAPUS — agar SW tidak redirect semua navigasi ke /offline
+                // Fallback ke /offline hanya terjadi saat network benar-benar gagal (via runtimeCaching)
+                navigateFallback: null,
                 runtimeCaching: [
+                    {
+                        // Navigasi halaman: coba network dulu, fallback ke /offline hanya jika gagal
+                        urlPattern: ({request}) => request.mode === 'navigate',
+                        handler: 'NetworkOnly',
+                        options: {
+                            plugins: [
+                                {
+                                    handlerDidError: async () => {
+                                        return caches.match('/offline');
+                                    }
+                                }
+                            ]
+                        }
+                    },
                     {
                         urlPattern: /\/offline$/,
                         handler: 'NetworkFirst',
@@ -44,7 +60,7 @@ export default defineConfig({
                             cacheName: 'google-fonts-cache',
                             expiration: {
                                 maxEntries: 10,
-                                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                                maxAgeSeconds: 60 * 60 * 24 * 365 // <= 365 days
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]
@@ -58,7 +74,7 @@ export default defineConfig({
                             cacheName: 'gstatic-fonts-cache',
                             expiration: {
                                 maxEntries: 10,
-                                maxAgeSeconds: 60 * 60 * 24 * 365 // <== 365 days
+                                maxAgeSeconds: 60 * 60 * 24 * 365 // <= 365 days
                             },
                             cacheableResponse: {
                                 statuses: [0, 200]

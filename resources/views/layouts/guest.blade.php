@@ -168,7 +168,7 @@
             </div>
 
             <!-- Right Side - Form -->
-            <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-background">
+            <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-8 bg-background">
                 <div class="w-full max-w-md">
                      <!-- Mobile Logo (Visible only on small screens) -->
                     <div class="flex lg:hidden justify-center mb-8">

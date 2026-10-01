@@ -1,4 +1,4 @@
-﻿@component('mail::message')
+﻿﻿@component('mail::message')
 # Laporan Bulanan: {{ $monthName }}
 
 Halo {{ $user->name }},
@@ -7,7 +7,7 @@ Berikut kami sampaikan laporan kinerja dan rekapitulasi sistem **Azventory** And
 
 @if(!empty($summary))
 @component('mail::panel')
-### ðŸ“Š Ringkasan Dasbor
+### 📊 Ringkasan Dasbor
 
 <table width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Inter', sans-serif;">
     <tr>
