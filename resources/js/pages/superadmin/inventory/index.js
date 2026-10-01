@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 // 7. Pagination sudah ter-include di dalam data.desktop dan data.mobile
-                // (tidak perlu inject terpisah â€” akan menimpa wrapper styling yang benar)
+                // (tidak perlu inject terpisah - akan menimpa wrapper styling yang benar)
 
                 // 8. Event delegation handles pagination listeners automatically.
 
@@ -584,10 +584,10 @@ window.confirmInventoryForceDelete = function (event) {
 };
 
 /**
- * confirmDelete â€” Soft-delete dengan undo countdown 5 detik.
+ * confirmDelete - Soft-delete dengan undo countdown 5 detik.
  * Item baris disembunyikan langsung, lalu toast tampil dengan tombol "Batalkan".
- * Jika dibatalkan â†’ baris muncul kembali, form TIDAK dikirim.
- * Jika 5 detik berlalu â†’ form di-submit ke server (soft-delete).
+ * Jika dibatalkan -> baris muncul kembali, form TIDAK dikirim.
+ * Jika 5 detik berlalu -> form di-submit ke server (soft-delete).
  */
 window.confirmDelete = function (event) {
     event.preventDefault();

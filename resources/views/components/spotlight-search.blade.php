@@ -1,4 +1,4 @@
-﻿<div 
+<div 
     x-data="{ 
         open: false, 
         query: '', 
@@ -266,7 +266,7 @@
             <div class="hidden lg:flex flex-wrap items-center bg-gray-50 px-4 py-2.5 text-xs text-gray-500">
                <span class="mx-1 font-medium text-gray-900">{{ __('ui.search_enter') }}</span>
                {{ __('ui.search_select') }}
-               <span class="mx-1 ml-3 font-medium text-gray-900">â†‘â†“</span>
+               <span class="mx-1 ml-3 font-medium text-gray-900">&uarr;&darr;</span>
                {{ __('ui.search_navigate') }}
                <span class="mx-1 ml-3 font-medium text-gray-900">{{ __('ui.search_esc') }}</span>
                {{ __('ui.search_close') }}

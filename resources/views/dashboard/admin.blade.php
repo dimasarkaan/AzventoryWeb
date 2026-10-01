@@ -1,5 +1,5 @@
-﻿{{-- ================================================================
-     DASHBOARD ADMIN â€” AzventoryWeb
+{{-- ================================================================
+    DASHBOARD ADMIN - AzventoryWeb
      resources/views/dashboard/admin.blade.php
 
      Scope:
@@ -126,7 +126,7 @@
                         </button>
 
                         <span class="ml-auto text-xs text-secondary-400 hidden sm:block">
-                            Data: {{ \Carbon\Carbon::parse($start)->format('d M Y') }} â€” {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
+                            Data: {{ \Carbon\Carbon::parse($start)->format('d M Y') }} - {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
                         </span>
                     </div>
 
@@ -1134,7 +1134,7 @@
                                 const masuk  = ctx.find(c => c.datasetIndex === 0)?.parsed.y ?? 0;
                                 const keluar = ctx.find(c => c.datasetIndex === 1)?.parsed.y ?? 0;
                                 const net = masuk - keluar;
-                                return [`  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`, `  Net Stok: ${net >= 0 ? '+' : ''}${net.toLocaleString('id-ID')} unit`];
+                                return [`  ─────────────────`, `  Net Stok: ${net >= 0 ? '+' : ''}${net.toLocaleString('id-ID')} unit`];
                             }
                         }
                     }

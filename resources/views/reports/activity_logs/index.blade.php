@@ -333,7 +333,7 @@
                         </div>
 
                         <div class="text-xs text-secondary-400 text-right">
-                            {{ $log->created_at->format('d M Y â€¢ H:i:s') }}
+                            {{ $log->created_at->format('d M Y') }} &bull; {{ $log->created_at->format('H:i:s') }}
                         </div>
                     </div>
                 @empty

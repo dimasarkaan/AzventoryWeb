@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     @include('dashboard.partials.dashboard-styles')
 @include('dashboard._superadmin_scripts')
     <div class="py-6">
@@ -192,7 +192,7 @@
 
                         {{-- Indikator rentang tanggal aktif --}}
                         <span class="ml-auto text-xs text-secondary-400 hidden sm:block">
-                            {{ __('ui.data_range') }} {{ \Carbon\Carbon::parse($start)->format('d M Y') }} â€” {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
+                            {{ __('ui.data_range') }} {{ \Carbon\Carbon::parse($start)->format('d M Y') }} - {{ \Carbon\Carbon::parse($end)->format('d M Y') }}
                         </span>
                     </div>
 
@@ -1069,7 +1069,7 @@
             const updateTrend = (el, val) => {
                 if (!el) return;
                 if (val === undefined || val === null) { el.textContent = ''; return; }
-                const prefix = val > 0 ? 'â†‘' : (val < 0 ? 'â†“' : '');
+                const prefix = val > 0 ? '↑' : (val < 0 ? '↓' : '');
                 el.textContent = `${prefix} ${Math.abs(val)}%`;
                 el.className = `text-[10px] ml-1 font-bold ${val >= 0 ? 'text-emerald-600' : 'text-red-600'}`;
             };
@@ -1273,7 +1273,7 @@
                                 const keluar = ctx.find(c => c.datasetIndex === 1)?.parsed.y ?? 0;
                                 const net = masuk - keluar;
                                 const prefix = net >= 0 ? '+' : '';
-                                return [`â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€`, `Net Stok: ${prefix}${net.toLocaleString('id-ID')} unit`];
+                                return [`─────────────────`, `Net Stok: ${prefix}${net.toLocaleString('id-ID')} unit`];
                             }
                         }
                     }

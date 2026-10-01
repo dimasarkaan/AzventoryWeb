@@ -268,7 +268,7 @@
         </div>
     </div>
 
-    <!-- Bulk Actions â€” Sticky bottom bar -->
+    <!-- Bulk Actions - Sticky bottom bar -->
     @if($pendingApprovals->isNotEmpty() && request('status', 'pending') === 'pending')
     <div id="bulk-actions-container" class="hidden fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 z-50 bg-white/95 backdrop-blur-md rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-secondary-200 p-2 sm:p-3 animate-fade-in-up items-center justify-center gap-2 sm:gap-4 w-auto max-w-[95vw]">
         <!-- Left Side: Selection Count & Clear -->

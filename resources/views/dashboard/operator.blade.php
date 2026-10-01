@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="operatorDashboardData()">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -53,7 +53,7 @@
                 </div>
 
             {{-- ================================================================
-                 STAT CARDS â€” Bento Workspace Style
+                 STAT CARDS - Bento Workspace Style
                  Referensi: ui-ux-pro-max / Bento Grids + Executive Dashboard
                  ================================================================ --}}
             @php
@@ -410,13 +410,13 @@
 
             {{-- ================================================================
                  BOTTOM SECTION (3 Columns)
-                 Skill: Bento Grids â€” rounded-[20px], soft bg, subtle border
+                 Skill: Bento Grids - rounded-[20px], soft bg, subtle border
                  UX Rules: no emoji, no layout-shift hover, 8px+ gap between items
                  ================================================================ --}}
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
 
-                {{-- Card 1: Sering Anda Pinjam â€” Leaderboard Style --}}
-                {{-- Ref: Sales Intelligence Dashboard â€” rank-1: gold, rank-2: silver, rank-3: bronze --}}
+                {{-- Card 1: Sering Anda Pinjam - Leaderboard Style --}}
+                {{-- Ref: Sales Intelligence Dashboard - rank-1: gold, rank-2: silver, rank-3: bronze --}}
                 <div class="card flex flex-col overflow-hidden shadow-soft border-none">
                     {{-- Header: konsisten dengan card lain (plain white + icon + title + subtitle) --}}
                     <div class="border-b border-secondary-100 px-5 py-3 flex items-center gap-3 bg-white flex-shrink-0">
@@ -515,7 +515,7 @@
                                 @endif
                             </div>
                         </div>
-                        {{-- Stat row pinned di bawah â€” isi ruang bawah yg kosong --}}
+                        {{-- Stat row pinned di bawah - isi ruang bawah yg kosong --}}
                         <div class="border-t border-secondary-100 px-5 py-2.5 grid grid-cols-3 gap-2 bg-secondary-50/40">
                             <div class="text-center">
                                 <p class="text-sm font-black text-secondary-900 tabular-nums">{{ $trustScore }}%</p>
@@ -564,7 +564,7 @@
                             <div class="divide-y divide-secondary-50">
                                 <template x-for="log in activityLogs.slice(0, 4)" :key="log.id || Math.random()">
                                     <div class="flex items-center gap-3 px-4 py-2.5 hover:bg-secondary-50/60 transition-colors duration-150">
-                                        {{-- Icon dot â€”  color badge, no scale transform --}}
+                                        {{-- Icon dot -  color badge, no scale transform --}}
                                         <div class="size-8 rounded-lg flex items-center justify-center flex-shrink-0"
                                              :class="{
                                                 'bg-success-50 text-success-600': log.action_lower.includes('tambah') || log.action_lower.includes('create') || log.action_lower.includes('masuk'),
